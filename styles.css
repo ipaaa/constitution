@@ -1,0 +1,301 @@
+:root {
+    --bg-light: #fdfdfb;
+    --text-main: #2d3436;
+    --accent-blue: #00cec9;
+    --accent-orange: #fab1a0;
+    --accent-yellow: #ffeaa7;
+    --accent-green: #55efc4;
+    --vibrant-pink: #fd79a8;
+    --card-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    --border-radius-lg: 24px;
+    --border-radius-sm: 12px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-light);
+    color: var(--text-main);
+    font-family: 'Inter', 'Noto Sans TC', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 30px;
+}
+
+/* Header */
+.main-header {
+    background: white;
+    padding: 20px 0;
+    border-bottom: 2px solid #f1f1f1;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 30px;
+}
+
+.brand h1 {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: var(--text-main);
+}
+
+.trending-tag {
+    background: var(--vibrant-pink);
+    color: white;
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    vertical-align: middle;
+    margin-left: 5px;
+}
+
+.logo-text h2 {
+    font-size: 0.95rem;
+    color: #636e72;
+    margin-top: 4px;
+}
+
+.search-bar-mimic {
+    flex-grow: 1;
+    max-width: 400px;
+    background: #f1f2f6;
+    padding: 10px 20px;
+    border-radius: 30px;
+    display: flex;
+    justify-content: space-between;
+    color: #a4b0be;
+    font-size: 0.9rem;
+    cursor: text;
+}
+
+.gov-badge {
+    text-align: right;
+}
+
+.gov-text { font-weight: 800; color: var(--accent-blue); font-size: 1.1rem; }
+.gov-desc { font-size: 0.7rem; color: #b2bec3; }
+
+/* Hero Layout & Mascot */
+.hero-layout {
+    padding: 60px 0;
+}
+
+.mascot-introduction {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    margin-bottom: 80px;
+    background: white;
+    padding: 40px;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--card-shadow);
+    position: relative;
+    border: 3px solid var(--accent-yellow);
+}
+
+.main-mascot {
+    width: 180px;
+    height: auto;
+    filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1));
+    animation: floating 3s ease-in-out infinite;
+}
+
+@keyframes floating {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.mascot-speech {
+    background: #f9f9f9;
+    padding: 25px;
+    border-radius: var(--border-radius-sm);
+    position: relative;
+    font-size: 1.15rem;
+    font-weight: 500;
+    color: #4b4b4b;
+}
+
+.mascot-speech::before {
+    content: '';
+    position: absolute;
+    left: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-width: 10px 10px;
+    border-style: solid;
+    border-color: transparent #f9f9f9 transparent transparent;
+}
+
+/* Grid & Articles */
+.grid-title {
+    font-size: 1.8rem;
+    font-weight: 900;
+    margin-bottom: 40px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.badge {
+    font-size: 0.8rem;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: var(--accent-blue);
+    color: white;
+}
+
+.badge.ngo { background: var(--accent-orange); }
+
+.articles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 30px;
+    margin-bottom: 800px; /* Large space for testing */
+    margin-bottom: 80px;
+}
+
+.article-card {
+    background: white;
+    padding: 30px;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s;
+    border: 2px solid transparent;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.article-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--accent-blue);
+}
+
+.card-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #b2bec3;
+    font-weight: 600;
+}
+
+.type-tag {
+    color: var(--accent-blue);
+    text-transform: uppercase;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--text-main);
+    line-height: 1.4;
+}
+
+.author-info {
+    font-size: 0.9rem;
+    color: #636e72;
+}
+
+.card-summary {
+    font-size: 0.95rem;
+    color: #636e72;
+}
+
+.btn-read {
+    margin-top: auto;
+    background: var(--accent-blue);
+    color: white;
+    padding: 10px 12px;
+    border-radius: 30px;
+    text-align: center;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: background 0.3s;
+}
+
+.btn-read:hover { background: #00b5b5; }
+
+/* NGO Section */
+.ngo-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.ngo-card {
+    background: #fff;
+    padding: 25px;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid #eee;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.ngo-card:hover {
+    box-shadow: var(--card-shadow);
+    transform: translateY(-5px);
+}
+
+.ngo-logo {
+    font-weight: 900;
+    font-size: 1.5rem;
+    color: var(--accent-orange);
+    margin-bottom: 15px;
+}
+
+.ngo-content h4 { font-size: 1.1rem; margin-bottom: 10px; }
+.ngo-content p { font-size: 0.85rem; color: #636e72; margin-bottom: 20px; }
+
+.btn-reel {
+    display: inline-block;
+    background: #f1f2f6;
+    padding: 8px 15px;
+    border-radius: 20px;
+    text-decoration: none;
+    color: var(--text-main);
+    font-weight: 700;
+    font-size: 0.8rem;
+}
+
+/* Footer */
+.site-footer {
+    background: #2d3436;
+    color: white;
+    padding: 40px 0;
+    margin-top: 100px;
+    text-align: center;
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.footer-links a {
+    color: var(--accent-blue);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+@media (max-width: 800px) {
+    .mascot-introduction { flex-direction: column; text-align: center; }
+    .mascot-speech::before { display: none; }
+    .ngo-cards { grid-template-columns: 1fr; }
+}
