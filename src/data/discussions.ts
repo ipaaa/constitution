@@ -1,0 +1,71 @@
+export type DiscussionCategory = 'Scholar Articles' | 'NGO Reports' | 'Reels';
+
+export type DiscussionItem = {
+  id: string;
+  category: DiscussionCategory;
+  title: string;
+  author: string;
+  year: string;
+  abstract: string;
+  link: string;
+  views?: number;
+};
+
+export const DISCUSSIONS_DATA: DiscussionItem[] = [
+  {
+    id: '1',
+    category: 'NGO Reports',
+    title: '國會擴權法案憲法法庭判決評析',
+    author: '民間司法改革基金會',
+    year: '2024',
+    abstract: '針對立法院職權行使法修法引發的釋憲案，探討「藐視國會罪」等核心爭議對權力分立的影響與憲法法庭的核心見解。',
+    link: 'https://www.jrf.org.tw/',
+  },
+  {
+    id: '2',
+    category: 'Scholar Articles',
+    title: '死刑合憲性審查與「情節最重大之罪」',
+    author: '法律白話文運動',
+    year: '2024',
+    abstract: '憲法法庭113年憲判字第8號判決深入解析：死刑雖然合憲，但實質限縮了適用範圍。這對台灣法制有何深遠影響？',
+    link: 'https://plainlaw.me/',
+  },
+  {
+    id: '3',
+    category: 'NGO Reports',
+    title: '從釋憲案看台灣婚姻平權的下一步',
+    author: '伴侶盟',
+    year: '2023',
+    abstract: '回顧748號解釋以來，兩岸同婚、跨國同婚在行政與司法上的突破與後續修法倡議。',
+    link: 'https://tapcpr.org/',
+  },
+  {
+    id: '4',
+    category: 'Scholar Articles',
+    title: '原住民狩獵權與野生動物保育之衝突',
+    author: '公視新聞網',
+    year: '2021',
+    abstract: '110年憲判字解析：王光祿案引發的文化權與環境權之爭，憲法法庭如何平衡原住民傳統文化與現代保育觀念。',
+    link: 'https://news.pts.org.tw/',
+  },
+  {
+    id: '5',
+    category: 'Reels',
+    title: '1分鐘看懂114年憲判字第1號！',
+    author: '司改會',
+    year: '2025',
+    abstract: '快速了解最新判決的5個重點，不再被複雜的法律用語卡住！',
+    views: 45600,
+    link: 'https://www.facebook.com/reel/1702284921181677',
+  },
+  {
+    id: '6',
+    category: 'Reels',
+    title: '什麼是「暫時處分」？',
+    author: '法操FOLLAW',
+    year: '2024',
+    abstract: '大法官出手喊卡！暫時處分的威力在哪裡？30秒法學小教室。',
+    views: 12800,
+    link: '#',
+  }
+];
