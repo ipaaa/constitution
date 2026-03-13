@@ -1,24 +1,25 @@
 const DISCUSSIONS_DATA = [
     {
-        "author": "黃丞儀",
-        "title": "台灣民主的潘朵拉盒子 —— 憲法法庭面臨的正當性危機",
-        "date": "2025/12/30",
-        "summary": "分析憲法法庭在政治與法律拉扯中的正當性挑戰。",
-        "type": "深度評論"
+        tag: "司改會",
+        title: "司改會",
+        desc: "司改會憲庭協助策警察的短影者，因此有祕會文流會飽的文法重訓議。",
+        linkText: "觀看短影音 >",
+        link: "https://www.facebook.com/reel/1702284921181677"
     },
     {
-        "author": "蘇彥圖",
-        "title": "《114年憲判字第1號判決》的艱難：一個初步的評論",
-        "date": "2026/1/2",
-        "summary": "針對本次判決的程序難點與法律解釋進行初步反思。",
-        "type": "專業短評"
+        tag: "法白",
+        title: "法白",
+        desc: "法白憲庭教育幾者，加人學看知識，法官遊白影響。",
+        linkText: "查看貼文 >",
+        link: "#"
     },
     {
-        "author": "張娟芬",
-        "title": "憲法法庭，歡迎回來 —— 兼評114年憲判字第1號判決",
-        "date": "2026/1/14",
-        "summary": "專欄評述憲法法庭的回歸與本次判決的實質意義。",
-        "type": "專欄文章"
+        tag: "經民連",
+        title: "經民連",
+        desc: "經民連主要外流程，講座政府的讓人誰言，並組同期不關察，官看更新的績。",
+        linkText: "查看貼文 >",
+        link: "#"
+    },
     {
         tag: "憲法法庭",
         title: "憲法法庭",
@@ -28,30 +29,28 @@ const DISCUSSIONS_DATA = [
     }
 ];
 
-document.addEventListener('DOMContentLoaded', () => {
-    renderArticles(DISCUSSIONS_DATA);
-});
-
-function renderArticles(data) {
+function renderArticles() {
     const container = document.getElementById('articles-container');
     if (!container) return;
-    container.innerHTML = '';
 
-    data.forEach(item => {
+    // We keep the first static card in HTML and append the dynamic ones
+    DISCUSSIONS_DATA.forEach(item => {
         const card = document.createElement('div');
-        card.className = 'article-card';
+        card.className = 'content-card';
+        
         card.innerHTML = `
-            <div class="card-meta">
-                <span class="type-tag">${item.type}</span>
-                <span class="date">${item.date}</span>
+            <div class="tag-badge">${item.tag}</div>
+            <div class="card-title-box">
+                <h3>${item.title}</h3>
             </div>
-            <h4 class="card-title">${item.title}</h4>
-            <div class="author-info">
-                <strong>作者：${item.author}</strong>
+            <div class="card-desc">
+                <p>${item.desc}</p>
             </div>
-            <p class="card-summary">${item.summary}</p>
-            <a href="#" class="btn-read">閱讀全文 →</a>
+            <a href="${item.link}" target="_blank" class="btn-more">${item.linkText}</a>
         `;
+        
         container.appendChild(card);
     });
 }
+
+document.addEventListener('DOMContentLoaded', renderArticles);
