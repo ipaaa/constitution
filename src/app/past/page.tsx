@@ -44,7 +44,7 @@ export default function PastTrack() {
   const progressPercentage = activeIndex >= 0 ? (activeIndex / (HISTORY_DATA.length - 1)) * 100 : 0;
 
   return (
-    <div className="w-full bg-[var(--color-textbook-bg)] text-[var(--color-textbook-text)] font-sans overflow-x-hidden min-h-screen">
+    <div className="w-full bg-[var(--color-textbook-bg)] text-[var(--color-textbook-text)] font-sans min-h-screen">
       
       {/* Intro Section */}
       <section className="h-screen flex flex-col items-center justify-center text-center px-6 relative">
@@ -85,7 +85,7 @@ export default function PastTrack() {
                     </h2>
                     <p 
                       className="text-xl leading-[1.8] text-[#3A3A3A] mb-5"
-                      dangerouslySetInnerHTML={{ __html: item.textbook.content }}
+                      dangerouslySetInnerHTML={{ __html: item.textbook.content as string }}
                     />
                     <div className="font-[Caveat] text-[#1565C0] text-3xl -rotate-3 inline-block mt-3 font-bold">
                       {item.textbook.handwriting}
