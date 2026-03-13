@@ -1,35 +1,36 @@
-# 憲庭加好友 add C0urt
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-「憲庭加好友 add C0urt」是一個專注於憲政知識數位化的公民科技平台，旨在以年輕、彩色且易於理解的方式，整理並呈現憲法法庭的最新議題與學界討論。
+## Getting Started
 
-此專案目前聚焦於 **114年憲判字第1號判決**（2025年憲判字第1號）的相關議論。
+First, run the development server:
 
-**實體預覽**: [https://ipaaa.github.io/constitution/](https://ipaaa.github.io/constitution/)
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-## 🌟 亮點功能
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-- **年輕化視覺設計**：採用充滿活力的色彩與現代化的卡片式佈局，打破法律嚴肅、枯燥的刻板印象。
-- **擬人化角色：貓頭鷹法官**：由可愛的貓頭鷹法官帶領使用者探索法律世界，讓專業知識更具親和力。
-- **響應式佈局**：支援手機與桌面裝置瀏覽。
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-## 🛠️ 技術堆棧
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-- **Frontend**: HTML5, Vanilla CSS3 (CSS Grid & Flexbox), Vanilla JavaScript (ES6+).
-- **Assets**: 高畫質貓頭鷹法官形象圖（AI 生成）。
+## Learn More
 
-## 🚀 快速開始
+To learn more about Next.js, take a look at the following resources:
 
-1. **複製專案**：
-   ```bash
-   git clone https://github.com/ipaaa/constitution.git
-   ```
-2. **運行專案**：
-   直接在瀏覽器中打開 `index.html` 即可，無需任何後端設定。
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-## 📖 專案背景
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-本專案源自於 g0v 零時政府的協作提案，並根據「憲法法庭黑客松提案」文件進行實作。目標是讓公民能更輕鬆地追蹤憲法法庭的動態，強化民主討論的正當性與參與度。
+## Deploy on Vercel
 
----
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-*Made with ❤️ for the g0v community.*
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
