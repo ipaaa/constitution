@@ -1,52 +1,88 @@
 export type HistoryEvent = {
   id: string;
-  year: string;
-  title: string;
-  description: string;
-  type: 'milestone' | 'conflict' | 'resolution';
+  textbook: {
+    chapter: string;
+    content: React.ReactNode | string;
+    handwriting: string;
+  };
+  reality: {
+    year: string;
+    title: string;
+    ruling: string;
+    bgImage: string;
+  };
 };
 
+// Using raw HTML string for the content to support the specific highlight span requested
 export const HISTORY_DATA: HistoryEvent[] = [
   {
     id: 'h1',
-    year: '1947',
-    title: '中華民國憲法頒布',
-    description: '在中國大陸時期制定，隨後政府遷台。這部憲法在那時的台灣社會，與真實的政治運作產生了巨大的落差。',
-    type: 'milestone',
+    textbook: {
+      chapter: '第六課：民主政治與選舉',
+      content: '我國實行民主共和，主權在民。人民有權透過<span class="textbook-highlight">自由、平等的定期選舉</span>，選出中央與地方公職人員，落實責任政治與政黨政治的理念。',
+      handwriting: '但曾經，國會議員是不用改選的！'
+    },
+    reality: {
+      year: '1990',
+      title: '你能親手選出新國會，終結萬年國代。',
+      ruling: '野百合學運・釋字第 261 號・終結中央民意代表無限期延任',
+      bgImage: 'https://images.unsplash.com/photo-1596701192534-77db54be22b9?q=80&w=2070&auto=format&fit=crop'
+    }
   },
   {
     id: 'h2',
-    year: '1948 - 1991',
-    title: '動員戡亂與戒嚴時期',
-    description: '動員戡亂時期臨時條款凍結了部分憲法條文，台灣進入長達四十年的戒嚴。憲法保障的言論、結社自由被大幅限制。',
-    type: 'conflict',
+    textbook: {
+      chapter: '第十章：基本人權保障 (言論自由)',
+      content: '憲法第十一條規定人民有言論、講學、著作及出版之自由。國家應給予最大限度之維護，俾其實現自我、溝通意見、追求真理及監督各種政治或社會活動之功能得以發揮。',
+      handwriting: '以前說實話可能會被抓去關？'
+    },
+    reality: {
+      year: '1991',
+      title: '你不再因為思想不同而被判定為叛亂罪。',
+      ruling: '廢除刑法100條運動・保障和平表達政治異議的自由',
+      bgImage: 'https://images.unsplash.com/photo-1552872673-9b7b99711ebb?q=80&w=2070&auto=format&fit=crop'
+    }
   },
   {
     id: 'h3',
-    year: '1990',
-    title: '野百合學運',
-    description: '學生聚集在中正紀念堂，要求解散國民大會、廢除臨時條款。這是台灣社會對「回歸憲政」最巨大的怒吼。',
-    type: 'conflict',
+    textbook: {
+      chapter: '第十章：基本人權保障 (集會結社)',
+      content: '我國憲法第十四條規定：「人民有集會及結社之自由。」這代表公民基於共同目的，有權<span class="textbook-highlight">和平集會、遊行表達訴求</span>，國家不得任意限制。',
+      handwriting: '以前上街頭會先被當罪犯？'
+    },
+    reality: {
+      year: '1998',
+      title: '你走上街頭抗議、不必先被當成罪犯。',
+      ruling: '釋字第 445 號・確立集會遊行是受憲法保障的基本權利',
+      bgImage: 'https://images.unsplash.com/photo-1529144415895-6aaf8be872fb?q=80&w=2034&auto=format&fit=crop'
+    }
   },
   {
     id: 'h4',
-    year: '1991 - 2005',
-    title: '七次修憲：臺灣民主化',
-    description: '透過七次修憲，廢除臨時條款、國會全面改選、總統直選，逐步將這部憲法修改為符合台灣現狀的民主架構。',
-    type: 'resolution',
+    textbook: {
+      chapter: '第十二章：多元社會與平權',
+      content: '憲法第七條明定：「中華民國人民，無分男女、宗教、種族、階級、黨派，在法律上一律平等。」現代社會更應保障<span class="textbook-highlight">不同性傾向者的婚姻自由</span>。',
+      handwriting: '🌈 必考：釋字748號！'
+    },
+    reality: {
+      year: '2017',
+      title: '你身邊的同志朋友可以合法結婚。',
+      ruling: '釋字第 748 號・確認婚姻自由不應因性傾向而被排除',
+      bgImage: 'https://images.unsplash.com/photo-1562214691-88df5e8c156f?q=80&w=2070&auto=format&fit=crop'
+    }
   },
   {
     id: 'h5',
-    year: '2017',
-    title: '釋字第748號：婚姻平權',
-    description: '大法官宣告民法未保障同性婚姻違憲。憲法不再只是冷冰冰的條文，而是真實保護少數群體權利的盾牌。',
-    type: 'milestone',
-  },
-  {
-    id: 'h6',
-    year: '2024',
-    title: '國會職權修法爭議',
-    description: '立法院通過職權行使法修正案，引發「擴權」爭議與青鳥行動。憲法法庭再次成為解決國家最高權力衝突的最終防線。',
-    type: 'conflict',
+    textbook: {
+      chapter: '第五課：權力分立與制衡',
+      content: '國家權力分為行政、立法、司法、考試、監察，五權分治、平等相維。當機關間發生職權爭議時，應由<span class="textbook-highlight">憲法法庭</span>作為最終的仲裁者，以確保憲政機關不越權。',
+      handwriting: '但若仲裁者自己面臨癱瘓呢？'
+    },
+    reality: {
+      year: '2024',
+      title: '最高權力衝突的最終防線，正臨挑戰。',
+      ruling: '國會職權修法爭議・114年憲判字第1號・憲政體制的韌性測試',
+      bgImage: 'https://images.unsplash.com/photo-1505664173622-c324c585ef18?q=80&w=2070&auto=format&fit=crop'
+    }
   }
 ];
