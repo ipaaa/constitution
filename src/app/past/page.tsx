@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
-import { HISTORY_DATA } from '@/data/history';
+import HISTORY_DATA from '@/data/history.json';
 import Link from 'next/link';
 import { ArrowDown } from 'lucide-react';
 

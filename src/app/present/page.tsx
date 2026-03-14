@@ -1,5 +1,20 @@
-import { DISCUSSIONS_DATA, DiscussionItem } from '@/data/discussions';
+import _DISCUSSIONS_DATA from '@/data/discussions.json';
 import { Search, ExternalLink, Play } from 'lucide-react';
+
+export type DiscussionCategory = 'Scholar Articles' | 'NGO Reports' | 'Reels';
+
+export type DiscussionItem = {
+  id: string;
+  category: DiscussionCategory;
+  title: string;
+  author: string;
+  year: string;
+  abstract: string;
+  link: string;
+  views?: number;
+};
+
+const DISCUSSIONS_DATA = _DISCUSSIONS_DATA as DiscussionItem[];
 
 const ScholarCard = ({ item }: { item: DiscussionItem }) => {
   const domain = item.link.startsWith('http') ? new URL(item.link).hostname : 'scholar.org';

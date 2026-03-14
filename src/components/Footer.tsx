@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Github, FileText } from 'lucide-react';
+import { Github, FileText, AlertCircle } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -28,6 +28,11 @@ export default function Footer() {
               <li>
                 <a href="https://github.com/g0v/Welcome-to-Add-C0urt" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition-colors flex items-center gap-2">
                   <Github size={16} /> GitHub 原始碼
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-red-500 transition-colors flex items-center gap-2 text-gray-400">
+                  <AlertCircle size={16} /> 內容錯誤回報 (Feedback)
                 </a>
               </li>
             </ul>

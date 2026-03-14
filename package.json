@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "sync-content": "node scripts/sync-content.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.577.0",
