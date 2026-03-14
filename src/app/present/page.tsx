@@ -1,92 +1,95 @@
 import { DISCUSSIONS_DATA, DiscussionItem } from '@/data/discussions';
-import { Search, ExternalLink, Play, BookOpen, FileText } from 'lucide-react';
+import { Search, ExternalLink, Play } from 'lucide-react';
 
 const ScholarCard = ({ item }: { item: DiscussionItem }) => (
-  <div className="bg-white rounded-3xl p-7 shadow-sm border-t-4 border-t-midnight border-x border-b border-black/5 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
-    <div className="flex justify-between items-start mb-5">
-      <span className="inline-flex items-center gap-1.5 text-midnight text-xs font-bold uppercase tracking-widest">
-        <BookOpen size={14} /> 學者觀點
-      </span>
-      <span className="text-xs font-bold text-gray-400 font-sans">{item.year}</span>
+  <div className="bg-white border border-gray-200 p-6 shadow-sm rounded-sm flex-1 hover:shadow-md transition-shadow flex flex-col h-full group">
+    <div className="flex justify-between items-start mb-4">
+      <div className="text-xs font-bold text-gray-500 uppercase tracking-wider">學者專欄</div>
+      <span className="text-xs font-mono text-gray-400">{item.year}</span>
     </div>
-    <h3 className="text-2xl font-bold text-midnight mb-2 line-clamp-2 font-serif leading-snug">{item.title}</h3>
-    <p className="text-sm font-bold text-gray-500 mb-4 uppercase tracking-wide">{item.author}</p>
-    <div className="w-8 h-0.5 bg-gray-200 mb-4" />
+    <h4 className="font-serif font-bold text-2xl mb-3 text-gray-900 line-clamp-2 group-hover:underline">{item.title}</h4>
+    <p className="text-sm font-medium text-gray-500 mb-4">{item.author}</p>
+    <div className="w-full h-px bg-gray-100 mb-4" />
     <p className="text-gray-600 text-[0.95rem] mb-6 flex-grow line-clamp-3 leading-relaxed font-serif text-justify">{item.abstract}</p>
-    <a href={item.link} target="_blank" rel="noopener noreferrer" className="mt-auto inline-flex items-center gap-1.5 text-midnight font-bold text-sm hover:text-royal-purple transition-colors">
-      研讀全文 <ExternalLink size={14} />
-    </a>
+    <div className="mt-auto pt-4 border-t border-gray-50 flex justify-between items-center text-sm font-medium">
+      <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1 group-hover:underline">
+        研讀全文 <ExternalLink size={14} />
+      </a>
+    </div>
   </div>
 );
 
 const NGOCard = ({ item }: { item: DiscussionItem }) => (
-  <div className="bg-sage/5 rounded-3xl p-6 shadow-sm border border-sage/20 hover:border-sage/50 hover:bg-sage/10 hover:-translate-y-1 transition-all duration-300 flex flex-col h-full relative overflow-hidden">
-    <div className="absolute top-0 right-0 w-24 h-24 bg-sage/10 rounded-bl-full -z-10" />
-    <div className="flex justify-between items-center mb-4">
-      <span className="inline-flex items-center gap-1.5 bg-white px-3 py-1 rounded-full text-xs font-bold text-sage border border-sage/20 shadow-sm">
-        <FileText size={14} /> NGO 倡議
-      </span>
-      <span className="text-xs font-bold text-sage/70">{item.year}</span>
+  <div className="bg-white border border-gray-200 p-6 shadow-sm rounded-sm flex-1 hover:shadow-md transition-shadow flex flex-col h-full border-t-4 border-t-[#D32F2F] group">
+    <div className="flex justify-between items-start mb-4">
+      <div className="text-xs font-bold text-[#D32F2F] uppercase tracking-wider">NGO 倡議</div>
+      <span className="text-xs font-mono text-gray-400">{item.year}</span>
     </div>
-    <h3 className="text-xl font-extrabold text-midnight mb-1 line-clamp-2">{item.title}</h3>
-    <p className="text-sm font-bold text-sage mb-3">{item.author}</p>
-    <p className="text-gray-700 text-sm mb-6 flex-grow line-clamp-3 leading-relaxed bg-white/50 p-3 rounded-xl border border-white/60">{item.abstract}</p>
-    <a href={item.link} target="_blank" rel="noopener noreferrer" className="mt-auto block text-center w-full bg-white border border-sage/30 text-sage py-2 rounded-xl font-bold text-sm hover:bg-sage hover:text-white transition-colors">
-      查看報告
-    </a>
+    <h4 className="font-sans font-bold text-2xl mb-3 text-gray-900 line-clamp-2 group-hover:underline">{item.title}</h4>
+    <p className="text-sm font-medium text-[#D32F2F] mb-4">{item.author}</p>
+    <div className="w-full h-px bg-gray-100 mb-4" />
+    <p className="text-gray-600 text-sm mb-6 flex-grow line-clamp-3 leading-relaxed">{item.abstract}</p>
+    <div className="mt-auto pt-4 flex justify-between items-center text-sm font-medium">
+      <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-1 border border-gray-200 px-3 py-1.5 rounded-sm hover:bg-gray-50">
+        查看報告 <ExternalLink size={14} />
+      </a>
+    </div>
   </div>
 );
 
 const ReelCard = ({ item }: { item: DiscussionItem }) => (
-  <div className="bg-midnight rounded-3xl p-1 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full group">
-    <div className="bg-gradient-to-br from-gray-800 to-black rounded-[22px] flex-grow relative overflow-hidden flex flex-col pt-32 p-5 border border-white/10">
-      {/* Play Button Overlay */}
-      <div className="absolute top-12 left-1/2 -translate-x-1/2 w-14 h-14 bg-solar rounded-full flex items-center justify-center text-midnight shadow-[0_0_30px_rgba(247,192,74,0.3)] group-hover:scale-110 group-hover:bg-white transition-all z-10">
-        <Play fill="currentColor" size={24} className="ml-1" />
+  <div className="bg-white border border-gray-200 p-3 shadow-sm rounded-sm hover:shadow-md transition-shadow flex flex-col h-full group">
+    {/* Image / Video frame */}
+    <div className="bg-[#0F0F0F] rounded-sm w-full aspect-[4/5] relative overflow-hidden flex flex-col items-center justify-center border border-gray-300">
+      <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center text-gray-900 shadow-md group-hover:scale-110 group-hover:bg-white transition-transform z-10 cursor-pointer">
+        <Play fill="currentColor" size={20} className="ml-1" />
       </div>
-      
-      {/* Backdrop pattern/image placeholder */}
-      <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-solar/40 via-transparent to-transparent pointer-events-none" />
-      
-      <div className="relative z-10 mt-auto">
-        <div className="flex justify-between items-center mb-2">
-          <span className="inline-flex items-center gap-1 bg-white/10 backdrop-blur-md px-2 py-0.5 rounded text-[10px] font-bold text-white tracking-wider border border-white/10 uppercase">
-            Shorts / Reels
-          </span>
-          {item.views && (
-            <span className="text-xs font-bold text-white/50">{item.views.toLocaleString()} 次觀看</span>
-          )}
+      {/* Subtle overlay info */}
+      <div className="absolute top-3 left-3 flex gap-2">
+        <span className="bg-black/80 backdrop-blur-sm text-white px-2 py-1 text-[10px] font-bold tracking-widest rounded-sm border border-white/20">
+          REELS
+        </span>
+      </div>
+      {item.views && (
+        <div className="absolute top-3 right-3">
+          <span className="text-[10px] font-bold text-white/80 drop-shadow-md">{item.views.toLocaleString()} 觀看</span>
         </div>
-        <h3 className="text-lg font-bold text-white mb-1 line-clamp-2 leading-snug">{item.title}</h3>
-        <p className="text-xs text-white/70 line-clamp-2">{item.abstract}</p>
-      </div>
+      )}
     </div>
     
-    <div className="px-5 py-3 flex justify-between items-center">
-      <span className="text-xs font-bold text-solar">{item.author}</span>
-      <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-white transition-colors p-1">
-        <ExternalLink size={16} />
-      </a>
+    {/* Description below like polaroid */}
+    <div className="px-1 py-3 flex-grow flex flex-col">
+      <h4 className="font-bold text-lg text-gray-900 mb-1 line-clamp-2 leading-snug group-hover:text-blue-600 transition-colors cursor-pointer">{item.title}</h4>
+      <p className="text-xs font-medium text-gray-500 mb-3">{item.author}</p>
+      <div className="mt-auto border-t border-gray-100 pt-3 flex justify-between items-center">
+        <span className="text-xs text-blue-600 font-medium">前往觀看</span>
+        <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gray-900 transition-colors">
+          <ExternalLink size={14} />
+        </a>
+      </div>
     </div>
   </div>
 );
 
 export default function PresentTrack() {
   return (
-    <div className="max-w-7xl mx-auto px-6 py-12 w-full">
+    <div className="max-w-7xl mx-auto px-6 py-12 w-full bg-[#fcfcfc] min-h-screen">
       {/* Search & Filter Bar */}
-      <div className="flex flex-col md:flex-row justify-between items-end md:items-center mb-12 gap-6">
-        <div>
-          <h1 className="text-4xl font-extrabold text-midnight mb-2">Track 2: 現在</h1>
-          <p className="text-gray-600 text-lg font-medium">憲法法庭熱搜榜 | 114年憲判字第1號</p>
+      <div className="flex flex-col md:flex-row justify-between items-end md:items-center mb-12 gap-6 pb-6 border-b border-gray-200">
+        <div className="border-l-4 border-gray-800 pl-4 w-full md:w-auto">
+          <h1 className="text-3xl font-bold text-gray-900 mb-1 flex items-center gap-3">
+            <span className="bg-gray-800 text-white text-xs px-2 py-0.5 rounded-sm uppercase tracking-widest font-mono select-none">Present</span>
+            憲庭熱搜榜
+          </h1>
+          <p className="text-gray-500 font-medium font-serif mt-2 text-lg">114年憲判字第1號 及其延伸觀點探討</p>
         </div>
-        <div className="flex bg-white rounded-full shadow-sm border border-black/5 p-1.5 w-full md:w-96 transition-all focus-within:ring-2 ring-sage/50">
+        <div className="flex bg-white rounded-sm shadow-sm border border-gray-300 w-full md:w-96 transition-all focus-within:border-gray-500 focus-within:shadow-md">
           <input 
             type="text" 
-            placeholder="搜尋關鍵字、法案..." 
-            className="flex-grow bg-transparent px-4 outline-none text-gray-700 font-sans"
+            placeholder="在檔案庫中搜尋關鍵字、法案..." 
+            className="flex-grow bg-transparent px-4 py-3 outline-none text-gray-700 font-sans"
           />
-          <button className="bg-solar text-midnight p-3 rounded-full hover:scale-105 transition-transform shadow-sm">
+          <button className="text-gray-500 hover:text-gray-900 px-4 hover:bg-gray-50 transition-colors border-l border-gray-200">
             <Search size={20} />
           </button>
         </div>
@@ -96,24 +99,38 @@ export default function PresentTrack() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 auto-rows-fr">
         
         {/* The Feature Highlight Card (Spans 2 columns) */}
-        <div className="md:col-span-2 xl:col-span-2 row-span-2 bg-gradient-to-br from-midnight to-royal-purple rounded-3xl p-8 md:p-10 text-white shadow-xl relative overflow-hidden group flex flex-col justify-between">
-          <div className="absolute -right-8 -bottom-8 opacity-5 text-[12rem] select-none pointer-events-none group-hover:scale-110 transition-transform duration-700">⚖️</div>
+        <div className="md:col-span-2 xl:col-span-2 row-span-2 bg-white border border-gray-200 p-8 md:p-10 relative group flex flex-col justify-between hover:shadow-md transition-shadow rounded-sm shadow-sm">
           <div>
-            <span className="inline-block bg-white/20 text-solar px-4 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase backdrop-blur-md mb-6 shadow-sm border border-white/10">
-              Highlight / TL;DR
-            </span>
-            <h2 className="text-3xl md:text-4xl font-extrabold leading-tight mb-6 font-serif tracking-wide">
-              114年憲判字第1號<br/>國會職權修法釋憲案
+            <div className="flex items-center gap-3 mb-6">
+              <span className="bg-gray-800 text-white px-3 py-1 text-xs font-medium tracking-wide rounded-sm uppercase">
+                焦點判決 TL;DR
+              </span>
+              <span className="text-sm text-gray-400 font-mono font-medium tracking-wider">2024-10-25</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-8 font-serif text-gray-900 border-l-4 border-gray-300 pl-5">
+              國會職權修法部分違憲：<br/>
+              <span className="bg-[#FFE082] px-1 pb-1">總統無赴立院報告義務</span>
             </h2>
-            <div className="space-y-4 mb-8 text-white/90 font-medium text-[1.05rem]">
-              <p className="flex items-start gap-3"><span className="text-solar text-2xl leading-none mt-[-2px]">•</span> <span className="flex-1"><strong>藐視國會罪</strong>：部分違憲，明確性原則與比例原則之衡量。</span></p>
-              <p className="flex items-start gap-3"><span className="text-solar text-2xl leading-none mt-[-2px]">•</span> <span className="flex-1"><strong>總統國情報告</strong>：即問即答違憲，總統無出席義務。</span></p>
-              <p className="flex items-start gap-3"><span className="text-solar text-2xl leading-none mt-[-2px]">•</span> <span className="flex-1"><strong>人事同意權</strong>：部分違憲，不得以未答復即拒絕審查。</span></p>
+            <div className="space-y-4 mb-8 text-gray-700 font-medium text-lg pl-6 border-l border-gray-100">
+              <p className="flex items-start gap-4">
+                 <span className="text-gray-300 font-mono mt-1 select-none font-bold">01</span> 
+                 <span className="flex-1"><strong>藐視國會罪</strong>違憲，不可刑罰。因不符明確性原則與比例原則。</span>
+              </p>
+              <p className="flex items-start gap-4">
+                 <span className="text-gray-300 font-mono mt-1 select-none font-bold">02</span> 
+                 <span className="flex-1"><strong>總統國情報告</strong>即問即答違憲，總統無出席義務。</span>
+              </p>
+              <p className="flex items-start gap-4">
+                 <span className="text-gray-300 font-mono mt-1 select-none font-bold">03</span> 
+                 <span className="flex-1"><strong>聽證調查權</strong>部分合憲，但需符合正當法律程序，確保權力分立。</span>
+              </p>
             </div>
           </div>
-          <a href="#" className="inline-flex items-center justify-center md:justify-start gap-2 text-midnight bg-solar px-6 py-3 rounded-xl font-bold hover:bg-white transition-all mt-4 w-full md:w-fit shadow-md hover:shadow-lg">
-            閱讀完整判決解析 <ExternalLink size={18} />
-          </a>
+          <div className="pt-6 border-t border-gray-100 mt-4 flex justify-end">
+            <a href="#" className="inline-flex items-center gap-1.5 text-blue-600 font-bold hover:text-blue-800 transition-colors w-max group-hover:underline">
+              閱讀白話文案由全文 <ExternalLink size={16} />
+            </a>
+          </div>
         </div>
 
         {/* Dynamic Data Cards with distinct visual layouts */}
