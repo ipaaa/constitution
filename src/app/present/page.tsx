@@ -1,75 +1,121 @@
 import { DISCUSSIONS_DATA, DiscussionItem } from '@/data/discussions';
 import { Search, ExternalLink, Play } from 'lucide-react';
 
-const ScholarCard = ({ item }: { item: DiscussionItem }) => (
-  <div className="bg-white border border-gray-200 p-6 shadow-sm rounded-sm flex-1 hover:shadow-md transition-shadow flex flex-col h-full group">
-    <div className="flex justify-between items-start mb-4">
-      <div className="text-xs font-bold text-gray-500 uppercase tracking-wider">學者專欄</div>
-      <span className="text-xs font-mono text-gray-400">{item.year}</span>
-    </div>
-    <h4 className="font-serif font-bold text-2xl mb-3 text-gray-900 line-clamp-2 group-hover:underline">{item.title}</h4>
-    <p className="text-sm font-medium text-gray-500 mb-4">{item.author}</p>
-    <div className="w-full h-px bg-gray-100 mb-4" />
-    <p className="text-gray-600 text-[0.95rem] mb-6 flex-grow line-clamp-3 leading-relaxed font-serif text-justify">{item.abstract}</p>
-    <div className="mt-auto pt-4 border-t border-gray-50 flex justify-between items-center text-sm font-medium">
-      <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1 group-hover:underline">
-        研讀全文 <ExternalLink size={14} />
-      </a>
-    </div>
-  </div>
-);
-
-const NGOCard = ({ item }: { item: DiscussionItem }) => (
-  <div className="bg-white border border-gray-200 p-6 shadow-sm rounded-sm flex-1 hover:shadow-md transition-shadow flex flex-col h-full border-t-4 border-t-[#D32F2F] group">
-    <div className="flex justify-between items-start mb-4">
-      <div className="text-xs font-bold text-[#D32F2F] uppercase tracking-wider">NGO 倡議</div>
-      <span className="text-xs font-mono text-gray-400">{item.year}</span>
-    </div>
-    <h4 className="font-sans font-bold text-2xl mb-3 text-gray-900 line-clamp-2 group-hover:underline">{item.title}</h4>
-    <p className="text-sm font-medium text-[#D32F2F] mb-4">{item.author}</p>
-    <div className="w-full h-px bg-gray-100 mb-4" />
-    <p className="text-gray-600 text-sm mb-6 flex-grow line-clamp-3 leading-relaxed">{item.abstract}</p>
-    <div className="mt-auto pt-4 flex justify-between items-center text-sm font-medium">
-      <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-1 border border-gray-200 px-3 py-1.5 rounded-sm hover:bg-gray-50">
-        查看報告 <ExternalLink size={14} />
-      </a>
-    </div>
-  </div>
-);
-
-const ReelCard = ({ item }: { item: DiscussionItem }) => (
-  <div className="bg-white border border-gray-200 p-3 shadow-sm rounded-sm hover:shadow-md transition-shadow flex flex-col h-full group">
-    {/* Image / Video frame */}
-    <div className="bg-[#0F0F0F] rounded-sm w-full aspect-[4/5] relative overflow-hidden flex flex-col items-center justify-center border border-gray-300">
-      <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center text-gray-900 shadow-md group-hover:scale-110 group-hover:bg-white transition-transform z-10 cursor-pointer">
-        <Play fill="currentColor" size={20} className="ml-1" />
+const ScholarCard = ({ item }: { item: DiscussionItem }) => {
+  const domain = item.link.startsWith('http') ? new URL(item.link).hostname : 'scholar.org';
+  return (
+  <div className="bg-white border border-gray-200 rounded-lg flex flex-col h-full shadow-sm overflow-hidden group hover:shadow-md transition-shadow">
+    {/* Masthead */}
+    <div className="bg-gray-100 p-2 flex items-center gap-2 border-b border-gray-200">
+      <div className="flex gap-1.5 px-2">
+        <div className="w-2.5 h-2.5 rounded-full bg-red-400 border border-red-500/20"></div>
+        <div className="w-2.5 h-2.5 rounded-full bg-yellow-400 border border-yellow-500/20"></div>
+        <div className="w-2.5 h-2.5 rounded-full bg-green-400 border border-green-500/20"></div>
       </div>
-      {/* Subtle overlay info */}
-      <div className="absolute top-3 left-3 flex gap-2">
-        <span className="bg-black/80 backdrop-blur-sm text-white px-2 py-1 text-[10px] font-bold tracking-widest rounded-sm border border-white/20">
-          REELS
-        </span>
+      <div className="bg-white text-[10px] text-gray-500 font-mono px-3 py-1 flex-grow rounded text-center truncate border border-gray-200 shadow-inner group-hover:text-blue-600 transition-colors">
+        {domain}
       </div>
-      {item.views && (
-        <div className="absolute top-3 right-3">
-          <span className="text-[10px] font-bold text-white/80 drop-shadow-md">{item.views.toLocaleString()} 觀看</span>
-        </div>
-      )}
     </div>
-    
-    {/* Description below like polaroid */}
-    <div className="px-1 py-3 flex-grow flex flex-col">
-      <h4 className="font-bold text-lg text-gray-900 mb-1 line-clamp-2 leading-snug group-hover:text-blue-600 transition-colors cursor-pointer">{item.title}</h4>
-      <p className="text-xs font-medium text-gray-500 mb-3">{item.author}</p>
-      <div className="mt-auto border-t border-gray-100 pt-3 flex justify-between items-center">
-        <span className="text-xs text-blue-600 font-medium">前往觀看</span>
-        <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gray-900 transition-colors">
-          <ExternalLink size={14} />
+    <div className="p-6 bg-[#FDFCF8] flex flex-col flex-grow">
+      <div className="flex justify-between items-start mb-4">
+        <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">學者專欄</div>
+        <span className="text-xs font-mono text-gray-400">{item.year}</span>
+      </div>
+      <h4 className="font-serif font-bold text-2xl mb-3 text-gray-900 line-clamp-2 group-hover:underline">{item.title}</h4>
+      <p className="text-sm font-medium text-gray-500 mb-4">{item.author}</p>
+      <div className="w-full h-px bg-gray-200 mb-4" />
+      <p className="text-gray-600 text-[0.95rem] mb-6 flex-grow line-clamp-3 leading-relaxed font-serif text-justify">{item.abstract}</p>
+      <div className="mt-auto pt-4 flex justify-between items-center text-sm font-medium">
+        <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1 group-hover:underline w-full justify-center border border-blue-100 bg-blue-50/50 py-2 rounded-sm hover:bg-blue-100">
+          研讀全文 <ExternalLink size={14} />
         </a>
       </div>
     </div>
   </div>
-);
+  );
+};
+
+const NGOCard = ({ item }: { item: DiscussionItem }) => {
+  const domain = item.link.startsWith('http') ? new URL(item.link).hostname : 'ngo-report.org';
+  return (
+  <div className="bg-white border border-gray-200 rounded-lg flex flex-col h-full shadow-sm overflow-hidden group hover:shadow-md transition-shadow">
+    <div className="bg-gray-100 p-2 flex items-center gap-2 border-b border-gray-200">
+      <div className="flex gap-1.5 px-2">
+        <div className="w-2.5 h-2.5 rounded-full bg-red-400 border border-red-500/20"></div>
+        <div className="w-2.5 h-2.5 rounded-full bg-yellow-400 border border-yellow-500/20"></div>
+        <div className="w-2.5 h-2.5 rounded-full bg-green-400 border border-green-500/20"></div>
+      </div>
+      <div className="bg-white text-[10px] text-gray-500 font-mono px-3 py-1 flex-grow rounded text-center truncate border border-gray-200 shadow-inner group-hover:text-blue-600 transition-colors">
+        {domain}
+      </div>
+    </div>
+    <div className="p-6 bg-[#FDFCF8] flex flex-col flex-grow border-t-4 border-t-[#D32F2F]">
+      <div className="flex justify-between items-start mb-4">
+        <div className="text-[10px] font-bold text-[#D32F2F] uppercase tracking-widest">NGO 倡議</div>
+        <span className="text-xs font-mono text-gray-400">{item.year}</span>
+      </div>
+      <h4 className="font-sans font-bold text-2xl mb-3 text-gray-900 line-clamp-2 group-hover:underline">{item.title}</h4>
+      <p className="text-sm font-medium text-[#D32F2F] mb-4">{item.author}</p>
+      <div className="w-full h-px bg-gray-200 mb-4" />
+      <p className="text-gray-600 text-[0.95rem] mb-6 flex-grow line-clamp-3 leading-relaxed">{item.abstract}</p>
+      <div className="mt-auto pt-4 flex justify-between items-center text-sm font-medium">
+        <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-gray-900 transition-colors flex items-center justify-center w-full gap-1 border border-gray-200 py-2 rounded-sm hover:bg-white bg-gray-50">
+          查看報告 <ExternalLink size={14} />
+        </a>
+      </div>
+    </div>
+  </div>
+  );
+};
+
+const ReelCard = ({ item }: { item: DiscussionItem }) => {
+  const domain = item.link.startsWith('http') ? new URL(item.link).hostname : 'youtube.com/shorts';
+  return (
+  <div className="bg-gray-900 border border-gray-800 rounded-lg flex flex-col h-full shadow-lg overflow-hidden group hover:shadow-xl transition-shadow">
+    <div className="bg-black p-2 flex items-center gap-2 border-b border-gray-800">
+      <div className="flex gap-1.5 px-2 opacity-50">
+        <div className="w-2.5 h-2.5 rounded-full bg-gray-600 border border-white/10"></div>
+        <div className="w-2.5 h-2.5 rounded-full bg-gray-600 border border-white/10"></div>
+        <div className="w-2.5 h-2.5 rounded-full bg-gray-600 border border-white/10"></div>
+      </div>
+      <div className="bg-gray-900 text-[10px] text-gray-500 font-mono px-3 py-1 flex-grow rounded text-center truncate border border-gray-800 shadow-inner group-hover:text-blue-400 transition-colors">
+        {domain}
+      </div>
+    </div>
+    
+    <div className="p-3 bg-gray-900 flex flex-col flex-grow">
+      {/* Image / Video frame */}
+      <div className="bg-[#0A0A0A] rounded-sm w-full aspect-[4/5] relative overflow-hidden flex flex-col items-center justify-center border border-gray-800">
+        <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center text-gray-900 shadow-md group-hover:scale-110 group-hover:bg-white transition-transform z-10 cursor-pointer">
+          <Play fill="currentColor" size={20} className="ml-1" />
+        </div>
+        <div className="absolute top-3 left-3 flex gap-2">
+          <span className="bg-black/80 text-white px-2 py-1 text-[10px] font-bold tracking-widest rounded-sm border border-white/10 uppercase">
+            Reels
+          </span>
+        </div>
+        {item.views && (
+          <div className="absolute top-3 right-3">
+            <span className="text-[10px] font-bold text-white/50">{item.views.toLocaleString()} 觀看</span>
+          </div>
+        )}
+      </div>
+      
+      {/* Description below */}
+      <div className="pt-4 px-1 flex-grow flex flex-col">
+        <h4 className="font-bold text-lg text-gray-100 mb-1 line-clamp-2 leading-snug group-hover:text-blue-400 transition-colors cursor-pointer">{item.title}</h4>
+        <p className="text-xs font-medium text-gray-500 mb-3">{item.author}</p>
+        <div className="mt-auto border-t border-gray-800 pt-3 flex justify-between items-center">
+          <span className="text-xs text-blue-400 font-medium">前往觀看</span>
+          <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+            <ExternalLink size={14} />
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  );
+};
 
 export default function PresentTrack() {
   return (
