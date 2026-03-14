@@ -141,52 +141,100 @@ export default function PresentTrack() {
         </div>
       </div>
 
-      {/* Bento Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 auto-rows-fr">
+      {/* Magazine Spread Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-12 items-start relative">
         
-        {/* The Feature Highlight Card (Spans 2 columns) */}
-        <div className="md:col-span-2 xl:col-span-2 row-span-2 bg-white border border-gray-200 p-8 md:p-10 relative group flex flex-col justify-between hover:shadow-md transition-shadow rounded-sm shadow-sm">
-          <div>
-            <div className="flex items-center gap-3 mb-6">
-              <span className="bg-gray-800 text-white px-3 py-1 text-xs font-medium tracking-wide rounded-sm uppercase">
-                焦點判決 TL;DR
-              </span>
-              <span className="text-sm text-gray-400 font-mono font-medium tracking-wider">2024-10-25</span>
+        {/* Left Page: Official TL;DR (Sticky) */}
+        <div className="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-28">
+          <div className="bg-[#f8f9fa] border-t-4 border-black border-l border-r border-b border-gray-200 p-8 lg:p-10 shadow-sm relative group flex flex-col justify-between h-full">
+            <div>
+              <div className="flex items-center gap-3 mb-6">
+                <span className="bg-gray-800 text-white px-3 py-1 text-[10px] font-bold tracking-widest rounded-sm uppercase">
+                  Official TL;DR
+                </span>
+                <span className="text-sm text-gray-500 font-mono tracking-wider">2024-10-25</span>
+              </div>
+              <h2 className="text-3xl lg:text-4xl font-bold leading-tight mb-8 font-serif text-gray-900 border-l-[6px] border-[#D32F2F] pl-5">
+                國會職權修法部分違憲：<br/>
+                <span className="bg-[#FFE082] px-1 pb-1">總統無赴立院報告義務</span>
+              </h2>
+              <div className="space-y-5 mb-8 text-gray-700 font-medium text-[0.95rem] leading-relaxed">
+                <p className="flex items-start gap-4 pb-4 border-b border-gray-200 border-dashed">
+                   <span className="text-[#D32F2F] font-mono mt-1 select-none font-bold">01</span> 
+                   <span className="flex-1"><strong>藐視國會罪</strong>違憲，不可刑罰。因不符明確性原則與比例原則。</span>
+                </p>
+                <p className="flex items-start gap-4 pb-4 border-b border-gray-200 border-dashed">
+                   <span className="text-[#D32F2F] font-mono mt-1 select-none font-bold">02</span> 
+                   <span className="flex-1"><strong>總統國情報告</strong>即問即答違憲，總統無出席義務。</span>
+                </p>
+                <p className="flex items-start gap-4">
+                   <span className="text-[#D32F2F] font-mono mt-1 select-none font-bold">03</span> 
+                   <span className="flex-1"><strong>聽證調查權</strong>部分合憲，但需符合正當法律程序，確保權力分立。</span>
+                </p>
+              </div>
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-8 font-serif text-gray-900 border-l-4 border-gray-300 pl-5">
-              國會職權修法部分違憲：<br/>
-              <span className="bg-[#FFE082] px-1 pb-1">總統無赴立院報告義務</span>
-            </h2>
-            <div className="space-y-4 mb-8 text-gray-700 font-medium text-lg pl-6 border-l border-gray-100">
-              <p className="flex items-start gap-4">
-                 <span className="text-gray-300 font-mono mt-1 select-none font-bold">01</span> 
-                 <span className="flex-1"><strong>藐視國會罪</strong>違憲，不可刑罰。因不符明確性原則與比例原則。</span>
-              </p>
-              <p className="flex items-start gap-4">
-                 <span className="text-gray-300 font-mono mt-1 select-none font-bold">02</span> 
-                 <span className="flex-1"><strong>總統國情報告</strong>即問即答違憲，總統無出席義務。</span>
-              </p>
-              <p className="flex items-start gap-4">
-                 <span className="text-gray-300 font-mono mt-1 select-none font-bold">03</span> 
-                 <span className="flex-1"><strong>聽證調查權</strong>部分合憲，但需符合正當法律程序，確保權力分立。</span>
-              </p>
+            <div className="pt-6 border-t border-gray-300 mt-4 flex justify-between items-center">
+              <span className="text-[10px] font-bold text-gray-400 tracking-widest uppercase hidden lg:block">Citation 114-1</span>
+              <a href="#" className="inline-flex items-center gap-1.5 text-gray-900 border border-gray-300 px-4 py-2 text-sm font-bold hover:bg-gray-900 hover:text-white transition-colors w-full justify-center lg:w-max rounded-sm shadow-sm">
+                閱讀白話文案由 <ExternalLink size={14} />
+              </a>
             </div>
-          </div>
-          <div className="pt-6 border-t border-gray-100 mt-4 flex justify-end">
-            <a href="#" className="inline-flex items-center gap-1.5 text-blue-600 font-bold hover:text-blue-800 transition-colors w-max group-hover:underline">
-              閱讀白話文案由全文 <ExternalLink size={16} />
-            </a>
           </div>
         </div>
 
-        {/* Dynamic Data Cards with distinct visual layouts */}
-        {DISCUSSIONS_DATA.map((item: DiscussionItem) => {
-          if (item.category === 'Scholar Articles') return <ScholarCard key={item.id} item={item} />;
-          if (item.category === 'NGO Reports') return <NGOCard key={item.id} item={item} />;
-          if (item.category === 'Reels') return <ReelCard key={item.id} item={item} />;
-          return null;
-        })}
+        {/* Right Page: Public Discussions */}
+        <div className="lg:col-span-7 xl:col-span-8 flex flex-col gap-12 lg:gap-16 lg:pl-4 xl:pl-8 pb-12">
+          
+          <div className="flex justify-between items-center border-b-2 border-gray-900 pb-3">
+            <h3 className="text-xl font-bold text-gray-900 font-serif tracking-wider">PUBLIC DISCUSSIONS <span className="text-gray-400 font-sans font-normal ml-2">民間迴響</span></h3>
+          </div>
 
+          {/* Scholars Section */}
+          <section>
+            <div className="flex items-center justify-between mb-6 border-b border-gray-200 pb-2">
+              <h4 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                <span className="w-2 h-2 bg-blue-600 rounded-full"></span> 學者專欄 (Scholar Perspectives)
+              </h4>
+              <span className="text-xs bg-gray-100 text-gray-500 font-mono px-2 py-1 rounded">2 Articles</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {DISCUSSIONS_DATA.filter(item => item.category === 'Scholar Articles').map(item => (
+                <ScholarCard key={item.id} item={item} />
+              ))}
+            </div>
+          </section>
+
+          {/* NGOs Section */}
+          <section>
+            <div className="flex items-center justify-between mb-6 border-b border-gray-200 pb-2">
+              <h4 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                <span className="w-2 h-2 bg-[#D32F2F] rounded-full"></span> NGO 倡議 (NGO Reports)
+              </h4>
+              <span className="text-xs bg-gray-100 text-gray-500 font-mono px-2 py-1 rounded">1 Article</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {DISCUSSIONS_DATA.filter(item => item.category === 'NGO Reports').map(item => (
+                <NGOCard key={item.id} item={item} />
+              ))}
+            </div>
+          </section>
+
+          {/* Reels Section */}
+          <section>
+            <div className="flex items-center justify-between mb-6 border-b border-gray-200 pb-2">
+              <h4 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                <span className="w-2 h-2 bg-green-500 rounded-full"></span> 影音轉譯 (Reels & Shorts)
+              </h4>
+               <span className="text-xs bg-gray-100 text-gray-500 font-mono px-2 py-1 rounded">1 Video</span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {DISCUSSIONS_DATA.filter(item => item.category === 'Reels').map(item => (
+                <ReelCard key={item.id} item={item} />
+              ))}
+            </div>
+          </section>
+
+        </div>
       </div>
     </div>
   );
