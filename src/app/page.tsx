@@ -64,22 +64,19 @@ export default function Home() {
               </p>
             </Link>
 
-            <Link href="/present" className="group block bg-pearl rounded-3xl p-8 border border-sage/30 shadow-sm hover:bg-sage hover:text-white transition-all duration-500 relative overflow-hidden">
-              <div className="absolute top-0 right-0 bg-solar text-midnight text-xs font-bold px-4 py-1.5 rounded-bl-xl z-10">
-                ⭐ 開發中焦點
-              </div>
-              <div className="bg-white w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm mb-6 group-hover:bg-white/20">
-                <Search className="text-sage group-hover:text-white" size={28} />
+            <Link href="/present" className="group block bg-pearl rounded-3xl p-8 border border-black/5 hover:bg-midnight hover:text-white transition-all duration-500">
+              <div className="bg-white w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm mb-6 group-hover:bg-white/10">
+                <Search className="text-midnight group-hover:text-solar" size={28} />
               </div>
               <h3 className="text-2xl font-bold mb-3">Track 2: 現在</h3>
-              <p className="text-gray-600 group-hover:text-white/90 font-medium leading-relaxed">
-                憲庭熱搜榜。<br/>去焦慮的結構化儀表板，掌握最新釋憲動態。
+              <p className="text-gray-600 group-hover:text-white/80 font-medium leading-relaxed">
+                憲庭熱搜榜。<br/>專業新聞剪報式儀表板，掌握最新釋憲動態。
               </p>
             </Link>
 
-            <Link href="/future" className="group block bg-pearl rounded-3xl p-8 border border-black/5 hover:bg-royal-purple hover:text-white transition-all duration-500">
+            <Link href="/future" className="group block bg-pearl rounded-3xl p-8 border border-black/5 hover:bg-midnight hover:text-white transition-all duration-500">
               <div className="bg-white w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm mb-6 group-hover:bg-white/10">
-                <Workflow className="text-royal-purple group-hover:text-solar" size={28} />
+                <Workflow className="text-midnight group-hover:text-solar" size={28} />
               </div>
               <h3 className="text-2xl font-bold mb-3">Track 3: 未來</h3>
               <p className="text-gray-600 group-hover:text-white/80 font-medium leading-relaxed">
