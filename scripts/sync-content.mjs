@@ -17,24 +17,47 @@ const CONFIG = {
 
 /**
  * Simple CSV to Array of Objects parser
+ * Handles empty fields and quoted values reliably
  */
 function parseCSV(csv) {
   const lines = csv.split(/\r?\n/).filter(line => line.trim() !== '');
   if (lines.length < 2) return [];
   
-  const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+  const headers = splitCSVLine(lines[0]);
   return lines.slice(1).map(line => {
-    // Basic CSV split handle for quoted commas
-    const values = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
+    const values = splitCSVLine(line);
     const obj = {};
     headers.forEach((header, i) => {
-      let val = values[i] ? values[i].trim().replace(/^"|"$/g, '') : '';
-      // Unescape quotes
-      val = val.replace(/""/g, '"');
-      obj[header] = val;
+      let val = values[i] || '';
+      obj[header] = val.trim();
     });
     return obj;
   });
+}
+
+function splitCSVLine(line) {
+  const result = [];
+  let current = '';
+  let inQuotes = false;
+  
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    if (char === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        current += '"'; // unescape ""
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (char === ',' && !inQuotes) {
+      result.push(current);
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+  result.push(current);
+  return result;
 }
 
 async function syncTrack1() {
@@ -50,26 +73,29 @@ async function syncTrack1() {
     const rows = parseCSV(csv);
     
     // Transform rows to match HistoryEvent structure
-    const data = rows.map(row => ({
-      id: row.id,
-      textbook: {
-        chapter: row.chapter,
-        content: row.content,
-        handwriting: row.handwriting
-      },
-      reality: {
-        year: row.year,
-        title: row.title,
-        ruling: row.ruling,
-        bgImage: row.image_url
-      }
-    }));
+    // We allow empty status for now as Track 1 might be mostly static, but supporting filter
+    const data = rows
+      .filter(row => !row.status || row.status.toLowerCase() === 'approved')
+      .map(row => ({
+        id: row.id,
+        textbook: {
+          chapter: row.chapter,
+          content: row.content,
+          handwriting: row.handwriting
+        },
+        reality: {
+          year: row.year,
+          title: row.title,
+          ruling: row.ruling,
+          bgImage: row.image_url
+        }
+      }));
     
     fs.writeFileSync(
       path.join(CONFIG.OUTPUT_DIR, 'history.json'),
       JSON.stringify(data, null, 2)
     );
-    console.log('✅ Track 1 sync complete.');
+    console.log(`✅ Track 1 sync complete. (${data.length} items)`);
   } catch (err) {
     console.error('❌ Track 1 sync failed:', err.message);
   }
@@ -87,9 +113,9 @@ async function syncTrack2() {
     const csv = await res.text();
     const rows = parseCSV(csv);
     
-    // Transform rows and filter by Status if needed
+    // Transform rows and filter by Status Approved
     const data = rows
-      .filter(row => row.status === 'Approved')
+      .filter(row => row.status && row.status.toLowerCase() === 'approved')
       .map(row => ({
         id: row.id,
         category: row.category,
@@ -105,7 +131,7 @@ async function syncTrack2() {
       path.join(CONFIG.OUTPUT_DIR, 'discussions.json'),
       JSON.stringify(data, null, 2)
     );
-    console.log('✅ Track 2 sync complete.');
+    console.log(`✅ Track 2 sync complete. (${data.length} items)`);
   } catch (err) {
     console.error('❌ Track 2 sync failed:', err.message);
   }
