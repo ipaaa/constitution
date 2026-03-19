@@ -37,6 +37,86 @@ const VibeTag = ({ vibe }: { vibe?: string }) => {
   );
 };
 
+const CourtTimeline = () => {
+  const milestones = [
+    { year: '1948', label: 'Council Established', detail: '司法院大法官會議成立', status: 'success' },
+    { year: '1993', label: 'Procedural Upgrade', detail: '大法官審理案件法正式實施', status: 'success' },
+    { year: '2019', label: 'ACT PASSED', detail: '憲法訴訟法三讀通過', status: 'success' },
+    { year: '2022', label: 'COURT LAUNCHED', detail: '憲法法庭正式揭牌，改制裁判化', status: 'success' },
+    { year: '2024', label: 'JUDGMENT 114-1', detail: '國會職權修法判決宣告', status: 'warning' },
+    { year: 'Present', label: 'SYSTEM CRITICAL', detail: '大法官缺額與預算凍結風險', status: 'danger' },
+  ];
+
+  return (
+    <div className="font-mono text-[11px] uppercase tracking-tighter bg-gray-50 border border-gray-200 p-6 rounded-sm shadow-inner">
+      <div className="flex items-center gap-2 mb-6 pb-2 border-b border-gray-200">
+        <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
+        <span className="font-bold text-gray-900">System Diagnostics: Judicial Health</span>
+      </div>
+      <div className="relative pl-4 space-y-8">
+        <div className="absolute left-[19px] top-1 bottom-1 w-px bg-gray-300 border-l border-dashed border-gray-400"></div>
+        {milestones.map((m, i) => (
+          <div key={i} className="relative pl-6 group">
+            <div className={`absolute left-[-2px] top-1 w-3 h-3 rounded-full border-2 border-white shadow-sm z-10 
+              ${m.status === 'success' ? 'bg-green-500' : m.status === 'warning' ? 'bg-yellow-500' : 'bg-red-600'}`}>
+            </div>
+            <div className="flex flex-col gap-0.5">
+              <span className="text-gray-400 font-bold">{m.year}</span>
+              <span className="text-gray-900 font-black leading-none mb-1">{m.label}</span>
+              <span className="text-[10px] text-gray-500 normal-case font-sans tracking-normal leading-tight opacity-70 group-hover:opacity-100 transition-opacity">
+                {m.detail}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-8 pt-4 border-t border-gray-200 flex flex-col gap-2">
+         <div className="flex justify-between text-[9px] text-gray-400">
+           <span>DB_STATE: ACTIVE</span>
+           <span>v4.0.2-LATEST</span>
+         </div>
+      </div>
+    </div>
+  );
+};
+
+const OfficialTLDR = () => (
+  <div className="bg-[#f8f9fa] border-t-4 border-black border-l border-r border-b border-gray-200 p-8 lg:p-10 shadow-sm relative group mb-12">
+    <div>
+      <div className="flex items-center gap-3 mb-6">
+        <span className="bg-gray-800 text-white px-3 py-1 text-[10px] font-bold tracking-widest rounded-sm uppercase">
+          Official TL;DR
+        </span>
+        <span className="text-sm text-gray-500 font-mono tracking-wider">2024-10-25</span>
+      </div>
+      <h2 className="text-3xl lg:text-4xl font-bold leading-tight mb-8 font-serif text-gray-900 border-l-[6px] border-[#D32F2F] pl-5">
+        國會職權修法部分違憲：<br/>
+        <span className="bg-[#FFE082] px-1 pb-1">總統無赴立院報告義務</span>
+      </h2>
+      <div className="space-y-5 mb-8 text-gray-700 font-medium text-[0.95rem] leading-relaxed">
+        <p className="flex items-start gap-4 pb-4 border-b border-gray-200 border-dashed">
+           <span className="text-[#D32F2F] font-mono mt-1 select-none font-bold">01</span> 
+           <span className="flex-1"><strong>藐視國會罪</strong>違憲，不可刑罰。因不符明確性原則與比例原則。</span>
+        </p>
+        <p className="flex items-start gap-4 pb-4 border-b border-gray-200 border-dashed">
+           <span className="text-[#D32F2F] font-mono mt-1 select-none font-bold">02</span> 
+           <span className="flex-1"><strong>總統國情報告</strong>即問即答違憲，總統無出席義務。</span>
+        </p>
+        <p className="flex items-start gap-4">
+           <span className="text-[#D32F2F] font-mono mt-1 select-none font-bold">03</span> 
+           <span className="flex-1"><strong>聽證調查權</strong>部分合憲，但需符合正當法律程序，確保權力分立。</span>
+        </p>
+      </div>
+    </div>
+    <div className="pt-6 border-t border-gray-300 mt-4 flex justify-between items-center">
+      <span className="text-[10px] font-bold text-gray-400 tracking-widest uppercase hidden lg:block">Citation 114-1</span>
+      <a href="#" className="inline-flex items-center gap-1.5 text-gray-900 border border-gray-300 px-4 py-2 text-sm font-bold hover:bg-gray-900 hover:text-white transition-colors w-full justify-center lg:w-max rounded-sm shadow-sm">
+        閱讀白話文案由 <ExternalLink size={14} />
+      </a>
+    </div>
+  </div>
+);
+
 const JudgeOwlComment = ({ comment }: { comment: string }) => {
   if (!comment) return null;
   return (
@@ -217,48 +297,18 @@ export default function PresentTrack() {
       {/* Magazine Spread Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-12 items-start relative">
         
-        {/* Left Page: Official TL;DR (Sticky) */}
-        <div className="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-28">
-          <div className="bg-[#f8f9fa] border-t-4 border-black border-l border-r border-b border-gray-200 p-8 lg:p-10 shadow-sm relative group flex flex-col justify-between h-full">
-            <div>
-              <div className="flex items-center gap-3 mb-6">
-                <span className="bg-gray-800 text-white px-3 py-1 text-[10px] font-bold tracking-widest rounded-sm uppercase">
-                  Official TL;DR
-                </span>
-                <span className="text-sm text-gray-500 font-mono tracking-wider">2024-10-25</span>
-              </div>
-              <h2 className="text-3xl lg:text-4xl font-bold leading-tight mb-8 font-serif text-gray-900 border-l-[6px] border-[#D32F2F] pl-5">
-                國會職權修法部分違憲：<br/>
-                <span className="bg-[#FFE082] px-1 pb-1">總統無赴立院報告義務</span>
-              </h2>
-              <div className="space-y-5 mb-8 text-gray-700 font-medium text-[0.95rem] leading-relaxed">
-                <p className="flex items-start gap-4 pb-4 border-b border-gray-200 border-dashed">
-                   <span className="text-[#D32F2F] font-mono mt-1 select-none font-bold">01</span> 
-                   <span className="flex-1"><strong>藐視國會罪</strong>違憲，不可刑罰。因不符明確性原則與比例原則。</span>
-                </p>
-                <p className="flex items-start gap-4 pb-4 border-b border-gray-200 border-dashed">
-                   <span className="text-[#D32F2F] font-mono mt-1 select-none font-bold">02</span> 
-                   <span className="flex-1"><strong>總統國情報告</strong>即問即答違憲，總統無出席義務。</span>
-                </p>
-                <p className="flex items-start gap-4">
-                   <span className="text-[#D32F2F] font-mono mt-1 select-none font-bold">03</span> 
-                   <span className="flex-1"><strong>聽證調查權</strong>部分合憲，但需符合正當法律程序，確保權力分立。</span>
-                </p>
-              </div>
-            </div>
-            <div className="pt-6 border-t border-gray-300 mt-4 flex justify-between items-center">
-              <span className="text-[10px] font-bold text-gray-400 tracking-widest uppercase hidden lg:block">Citation 114-1</span>
-              <a href="#" className="inline-flex items-center gap-1.5 text-gray-900 border border-gray-300 px-4 py-2 text-sm font-bold hover:bg-gray-900 hover:text-white transition-colors w-full justify-center lg:w-max rounded-sm shadow-sm">
-                閱讀白話文案由 <ExternalLink size={14} />
-              </a>
-            </div>
-          </div>
+        {/* Left Page: System Diagnostics Timeline (Sticky) */}
+        <div className="lg:col-span-4 xl:col-span-3 lg:sticky lg:top-28">
+           <CourtTimeline />
         </div>
 
-        {/* Right Page: Public Discussions */}
-        <div className="lg:col-span-7 xl:col-span-8 flex flex-col gap-12 lg:gap-16 lg:pl-4 xl:pl-8 pb-12">
+        {/* Right Page: Content Flow */}
+        <div className="lg:col-span-8 xl:col-span-9 flex flex-col lg:pl-4 xl:pl-8 pb-12">
           
-          <div className="flex justify-between items-center border-b-2 border-gray-900 pb-3">
+          {/* Relocated TL;DR */}
+          <OfficialTLDR />
+          
+          <div className="flex justify-between items-center border-b-2 border-gray-900 pb-3 mb-12">
             <h3 className="text-xl font-bold text-gray-900 font-serif tracking-wider">PUBLIC VOICES <span className="text-gray-400 font-sans font-normal ml-2">問題怎麼看</span></h3>
           </div>
 
