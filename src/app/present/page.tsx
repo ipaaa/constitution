@@ -147,10 +147,79 @@ const OfficialTLDR = ({ item }: { item?: DiscussionItem }) => {
             閱讀完整分析 <ExternalLink size={14} />
           </a>
         </div>
+
+        {/* Reaction Widget */}
+        <ConstitutionalMoodWidget />
       </div>
     </div>
   );
 };
+
+const ConstitutionalMoodWidget = () => {
+  const moods = [
+    { emoji: '🧊', label: '如臨深淵', color: 'hover:bg-blue-50 hover:border-blue-200 text-blue-700' },
+    { emoji: '🔥', label: '滿血復活', color: 'hover:bg-red-50 hover:border-red-200 text-red-700' },
+    { emoji: '⏳', label: '靜觀其變', color: 'hover:bg-amber-50 hover:border-amber-200 text-amber-700' },
+    { emoji: '💡', label: '原來如此', color: 'hover:bg-yellow-50 hover:border-yellow-200 text-yellow-700' },
+  ];
+
+  return (
+    <div className="mt-8 pt-8 border-t border-gray-200">
+      <p className="text-xs font-bold text-gray-400 tracking-widest uppercase mb-4 text-center">HOW DO YOU FEEL? <span className="text-gray-300 ml-2">看完後您的心情是？</span></p>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {moods.map((mood, idx) => (
+          <button 
+            key={idx}
+            className={`flex flex-col items-center justify-center p-4 border border-gray-200 bg-white rounded-sm transition-all duration-300 group shadow-sm ${mood.color}`}
+          >
+            <span className="text-3xl mb-2 group-hover:scale-125 transition-transform duration-300">{mood.emoji}</span>
+            <span className="text-xs font-bold tracking-tighter">{mood.label}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const NarrativeLoopFooter = () => (
+  <div className="mt-20 mb-12 border-t-2 border-gray-900 pt-12">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <a href="/past" className="group block">
+        <div className="bg-[#F3EBD1] border-2 border-gray-900 p-8 md:p-12 relative overflow-hidden transition-transform hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] duration-300 h-full flex flex-col justify-between">
+          <div className="relative z-10">
+            <span className="inline-block bg-gray-900 text-white text-[10px] font-bold px-2 py-1 tracking-widest uppercase mb-6">BACK TO THE ORIGIN</span>
+            <h4 className="text-3xl md:text-5xl font-serif font-black text-gray-900 mb-4 leading-tight">想知道我們如何<br/>走到這一步？</h4>
+            <p className="text-gray-700 font-medium">回顧歷史：看課本上的民主理想，如何經受現實判決的考驗。</p>
+          </div>
+          <div className="mt-12 flex items-center gap-2 text-gray-900 font-bold uppercase text-sm tracking-widest group-hover:gap-4 transition-all border-b-2 border-gray-900 w-max pb-1">
+            進入：歷史與教科書 (TRACK 01) →
+          </div>
+          {/* Decorative index tab */}
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gray-900 text-[#F3EBD1] flex items-center justify-center translate-x-12 -translate-y-12 rotate-45 font-bold text-xl hover:bg-red-700 transition-colors">
+            PAST
+          </div>
+        </div>
+      </a>
+
+      <a href="/future" className="group block">
+        <div className="bg-white border-2 border-gray-900 p-8 md:p-12 relative overflow-hidden transition-transform hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] duration-300 h-full flex flex-col justify-between">
+          <div className="relative z-10">
+            <span className="inline-block bg-red-700 text-white text-[10px] font-bold px-2 py-1 tracking-widest uppercase mb-6">EXPLORE THE FUTURE</span>
+            <h4 className="text-3xl md:text-5xl font-serif font-black text-gray-900 mb-4 leading-tight">想預見接下來<br/>還有哪些考驗？</h4>
+            <p className="text-gray-700 font-medium">探索未來：當憲法法庭進入復健期，您的權益正在哪個路口等候？</p>
+          </div>
+          <div className="mt-12 flex items-center gap-2 text-gray-900 font-bold uppercase text-sm tracking-widest group-hover:gap-4 transition-all border-b-2 border-gray-900 w-max pb-1">
+            進入：憲政復健現狀 (TRACK 03) →
+          </div>
+          {/* Decorative stamp */}
+          <div className="absolute -bottom-6 -right-6 w-32 h-32 border-4 border-red-700/20 rounded-full flex items-center justify-center rotate-12 group-hover:rotate-0 transition-transform duration-700">
+             <span className="text-red-700/20 font-black text-2xl uppercase tracking-tighter">FUTURE</span>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+);
 
 const JudgeOwlComment = ({ comment }: { comment: string }) => {
   if (!comment) return null;
@@ -397,6 +466,9 @@ export default function PresentTrack() {
               ))}
             </div>
           </section>
+
+          {/* Narrative Loop Footer */}
+          <NarrativeLoopFooter />
 
         </div>
       </div>
