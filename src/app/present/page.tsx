@@ -200,7 +200,7 @@ export default function PresentTrack() {
             <span className="bg-gray-800 text-white text-xs px-2 py-0.5 rounded-sm uppercase tracking-widest font-mono select-none">Present</span>
             憲庭熱搜榜
           </h1>
-          <p className="text-gray-500 font-medium font-serif mt-2 text-lg">114年憲判字第1號 及其延伸觀點探討</p>
+          <p className="text-gray-500 font-medium font-serif mt-2 text-lg">公民必讀的憲政剪貼簿：看專家與民間如何解讀判決</p>
         </div>
         <div className="flex bg-white rounded-sm shadow-sm border border-gray-300 w-full md:w-96 transition-all focus-within:border-gray-500 focus-within:shadow-md">
           <input 
