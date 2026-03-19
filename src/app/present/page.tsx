@@ -12,9 +12,35 @@ export type DiscussionItem = {
   abstract: string;
   link: string;
   views?: number;
+  owl_comment?: string;
+  vibe?: string;
 };
 
 const DISCUSSIONS_DATA = _DISCUSSIONS_DATA as DiscussionItem[];
+
+const VibeTag = ({ vibe }: { vibe?: string }) => {
+  if (!vibe) return null;
+  return (
+    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-gray-900 text-white text-[10px] font-bold tracking-tight rounded-sm shadow-sm transform -rotate-1 hover:rotate-0 transition-transform cursor-default select-none mb-1">
+      {vibe}
+    </span>
+  );
+};
+
+const JudgeOwlComment = ({ comment }: { comment: string }) => {
+  if (!comment) return null;
+  return (
+    <div className="mt-6 bg-[#FFF9C4] border-l-4 border-[#FBC02D] p-4 relative group/owl shadow-sm">
+      <div className="absolute -top-8 -right-3 transform transition-transform group-hover/owl:scale-110 duration-300">
+        <img src="/owl.png" alt="Judge Owl" className="w-14 h-14 object-contain drop-shadow-md" />
+      </div>
+      <p className="text-sm font-serif text-gray-900 leading-relaxed italic pr-6 italic">
+        「{comment}」
+      </p>
+      <div className="text-[10px] font-bold text-[#A67C00] uppercase tracking-wider mt-2 text-right">— 貓頭鷹法官．小點評</div>
+    </div>
+  );
+};
 
 const ScholarCard = ({ item }: { item: DiscussionItem }) => {
   const domain = item.link.startsWith('http') ? new URL(item.link).hostname : 'scholar.org';
@@ -32,14 +58,20 @@ const ScholarCard = ({ item }: { item: DiscussionItem }) => {
       </div>
     </div>
     <div className="p-6 bg-[#FDFCF8] flex flex-col flex-grow">
+      <div className="mb-2">
+        <VibeTag vibe={item.vibe} />
+      </div>
       <div className="flex justify-between items-start mb-4">
-        <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">學者專欄</div>
+        <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">學者文章</div>
         <span className="text-xs font-mono text-gray-400">{item.year}</span>
       </div>
       <h4 className="font-serif font-bold text-2xl mb-3 text-gray-900 line-clamp-2 group-hover:underline">{item.title}</h4>
-      <p className="text-sm font-medium text-gray-500 mb-4">{item.author}</p>
+      <p className="text-sm font-medium text-[#D32F2F] mb-4">{item.author}</p>
       <div className="w-full h-px bg-gray-200 mb-4" />
       <p className="text-gray-600 text-[0.95rem] mb-6 flex-grow line-clamp-3 leading-relaxed font-serif text-justify">{item.abstract}</p>
+      
+      {item.owl_comment && <JudgeOwlComment comment={item.owl_comment} />}
+      
       <div className="mt-auto pt-4 flex justify-between items-center text-sm font-medium">
         <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1 group-hover:underline w-full justify-center border border-blue-100 bg-blue-50/50 py-2 rounded-sm hover:bg-blue-100">
           研讀全文 <ExternalLink size={14} />
@@ -65,6 +97,9 @@ const NGOCard = ({ item }: { item: DiscussionItem }) => {
       </div>
     </div>
     <div className="p-6 bg-[#FDFCF8] flex flex-col flex-grow border-t-4 border-t-[#D32F2F]">
+      <div className="mb-2">
+        <VibeTag vibe={item.vibe} />
+      </div>
       <div className="flex justify-between items-start mb-4">
         <div className="text-[10px] font-bold text-[#D32F2F] uppercase tracking-widest">NGO 倡議</div>
         <span className="text-xs font-mono text-gray-400">{item.year}</span>
@@ -73,6 +108,9 @@ const NGOCard = ({ item }: { item: DiscussionItem }) => {
       <p className="text-sm font-medium text-[#D32F2F] mb-4">{item.author}</p>
       <div className="w-full h-px bg-gray-200 mb-4" />
       <p className="text-gray-600 text-[0.95rem] mb-6 flex-grow line-clamp-3 leading-relaxed">{item.abstract}</p>
+      
+      {item.owl_comment && <JudgeOwlComment comment={item.owl_comment} />}
+      
       <div className="mt-auto pt-4 flex justify-between items-center text-sm font-medium">
         <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-gray-900 transition-colors flex items-center justify-center w-full gap-1 border border-gray-200 py-2 rounded-sm hover:bg-white bg-gray-50">
           查看報告 <ExternalLink size={14} />
@@ -104,10 +142,15 @@ const ReelCard = ({ item }: { item: DiscussionItem }) => {
         <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center text-gray-900 shadow-md group-hover:scale-110 group-hover:bg-white transition-transform z-10 cursor-pointer">
           <Play fill="currentColor" size={20} className="ml-1" />
         </div>
-        <div className="absolute top-3 left-3 flex gap-2">
-          <span className="bg-black/80 text-white px-2 py-1 text-[10px] font-bold tracking-widest rounded-sm border border-white/10 uppercase">
+        <div className="absolute top-3 left-3 flex flex-col gap-2">
+          <span className="bg-black/80 text-white px-2 py-1 text-[10px] font-bold tracking-widest rounded-sm border border-white/10 uppercase w-fit">
             Reels
           </span>
+          {item.vibe && (
+            <span className="bg-blue-600 text-white px-2 py-0.5 text-[9px] font-bold tracking-tighter rounded-sm w-fit shadow-lg">
+              {item.vibe}
+            </span>
+          )}
         </div>
         {item.views && (
           <div className="absolute top-3 right-3">
@@ -119,7 +162,14 @@ const ReelCard = ({ item }: { item: DiscussionItem }) => {
       {/* Description below */}
       <div className="pt-4 px-1 flex-grow flex flex-col">
         <h4 className="font-bold text-lg text-gray-100 mb-1 line-clamp-2 leading-snug group-hover:text-blue-400 transition-colors cursor-pointer">{item.title}</h4>
-        <p className="text-xs font-medium text-gray-500 mb-3">{item.author}</p>
+        <p className="text-xs font-medium text-[#D32F2F] mb-3">{item.author}</p>
+        
+        {item.owl_comment && (
+          <div className="mb-4 bg-black/60 border-l-2 border-[#FFE082] p-3 rounded-sm relative shadow-inner">
+             <p className="text-xs text-[#FFE082] italic leading-snug">🦉: {item.owl_comment}</p>
+          </div>
+        )}
+        
         <div className="mt-auto border-t border-gray-800 pt-3 flex justify-between items-center">
           <span className="text-xs text-blue-400 font-medium">前往觀看</span>
           <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
@@ -208,7 +258,7 @@ export default function PresentTrack() {
           <section>
             <div className="flex items-center justify-between mb-6 border-b border-gray-200 pb-2">
               <h4 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                <span className="w-2 h-2 bg-blue-600 rounded-full"></span> 學者專欄 (Scholar Perspectives)
+                <span className="w-2 h-2 bg-blue-600 rounded-full"></span> 學者文章 (Scholar Perspectives)
               </h4>
               <span className="text-xs bg-gray-100 text-gray-500 font-mono px-2 py-1 rounded">2 Articles</span>
             </div>

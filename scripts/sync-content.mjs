@@ -124,7 +124,9 @@ async function syncTrack2() {
         year: row.year,
         abstract: row.abstract,
         link: row.link,
-        views: row.views ? parseInt(row.views, 10) : undefined
+        views: row.views ? parseInt(row.views, 10) : undefined,
+        owl_comment: row.owl_comment || row['owl comment'],
+        vibe: row.vibe || row['vibe'] || row['Vibe']
       }));
     
     fs.writeFileSync(
