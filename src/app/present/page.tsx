@@ -71,8 +71,7 @@ const ScholarCard = ({ item }: { item: DiscussionItem }) => {
       <div className="mb-2">
         <VibeTag vibe={item.vibe} />
       </div>
-      <div className="flex justify-between items-start mb-4">
-        <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">學者文章</div>
+      <div className="flex justify-end items-start mb-4">
         <span className="text-xs font-mono text-gray-400">{item.year}</span>
       </div>
       <h4 className="font-serif font-bold text-2xl mb-3 text-gray-900 line-clamp-2 group-hover:underline">{item.title}</h4>
@@ -110,8 +109,7 @@ const NGOCard = ({ item }: { item: DiscussionItem }) => {
       <div className="mb-2">
         <VibeTag vibe={item.vibe} />
       </div>
-      <div className="flex justify-between items-start mb-4">
-        <div className="text-[10px] font-bold text-[#D32F2F] uppercase tracking-widest">NGO 倡議</div>
+      <div className="flex justify-end items-start mb-4">
         <span className="text-xs font-mono text-gray-400">{item.year}</span>
       </div>
       <h4 className="font-sans font-bold text-2xl mb-3 text-gray-900 line-clamp-2 group-hover:underline">{item.title}</h4>
