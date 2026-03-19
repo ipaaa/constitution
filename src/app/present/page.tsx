@@ -83,7 +83,7 @@ const ScholarCard = ({ item }: { item: DiscussionItem }) => {
       
       <div className="mt-auto pt-4 flex justify-between items-center text-sm font-medium">
         <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1 group-hover:underline w-full justify-center border border-blue-100 bg-blue-50/50 py-2 rounded-sm hover:bg-blue-100">
-          研讀全文 <ExternalLink size={14} />
+          開啟原始連結 <ExternalLink size={14} />
         </a>
       </div>
     </div>
@@ -121,7 +121,7 @@ const NGOCard = ({ item }: { item: DiscussionItem }) => {
       
       <div className="mt-auto pt-4 flex justify-between items-center text-sm font-medium">
         <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-gray-900 transition-colors flex items-center justify-center w-full gap-1 border border-gray-200 py-2 rounded-sm hover:bg-white bg-gray-50">
-          查看報告 <ExternalLink size={14} />
+          開啟原始報告 <ExternalLink size={14} />
         </a>
       </div>
     </div>
@@ -179,7 +179,7 @@ const ReelCard = ({ item }: { item: DiscussionItem }) => {
         )}
         
         <div className="mt-auto border-t border-gray-800 pt-3 flex justify-between items-center">
-          <span className="text-xs text-blue-400 font-medium">前往觀看</span>
+          <span className="text-xs text-blue-400 font-medium">開啟原始影片</span>
           <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
             <ExternalLink size={14} />
           </a>
@@ -259,7 +259,7 @@ export default function PresentTrack() {
         <div className="lg:col-span-7 xl:col-span-8 flex flex-col gap-12 lg:gap-16 lg:pl-4 xl:pl-8 pb-12">
           
           <div className="flex justify-between items-center border-b-2 border-gray-900 pb-3">
-            <h3 className="text-xl font-bold text-gray-900 font-serif tracking-wider">PUBLIC DISCUSSIONS <span className="text-gray-400 font-sans font-normal ml-2">民間迴響</span></h3>
+            <h3 className="text-xl font-bold text-gray-900 font-serif tracking-wider">PUBLIC BOOKMARKS <span className="text-gray-400 font-sans font-normal ml-2">好文剪貼書籤</span></h3>
           </div>
 
           {/* Scholars Section */}
