@@ -39,42 +39,65 @@ const VibeTag = ({ vibe }: { vibe?: string }) => {
 
 const CourtTimeline = () => {
   const milestones = [
-    { year: '1948', label: 'Council Established', detail: '司法院大法官會議成立', status: 'success' },
-    { year: '1993', label: 'Procedural Upgrade', detail: '大法官審理案件法正式實施', status: 'success' },
-    { year: '2019', label: 'ACT PASSED', detail: '憲法訴訟法三讀通過', status: 'success' },
-    { year: '2022', label: 'COURT LAUNCHED', detail: '憲法法庭正式揭牌，改制裁判化', status: 'success' },
-    { year: '2024', label: 'JUDGMENT 114-1', detail: '國會職權修法判決宣告', status: 'warning' },
-    { year: 'Present', label: 'SYSTEM CRITICAL', detail: '大法官缺額與預算凍結風險', status: 'danger' },
+    { year: '1948', label: '司法院大法官會議成立', detail: '標誌著中華民國憲法解釋制度的開啟，確立了由大法官掌理憲法解釋與統一解釋法令之權。', status: 'history' },
+    { year: '1993', label: '大法官審理案件法實施', detail: '程序制度化的重要里程碑，細化了審理程序，並在此基礎上誕生了許多影響深遠的解釋。', status: 'history' },
+    { year: '2019', label: '憲法訴訟法三讀通過', detail: '從「會議制」轉向「法院制」的法源基礎，將案件審理司法化、裁判化。', status: 'history' },
+    { year: '2022', label: '憲法法庭正式揭牌', detail: '裁判化轉型正式啟動，大法官改以「憲法法庭」名義行使職權並公告裁判。', status: 'present' },
+    { year: '2024', label: '114年憲判字第1號', detail: '關於國會職權修法之重大判決，確立了權力分立與法律明確性原則的當代界線。', status: 'critical' },
+    { year: '未來', label: '憲政體制的韌性考驗', detail: '面臨大法官缺額、預算凍結與程序法修法等爭議，憲法法庭的功能完整性將受挑戰。', status: 'danger' },
   ];
 
   return (
-    <div className="font-mono text-[11px] uppercase tracking-tighter bg-gray-50 border border-gray-200 p-6 rounded-sm shadow-inner">
-      <div className="flex items-center gap-2 mb-6 pb-2 border-b border-gray-200">
-        <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
-        <span className="font-bold text-gray-900">System Diagnostics: Judicial Health</span>
+    <div className="bg-[#f4f1ea] border border-[#d1ccc0] p-6 lg:p-8 rounded-sm shadow-sm relative overflow-hidden">
+      {/* Archive Header */}
+      <div className="border-b-2 border-gray-900 pb-4 mb-8">
+        <div className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-1">ARCHIVE RECORD / NO. 77</div>
+        <h3 className="text-2xl font-serif font-black text-gray-900 leading-tight">憲政大事記</h3>
+        <p className="text-xs text-gray-600 mt-2 font-serif italic">Chronicle of the Constitutional Court</p>
       </div>
-      <div className="relative pl-4 space-y-8">
-        <div className="absolute left-[19px] top-1 bottom-1 w-px bg-gray-300 border-l border-dashed border-gray-400"></div>
+
+      <div className="space-y-6 relative">
         {milestones.map((m, i) => (
-          <div key={i} className="relative pl-6 group">
-            <div className={`absolute left-[-2px] top-1 w-3 h-3 rounded-full border-2 border-white shadow-sm z-10 
-              ${m.status === 'success' ? 'bg-green-500' : m.status === 'warning' ? 'bg-yellow-500' : 'bg-red-600'}`}>
+          <div key={i} className="relative group">
+            {/* Folder Tab Aesthetic */}
+            <div className="flex items-start">
+              <div className={`w-14 shrink-0 font-mono text-sm pt-1 border-r-2 mr-4 text-right pr-4 mb-4 transition-colors
+                ${m.status === 'danger' ? 'border-[#D32F2F] text-[#D32F2F]' : 'border-gray-900 text-gray-900'}`}>
+                {m.year}
+              </div>
+              <div className="flex-1 pb-6 relative">
+                <h4 className={`text-lg font-serif font-bold leading-tight mb-2 group-hover:text-blue-900 transition-colors
+                  ${m.status === 'danger' ? 'text-[#D32F2F]' : 'text-gray-900'}`}>
+                  {m.label}
+                </h4>
+                <p className="text-sm text-gray-600 font-serif leading-relaxed text-justify">
+                  {m.detail}
+                </p>
+                {/* Visual Connector Line */}
+                {i < milestones.length - 1 && (
+                  <div className="absolute left-[-25px] top-6 bottom-[-20px] w-px bg-gray-300"></div>
+                )}
+              </div>
             </div>
-            <div className="flex flex-col gap-0.5">
-              <span className="text-gray-400 font-bold">{m.year}</span>
-              <span className="text-gray-900 font-black leading-none mb-1">{m.label}</span>
-              <span className="text-[10px] text-gray-500 normal-case font-sans tracking-normal leading-tight opacity-70 group-hover:opacity-100 transition-opacity">
-                {m.detail}
-              </span>
-            </div>
+            {/* Important Stamp for danger status */}
+            {m.status === 'danger' && (
+              <div className="absolute -top-1 -right-2 rotate-12 border-2 border-[#D32F2F] text-[#D32F2F] px-2 py-1 text-[10px] font-black uppercase tracking-tighter opacity-70 select-none">
+                Urgent Record
+              </div>
+            )}
           </div>
         ))}
       </div>
-      <div className="mt-8 pt-4 border-t border-gray-200 flex flex-col gap-2">
-         <div className="flex justify-between text-[9px] text-gray-400">
-           <span>DB_STATE: ACTIVE</span>
-           <span>v4.0.2-LATEST</span>
-         </div>
+
+      {/* Footer / Stamp */}
+      <div className="mt-8 pt-6 border-t border-[#d1ccc0] flex justify-between items-center opacity-40 grayscale group hover:grayscale-0 transition-all">
+        <div className="text-[9px] font-mono leading-none">
+          SEC-CAT: CONSTITUTIONAL_EVOLUTION<br/>
+          REF: PUBLIC_VOICES_V2
+        </div>
+        <div className="w-10 h-10 border-2 border-gray-900 rounded-full flex items-center justify-center font-black text-[10px] rotate-[-20deg]">
+          ARCH
+        </div>
       </div>
     </div>
   );
