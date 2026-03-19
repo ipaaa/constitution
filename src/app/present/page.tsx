@@ -20,8 +20,18 @@ const DISCUSSIONS_DATA = _DISCUSSIONS_DATA as DiscussionItem[];
 
 const VibeTag = ({ vibe }: { vibe?: string }) => {
   if (!vibe) return null;
+  
+  const getStyle = (text: string) => {
+    if (text.includes('🔥')) return 'bg-[#FF4E50] text-white border-[#FF8A8C] shadow-[0_2px_0_0_#b91c1c]';
+    if (text.includes('💡')) return 'bg-[#FDB813] text-gray-900 border-[#FFE082] shadow-[0_2px_0_0_#b45309]';
+    if (text.includes('⚖️')) return 'bg-[#4A90E2] text-white border-[#8EBAE3] shadow-[0_2px_0_0_#1d4ed8]';
+    if (text.includes('📣')) return 'bg-[#E91E63] text-white border-[#F48FB1] shadow-[0_2px_0_0_#880e4f]';
+    if (text.includes('⚠️')) return 'bg-[#FF9800] text-white border-[#FFCC80] shadow-[0_2px_0_0_#e65100]';
+    return 'bg-gray-900 text-white border-gray-700 shadow-[0_2px_0_0_#000]';
+  };
+
   return (
-    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-gray-900 text-white text-[10px] font-bold tracking-tight rounded-sm shadow-sm transform -rotate-1 hover:rotate-0 transition-transform cursor-default select-none mb-1">
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black tracking-wider border-b-2 uppercase transform -rotate-2 hover:rotate-0 hover:scale-105 transition-all cursor-default select-none mb-2 ${getStyle(vibe)}`}>
       {vibe}
     </span>
   );
