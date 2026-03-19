@@ -16,48 +16,67 @@ const CONFIG = {
 };
 
 /**
- * Simple CSV to Array of Objects parser
- * Handles empty fields and quoted values reliably
+ * Robust CSV parser that handles newlines and commas within quotes
  */
 function parseCSV(csv) {
-  const lines = csv.split(/\r?\n/).filter(line => line.trim() !== '');
-  if (lines.length < 2) return [];
-  
-  const headers = splitCSVLine(lines[0]);
-  return lines.slice(1).map(line => {
-    const values = splitCSVLine(line);
+  const rows = [];
+  let currentRow = [];
+  let currentField = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < csv.length; i++) {
+    const char = csv[i];
+    const nextChar = csv[i + 1];
+
+    if (inQuotes) {
+      if (char === '"') {
+        if (nextChar === '"') {
+          currentField += '"';
+          i++; // skip next quote
+        } else {
+          inQuotes = false;
+        }
+      } else {
+        currentField += char;
+      }
+    } else {
+      if (char === '"') {
+        inQuotes = true;
+      } else if (char === ',') {
+        currentRow.push(currentField.trim());
+        currentField = '';
+      } else if (char === '\n' || char === '\r') {
+        if (currentField !== '' || currentRow.length > 0) {
+          currentRow.push(currentField.trim());
+          rows.push(currentRow);
+          currentRow = [];
+          currentField = '';
+        }
+        if (char === '\r' && nextChar === '\n') {
+          i++; // skip \n
+        }
+      } else {
+        currentField += char;
+      }
+    }
+  }
+
+  // Handle last field if file doesn't end with newline
+  if (currentField !== '' || currentRow.length > 0) {
+    currentRow.push(currentField.trim());
+    rows.push(currentRow);
+  }
+
+  if (rows.length < 2) return [];
+
+  const headers = rows[0];
+  return rows.slice(1).map(row => {
     const obj = {};
     headers.forEach((header, i) => {
-      let val = values[i] || '';
-      obj[header] = val.trim();
+      obj[header] = row[i] || '';
     });
     return obj;
   });
-}
-
-function splitCSVLine(line) {
-  const result = [];
-  let current = '';
-  let inQuotes = false;
-  
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
-    if (char === '"') {
-      if (inQuotes && line[i + 1] === '"') {
-        current += '"'; // unescape ""
-        i++;
-      } else {
-        inQuotes = !inQuotes;
-      }
-    } else if (char === ',' && !inQuotes) {
-      result.push(current);
-      current = '';
-    } else {
-      current += char;
-    }
-  }
-  result.push(current);
-  return result;
 }
 
 async function syncTrack1() {
