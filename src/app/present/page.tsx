@@ -268,7 +268,9 @@ export default function PresentTrack() {
               <h4 className="text-lg font-bold text-gray-800 flex items-center gap-2">
                 <span className="w-2 h-2 bg-blue-600 rounded-full"></span> 學者文章 (Scholar Perspectives)
               </h4>
-              <span className="text-xs bg-gray-100 text-gray-500 font-mono px-2 py-1 rounded">2 Articles</span>
+              <span className="text-xs bg-gray-100 text-gray-500 font-mono px-2 py-1 rounded">
+                {DISCUSSIONS_DATA.filter(item => item.category === 'Scholar Articles').length} Articles
+              </span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {DISCUSSIONS_DATA.filter(item => item.category === 'Scholar Articles').map(item => (
@@ -283,7 +285,9 @@ export default function PresentTrack() {
               <h4 className="text-lg font-bold text-gray-800 flex items-center gap-2">
                 <span className="w-2 h-2 bg-[#D32F2F] rounded-full"></span> NGO 倡議 (NGO Reports)
               </h4>
-              <span className="text-xs bg-gray-100 text-gray-500 font-mono px-2 py-1 rounded">1 Article</span>
+              <span className="text-xs bg-gray-100 text-gray-500 font-mono px-2 py-1 rounded">
+                {DISCUSSIONS_DATA.filter(item => item.category === 'NGO Reports').length} Articles
+              </span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {DISCUSSIONS_DATA.filter(item => item.category === 'NGO Reports').map(item => (
@@ -298,7 +302,9 @@ export default function PresentTrack() {
               <h4 className="text-lg font-bold text-gray-800 flex items-center gap-2">
                 <span className="w-2 h-2 bg-green-500 rounded-full"></span> 影音轉譯 (Reels & Shorts)
               </h4>
-               <span className="text-xs bg-gray-100 text-gray-500 font-mono px-2 py-1 rounded">1 Video</span>
+               <span className="text-xs bg-gray-100 text-gray-500 font-mono px-2 py-1 rounded">
+                 {DISCUSSIONS_DATA.filter(item => item.category === 'Reels').length} Videos
+               </span>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {DISCUSSIONS_DATA.filter(item => item.category === 'Reels').map(item => (
