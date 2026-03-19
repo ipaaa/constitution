@@ -259,7 +259,7 @@ export default function PresentTrack() {
         <div className="lg:col-span-7 xl:col-span-8 flex flex-col gap-12 lg:gap-16 lg:pl-4 xl:pl-8 pb-12">
           
           <div className="flex justify-between items-center border-b-2 border-gray-900 pb-3">
-            <h3 className="text-xl font-bold text-gray-900 font-serif tracking-wider">PUBLIC BOOKMARKS <span className="text-gray-400 font-sans font-normal ml-2">好文剪貼書籤</span></h3>
+            <h3 className="text-xl font-bold text-gray-900 font-serif tracking-wider">PUBLIC VOICES <span className="text-gray-400 font-sans font-normal ml-2">問題怎麼看</span></h3>
           </div>
 
           {/* Scholars Section */}
