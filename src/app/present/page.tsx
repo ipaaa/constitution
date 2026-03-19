@@ -110,8 +110,17 @@ const OfficialTLDR = ({ item }: { item?: DiscussionItem }) => {
   const points = item.abstract.split(/\r?\n/).filter(p => p.trim());
 
   return (
-    <div className="bg-[#f8f9fa] border-t-4 border-black border-l border-r border-b border-gray-200 p-6 md:p-10 shadow-sm relative group mb-12">
-      <div>
+    <div className="bg-[#f8f9fa] border-t-4 border-black border-l border-r border-b border-gray-200 shadow-sm relative group mb-12 overflow-hidden">
+      {/* Hero Illustration */}
+      <div className="w-full h-auto overflow-hidden border-b border-gray-200">
+        <img 
+          src="/tldr-illustration.png" 
+          alt="Constitutional Court Status" 
+          className="w-full h-auto object-cover opacity-90 hover:opacity-100 transition-opacity duration-500"
+        />
+      </div>
+
+      <div className="p-6 md:p-10">
         <div className="flex items-center gap-3 mb-6">
           <span className="bg-gray-800 text-white px-3 py-1 text-[10px] font-bold tracking-widest rounded-sm uppercase">
             Official TL;DR
@@ -131,13 +140,13 @@ const OfficialTLDR = ({ item }: { item?: DiscussionItem }) => {
             </p>
           ))}
         </div>
-      </div>
-      
-      <div className="pt-6 border-t border-gray-300 mt-4 flex flex-col md:flex-row justify-between items-center gap-4">
-        <span className="text-[10px] font-bold text-gray-400 tracking-widest uppercase hidden lg:block">Citation {item.id === 'tldr' ? 'CORE' : item.id}</span>
-        <a href={item.link} className="inline-flex items-center gap-1.5 text-gray-900 border border-gray-300 px-4 py-2 text-sm font-bold hover:bg-gray-900 hover:text-white transition-colors w-full justify-center md:w-max rounded-sm shadow-sm">
-          閱讀完整分析 <ExternalLink size={14} />
-        </a>
+
+        <div className="pt-6 border-t border-gray-300 mt-4 flex flex-col md:flex-row justify-between items-center gap-4">
+          <span className="text-[10px] font-bold text-gray-400 tracking-widest uppercase hidden lg:block">Citation {item.id === 'tldr' ? 'CORE' : item.id}</span>
+          <a href={item.link} className="inline-flex items-center gap-1.5 text-gray-900 border border-gray-300 px-4 py-2 text-sm font-bold hover:bg-gray-900 hover:text-white transition-colors w-full justify-center md:w-max rounded-sm shadow-sm">
+            閱讀完整分析 <ExternalLink size={14} />
+          </a>
+        </div>
       </div>
     </div>
   );
