@@ -145,7 +145,8 @@ async function syncTrack2() {
         link: row.link,
         views: row.views ? parseInt(row.views, 10) : undefined,
         owl_comment: row.owl_comment || row['owl comment'],
-        vibe: row.vibe || row['vibe'] || row['Vibe']
+        vibe: row.vibe || row['vibe'] || row['Vibe'],
+        sticky: row.sticky ? row.sticky.toLowerCase() === 'true' : false
       }));
     
     fs.writeFileSync(

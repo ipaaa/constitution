@@ -14,6 +14,7 @@ export type DiscussionItem = {
   views?: number;
   owl_comment?: string;
   vibe?: string;
+  sticky?: boolean;
 };
 
 const DISCUSSIONS_DATA = _DISCUSSIONS_DATA as DiscussionItem[];
@@ -371,10 +372,19 @@ const ReelCard = ({ item }: { item: DiscussionItem }) => {
       </div>
     </div>
   </div>
-  );
+);
 };
 
 export default function PresentTrack() {
+  // Unified sorting logic: Sticky first, then by year (descending)
+  const sortDiscussions = (items: DiscussionItem[]) => {
+    return [...items].sort((a, b) => {
+      if (a.sticky && !b.sticky) return -1;
+      if (!a.sticky && b.sticky) return 1;
+      return b.year.localeCompare(a.year);
+    });
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-12 w-full bg-[#fcfcfc] min-h-screen">
       {/* Search & Filter Bar */}
@@ -427,7 +437,7 @@ export default function PresentTrack() {
               </span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {DISCUSSIONS_DATA.filter(item => item.category === 'Scholar Articles').map(item => (
+              {sortDiscussions(DISCUSSIONS_DATA.filter(item => item.category === 'Scholar Articles')).map(item => (
                 <ScholarCard key={item.id} item={item} />
               ))}
             </div>
@@ -444,7 +454,7 @@ export default function PresentTrack() {
               </span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {DISCUSSIONS_DATA.filter(item => item.category === 'NGO Reports').map(item => (
+              {sortDiscussions(DISCUSSIONS_DATA.filter(item => item.category === 'NGO Reports')).map(item => (
                 <NGOCard key={item.id} item={item} />
               ))}
             </div>
@@ -461,7 +471,7 @@ export default function PresentTrack() {
                </span>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {DISCUSSIONS_DATA.filter(item => item.category === 'Reels').map(item => (
+              {sortDiscussions(DISCUSSIONS_DATA.filter(item => item.category === 'Reels')).map(item => (
                 <ReelCard key={item.id} item={item} />
               ))}
             </div>
