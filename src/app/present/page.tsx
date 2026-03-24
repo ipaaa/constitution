@@ -1,42 +1,11 @@
 import _DISCUSSIONS_DATA from '@/data/discussions.json';
 import { Search, ExternalLink, Play } from 'lucide-react';
 
-export type DiscussionCategory = 'Scholar Articles' | 'NGO Reports' | 'Reels';
-
-export type DiscussionItem = {
-  id: string;
-  category: DiscussionCategory;
-  title: string;
-  author: string;
-  year: string;
-  abstract: string;
-  link: string;
-  views?: number;
-  owl_comment?: string;
-  vibe?: string;
-  sticky?: boolean;
-};
+import { VibeTag, JudgeOwlComment, type DiscussionItem, type DiscussionCategory } from '@/components/SharedPresent';
 
 const DISCUSSIONS_DATA = _DISCUSSIONS_DATA as DiscussionItem[];
 
-const VibeTag = ({ vibe }: { vibe?: string }) => {
-  if (!vibe) return null;
-  
-  const getStyle = (text: string) => {
-    if (text.includes('🔥')) return 'bg-[#FF4E50] text-white border-[#FF8A8C] shadow-[0_2px_0_0_#b91c1c]';
-    if (text.includes('💡')) return 'bg-[#FDB813] text-gray-900 border-[#FFE082] shadow-[0_2px_0_0_#b45309]';
-    if (text.includes('⚖️')) return 'bg-[#4A90E2] text-white border-[#8EBAE3] shadow-[0_2px_0_0_#1d4ed8]';
-    if (text.includes('📣')) return 'bg-[#E91E63] text-white border-[#F48FB1] shadow-[0_2px_0_0_#880e4f]';
-    if (text.includes('⚠️')) return 'bg-[#FF9800] text-white border-[#FFCC80] shadow-[0_2px_0_0_#e65100]';
-    return 'bg-gray-900 text-white border-gray-700 shadow-[0_2px_0_0_#000]';
-  };
-
-  return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black tracking-wider border-b-2 uppercase transform -rotate-2 hover:rotate-0 hover:scale-105 transition-all cursor-default select-none mb-2 ${getStyle(vibe)}`}>
-      {vibe}
-    </span>
-  );
-};
+import Link from 'next/link';
 
 const CourtTimeline = () => {
   const milestones = [
@@ -222,25 +191,11 @@ const NarrativeLoopFooter = () => (
   </div>
 );
 
-const JudgeOwlComment = ({ comment }: { comment: string }) => {
-  if (!comment) return null;
-  return (
-    <div className="mt-6 bg-[#FFF9C4] border-l-4 border-[#FBC02D] p-4 relative group/owl shadow-sm">
-      <div className="absolute -top-8 -right-3 transform transition-transform group-hover/owl:scale-110 duration-300">
-        <img src="/owl.png" alt="Judge Owl" className="w-14 h-14 object-contain drop-shadow-md" />
-      </div>
-      <p className="text-sm font-serif text-gray-900 leading-relaxed italic pr-6 italic">
-        「{comment}」
-      </p>
-      <div className="text-[10px] font-bold text-[#A67C00] uppercase tracking-wider mt-2 text-right">— 貓頭鷹法官．小點評</div>
-    </div>
-  );
-};
 
 const ScholarCard = ({ item }: { item: DiscussionItem }) => {
   const domain = item.link.startsWith('http') ? new URL(item.link).hostname : 'scholar.org';
   return (
-  <div className="bg-white border border-gray-200 rounded-lg flex flex-col h-full shadow-sm overflow-hidden group hover:shadow-md transition-shadow">
+  <Link href={`/present/${item.id}`} className="bg-white border border-gray-200 rounded-lg flex flex-col h-full shadow-sm overflow-hidden group hover:shadow-md transition-shadow">
     {/* Masthead */}
     <div className="bg-gray-100 p-2 flex items-center gap-2 border-b border-gray-200">
       <div className="flex gap-1.5 px-2">
@@ -267,19 +222,19 @@ const ScholarCard = ({ item }: { item: DiscussionItem }) => {
       {item.owl_comment && <JudgeOwlComment comment={item.owl_comment} />}
       
       <div className="mt-auto pt-4 flex justify-between items-center text-sm font-medium">
-        <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1 group-hover:underline w-full justify-center border border-blue-100 bg-blue-50/50 py-2 rounded-sm hover:bg-blue-100">
-          開啟原始連結 <ExternalLink size={14} />
-        </a>
+        <div className="text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1 group-hover:underline w-full justify-center border border-blue-100 bg-blue-50/50 py-2 rounded-sm hover:bg-blue-100">
+          開啟詳法與導讀 <ExternalLink size={14} />
+        </div>
       </div>
     </div>
-  </div>
+  </Link>
   );
 };
 
 const NGOCard = ({ item }: { item: DiscussionItem }) => {
   const domain = item.link.startsWith('http') ? new URL(item.link).hostname : 'ngo-report.org';
   return (
-  <div className="bg-white border border-gray-200 rounded-lg flex flex-col h-full shadow-sm overflow-hidden group hover:shadow-md transition-shadow">
+  <Link href={`/present/${item.id}`} className="bg-white border border-gray-200 rounded-lg flex flex-col h-full shadow-sm overflow-hidden group hover:shadow-md transition-shadow">
     <div className="bg-gray-100 p-2 flex items-center gap-2 border-b border-gray-200">
       <div className="flex gap-1.5 px-2">
         <div className="w-2.5 h-2.5 rounded-full bg-red-400 border border-red-500/20"></div>
@@ -305,19 +260,19 @@ const NGOCard = ({ item }: { item: DiscussionItem }) => {
       {item.owl_comment && <JudgeOwlComment comment={item.owl_comment} />}
       
       <div className="mt-auto pt-4 flex justify-between items-center text-sm font-medium">
-        <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-gray-900 transition-colors flex items-center justify-center w-full gap-1 border border-gray-200 py-2 rounded-sm hover:bg-white bg-gray-50">
-          開啟原始報告 <ExternalLink size={14} />
-        </a>
+        <div className="text-gray-700 hover:text-gray-900 transition-colors flex items-center justify-center w-full gap-1 border border-gray-200 py-2 rounded-sm hover:bg-white bg-gray-50">
+          查看專題報告與導讀 <ExternalLink size={14} />
+        </div>
       </div>
     </div>
-  </div>
+  </Link>
   );
 };
 
 const ReelCard = ({ item }: { item: DiscussionItem }) => {
   const domain = item.link.startsWith('http') ? new URL(item.link).hostname : 'youtube.com/shorts';
   return (
-  <div className="bg-gray-900 border border-gray-800 rounded-lg flex flex-col h-full shadow-lg overflow-hidden group hover:shadow-xl transition-shadow">
+  <Link href={`/present/${item.id}`} className="bg-gray-900 border border-gray-800 rounded-lg flex flex-col h-full shadow-lg overflow-hidden group hover:shadow-xl transition-shadow">
     <div className="bg-black p-2 flex items-center gap-2 border-b border-gray-800">
       <div className="flex gap-1.5 px-2 opacity-50">
         <div className="w-2.5 h-2.5 rounded-full bg-gray-600 border border-white/10"></div>
@@ -364,14 +319,14 @@ const ReelCard = ({ item }: { item: DiscussionItem }) => {
         )}
         
         <div className="mt-auto border-t border-gray-800 pt-3 flex justify-between items-center">
-          <span className="text-xs text-blue-400 font-medium">開啟原始影片</span>
-          <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+          <span className="text-xs text-blue-400 font-medium tracking-tighter">查看由貓頭鷹轉譯的影片說明</span>
+          <div className="text-gray-400 group-hover:text-white transition-colors">
             <ExternalLink size={14} />
-          </a>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </Link>
 );
 };
 

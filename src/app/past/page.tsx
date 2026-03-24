@@ -80,6 +80,11 @@ export default function PastTrack() {
                   className={`absolute top-0 left-0 w-full h-full flex items-center justify-center p-8 md:p-20 textbook-item ${isActive ? 'active' : ''} ${isExitUp ? 'exit-up' : ''} ${isExitDown ? 'exit-down' : ''}`}
                 >
                   <div className="max-w-md font-serif">
+                    <div className="mb-3">
+                      <span className="inline-block bg-[#1565C0]/10 text-[#1565C0] text-xs font-bold px-2 py-0.5 rounded border border-[#1565C0]/20 uppercase tracking-tight">
+                        {item.category || '憲法起源'}
+                      </span>
+                    </div>
                     <h2 className="text-3xl md:text-4xl font-black text-[#1A1A1A] border-b-2 border-[#D3D3D3] pb-4 mb-6">
                       {item.textbook.chapter}
                     </h2>
@@ -133,9 +138,16 @@ export default function PastTrack() {
                   
                   {/* Content Overlay */}
                   <div className="relative z-10 max-w-lg text-[var(--color-reality-text)] reality-content">
-                    <span className="inline-block bg-[var(--color-accent-red)] text-white text-base md:text-lg font-black py-2 px-4 rounded mb-6 tracking-widest">
-                      {item.reality.year}
-                    </span>
+                    <div className="flex items-center gap-3 mb-6">
+                      <span className="inline-block bg-[var(--color-accent-red)] text-white text-base md:text-lg font-black py-2 px-4 rounded tracking-widest">
+                        {item.reality.year}
+                      </span>
+                      {item.reality.ruling_id && (
+                        <span className="inline-block bg-white text-[var(--color-accent-red)] border-2 border-[var(--color-accent-red)] text-base md:text-lg font-black py-1.5 px-4 rounded tracking-tighter">
+                          {item.reality.ruling_id}
+                        </span>
+                      )}
+                    </div>
                     <h3 className="font-sans text-4xl md:text-5xl font-black leading-[1.2] mb-6 tracking-tight">
                       {item.reality.title}
                     </h3>

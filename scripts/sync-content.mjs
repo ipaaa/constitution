@@ -97,6 +97,7 @@ async function syncTrack1() {
       .filter(row => !row.status || row.status.toLowerCase() === 'approved')
       .map(row => ({
         id: row.id,
+        category: row.category || '憲法基礎',
         textbook: {
           chapter: row.chapter,
           content: row.content,
@@ -106,9 +107,18 @@ async function syncTrack1() {
           year: row.year,
           title: row.title,
           ruling: row.ruling,
+          ruling_id: row.ruling_id,
           bgImage: row.image_url
         }
-      }));
+      }))
+      .sort((a, b) => {
+        const parseYear = (y) => {
+          if (!y) return 0;
+          const match = y.match(/\d+/);
+          return match ? parseInt(match[0], 10) : 0;
+        };
+        return parseYear(a.reality.year) - parseYear(b.reality.year);
+      });
     
     fs.writeFileSync(
       path.join(CONFIG.OUTPUT_DIR, 'history.json'),
@@ -145,8 +155,10 @@ async function syncTrack2() {
         link: row.link,
         views: row.views ? parseInt(row.views, 10) : undefined,
         owl_comment: row.owl_comment || row['owl comment'],
+        owl_depth_comment: row.owl_depth_comment || row['owl depth comment'],
         vibe: row.vibe || row['vibe'] || row['Vibe'],
-        sticky: row.sticky ? row.sticky.toLowerCase() === 'true' : false
+        sticky: row.sticky ? row.sticky.toLowerCase() === 'true' : false,
+        full_content: row.full_content || row['full content']
       }));
     
     fs.writeFileSync(

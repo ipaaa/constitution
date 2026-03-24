@@ -1,6 +1,7 @@
 [
   {
     "id": "h1",
+    "category": "權力分立",
     "textbook": {
       "chapter": "第六課：民主政治與選舉",
       "content": "我國實行民主共和，主權在民。人民有權透過自由、平等的定期選舉，選出中央與地方公職人員。",
@@ -9,12 +10,14 @@
     "reality": {
       "year": "1990",
       "title": "你能親手選出新國會，終結萬年國代。",
-      "ruling": "野百合學運・釋字第 261 號・終結中央民意代表無限期延任",
+      "ruling": "野百合學運・終結中央民意代表無限期延任",
+      "ruling_id": "釋字第 261 號",
       "bgImage": "https://images.unsplash.com/photo-1596701192534-77db54be22b9?q=80&w=2070&auto=format&fit=crop"
     }
   },
   {
     "id": "h2",
+    "category": "言論自由",
     "textbook": {
       "chapter": "第十章：基本人權保障",
       "content": "憲法第十一條規定人民有言論、講學、著作及出版之自由。國家應給予最大限度之維護。",
@@ -24,7 +27,152 @@
       "year": "1991",
       "title": "你不再因為思想不同而被判定為叛亂罪。",
       "ruling": "廢除刑法100條運動・保障和平表達政治異議的自由",
+      "ruling_id": "釋字第 272 號",
       "bgImage": "https://images.unsplash.com/photo-1552872673-9b7b99711ebb?q=80&w=2070&auto=format&fit=crop"
+    }
+  },
+  {
+    "id": "h4",
+    "category": "性別平等",
+    "textbook": {
+      "chapter": "第七條：主權在民與平等權",
+      "content": "中華民國人民，無分男女、宗教、種族、階級、黨派，在法律上一律平等。",
+      "handwriting": "但民法曾規定：意見不合時，聽老公的。"
+    },
+    "reality": {
+      "year": "1994",
+      "title": "廢除夫權優先，母親也能擁有子女監護權。",
+      "ruling": "宣告民法父權優先條款違憲",
+      "ruling_id": "釋字第 365 號",
+      "bgImage": "https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?q=80&w=2070&auto=format&fit=crop"
+    }
+  },
+  {
+    "id": "h6",
+    "category": "學生權利",
+    "textbook": {
+      "chapter": "第十六條：訴訟權之保障",
+      "content": "人民有請願、訴願及訴訟之權。旨在保障人民受損害時得尋求司法救濟。",
+      "handwriting": "以前被老師退學，只能乖乖捲舖蓋？"
+    },
+    "reality": {
+      "year": "1995",
+      "title": "校園不再是法律化外之地，學生被退學也能申訴。",
+      "ruling": "打破「特別權力關係」，保障學生救濟權",
+      "ruling_id": "釋字第 382 號",
+      "bgImage": "https://images.unsplash.com/photo-1523050335392-93851179ae22?q=80&w=2070&auto=format&fit=crop"
+    }
+  },
+  {
+    "id": "h7",
+    "category": "宗教自由",
+    "textbook": {
+      "chapter": "第十三條：宗教信仰之自由",
+      "content": "人民有信仰宗教之自由，國家不得對特定宗教予以歧視，亦不得規定人民參加特定宗教活動。",
+      "handwriting": "不想拿槍殺生，難道只能選擇坐牢？"
+    },
+    "reality": {
+      "year": "1999",
+      "title": "信仰不能強迫，憲法催生了「替代役」制度。",
+      "ruling": "保義自由與兵役義務之平衡",
+      "ruling_id": "釋字第 490 號",
+      "bgImage": "https://images.unsplash.com/photo-1469474094887-2183a83a6071?q=80&w=2070&auto=format&fit=crop"
+    }
+  },
+  {
+    "id": "h3",
+    "category": "遷徙自由",
+    "textbook": {
+      "chapter": "第一章：人民之權利義務",
+      "content": "憲法第十條規定人民有居住與遷徙之自由。旨在保障人民之生活空間與進出國境之權利。",
+      "handwriting": "有人拿著台灣護照，卻回不了家？"
+    },
+    "reality": {
+      "year": "2003",
+      "title": "打破黑名單，讓流亡海外的異議人士能回家。",
+      "ruling": "保障國民入出境之基本權利",
+      "ruling_id": "釋字第 558 號",
+      "bgImage": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2070&auto=format&fit=crop"
+    }
+  },
+  {
+    "id": "h5",
+    "category": "正當法律程序",
+    "textbook": {
+      "chapter": "第八條：人身自由之保障",
+      "content": "人民身體之自由應予保障。非經司法或警察機關依法定程序，不得逮捕拘禁。",
+      "handwriting": "只要供詞就能判死刑，誰來保護無辜者？"
+    },
+    "reality": {
+      "year": "2004",
+      "title": "拒絕冤獄！不能只憑共同被告的自白就判人有罪。",
+      "ruling": "保障刑事被告之對質詰問權（徐自強案）",
+      "ruling_id": "釋字第 582 號",
+      "bgImage": "https://images.unsplash.com/photo-1453919177891-ec5969da2f1c?q=80&w=2070&auto=format&fit=crop"
+    }
+  },
+  {
+    "id": "h10",
+    "category": "性取向平等",
+    "textbook": {
+      "chapter": "婚姻與家庭制度",
+      "content": "婚姻與家庭受憲法制度性保障。人民有與誰結婚、組成家庭之自由。",
+      "handwriting": "相愛的人，為何不能在法律上成為家人？"
+    },
+    "reality": {
+      "year": "2017",
+      "title": "亞洲第一！同性伴侶也能合法締結婚姻。",
+      "ruling": "婚姻平權大突破",
+      "ruling_id": "釋字第 748 號",
+      "bgImage": "https://images.unsplash.com/photo-1550100136-e092101726f4?q=80&w=2070&auto=format&fit=crop"
+    }
+  },
+  {
+    "id": "h14",
+    "category": "原住民族權利",
+    "textbook": {
+      "chapter": "多元文化與民族發展",
+      "content": "國家肯定多元文化，並依民族意願，保障原住民族之地位及政治參與、教育文化及社會福利等多項權利。",
+      "handwriting": "明明流著原住民的血，法律卻不認我？"
+    },
+    "reality": {
+      "year": "2022",
+      "title": "遲來的正義，西拉雅族正式找回原住民身分。",
+      "ruling": "承認平埔族群原住民身分",
+      "ruling_id": "111 年 憲判字第 17 號",
+      "bgImage": ""
+    }
+  },
+  {
+    "id": "h11",
+    "category": "團結權",
+    "textbook": {
+      "chapter": "第十四條：结社自由",
+      "content": "人民有集會及結社之自由。包括勞工組織工會以爭取合理勞動條件之權利。",
+      "handwriting": "工會要罷工、要抗議，還要經過老闆同意？"
+    },
+    "reality": {
+      "year": "2023",
+      "title": "工會勞動權利保障，捍衛勞工的團結尊嚴。",
+      "ruling": "華航工會爭議案",
+      "ruling_id": "112 年憲判字第 7 號",
+      "bgImage": "https://images.unsplash.com/photo-1542744094-24638eff58bb?q=80&w=2070&auto=format&fit=crop"
+    }
+  },
+  {
+    "id": "h15",
+    "category": "測試",
+    "textbook": {
+      "chapter": "測試",
+      "content": "測試",
+      "handwriting": "測試"
+    },
+    "reality": {
+      "year": "2025",
+      "title": "測試",
+      "ruling": "測試",
+      "ruling_id": "測試",
+      "bgImage": ""
     }
   }
 ]
