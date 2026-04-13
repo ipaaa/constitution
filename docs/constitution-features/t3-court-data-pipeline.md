@@ -1,7 +1,7 @@
 ---
 id: "003"
 title: T3 Court Data Pipeline
-status: implement
+status: review
 source: commission seed
 started: 2026-04-13T16:16:43Z
 completed:
