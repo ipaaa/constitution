@@ -1,30 +1,31 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { MOCK_PENDING_CASES, AVAILABLE_TAGS, IdentityTag, PendingCase } from '@/data/future';
+import { PENDING_CASES, AVAILABLE_TAGS, IdentityTag, computeBacklogStatistics } from '@/data/future';
 
 export default function FutureTrack() {
   const [activeTags, setActiveTags] = useState<IdentityTag[]>([]);
 
   // Calculate filtered cases
   const filteredCases = useMemo(() => {
-    if (activeTags.length === 0) return MOCK_PENDING_CASES;
-    return MOCK_PENDING_CASES.filter(c => 
+    if (activeTags.length === 0) return PENDING_CASES;
+    return PENDING_CASES.filter(c =>
       c.tags.some(tag => activeTags.includes(tag))
     );
   }, [activeTags]);
 
   const toggleTag = (tag: IdentityTag) => {
-    setActiveTags(prev => 
+    setActiveTags(prev =>
       prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
     );
   };
 
-  // For visual effect, let's say the total "real" backlog is 142.
-  // When a filter is applied, we emphasize the specific ratio.
-  const TOTAL_CASES = 142;
-  const filteredCount = activeTags.length === 0 ? TOTAL_CASES : filteredCases.length;
-  const estimatedYears = activeTags.length === 0 ? '1.5 ~ 2' : ((filteredCases.length / 5) * 0.1).toFixed(1);
+  const stats = useMemo(() => computeBacklogStatistics(filteredCases), [filteredCases]);
+  const filteredCount = stats.totalCases;
+  // Estimate: average days pending converted to years, doubled due to 5-justice bottleneck
+  const estimatedYears = activeTags.length === 0
+    ? ((stats.averageDaysPending / 365) * 2).toFixed(1)
+    : ((stats.averageDaysPending / 365) * 2).toFixed(1);
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12 w-full bg-[#fcfcfc] min-h-screen">
@@ -85,25 +86,27 @@ export default function FutureTrack() {
              <div className="flex flex-wrap gap-2 justify-center lg:justify-end max-w-[300px] content-end">
                {/* Show actual mapped dots for filtered, or just a grid for all */}
                {activeTags.length === 0 ? (
-                  Array.from({length: 80}).map((_, i) => (
-                    <div key={i} className={`w-3 h-3 rounded-full ${i < 15 ? 'bg-gray-800 scale-110' : 'bg-gray-300'}`}></div>
-                  ))
-               ) : (
-                  filteredCases.map((c, i) => (
-                    <div 
-                       key={c.id} 
-                       className="w-4 h-4 rounded-full bg-blue-500 cursor-pointer hover:scale-150 transition-transform relative group"
+                  PENDING_CASES.map((c, i) => (
+                    <div
+                       key={c.id}
+                       className="w-3.5 h-3.5 rounded-full bg-gray-800 cursor-pointer hover:scale-150 transition-transform relative group"
                     >
-                      {/* Tooltip for the case */}
                       <div className="absolute opacity-0 group-hover:opacity-100 -top-12 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] px-3 py-1.5 rounded-sm whitespace-nowrap shadow-lg transition-opacity pointer-events-none z-50">
                         {c.topic} ({c.daysPending}天)
                       </div>
                     </div>
-                  )).concat(
-                    Array.from({length: 40}).map((_, i) => (
-                      <div key={`blank-${i}`} className="w-3 h-3 rounded-full bg-gray-200"></div>
-                    ))
-                  )
+                  ))
+               ) : (
+                  filteredCases.map((c) => (
+                    <div
+                       key={c.id}
+                       className="w-4 h-4 rounded-full bg-blue-500 cursor-pointer hover:scale-150 transition-transform relative group"
+                    >
+                      <div className="absolute opacity-0 group-hover:opacity-100 -top-12 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] px-3 py-1.5 rounded-sm whitespace-nowrap shadow-lg transition-opacity pointer-events-none z-50">
+                        {c.topic} ({c.daysPending}天)
+                      </div>
+                    </div>
+                  ))
                )}
              </div>
              <div className="w-full text-center lg:text-right text-xs mt-6 font-mono text-gray-400 uppercase tracking-widest">System Queue Overload</div>
