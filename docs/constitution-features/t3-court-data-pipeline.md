@@ -9,7 +9,7 @@ verdict:
 score: 0.8
 worktree: .worktrees/spacedock-ensign-t3-court-data-pipeline
 issue:
-pr:
+pr: #1
 ---
 
 Replace the mock data in `src/data/future.ts` with real/structured constitutional court pending case data.
