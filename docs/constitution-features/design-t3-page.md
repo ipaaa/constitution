@@ -21,3 +21,31 @@ Key elements:
 - **Crisis Framing** — The page narrative should frame the 5-justice constraint as a systemic bottleneck, not just a number. Show estimated processing time, case backlog depth, and what rights remain in limbo.
 
 The existing `src/app/future/page.tsx` has a basic tag filter and mock data. This redesign should elevate it into a compelling, data-driven interactive experience consistent with the visual language of Track 1 and Track 2.
+
+## Stage Report
+
+### 1. All components and pages described in the design spec are implemented
+**DONE**
+- `src/components/future/RightsCalculator.tsx` — Interactive tag filter with 12 identity tags (expanded from original 5), colored tag pills, result count summary, and clear-all button.
+- `src/components/future/BottleneckFunnel.tsx` — SVG funnel visualization with animated particles flowing through a 5-justice bottleneck, stats bar (pending cases / active justices / estimated years), and capacity progress bar.
+- `src/components/future/CaseCard.tsx` — Case detail cards with topic, applicant, days pending, tags, and visual urgency indicators (color-coded borders, urgency bar, urgency label) that scale with wait time.
+- `src/app/future/page.tsx` — Full Track 3 page assembling all components with crisis banner, responsive sidebar layout, sort controls, and explanation section.
+
+### 2. Data files or type definitions for new data structures are created
+**DONE**
+- `src/data/future.ts` — Expanded `IdentityTag` union type from 5 to 12 tags. Added `TAG_COLORS` mapping for consistent color theming across components. Expanded `PENDING_CASES` from 8 to 28 detailed cases covering all 12 constituencies. Added `CRISIS_STATS` constants for centralized crisis metrics (total pending, active justices, required quorum, vacancy count, estimated clearance time).
+
+### 3. The feature renders without errors and matches the design's responsive behavior
+**DONE**
+- `next build` completes successfully with zero TypeScript or compilation errors.
+- Rights calculator filter: tag selection instantly filters case cards and updates funnel stats.
+- Bottleneck funnel: SVG with animated particles, stats bar, and capacity indicator all render correctly.
+- Case detail cards: urgency-based visual weight (border color, bar width, label) differentiates long-pending from recent cases.
+- Crisis framing: dark emergency banner with pulsing indicator, 4 explanation cards below the fold.
+- Responsive: sidebar stacks above content on mobile, grid adapts from 2-column to 1-column for cards.
+
+### 4. No regressions to existing Track 1/Track 2 functionality
+**DONE**
+- Navbar, Footer, and layout remain unchanged.
+- All other routes (`/`, `/past`, `/present`, `/present/[id]`, `/preview`) build and render as before.
+- No shared components were modified; new components are isolated under `src/components/future/`.
