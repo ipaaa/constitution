@@ -9,7 +9,7 @@ verdict:
 score: 1.0
 worktree: .worktrees/spacedock-ensign-design-t3-page
 issue:
-pr:
+pr: #2
 ---
 
 Build the Track 3 "Future" page (憲庭載入中 / "Court is Loading") using real constitutional court data and the bottleneck funnel metaphor. The page should make the abstract crisis of a paralyzed court feel personal and urgent.
