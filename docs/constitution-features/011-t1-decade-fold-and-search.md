@@ -10,6 +10,7 @@ score: 0.8
 worktree: .worktrees/spacedock-ensign-011-t1-decade-fold-and-search
 issue:
 pr:
+mod-block: merge:pr-merge
 ---
 
 實作 010 ideation 報告中 captain 選定的 **A + E 組合方案** — 把 `/past` 頁面從「全部 entries 擠在一條 scroll 軸」重構為「依年代折疊 section + 全站搜尋」。
