@@ -10,6 +10,7 @@ score: 0.7
 worktree: .worktrees/spacedock-ensign-010-t1-timeline-crowding
 issue:
 pr:
+mod-block: merge:pr-merge
 ---
 
 T1 的 timeline（`/past` 頁面）在加入新 entries 之後變得過於擁擠，UX 崩壞。需要有人研究現況、列出可能的解法，讓 captain 評估要走哪條路。
