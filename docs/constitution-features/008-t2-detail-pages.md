@@ -1,7 +1,7 @@
 ---
 id: "008"
 title: T2 Detail Page Enhancement
-status: implement
+status: review
 source: codebase audit
 started: 2026-04-16T22:13:16Z
 completed:

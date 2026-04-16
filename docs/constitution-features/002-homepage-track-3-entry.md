@@ -1,7 +1,7 @@
 ---
 id: "002"
 title: Homepage Track 3 Entry
-status: implement
+status: review
 source: commission seed
 started: 2026-04-16T22:13:15Z
 completed:
