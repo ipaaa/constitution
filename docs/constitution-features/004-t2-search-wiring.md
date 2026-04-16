@@ -9,7 +9,7 @@ verdict:
 score: 0.9
 worktree: .worktrees/spacedock-ensign-t2-search-wiring
 issue:
-pr:
+pr: #3
 mod-block: merge:pr-merge
 ---
 

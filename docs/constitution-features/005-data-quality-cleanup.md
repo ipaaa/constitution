@@ -9,7 +9,7 @@ verdict:
 score: 0.85
 worktree: .worktrees/spacedock-ensign-data-quality-cleanup
 issue:
-pr:
+pr: #4
 mod-block: merge:pr-merge
 ---
 
