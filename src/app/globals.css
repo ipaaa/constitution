@@ -121,3 +121,30 @@
   color: var(--color-accent-red);
   transform: translateY(-50%) translateX(-10px);
 }
+
+/* Decade fold: collapse / expand animation (~400ms ease) */
+.decade-body {
+  overflow: hidden;
+  transition: max-height 400ms cubic-bezier(0.25, 1, 0.5, 1), opacity 400ms ease;
+}
+.decade-body.collapsed {
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.decade-body.expanded {
+  max-height: none;
+  opacity: 1;
+}
+
+/* Search landing: ~1.5s highlight pulse on the target entry */
+@keyframes entry-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.0); background-color: rgba(211, 47, 47, 0.0); }
+  20%  { box-shadow: 0 0 0 14px rgba(211, 47, 47, 0.35); background-color: rgba(211, 47, 47, 0.18); }
+  60%  { box-shadow: 0 0 0 6px rgba(211, 47, 47, 0.15); background-color: rgba(211, 47, 47, 0.08); }
+  100% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.0); background-color: rgba(211, 47, 47, 0.0); }
+}
+.entry-pulse {
+  animation: entry-pulse 1.5s ease-out 1;
+  border-radius: 4px;
+}
