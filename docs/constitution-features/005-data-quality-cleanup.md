@@ -10,7 +10,7 @@ score: 0.85
 worktree: .worktrees/spacedock-ensign-data-quality-cleanup
 issue:
 pr: #4
-mod-block: merge:pr-merge
+mod-block: 
 ---
 
 目前 codebase 中有多處 placeholder / 測試資料影響品質：
