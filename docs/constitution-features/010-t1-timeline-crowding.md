@@ -1,13 +1,13 @@
 ---
 id: "010"
 title: T1 Timeline Crowding — Solution Options
-status: design
+status: implement
 source: captain-filed
-started:
+started: 2026-04-16T20:53:14Z
 completed:
 verdict:
 score: 0.7
-worktree:
+worktree: .worktrees/spacedock-ensign-010-t1-timeline-crowding
 issue:
 pr:
 ---

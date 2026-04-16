@@ -1,13 +1,13 @@
 ---
 id: "009"
 title: Docs & Lint Cleanup
-status: design
+status: implement
 source: debrief follow-up
-started:
+started: 2026-04-16T20:53:13Z
 completed:
 verdict:
 score: 0.3
-worktree:
+worktree: .worktrees/spacedock-ensign-009-docs-and-lint-cleanup
 issue:
 pr:
 ---
