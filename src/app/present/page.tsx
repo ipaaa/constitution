@@ -4,11 +4,12 @@ import { useMemo, useState } from 'react';
 import _DISCUSSIONS_DATA from '@/data/discussions.json';
 import { Search, ExternalLink, Play } from 'lucide-react';
 
-import { VibeTag, JudgeOwlComment, type DiscussionItem, type DiscussionCategory } from '@/components/SharedPresent';
+import { VibeTag, JudgeOwlComment, type DiscussionItem } from '@/components/SharedPresent';
 
 const DISCUSSIONS_DATA = _DISCUSSIONS_DATA as DiscussionItem[];
 
 import Link from 'next/link';
+import Image from 'next/image';
 
 const CourtTimeline = () => {
   const milestones = [
@@ -86,9 +87,12 @@ const OfficialTLDR = ({ item }: { item?: DiscussionItem }) => {
     <div className="bg-[#f8f9fa] border-t-4 border-black border-l border-r border-b border-gray-200 shadow-sm relative group mb-12 overflow-hidden">
       {/* Hero Illustration */}
       <div className="w-full h-auto overflow-hidden border-b border-gray-200">
-        <img 
-          src="/tldr-illustration.png" 
-          alt="Constitutional Court Status" 
+        <Image
+          src="/tldr-illustration.png"
+          alt="Constitutional Court Status"
+          width={1024}
+          height={503}
+          priority
           className="w-full h-auto object-cover opacity-90 hover:opacity-100 transition-opacity duration-500"
         />
       </div>
