@@ -10,6 +10,7 @@ score: 0.3
 worktree: .worktrees/spacedock-ensign-009-docs-and-lint-cleanup
 issue:
 pr:
+mod-block: merge:pr-merge
 ---
 
 Small maintenance pass to settle two follow-ups flagged in the 2026-04-16 session debrief.
