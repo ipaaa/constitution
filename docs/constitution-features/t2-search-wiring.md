@@ -1,7 +1,7 @@
 ---
 id: "004"
 title: T2 Search & Filter
-status: implement
+status: review
 source: codebase audit
 started: 2026-04-16T15:57:36Z
 completed:
