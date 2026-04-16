@@ -9,7 +9,7 @@ verdict:
 score: 0.3
 worktree: .worktrees/spacedock-ensign-009-docs-and-lint-cleanup
 issue:
-pr:
+pr: #6
 mod-block: merge:pr-merge
 ---
 

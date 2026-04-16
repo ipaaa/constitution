@@ -9,7 +9,7 @@ verdict:
 score: 0.7
 worktree: .worktrees/spacedock-ensign-010-t1-timeline-crowding
 issue:
-pr:
+pr: #7
 mod-block: merge:pr-merge
 ---
 
