@@ -1,13 +1,13 @@
 ---
 id: "005"
 title: Data Quality Cleanup
-status: design
+status: implement
 source: codebase audit
-started:
+started: 2026-04-16T15:57:37Z
 completed:
 verdict:
 score: 0.85
-worktree:
+worktree: .worktrees/spacedock-ensign-data-quality-cleanup
 issue:
 pr:
 ---

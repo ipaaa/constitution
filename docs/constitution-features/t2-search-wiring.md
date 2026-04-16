@@ -1,13 +1,13 @@
 ---
 id: "004"
 title: T2 Search & Filter
-status: design
+status: implement
 source: codebase audit
-started:
+started: 2026-04-16T15:57:36Z
 completed:
 verdict:
 score: 0.9
-worktree:
+worktree: .worktrees/spacedock-ensign-t2-search-wiring
 issue:
 pr:
 ---
