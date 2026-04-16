@@ -59,12 +59,10 @@ Performed both maintenance follow-ups: synced the workflow README to the current
 9. **DONE** — Changes committed on branch `spacedock-ensign/009-docs-and-lint-cleanup` with a `chore:` message (see git log).
 10. **DONE** — This Stage Report section.
 
-## Stage Report — Review
-
-### Verdict: PASSED
+## Stage Report (review)
 
 ### Summary
-Independent review of commit `f05e90d` on branch `spacedock-ensign/009-docs-and-lint-cleanup`. Both maintenance fixes landed cleanly with no scope creep. README now documents the `{id}-{slug}.md` convention in both the File Naming and Feature Template sections. The Present page's two ESLint warnings are resolved: the unused `DiscussionCategory` import is removed, and the hero `<img>` was migrated to `next/image`'s `<Image>` with preserved src/alt/className and correct dimensions (1024×503 matches the actual PNG via `file public/tldr-illustration.png`). The `priority` flag is appropriate for an above-the-fold hero. All three verification commands pass clean. Diff scope is exactly 3 files (entity MD, README, page.tsx).
+**Verdict: PASSED.** Independent review of commit `f05e90d` on branch `spacedock-ensign/009-docs-and-lint-cleanup`. Both maintenance fixes landed cleanly with no scope creep. README now documents the `{id}-{slug}.md` convention in both the File Naming and Feature Template sections. The Present page's two ESLint warnings are resolved: the unused `DiscussionCategory` import is removed, and the hero `<img>` was migrated to `next/image`'s `<Image>` with preserved src/alt/className and correct dimensions (1024×503 matches the actual PNG via `file public/tldr-illustration.png`). The `priority` flag is appropriate for an above-the-fold hero. All three verification commands pass clean. Diff scope is exactly 3 files (entity MD, README, page.tsx).
 
 ### Checklist
 
