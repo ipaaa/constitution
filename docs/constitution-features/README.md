@@ -28,7 +28,7 @@ This workflow tracks features for a constitution literacy website that makes Tai
 
 ## File Naming
 
-Each feature is a markdown file named `{slug}.md` — lowercase, hyphens, no spaces. Example: `bottleneck-funnel.md`.
+Each feature is a markdown file named `{id}-{slug}.md` — lowercase, hyphens, no spaces. Example: `004-t2-search-wiring.md`.
 
 ## Schema
 
@@ -140,6 +140,8 @@ grep -l "status: design" docs/constitution-features/*.md
 ```
 
 ## Feature Template
+
+Save new features as `{id}-{slug}.md` (e.g. `004-t2-search-wiring.md`):
 
 ```yaml
 ---
