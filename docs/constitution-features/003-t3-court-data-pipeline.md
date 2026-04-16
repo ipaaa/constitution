@@ -1,13 +1,13 @@
 ---
 id: "003"
 title: T3 Court Data Pipeline
-status: design
+status: implement
 source: commission seed
-started: 
+started: 2026-04-16T17:24:00Z
 completed:
 verdict:
 score: 0.8
-worktree: 
+worktree: .worktrees/spacedock-ensign-003-t3-court-data-pipeline
 issue:
 pr: 
 ---
