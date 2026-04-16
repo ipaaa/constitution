@@ -1,15 +1,15 @@
 ---
 id: "003"
 title: T3 Court Data Pipeline
-status: review
+status: design
 source: commission seed
-started: 2026-04-13T16:16:43Z
+started: 
 completed:
 verdict:
 score: 0.8
-worktree: .worktrees/spacedock-ensign-t3-court-data-pipeline
+worktree: 
 issue:
-pr: #1
+pr: 
 ---
 
 Replace the mock data in `src/data/future.ts` with real/structured constitutional court pending case data.
