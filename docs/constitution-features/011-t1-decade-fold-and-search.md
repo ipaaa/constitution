@@ -9,7 +9,7 @@ verdict:
 score: 0.8
 worktree: .worktrees/spacedock-ensign-011-t1-decade-fold-and-search
 issue:
-pr:
+pr: #8
 mod-block: merge:pr-merge
 ---
 
