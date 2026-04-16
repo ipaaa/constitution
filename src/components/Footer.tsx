@@ -31,7 +31,7 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-red-500 transition-colors flex items-center gap-2 text-gray-400">
+                <a href="https://github.com/g0v/Welcome-to-Add-C0urt/issues/new" target="_blank" rel="noopener noreferrer" className="hover:text-red-500 transition-colors flex items-center gap-2">
                   <AlertCircle size={16} /> 內容錯誤回報 (Feedback)
                 </a>
               </li>
