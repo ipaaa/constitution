@@ -1,7 +1,7 @@
 ---
 id: "011"
 title: T1 Decade Fold + Search (A+E Implementation)
-status: implement
+status: review
 source: 010 ideation decision
 started: 2026-04-16T21:16:29Z
 completed:
