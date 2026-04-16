@@ -222,3 +222,98 @@ Spec 應涵蓋：
 ### Summary
 
 診斷了 `src/app/past/page.tsx` 的 render 擁擠根源（10 筆 entries → 1000vh scroll + 30 個絕對定位 DOM 節點 + timeline dot 標籤疊字），提出 5 個橫跨「小改動」到「路由重構」的候選解法，推薦「年代折疊（A）」作為主方案並搭配「搜尋（E）」作為組合加分項，誠實列出每條路的讓步。Ideation only — 無 `src/**` 改動。
+
+## Stage Report (review)
+
+獨立 reviewer：對著 worktree 的 `src/app/past/page.tsx`、`src/data/history.json`、`src/app/globals.css` 逐條驗證 ideation 產物。以下檢核沿用 review checklist 的編號。
+
+### 驗證結果
+
+1. **診斷引用對照實際 code — DONE**
+   - `src/app/past/page.tsx:4`：`import HISTORY_DATA from '@/data/history.json'` — 完全一致
+   - `src/app/past/page.tsx:12-41`：`useEffect` 內 `IntersectionObserver`，`rootMargin: "-45% 0px -45% 0px"` — 一致
+   - `src/app/past/page.tsx:72-101`：左欄 textbook items map，使用 `absolute top-0 left-0` + `.textbook-item.active/.exit-up/.exit-down` class — 一致
+   - `src/app/past/page.tsx:111-120`：中央 timeline dots map，dot 上內嵌 year label (`whitespace-nowrap`) — 一致（標籤實際在 116-118）
+   - `src/app/past/page.tsx:125-160`：右欄 reality items map，絕對定位 + `bgImage` url — 一致
+   - `src/app/past/page.tsx:167-173`：10 個 `h-screen.vh-trigger` scroll triggers with `data-step={index}` — 一致
+   - `src/app/globals.css:60-78`：`.textbook-item` 三組狀態 class（active / exit-up / exit-down）CSS transition — 一致
+   - 中央 timeline 容器 `flex-col justify-between py-[20vh]` 位於 `src/app/past/page.tsx:105` — 診斷文字把 `py-[20vh]` 歸屬到 `:111-120` 區段略微鬆散，但不是事實錯誤（115 行以內屬於同一 `<div>`），算合格
+
+2. **entry count 與 scroll 高度公式 — DONE**
+   - `node -e "console.log(require('./src/data/history.json').length)"` → **10**，與診斷「`HISTORY_DATA.length === 10`」一致
+   - years: 1990, 1991, 1994, 1995, 1999, 2003, 2004, 2017, 2022, 2023 — 與「年份從 1990 到 2023」一致
+   - categories: 10 個（權力分立／言論自由／性別平等／學生權利／宗教自由／遷徙自由／正當法律程序／性取向平等／原住民族權利／團結權） — 與「10 個不同 categories」一致
+   - `src/app/past/page.tsx:64` `style={{ height: \`${HISTORY_DATA.length * 100}vh\` }}` — 與診斷引用的 `HISTORY_DATA.length * 100vh` 公式完全一致
+   - 1000vh 的算術（10 × 100vh）正確；「1920px 螢幕滾 ~19 個螢幕」是 intro + 10 個 trigger + outro 的合理近似
+
+3. **候選解法結構完整性 — DONE**
+   - 共 5 個候選（A 年代折疊 / B filter chips / C mini-map / D 子頁 / E 搜尋），超過「至少 3 個」的要求
+   - 每個候選都涵蓋了 **名稱與一句話**、**UX 樣貌**、**實作複雜度**（含檔案粗估）、**Trade-offs**（正負向各有）、**例子**（參考產品） — 欄位齊全
+
+4. **option space 光譜 — DONE**
+   - 最小改動：B（filter chips，只改 `page.tsx` 加 useState + filter）、E（搜尋，只改 `page.tsx` + 可選 fuse.js）
+   - 中等改動：A（頂層結構換成 collapsible sections）、C（新增 mini-map 組件）
+   - 最大改動：D（新增 `/past/[decade]/page.tsx` 動態路由 + overview 重做）
+   - 光譜從「加 UI」→「重組頁內結構」→「重組路由」真的橫跨三個層級，不是同一個點子的變體
+
+5. **推薦方案一致性 — DONE**
+   - 明確選 A，給了 5 條理由（對應擁擠根源、敘事合理、規模化、保留資產、複雜度可控）
+   - 誠實寫出 vs B/D/C/E 各自放棄了什麼；特別點出「需要一次點擊才進入敘事」這個 UX 退步是 A 自己的代價 — 對 trade-offs 誠實
+   - 推薦理由與診斷對得上：診斷主張「所有 entries 疊在同一 scroll 軸」是根源；推薦方案確實是唯一切開 scroll 軸的選項（B/E 加 escape hatch、C 加地圖、D 雖也切但代價大）— 邏輯閉環
+
+6. **可組合方案 — DONE**
+   - 明確推薦 A+E（年代折疊 + 搜尋），說明為何互補（探索型 vs 目標型使用者）
+   - 討論 A+B 並給出不推薦理由（年代本身就是 filter，疊 category chip 會有兩層邏輯）
+   - 明確排除 C + 任何組合（頁面分段後 mini-map 價值消失）— 不是偷懶，是有根據的排除
+
+7. **NO src/\*\* 變動 — DONE**
+   - `git show --stat 0bfd037`（branch 唯一 commit）只觸及 `docs/constitution-features/010-t1-timeline-crowding.md`
+   - `git diff main..HEAD --name-only` 另列出的 `009-docs-and-lint-cleanup.md` 是 worktree 共用 base 已有、非本任務造成
+   - 無任何 `src/` 檔案被修改
+
+8. **推薦方案 sanity check — DONE**
+   - A 是否真的是最佳？給定診斷強調「scroll 距離 × DOM 節點 × timeline 密度三者同時爆炸」，A 同時解決三者：scroll 距離拆到每個 section、DOM 透過收合減少、timeline 密度在 section 內部重算。其他方案各自只解決一到兩個維度。結論：與 trade-offs 內部一致
+   - 唯一可以挑剔的是「A 不解決『找釋字 748』這種精準查詢」，但 ideation 自己已經承認並用 A+E 組合補齊 — 誠實
+
+9. **Trade-offs sanity check — DONE**
+   - A 沒有過度推銷：內文明確寫「破壞『開頁即沉浸 scroll』的無縫感」這個 UX 退步
+   - B 沒有隱瞞：明寫「不下 filter 時仍然滾 1000vh+」— 不假裝解決了核心問題
+   - C 點出「mobile 沒空間」+「與中央 timeline 功能重疊可能讓人困惑」— 關鍵弱點有揭露
+   - D 誠實寫出「破壞『一頁看完整部憲法史』的敘事連貫性」+「新美術設計」— 承認是真工程 + 設計雙重成本
+   - E 誠實寫「不知道要找什麼的使用者沒用 — 他們才是擁擠問題的主受害者」+「10–30 筆搜尋必要性不高」— 不過度推銷
+   - 唯一可補強（但不影響通過）：A 沒有明確提到「SEO／深連結到特定 entry 的 URL 結構是否需要配合做 hash anchor」；但這不是核心 trade-off，captain 若選 A 再追問也來得及
+
+10. **驗證判定 — DONE** — 詳見下方 Verdict
+
+### Verdict
+
+**PASSED.**
+
+Rationale：
+- 現狀診斷全部檔名、行號、公式、筆數經過逐條 cross-check，無造假
+- 5 個候選解法欄位齊全、橫跨真實光譜（小／中／大改動）、例子皆為可驗證的真實產品
+- 推薦方案邏輯與診斷閉環，誠實列出對其他選項的讓步，沒有寫成「我的選擇最好、其他都差」
+- 可組合方案提出有價值的 A+E 組合，並有根據地排除 A+B 與 C 的所有組合
+- 乾淨的 ideation-only commit，無 `src/**` leakage
+- 品質足以讓 captain 直接依此挑方向並 dispatch 下一輪 implement
+
+Minor 觀察（非阻擋 — 留給 captain 參考即可）：
+- 若 captain 選擇 A，後續 implement 需要補上「hero → 第一個 section 的銜接動畫」與「是否預設展開第一個年代」這類設計細節；ideation 未展開但已點到
+- 若 captain 選擇 A+E，後續 implement 需要決定搜尋結果跳轉時「如何自動展開收合 section」的互動順序
+
+### Completion checklist (review stage)
+
+1. 驗證 `### 現狀診斷` file:line 引用 — **DONE**
+2. 驗證 entry count (10) 與 `HISTORY_DATA.length * 100vh` 公式 — **DONE**
+3. 驗證 `### 候選解法` ≥3 個且欄位齊全 — **DONE**（實際 5 個）
+4. 驗證 option space 從最小改動到最大改動都有 — **DONE**
+5. 驗證 `### 推薦方案` 誠實列出放棄了什麼 — **DONE**
+6. 驗證 `### 可組合方案` 存在並合理 — **DONE**
+7. 驗證 `git diff main..HEAD` 無 `src/**` — **DONE**
+8. Sanity-check 推薦方案內部一致性 — **DONE**
+9. Sanity-check trade-offs 是否過度推銷或漏洞 — **DONE**
+10. 下 PASSED / REJECTED verdict — **DONE**（PASSED）
+
+### Summary (review)
+
+Ideation 產物全部 cross-check 通過：file:line 引用皆準確、entry count 與 scroll 公式精確對應實際 code、5 個候選解法結構完整且光譜真實、推薦方案與診斷邏輯閉環且誠實揭露 trade-offs、可組合方案有判斷依據、無 `src/**` 污染。**PASSED** — captain 可以在 A / B / C / D / E 之間挑選（或接受推薦的 A 或 A+E 組合），直接 dispatch implement 階段。
