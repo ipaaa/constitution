@@ -10,6 +10,7 @@ score: 0.9
 worktree: .worktrees/spacedock-ensign-t2-search-wiring
 issue:
 pr:
+mod-block: merge:pr-merge
 ---
 
 Track 2 的搜尋欄 UI 已經存在（`src/app/present/page.tsx`），但完全沒有接線——輸入文字不會篩選任何內容。
