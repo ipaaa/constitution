@@ -10,6 +10,7 @@ score: 0.8
 worktree: .worktrees/spacedock-ensign-003-t3-court-data-pipeline
 issue:
 pr: 
+mod-block: merge:pr-merge
 ---
 
 Replace the mock data in `src/data/future.ts` with real/structured constitutional court pending case data.
