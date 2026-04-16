@@ -1,3 +1,6 @@
+'use client';
+
+import { useMemo, useState } from 'react';
 import _DISCUSSIONS_DATA from '@/data/discussions.json';
 import { Search, ExternalLink, Play } from 'lucide-react';
 
@@ -331,6 +334,8 @@ const ReelCard = ({ item }: { item: DiscussionItem }) => {
 };
 
 export default function PresentTrack() {
+  const [searchTerm, setSearchTerm] = useState('');
+
   // Unified sorting logic: Sticky first, then by year (descending)
   const sortDiscussions = (items: DiscussionItem[]) => {
     return [...items].sort((a, b) => {
@@ -339,6 +344,22 @@ export default function PresentTrack() {
       return b.year.localeCompare(a.year);
     });
   };
+
+  // Case-insensitive filter across title, author, and abstract.
+  // Empty / whitespace-only search restores the full list.
+  const filteredData = useMemo(() => {
+    const q = searchTerm.trim().toLowerCase();
+    if (!q) return DISCUSSIONS_DATA;
+    return DISCUSSIONS_DATA.filter(item =>
+      item.title.toLowerCase().includes(q) ||
+      item.author.toLowerCase().includes(q) ||
+      item.abstract.toLowerCase().includes(q)
+    );
+  }, [searchTerm]);
+
+  const scholarItems = filteredData.filter(item => item.category === 'Scholar Articles');
+  const ngoItems = filteredData.filter(item => item.category === 'NGO Reports');
+  const reelItems = filteredData.filter(item => item.category === 'Reels');
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12 w-full bg-[#fcfcfc] min-h-screen">
@@ -352,10 +373,13 @@ export default function PresentTrack() {
           <p className="text-gray-500 font-medium font-serif mt-2 text-lg">公民必讀的憲政剪貼簿：看專家與民間如何解讀判決</p>
         </div>
         <div className="flex bg-white rounded-sm shadow-sm border border-gray-300 w-full md:w-96 transition-all focus-within:border-gray-500 focus-within:shadow-md">
-          <input 
-            type="text" 
-            placeholder="在檔案庫中搜尋關鍵字、法案..." 
+          <input
+            type="text"
+            placeholder="在檔案庫中搜尋關鍵字、法案..."
             className="flex-grow bg-transparent px-4 py-3 outline-none text-gray-700 font-sans"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            aria-label="搜尋標題、作者、摘要"
           />
           <button className="text-gray-500 hover:text-gray-900 px-4 hover:bg-gray-50 transition-colors border-l border-gray-200">
             <Search size={20} />
@@ -388,11 +412,11 @@ export default function PresentTrack() {
                 <span className="w-2 h-2 bg-blue-600 rounded-full"></span> 學者文章 (Scholar Perspectives)
               </h4>
               <span className="text-xs bg-gray-100 text-gray-500 font-mono px-2 py-1 rounded">
-                {DISCUSSIONS_DATA.filter(item => item.category === 'Scholar Articles').length} Articles
+                {scholarItems.length} Articles
               </span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {sortDiscussions(DISCUSSIONS_DATA.filter(item => item.category === 'Scholar Articles')).map(item => (
+              {sortDiscussions(scholarItems).map(item => (
                 <ScholarCard key={item.id} item={item} />
               ))}
             </div>
@@ -405,11 +429,11 @@ export default function PresentTrack() {
                 <span className="w-2 h-2 bg-[#D32F2F] rounded-full"></span> NGO 倡議 (NGO Reports)
               </h4>
               <span className="text-xs bg-gray-100 text-gray-500 font-mono px-2 py-1 rounded">
-                {DISCUSSIONS_DATA.filter(item => item.category === 'NGO Reports').length} Articles
+                {ngoItems.length} Articles
               </span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {sortDiscussions(DISCUSSIONS_DATA.filter(item => item.category === 'NGO Reports')).map(item => (
+              {sortDiscussions(ngoItems).map(item => (
                 <NGOCard key={item.id} item={item} />
               ))}
             </div>
@@ -422,11 +446,11 @@ export default function PresentTrack() {
                 <span className="w-2 h-2 bg-green-500 rounded-full"></span> 影音轉譯 (Reels & Shorts)
               </h4>
                <span className="text-xs bg-gray-100 text-gray-500 font-mono px-2 py-1 rounded">
-                 {DISCUSSIONS_DATA.filter(item => item.category === 'Reels').length} Videos
+                 {reelItems.length} Videos
                </span>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {sortDiscussions(DISCUSSIONS_DATA.filter(item => item.category === 'Reels')).map(item => (
+              {sortDiscussions(reelItems).map(item => (
                 <ReelCard key={item.id} item={item} />
               ))}
             </div>
