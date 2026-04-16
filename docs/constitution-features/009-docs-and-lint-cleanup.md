@@ -1,7 +1,7 @@
 ---
 id: "009"
 title: Docs & Lint Cleanup
-status: implement
+status: review
 source: debrief follow-up
 started: 2026-04-16T20:53:13Z
 completed:
