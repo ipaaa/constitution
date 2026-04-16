@@ -140,7 +140,7 @@
       "title": "遲來的正義，西拉雅族正式找回原住民身分。",
       "ruling": "承認平埔族群原住民身分",
       "ruling_id": "111 年 憲判字第 17 號",
-      "bgImage": ""
+      "bgImage": "https://images.unsplash.com/photo-1519817914152-22d216bb9170?q=80&w=2070&auto=format&fit=crop"
     }
   },
   {
@@ -157,22 +157,6 @@
       "ruling": "華航工會爭議案",
       "ruling_id": "112 年憲判字第 7 號",
       "bgImage": "https://images.unsplash.com/photo-1542744094-24638eff58bb?q=80&w=2070&auto=format&fit=crop"
-    }
-  },
-  {
-    "id": "h15",
-    "category": "測試",
-    "textbook": {
-      "chapter": "測試",
-      "content": "測試",
-      "handwriting": "測試"
-    },
-    "reality": {
-      "year": "2025",
-      "title": "測試",
-      "ruling": "測試",
-      "ruling_id": "測試",
-      "bgImage": ""
     }
   }
 ]
