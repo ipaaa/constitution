@@ -21,9 +21,22 @@ function urgencyBarColor(days: number): string {
   return 'bg-gray-300';
 }
 
+const FILING_DATE_FMT = new Intl.DateTimeFormat('zh-TW', {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+});
+
+function formatFilingDate(iso: string): string {
+  const ts = Date.parse(iso);
+  if (Number.isNaN(ts)) return iso;
+  return FILING_DATE_FMT.format(new Date(ts));
+}
+
 export default function CaseCard({ case_ }: CaseCardProps) {
   const urgency = urgencyLevel(case_.daysPending);
   const years = (case_.daysPending / 365).toFixed(1);
+  const filedOn = formatFilingDate(case_.filingDate);
 
   return (
     <div
@@ -45,8 +58,16 @@ export default function CaseCard({ case_ }: CaseCardProps) {
         {case_.topic}
       </h4>
 
-      {/* Applicant */}
-      <p className="text-sm text-gray-500 mb-3">{case_.applicant}</p>
+      {/* Applicant + filing date */}
+      <div className="mb-3 flex items-baseline justify-between gap-3">
+        <p className="text-sm text-gray-500 truncate">{case_.applicant}</p>
+        <time
+          dateTime={case_.filingDate}
+          className="font-mono text-[10px] text-gray-400 whitespace-nowrap"
+        >
+          申請 {filedOn}
+        </time>
+      </div>
 
       {/* Tags */}
       <div className="flex flex-wrap gap-1.5 mb-4">
