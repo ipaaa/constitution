@@ -52,3 +52,56 @@ Chose a minimal custom renderer over pulling in a dependency (e.g., `react-markd
 - Volunteer-transcription CTA uses `mailto:volunteer@addcourt.tw` as a placeholder inbox. Swap for a real submission form or inbox later if the team has one.
 - Markdown renderer intentionally omits lists, code blocks, images, and tables — out of scope per the entity bullet list. If future content needs those, extend `parseBlocks` / `renderInline` rather than swapping to a third-party renderer (current behavior is auditable in ~110 LOC).
 - Related-articles scoring is deliberately simple (category + vibe only). If the team later adds tag arrays or author-overlap signals, extend `relatedScore` in `src/components/PresentDetail.tsx`.
+
+## Stage Report (review)
+
+### Summary
+Independent review of the T2 Detail Page Enhancement implementation on `spacedock-ensign/008-t2-detail-pages`. Verified each acceptance criterion against the diff with line-level evidence, exercised the Markdown renderer's URL allowlist against common script-injection vectors, ran `computeRelated` against the real `discussions.json` shape, and re-ran type-check + production build in the worktree. **Verdict: PASSED.**
+
+### Checklist
+
+1. **Read full implementation diff — DONE.** `git diff --stat main...HEAD` shows 4 files changed: entity doc + `src/app/present/[id]/page.tsx` + two new components (`Markdown.tsx`, `PresentDetail.tsx`). Total +454/-33. Two commits (`3a9b372` feature + `424b06b` stage report).
+
+2. **Acceptance criteria — all DONE.**
+   - **Empty-content graceful CTA:** `EmptyContentCTA` at `src/components/PresentDetail.tsx:10-40` replaces the old "Awaiting Transcription" placeholder with two typed CTAs — primary link to `item.link` (lines 23-30) and a pre-populated mailto for volunteer transcription (lines 31-36). Rendered conditionally from `src/app/present/[id]/page.tsx:96-102`.
+   - **Markdown rendering for `full_content`:** `Markdown` component at `src/components/Markdown.tsx:91-146` wired in at `src/app/present/[id]/page.tsx:97-99` inside `<article className="prose-serif">`. Supports `#`/`##`/`###` headings, `**bold**`, `[text](url)` links, `>` blockquotes, paragraphs — matches spec scope exactly.
+   - **2-3 related articles:** `RelatedArticles` at `src/components/PresentDetail.tsx:176-227` with `limit=3` and `md:grid-cols-3`; rendered at `src/app/present/[id]/page.tsx:138`.
+   - **Share feature:** `ShareActions` at `src/components/PresentDetail.tsx:46-147` exposes copy-link, Twitter, Facebook. Two variants: `header` (icon buttons in sticky bar, line 47 of page) and `inline` (pill buttons in footer, line 133 of page).
+   - **`owl_depth_comment` display:** gating logic at `src/app/present/[id]/page.tsx:31` (`const depthComment = item.owl_depth_comment || item.owl_comment`) and conditional block at lines 106-118. When both fields are empty, the decorative "Arxiv Review" header and the trailing caption are hidden entirely (no orphan label).
+
+3. **Markdown renderer security review — PASSED.**
+   - No `dangerouslySetInnerHTML` in the new code (verified via grep; the two existing uses in `src/app/present/page.tsx` and `src/app/past/page.tsx` are pre-existing and out of scope for this feature).
+   - URL allowlist at `src/components/Markdown.tsx:7-12` correctly blocks `javascript:` (case-insensitive, including with leading whitespace after trim), `data:`, `vbscript:`, `file:`, `ftp:` — verified by direct regex testing.
+   - User-authored text is composed as React nodes via `renderInline` (lines 16-58) and React automatically escapes text children, so no HTML/XSS injection is possible even for raw `<script>` strings.
+   - **Minor note (non-blocking):** the allowlist accepts protocol-relative URLs (`//evil.com`) because `^(...|\/|...)` matches a single leading slash. Browsers resolve these to `https://evil.com`, so `[x](//evil.com)` could silently navigate users off-site; it's not a code-execution vector. Given the content pipeline is author-controlled (Google Sheets → volunteer transcription, not open user comments), this is acceptable for ship. If tightened later, change the pattern to require two leading slashes before a path (`\/(?!\/)` negative lookahead) or a stricter scheme check.
+
+4. **Markdown renderer scope review — DONE.** Implemented subset (headings h1-h3, bold, links, blockquotes + paragraph/line-break handling) matches the entity's "標題、粗體、連結、引用" bullet exactly. Renderer is ~110 LOC and auditable. Real `discussions.json` currently has zero entries with `full_content` populated (all 9 rows have the field empty or absent), so the production runtime path is the `EmptyContentCTA` branch — exercised and clean. The Markdown path is unit-testable by inspection and the parser handles edge cases (CRLF normalization line 66, empty blocks line 71, mixed blockquote detection line 80).
+
+5. **Related articles logic — DONE.**
+   - `relatedScore` at `src/components/PresentDetail.tsx:151-156` is deterministic (pure function of category equality + vibe equality).
+   - Self exclusion at line 164 (`d.id !== current.id`) plus `tldr` exclusion (`d.id !== 'tldr'`) — verified against real data: `computeRelated(self, ...)` never returns self or the `Official TL;DR` row.
+   - Empty-result path: `return null` at line 184 when `related.length === 0`, so the entire section (header + grid + "更多檔案" CTA) is unrendered cleanly.
+   - Exercised against all 9 real items: `d1 → [d9]`, `d2 → [d4, d6, d5]`, `d7 → [d8, d9]`, `tldr → []`, etc. Score-ties broken by descending year (line 170). Vibe match (3pts) correctly outweighs category match (2pts).
+   - Responsive grid: `grid-cols-1 md:grid-cols-3` at line 202 — single column on mobile, 3 columns at md (768px+). `line-clamp-3` on title and `truncate` on author (lines 213, 217) prevent overflow on narrow cards.
+
+6. **Share feature — DONE.**
+   - Clipboard fallback at `src/components/PresentDetail.tsx:49-72`: primary path uses `navigator.clipboard.writeText`; fallback creates an off-screen `<textarea>`, selects it, and uses `document.execCommand('copy')` — standard pattern for non-secure contexts / older browsers. Wrapped in try/catch with visual feedback reset on failure.
+   - Twitter URL: `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}` (line 83) — both components properly encoded.
+   - Facebook URL: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}` (line 84) — URL-encoded.
+   - SSR safety: `getCurrentUrl()` at line 44 returns `''` when `typeof window === 'undefined'`, but — critically — the function is only called inside `onClick` handlers (`handleCopy`, `handleOpenShare`), never during render. So no hydration mismatch is possible. The `useState(false)` initial for `copied` is stable across server/client. Verified by reading the component top-to-bottom.
+   - Popup opened via `window.open(..., '_blank', 'noopener,noreferrer')` (line 79) — safe window opener.
+
+7. **`owl_depth_comment` gating — DONE.** When `owl_depth_comment` and `owl_comment` are both absent/empty, `depthComment` is falsy (line 31 of page) and the whole `<section className="mt-20 pt-12 border-t-2 ...">` block (lines 106-118) is skipped, so neither the "Arxiv Review" label nor the italic caption render. When either field has content, the existing `JudgeOwlComment` visual treatment is preserved untouched (still using the original `isDepth` styling at `src/components/SharedPresent.tsx:40-55`). Note: real `discussions.json` has 8/9 rows with `owl_comment` and 0/9 with `owl_depth_comment`, so most pages currently show the regular yellow-owl card as before; gating only kicks in for the TL;DR row which has neither.
+
+8. **Code quality — DONE.**
+   - No `any` types in any of the three touched/new files (grep-verified).
+   - Tailwind palette consistent: `#fcfcfc` (page bg, page.tsx:34), `#D32F2F` (author chip + big CTA, page.tsx:77, 128), `#f8f9fa` (abstract + blockquote, page.tsx:89 + Markdown.tsx:122). No inline `style={}` additions.
+   - Component boundaries are clean: `Markdown.tsx` is pure/stateless; `PresentDetail.tsx` groups three related client-component widgets; the page itself stays thin and orchestrates.
+   - Typed `DiscussionItem` reused from `SharedPresent`, not redefined.
+   - `src/data/discussions.json` untouched: `git diff --stat main...HEAD -- src/data/` returns empty.
+
+9. **Build verification in the worktree — DONE.**
+   - `npx tsc --noEmit` — clean, no errors.
+   - `npx next build` — succeeds. Output: "Compiled successfully in 1628.6ms", 8/8 static pages generated (`/`, `/_not-found`, `/future`, `/past`, `/present`, `/preview` static; `/present/[id]` dynamic as before). No TypeScript or lint errors. No regressions to `/past`, `/future`, or `/present` list page (all three still prerender as static content). The Next.js "multiple lockfiles" warning is environmental (the worktree has its own `package-lock.json`) and not caused by this PR.
+
+10. **Verdict — PASSED.** Every acceptance criterion from the entity description is met with line-level evidence. The custom Markdown renderer is the highest-risk surface and it blocks all major script-injection URL schemes, composes user text through React (not HTML), and matches the entity's declared scope exactly. Share feature has a correct clipboard fallback and no SSR hydration risks. Related-articles logic is deterministic, tested against real data, and degrades to `null` cleanly. `owl_depth_comment` gating fixes the orphan-label issue as specified. Build + type-check are clean; no regressions to other tracks. `discussions.json` untouched. Single minor non-blocking observation (protocol-relative URLs `//evil.com` pass the allowlist), documented above for future hardening — not a ship blocker given the closed content pipeline.
