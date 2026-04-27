@@ -15,7 +15,7 @@ export default function Home() {
               <span className="bg-gray-800 text-white px-2 py-1 text-xs font-bold tracking-widest uppercase">
                 官方首頁 / Home
               </span>
-              <span className="text-sm font-bold text-gray-500 font-mono tracking-wider">
+              <span className="text-sm font-bold text-gray-600 font-mono tracking-wider">
                 {new Date().toISOString().split('T')[0]}
               </span>
             </div>
@@ -44,7 +44,7 @@ export default function Home() {
               </div>
               <Image 
                 src="/owl.png" 
-                alt="Judge Owl Mascot" 
+                alt="貓頭鷹法官吉祥物"
                 width={360} 
                 height={360} 
                 className="drop-shadow-xl"

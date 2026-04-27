@@ -96,12 +96,13 @@ export default function FutureTrack() {
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-serif font-bold text-gray-900 text-xl">
                 {activeTags.length === 0 ? '所有待審案件' : '相關待審案件'}
-                <span className="text-gray-400 font-mono text-base ml-2">({filteredCases.length})</span>
+                <span className="text-gray-500 font-mono text-base ml-2">({filteredCases.length})</span>
               </h3>
               <div className="flex gap-1 bg-gray-100 rounded-sm p-0.5">
                 <button
                   onClick={() => setSortMode('urgency')}
-                  className={`text-xs px-3 py-1 rounded-sm font-medium transition-colors ${
+                  aria-pressed={sortMode === 'urgency'}
+                  className={`text-xs px-3 py-1 rounded-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 ${
                     sortMode === 'urgency'
                       ? 'bg-white text-gray-900 shadow-sm'
                       : 'text-gray-500 hover:text-gray-700'
@@ -111,7 +112,8 @@ export default function FutureTrack() {
                 </button>
                 <button
                   onClick={() => setSortMode('recent')}
-                  className={`text-xs px-3 py-1 rounded-sm font-medium transition-colors ${
+                  aria-pressed={sortMode === 'recent'}
+                  className={`text-xs px-3 py-1 rounded-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 ${
                     sortMode === 'recent'
                       ? 'bg-white text-gray-900 shadow-sm'
                       : 'text-gray-500 hover:text-gray-700'

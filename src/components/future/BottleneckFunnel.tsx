@@ -39,22 +39,22 @@ export default function BottleneckFunnel({ filteredCount, totalCount }: Bottlene
       <div className="grid grid-cols-3 gap-4 mb-8">
         <div className="text-center p-4 bg-white border border-gray-200 rounded-sm">
           <div className="font-mono text-3xl font-bold text-gray-900">{filteredCount}</div>
-          <div className="text-xs text-gray-500 mt-1 font-medium">待審案件</div>
+          <div className="text-xs text-gray-600 mt-1 font-medium">待審案件</div>
         </div>
         <div className="text-center p-4 bg-white border border-red-200 rounded-sm relative">
           <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
           <div className="font-mono text-3xl font-bold text-[#D32F2F]">{CRISIS_STATS.activeJustices}</div>
-          <div className="text-xs text-gray-500 mt-1 font-medium">現存大法官</div>
+          <div className="text-xs text-gray-600 mt-1 font-medium">現存大法官</div>
         </div>
         <div className="text-center p-4 bg-white border border-gray-200 rounded-sm">
-          <div className="font-mono text-3xl font-bold text-gray-900">{estimatedYears}<span className="text-lg text-gray-400">年</span></div>
-          <div className="text-xs text-gray-500 mt-1 font-medium">預估清理時間</div>
+          <div className="font-mono text-3xl font-bold text-gray-900">{estimatedYears}<span className="text-lg text-gray-500">年</span></div>
+          <div className="text-xs text-gray-600 mt-1 font-medium">預估清理時間</div>
         </div>
       </div>
 
       {/* SVG Funnel */}
       <div className="relative bg-white border border-gray-200 rounded-sm p-4 overflow-hidden" style={{ height: 240 }}>
-        <svg viewBox="0 0 800 200" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
+        <svg viewBox="0 0 800 200" className="w-full h-full" preserveAspectRatio="xMidYMid meet" role="img" aria-label={`案件流量視覺化：${filteredCount} 件待審案件通過 ${CRISIS_STATS.activeJustices} 名大法官的瓶頸`}>
           <defs>
             {/* Gradient for the wide entry */}
             <linearGradient id="funnelGrad" x1="0" x2="1" y1="0" y2="0">
@@ -113,7 +113,7 @@ export default function BottleneckFunnel({ filteredCount, totalCount }: Bottlene
         </svg>
 
         {/* Overlaid explanation */}
-        <div className="absolute bottom-3 left-4 text-[10px] font-mono text-gray-400 uppercase tracking-widest">
+        <div className="absolute bottom-3 left-4 text-[10px] font-mono text-gray-500 uppercase tracking-widest">
           Case Flow Visualization / Rehabilitation Period
         </div>
       </div>
@@ -121,7 +121,7 @@ export default function BottleneckFunnel({ filteredCount, totalCount }: Bottlene
       {/* Capacity bar */}
       <div className="mt-4 bg-white border border-gray-200 rounded-sm p-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-medium text-gray-500">法庭人力容量</span>
+          <span className="text-xs font-medium text-gray-600">法庭人力容量</span>
           <span className="text-xs font-mono text-[#D32F2F] font-bold">{CRISIS_STATS.activeJustices} / {CRISIS_STATS.designatedTotal}</span>
         </div>
         <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
@@ -131,8 +131,8 @@ export default function BottleneckFunnel({ filteredCount, totalCount }: Bottlene
           />
         </div>
         <div className="flex justify-between mt-1.5">
-          <span className="text-[10px] text-gray-400">{CRISIS_STATS.vacantSeats} 席空缺</span>
-          <span className="text-[10px] text-gray-400">需 {CRISIS_STATS.requiredForRuling} 人始得判決</span>
+          <span className="text-[10px] text-gray-500">{CRISIS_STATS.vacantSeats} 席空缺</span>
+          <span className="text-[10px] text-gray-500">需 {CRISIS_STATS.requiredForRuling} 人始得判決</span>
         </div>
       </div>
     </div>

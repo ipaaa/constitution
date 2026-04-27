@@ -3,7 +3,7 @@ import { Github, FileText, AlertCircle } from 'lucide-react';
 
 export default function Footer() {
   return (
-    <footer className="py-12 border-t border-gray-200 bg-white text-gray-500 text-sm mt-auto w-full font-sans relative overflow-hidden">
+    <footer className="py-12 border-t border-gray-200 bg-white text-gray-500 text-sm mt-auto w-full font-sans relative overflow-hidden" aria-label="網站底部資訊">
       <div className="absolute top-0 right-12 w-64 h-64 bg-gray-50 rounded-full blur-3xl -z-10"></div>
       
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
@@ -21,18 +21,18 @@ export default function Footer() {
             <h5 className="font-bold text-gray-900 mb-4 tracking-wider uppercase text-xs">專案資源 (Resources)</h5>
             <ul className="space-y-3 font-medium">
               <li>
-                <a href="https://g0v.hackmd.io/njOKlAIVQcmCgomNMr9cUg?view" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition-colors flex items-center gap-2">
-                  <FileText size={16} /> HackMD 協作共筆
+                <a href="https://g0v.hackmd.io/njOKlAIVQcmCgomNMr9cUg?view" target="_blank" rel="noopener noreferrer" aria-label="HackMD 協作共筆（開啟新分頁）" className="hover:text-blue-600 transition-colors flex items-center gap-2">
+                  <FileText size={16} aria-hidden="true" /> HackMD 協作共筆
                 </a>
               </li>
               <li>
-                <a href="https://github.com/g0v/Welcome-to-Add-C0urt" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition-colors flex items-center gap-2">
-                  <Github size={16} /> GitHub 原始碼
+                <a href="https://github.com/g0v/Welcome-to-Add-C0urt" target="_blank" rel="noopener noreferrer" aria-label="GitHub 原始碼（開啟新分頁）" className="hover:text-blue-600 transition-colors flex items-center gap-2">
+                  <Github size={16} aria-hidden="true" /> GitHub 原始碼
                 </a>
               </li>
               <li>
-                <a href="https://github.com/g0v/Welcome-to-Add-C0urt/issues/new" target="_blank" rel="noopener noreferrer" className="hover:text-red-500 transition-colors flex items-center gap-2">
-                  <AlertCircle size={16} /> 內容錯誤回報 (Feedback)
+                <a href="https://github.com/g0v/Welcome-to-Add-C0urt/issues/new" target="_blank" rel="noopener noreferrer" aria-label="內容錯誤回報（開啟新分頁）" className="hover:text-red-500 transition-colors flex items-center gap-2">
+                  <AlertCircle size={16} aria-hidden="true" /> 內容錯誤回報 (Feedback)
                 </a>
               </li>
             </ul>

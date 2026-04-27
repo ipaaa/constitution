@@ -40,8 +40,8 @@ export default function ArticleDetail({ params }: { params: Promise<{ id: string
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <button className="p-2 hover:bg-gray-800 rounded-full transition-colors opacity-40 hover:opacity-100"><Share2 size={18} /></button>
-          <button className="p-2 hover:bg-gray-800 rounded-full transition-colors opacity-40 hover:opacity-100"><Printer size={18} /></button>
+          <button className="p-2 hover:bg-gray-800 rounded-full transition-colors opacity-40 hover:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500" aria-label="分享此文章"><Share2 size={18} /></button>
+          <button className="p-2 hover:bg-gray-800 rounded-full transition-colors opacity-40 hover:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500" aria-label="列印此文章"><Printer size={18} /></button>
         </div>
       </header>
 
@@ -107,13 +107,14 @@ export default function ArticleDetail({ params }: { params: Promise<{ id: string
           {/* Action Footer */}
           <div className="mt-20 flex flex-col items-center border-t border-gray-100 pt-12">
              <p className="text-sm text-gray-400 font-serif mb-6 italic italic">想對對看與原文的精確度嗎？或者想看更多原始圖表？</p>
-             <a 
-               href={item.link} 
-               target="_blank" 
+             <a
+               href={item.link}
+               target="_blank"
                rel="noopener noreferrer"
+               aria-label="閱讀原始文件（開啟新分頁）"
                className="bg-[#D32F2F] text-white px-10 py-5 rounded shadow-[0_4px_0_0_#8e1e1e] hover:shadow-[0_2px_0_0_#8e1e1e] hover:translate-y-[2px] active:translate-y-[4px] active:shadow-none transition-all font-black text-lg flex items-center gap-3 tracking-widest uppercase"
              >
-               閱讀原始文件 <ExternalLink size={20} />
+               閱讀原始文件 <ExternalLink size={20} aria-hidden="true" />
              </a>
           </div>
         </div>
