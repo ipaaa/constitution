@@ -9,7 +9,7 @@ verdict:
 score: 0.5
 worktree: .worktrees/spacedock-ensign-006-cross-track-navigation
 issue:
-pr:
+pr: #11
 mod-block: merge:pr-merge
 ---
 

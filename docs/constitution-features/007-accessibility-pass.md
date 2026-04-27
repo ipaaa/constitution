@@ -9,7 +9,7 @@ verdict:
 score: 0.6
 worktree: .worktrees/spacedock-ensign-007-accessibility-pass
 issue:
-pr:
+pr: #12
 mod-block: merge:pr-merge
 ---
 
