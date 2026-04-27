@@ -1,7 +1,9 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { PendingCase, TAG_COLORS, IdentityTag } from '@/data/future';
+import { getLinksForCase } from '@/data/cross-track-links';
 
 interface CaseCardProps {
   case_: PendingCase;
@@ -31,6 +33,36 @@ function formatFilingDate(iso: string): string {
   const ts = Date.parse(iso);
   if (Number.isNaN(ts)) return iso;
   return FILING_DATE_FMT.format(new Date(ts));
+}
+
+function CaseHistoryLinks({ caseId }: { caseId: string }) {
+  const links = getLinksForCase(caseId);
+  if (links.length === 0) return null;
+
+  return (
+    <div className="pt-3 mt-3 border-t border-gray-100">
+      <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">
+        歷史脈絡
+      </p>
+      <div className="flex flex-col gap-1">
+        {links.map((link, i) => (
+          <Link
+            key={i}
+            href={link.href}
+            className="flex items-center gap-2 text-[11px] text-[#1565C0] hover:text-[#0D47A1] transition-colors group"
+          >
+            <span className="bg-[#1565C0]/10 text-[#1565C0] text-[8px] font-bold px-1 py-0.5 rounded tracking-wider uppercase shrink-0">
+              T1
+            </span>
+            <span className="truncate">{link.label}</span>
+            <span className="text-gray-400 text-[10px] truncate hidden sm:inline">
+              {link.description}
+            </span>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export default function CaseCard({ case_ }: CaseCardProps) {
@@ -95,6 +127,9 @@ export default function CaseCard({ case_ }: CaseCardProps) {
           {urgency.label}
         </span>
       </div>
+
+      {/* Cross-track links to historical rulings */}
+      <CaseHistoryLinks caseId={case_.id} />
     </div>
   );
 }
