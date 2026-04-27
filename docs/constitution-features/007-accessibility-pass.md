@@ -1,7 +1,7 @@
 ---
 id: "007"
 title: Accessibility Pass
-status: implement
+status: review
 source: codebase audit
 started: 2026-04-27T16:30:08Z
 completed:
