@@ -10,6 +10,7 @@ score: 0.7
 worktree: .worktrees/spacedock-ensign-008-t2-detail-pages
 issue:
 pr:
+mod-block: merge:pr-merge
 ---
 
 T2 的文章詳情頁（`src/app/present/[id]/page.tsx`）已經實作，但幾乎所有文章都顯示「等待轉譯」狀態，因為 `discussions.json` 中的 `full_content` 欄位都是空的。

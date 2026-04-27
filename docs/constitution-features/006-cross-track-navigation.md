@@ -10,6 +10,7 @@ score: 0.5
 worktree: .worktrees/spacedock-ensign-006-cross-track-navigation
 issue:
 pr:
+mod-block: merge:pr-merge
 ---
 
 三條軌道目前是各自獨立的體驗，缺少內容層面的跨軌道連結。Documents/architecture.md 描述的是一個「過去→現在→未來」的連貫旅程，但實際上只有 T2 的 Narrative Loop Footer 有簡單的 T1/T3 連結。

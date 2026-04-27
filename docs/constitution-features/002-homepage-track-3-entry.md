@@ -10,6 +10,7 @@ score: 0.7
 worktree: .worktrees/spacedock-ensign-002-homepage-track-3-entry
 issue:
 pr:
+mod-block: merge:pr-merge
 ---
 
 Upgrade the homepage Track 3 card from a greyed-out placeholder link to a live, compelling entry point that previews the bottleneck crisis.
