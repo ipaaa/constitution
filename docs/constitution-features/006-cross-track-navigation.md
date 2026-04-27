@@ -1,7 +1,7 @@
 ---
 id: "006"
 title: Cross-Track Navigation
-status: implement
+status: review
 source: codebase audit
 started: 2026-04-27T16:30:06Z
 completed:
