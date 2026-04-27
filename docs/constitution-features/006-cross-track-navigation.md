@@ -1,13 +1,13 @@
 ---
 id: "006"
 title: Cross-Track Navigation
-status: design
+status: implement
 source: codebase audit
-started:
+started: 2026-04-27T16:30:06Z
 completed:
 verdict:
 score: 0.5
-worktree:
+worktree: .worktrees/spacedock-ensign-006-cross-track-navigation
 issue:
 pr:
 ---

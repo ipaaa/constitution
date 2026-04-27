@@ -1,13 +1,13 @@
 ---
 id: "007"
 title: Accessibility Pass
-status: design
+status: implement
 source: codebase audit
-started:
+started: 2026-04-27T16:30:08Z
 completed:
 verdict:
 score: 0.6
-worktree:
+worktree: .worktrees/spacedock-ensign-007-accessibility-pass
 issue:
 pr:
 ---
