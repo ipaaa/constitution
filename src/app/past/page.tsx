@@ -4,6 +4,8 @@ import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import HISTORY_DATA from '@/data/history.json';
 import Link from 'next/link';
 import { ArrowDown, ChevronDown, Search, X } from 'lucide-react';
+import { getLinksForHistory } from '@/data/cross-track-links';
+import CrossTrackLinks from '@/components/CrossTrackLinks';
 
 type HistoryEntry = (typeof HISTORY_DATA)[number];
 
@@ -251,6 +253,11 @@ function DecadeSection({ group, expanded, onToggle, registerEntryRef }: DecadeSe
                       <div className="text-xl md:text-2xl font-bold text-[#AAAAAA] border-l-4 border-[var(--color-accent-red)] pl-4">
                         {item.reality.ruling}
                       </div>
+                      <CrossTrackLinks
+                        links={getLinksForHistory(item.id)}
+                        heading="Related — 跨軌道連結"
+                        compact
+                      />
                     </div>
                   </div>
                 );
