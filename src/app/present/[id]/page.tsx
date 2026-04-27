@@ -5,8 +5,34 @@ import _DISCUSSIONS_DATA from '@/data/discussions.json';
 import { VibeTag, JudgeOwlComment, type DiscussionItem } from '@/components/SharedPresent';
 import Link from 'next/link';
 import { ChevronLeft, ExternalLink, Share2, Printer } from 'lucide-react';
+import { getLinksForDiscussion } from '@/data/cross-track-links';
+import CrossTrackLinks from '@/components/CrossTrackLinks';
 
 const DISCUSSIONS_DATA = _DISCUSSIONS_DATA as DiscussionItem[];
+
+function CrossTrackSection({ discussionId }: { discussionId: string }) {
+  const { historyLinks, futureLinks } = getLinksForDiscussion(discussionId);
+  const allLinks = [...historyLinks, ...futureLinks];
+  if (allLinks.length === 0) return null;
+
+  return (
+    <section className="mt-16 pt-10 border-t border-gray-200">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-8 h-px bg-gray-300" />
+        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+          Cross-Track Navigation / 跨軌道探索
+        </span>
+        <div className="flex-1 h-px bg-gray-300" />
+      </div>
+      {historyLinks.length > 0 && (
+        <CrossTrackLinks links={historyLinks} heading="歷史脈絡 — 相關釋憲判例" />
+      )}
+      {futureLinks.length > 0 && (
+        <CrossTrackLinks links={futureLinks} heading="未來影響 — 相關待審案件" />
+      )}
+    </section>
+  );
+}
 
 export default function ArticleDetail({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -103,6 +129,9 @@ export default function ArticleDetail({ params }: { params: Promise<{ id: string
                 </div>
              </div>
           </section>
+
+          {/* Cross-Track Navigation */}
+          <CrossTrackSection discussionId={item.id} />
 
           {/* Action Footer */}
           <div className="mt-20 flex flex-col items-center border-t border-gray-100 pt-12">
