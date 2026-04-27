@@ -42,7 +42,7 @@ export const JudgeOwlComment = ({ comment, isDepth = false }: { comment?: string
   return (
     <div className={`mt-6 ${isDepth ? 'bg-[#E8F5E9] border-[#4CAF50]' : 'bg-[#FFF9C4] border-[#FBC02D]'} border-l-4 p-4 relative group/owl shadow-sm`}>
       <div className="absolute -top-8 -right-3 transform transition-transform group-hover/owl:scale-110 duration-300">
-        <img src="/owl.png" alt="Judge Owl" className="w-14 h-14 object-contain drop-shadow-md" />
+        <img src="/owl.png" alt="貓頭鷹法官" className="w-14 h-14 object-contain drop-shadow-md" />
       </div>
       <p className="text-sm font-serif text-gray-900 leading-relaxed italic pr-6">
         「{comment}」

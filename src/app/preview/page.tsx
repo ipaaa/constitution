@@ -21,7 +21,7 @@ export default function PreviewPage() {
              <p className="font-serif text-lg leading-relaxed text-[#3a3a3a]">
                人民有集會結社之自由。<span className="bg-[#FFE082] px-1 font-bold">保障和平表達</span>的權利。
              </p>
-             <div className="font-[Caveat] text-[#1565C0] text-2xl -rotate-6 mt-6 font-bold">以前上街頭會先被當罪犯？</div>
+             <div className="font-[Caveat] text-[#0D47A1] text-2xl -rotate-6 mt-6 font-bold">以前上街頭會先被當罪犯？</div>
           </div>
           {/* Reality */}
           <div className="w-1/2 p-8 bg-[#0F0F0F] text-white flex flex-col justify-center relative">
