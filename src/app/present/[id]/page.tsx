@@ -48,11 +48,11 @@ export default function ArticleDetail({ params }: { params: Promise<{ id: string
           <button
             type="button"
             onClick={() => { if (typeof window !== 'undefined') window.print(); }}
-            aria-label="列印"
+            aria-label="列印此文章"
             title="列印"
-            className="p-2 hover:bg-gray-800 rounded-full transition-colors opacity-60 hover:opacity-100"
+            className="p-2 hover:bg-gray-800 rounded-full transition-colors opacity-60 hover:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
           >
-            <Printer size={18} />
+            <Printer size={18} aria-hidden="true" />
           </button>
         </div>
       </header>
@@ -125,9 +125,10 @@ export default function ArticleDetail({ params }: { params: Promise<{ id: string
                  href={item.link}
                  target="_blank"
                  rel="noopener noreferrer"
+                 aria-label="閱讀原始文件（開啟新分頁）"
                  className="bg-[#D32F2F] text-white px-10 py-5 rounded shadow-[0_4px_0_0_#8e1e1e] hover:shadow-[0_2px_0_0_#8e1e1e] hover:translate-y-[2px] active:translate-y-[4px] active:shadow-none transition-all font-black text-lg flex items-center gap-3 tracking-widest uppercase"
                >
-                 閱讀原始文件 <ExternalLink size={20} />
+                 閱讀原始文件 <ExternalLink size={20} aria-hidden="true" />
                </a>
              </div>
              <ShareActions title={item.title} />

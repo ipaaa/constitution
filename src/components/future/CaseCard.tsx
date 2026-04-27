@@ -63,7 +63,7 @@ export default function CaseCard({ case_ }: CaseCardProps) {
         <p className="text-sm text-gray-500 truncate">{case_.applicant}</p>
         <time
           dateTime={case_.filingDate}
-          className="font-mono text-[10px] text-gray-400 whitespace-nowrap"
+          className="font-mono text-[10px] text-gray-500 whitespace-nowrap"
         >
           申請 {filedOn}
         </time>

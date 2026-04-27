@@ -118,7 +118,7 @@ function DecadeSection({ group, expanded, onToggle, registerEntryRef }: DecadeSe
         onClick={onToggle}
         aria-expanded={expanded}
         aria-controls={`decade-${group.decade}-body`}
-        className="w-full text-left px-6 md:px-12 py-8 md:py-10 flex items-center gap-6 hover:bg-black/[0.03] transition-colors group"
+        className="w-full text-left px-6 md:px-12 py-8 md:py-10 flex items-center gap-6 hover:bg-black/[0.03] transition-colors group focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
       >
         <div className="flex-shrink-0 w-20 md:w-28">
           <div className="font-serif font-black text-4xl md:text-5xl text-[var(--color-textbook-text)] leading-none">
@@ -193,7 +193,7 @@ function DecadeSection({ group, expanded, onToggle, registerEntryRef }: DecadeSe
                         className="text-xl leading-[1.8] text-[#3A3A3A] mb-5"
                         dangerouslySetInnerHTML={{ __html: item.textbook.content as string }}
                       />
-                      <div className="font-[Caveat] text-[#1565C0] text-3xl -rotate-3 inline-block mt-3 font-bold">
+                      <div className="font-[Caveat] text-[#0D47A1] text-3xl -rotate-3 inline-block mt-3 font-bold">
                         {item.textbook.handwriting}
                       </div>
                     </div>
@@ -231,6 +231,8 @@ function DecadeSection({ group, expanded, onToggle, registerEntryRef }: DecadeSe
                     className={`absolute top-0 left-0 w-full h-full flex items-center justify-center p-8 md:p-20 reality-item ${isActive ? 'active' : ''}`}
                   >
                     <div
+                      role="img"
+                      aria-label={`${item.reality.title} 背景圖片`}
                       className="absolute inset-0 bg-cover bg-center grayscale-[80%] brightness-40 reality-bg-image z-0"
                       style={{ backgroundImage: `url('${item.reality.bgImage}')` }}
                     />
@@ -373,12 +375,12 @@ export default function PastTrack() {
   return (
     <div className="w-full bg-[var(--color-textbook-bg)] text-[var(--color-textbook-text)] font-sans min-h-screen">
       {/* Intro Section */}
-      <section className="h-screen flex flex-col items-center justify-center text-center px-6 relative">
-        <h2 className="text-5xl md:text-7xl font-black mb-6 font-serif">憲法課本時光機</h2>
+      <section className="h-screen flex flex-col items-center justify-center text-center px-6 relative" aria-label="憲法課本時光機介紹">
+        <h1 className="text-5xl md:text-7xl font-black mb-6 font-serif">憲法課本時光機</h1>
         <p className="text-xl md:text-2xl max-w-2xl text-gray-700 leading-relaxed font-serif">
           那些習以為常的權利，不是憑空出現的。<br />讓我們翻開課本，回到當年憲法法庭敲下判決的那一刻。
         </p>
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-50">
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-50" aria-hidden="true">
           <ArrowDown size={32} />
         </div>
       </section>
@@ -477,7 +479,7 @@ export default function PastTrack() {
       </div>
 
       {/* Outro Section */}
-      <section className="min-h-screen flex flex-col items-center justify-center text-center px-6 bg-[var(--color-textbook-bg)] border-t border-black/5 relative z-20">
+      <section className="min-h-screen flex flex-col items-center justify-center text-center px-6 bg-[var(--color-textbook-bg)] border-t border-black/5 relative z-20" aria-label="結語：憲庭載入中">
         <h2 className="text-4xl md:text-6xl font-black mb-6 font-serif">但是現在，憲庭載入中...</h2>
         <p className="text-lg md:text-2xl max-w-3xl text-gray-700 leading-relaxed font-serif mb-12">
           過去捍衛我們權利的最後防線，正因為政治角力面臨癱瘓危機。<br />
