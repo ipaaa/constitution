@@ -20,12 +20,10 @@ const CourtTimeline = () => {
   ];
 
   return (
-    <div className="bg-[#f4f1ea] border border-[#d1ccc0] p-6 lg:p-8 rounded-sm shadow-sm relative overflow-hidden">
-      {/* Archive Header */}
-      <div className="border-b-2 border-gray-900 pb-4 mb-8">
-        <div className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-1">ARCHIVE RECORD / NO. 77</div>
-        <h3 className="text-2xl font-serif font-black text-gray-900 leading-tight">憲政大事記</h3>
-        <p className="text-xs text-gray-600 mt-2 font-serif italic">Chronicle of the Constitutional Court</p>
+    <div className="bg-[#f4f1ea] p-6 lg:p-8 rounded-sm relative overflow-hidden">
+      {/* Header */}
+      <div className="pb-4 mb-8">
+        <h3 className="text-2xl font-serif font-black text-gray-900 leading-tight">重要時間表</h3>
       </div>
 
       <div className="space-y-6 relative">
@@ -53,24 +51,14 @@ const CourtTimeline = () => {
             </div>
             {/* Important Stamp for danger status */}
             {m.status === 'danger' && (
-              <div className="absolute -top-1 -right-2 rotate-12 border-2 border-[#D32F2F] text-[#D32F2F] px-2 py-1 text-[10px] font-black uppercase tracking-tighter opacity-70 select-none">
-                Urgent Record
+              <div className="absolute -top-1 -right-2 rotate-12 border-2 border-[#D32F2F] text-[#D32F2F] px-2 py-1 text-[10px] font-black tracking-tighter opacity-70 select-none">
+                注意
               </div>
             )}
           </div>
         ))}
       </div>
 
-      {/* Footer / Stamp */}
-      <div className="mt-8 pt-6 border-t border-[#d1ccc0] flex justify-between items-center opacity-40 grayscale group hover:grayscale-0 transition-all">
-        <div className="text-[9px] font-mono leading-none">
-          SEC-CAT: CONSTITUTIONAL_EVOLUTION<br/>
-          REF: PUBLIC_VOICES_V2
-        </div>
-        <div className="w-10 h-10 border-2 border-gray-900 rounded-full flex items-center justify-center font-black text-[10px] rotate-[-20deg]">
-          ARCH
-        </div>
-      </div>
     </div>
   );
 };
@@ -82,7 +70,7 @@ const OfficialTLDR = ({ item }: { item?: DiscussionItem }) => {
   const points = item.abstract.split(/\r?\n/).filter(p => p.trim());
 
   return (
-    <div className="bg-[#f8f9fa] border-t-4 border-black border-l border-r border-b border-gray-200 shadow-sm relative group mb-12 overflow-hidden">
+    <div className="bg-[#f8f9fa] border-t-4 border-black shadow-sm relative group mb-12 overflow-hidden rounded-sm">
       {/* Hero Illustration */}
       <div className="w-full h-auto overflow-hidden border-b border-gray-200">
         <Image
@@ -97,8 +85,8 @@ const OfficialTLDR = ({ item }: { item?: DiscussionItem }) => {
 
       <div className="p-6 md:p-10">
         <div className="flex items-center gap-3 mb-6">
-          <span className="bg-gray-800 text-white px-3 py-1 text-[10px] font-bold tracking-widest rounded-sm uppercase">
-            Official TL;DR
+          <span className="bg-gray-800 text-white px-3 py-1 text-[10px] font-bold tracking-widest rounded-sm">
+            懶人包
           </span>
           <span className="text-sm text-gray-500 font-mono tracking-wider">{item.year}</span>
         </div>
@@ -117,9 +105,8 @@ const OfficialTLDR = ({ item }: { item?: DiscussionItem }) => {
         </div>
 
         <div className="pt-6 border-t border-gray-300 mt-4 flex flex-col md:flex-row justify-between items-center gap-4">
-          <span className="text-[10px] font-bold text-gray-400 tracking-widest uppercase hidden lg:block">Citation {item.id === 'tldr' ? 'CORE' : item.id}</span>
-          <a href={item.link} target="_blank" rel="noopener noreferrer" aria-label="閱讀完整分析（開啟新分頁）" className="inline-flex items-center gap-1.5 text-gray-900 border border-gray-300 px-4 py-2 text-sm font-bold hover:bg-gray-900 hover:text-white transition-colors w-full justify-center md:w-max rounded-sm shadow-sm">
-            閱讀完整分析 <ExternalLink size={14} aria-hidden="true" />
+          <a href={item.link} target="_blank" rel="noopener noreferrer" aria-label="看完整內容（開啟新分頁）" className="inline-flex items-center gap-1.5 text-gray-900 border border-gray-300 px-4 py-2 text-sm font-bold hover:bg-gray-900 hover:text-white transition-colors w-full justify-center md:w-max rounded-sm shadow-sm">
+            看完整內容 <ExternalLink size={14} aria-hidden="true" />
           </a>
         </div>
 
@@ -132,21 +119,21 @@ const OfficialTLDR = ({ item }: { item?: DiscussionItem }) => {
 
 const ConstitutionalMoodWidget = () => {
   const moods = [
-    { emoji: '🧊', label: '如臨深淵', color: 'hover:bg-blue-50 hover:border-blue-200 text-blue-700' },
-    { emoji: '🔥', label: '滿血復活', color: 'hover:bg-red-50 hover:border-red-200 text-red-700' },
-    { emoji: '⏳', label: '靜觀其變', color: 'hover:bg-amber-50 hover:border-amber-200 text-amber-700' },
-    { emoji: '💡', label: '原來如此', color: 'hover:bg-yellow-50 hover:border-yellow-200 text-yellow-700' },
+    { emoji: '🧊', label: '好擔心', color: 'hover:bg-blue-50 hover:border-blue-200 text-blue-700' },
+    { emoji: '🔥', label: '太好了！', color: 'hover:bg-red-50 hover:border-red-200 text-red-700' },
+    { emoji: '⏳', label: '再看看', color: 'hover:bg-amber-50 hover:border-amber-200 text-amber-700' },
+    { emoji: '💡', label: '長知識了', color: 'hover:bg-yellow-50 hover:border-yellow-200 text-yellow-700' },
   ];
 
   return (
     <div className="mt-8 pt-8 border-t border-gray-200">
-      <p className="text-xs font-bold text-gray-400 tracking-widest uppercase mb-4 text-center">HOW DO YOU FEEL? <span className="text-gray-300 ml-2">看完後您的心情是？</span></p>
+      <p className="text-sm font-bold text-gray-500 mb-4 text-center">你看完覺得怎樣？</p>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {moods.map((mood, idx) => (
           <button
             key={idx}
             aria-label={mood.label}
-            className={`flex flex-col items-center justify-center p-4 border border-gray-200 bg-white rounded-sm transition-all duration-300 group shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 ${mood.color}`}
+            className={`flex flex-col items-center justify-center p-4 bg-gray-50 rounded-sm transition-all duration-300 group focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 ${mood.color}`}
           >
             <span className="text-3xl mb-2 group-hover:scale-125 transition-transform duration-300" aria-hidden="true">{mood.emoji}</span>
             <span className="text-xs font-bold tracking-tighter">{mood.label}</span>
@@ -158,38 +145,28 @@ const ConstitutionalMoodWidget = () => {
 };
 
 const NarrativeLoopFooter = () => (
-  <div className="mt-20 mb-12 border-t-2 border-gray-900 pt-12">
+  <div className="mt-20 mb-12 pt-12">
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
       <a href="/past" className="group block">
-        <div className="bg-[#F3EBD1] border-2 border-gray-900 p-8 md:p-12 relative overflow-hidden transition-transform hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] duration-300 h-full flex flex-col justify-between">
+        <div className="bg-[#F3EBD1] rounded-sm p-8 md:p-12 relative overflow-hidden transition-transform hover:-translate-y-1 hover:shadow-lg duration-300 h-full flex flex-col justify-between">
           <div className="relative z-10">
-            <span className="inline-block bg-gray-900 text-white text-[10px] font-bold px-2 py-1 tracking-widest uppercase mb-6">BACK TO THE ORIGIN</span>
-            <h4 className="text-3xl md:text-5xl font-serif font-black text-gray-900 mb-4 leading-tight">想知道我們如何<br/>走到這一步？</h4>
+            <h4 className="text-3xl md:text-4xl font-serif font-black text-gray-900 mb-4 leading-tight">想知道我們如何<br/>走到這一步？</h4>
             <p className="text-gray-700 font-medium">回顧歷史：看課本上的民主理想，如何經受現實判決的考驗。</p>
           </div>
-          <div className="mt-12 flex items-center gap-2 text-gray-900 font-bold uppercase text-sm tracking-widest group-hover:gap-4 transition-all border-b-2 border-gray-900 w-max pb-1">
-            進入：歷史與教科書 (TRACK 01) →
-          </div>
-          {/* Decorative index tab */}
-          <div className="absolute top-0 right-0 w-24 h-24 bg-gray-900 text-[#F3EBD1] flex items-center justify-center translate-x-12 -translate-y-12 rotate-45 font-bold text-xl hover:bg-red-700 transition-colors">
-            PAST
+          <div className="mt-12 flex items-center gap-2 text-gray-900 font-bold text-sm group-hover:gap-4 transition-all w-max pb-1">
+            回顧歷史 →
           </div>
         </div>
       </a>
 
       <a href="/future" className="group block">
-        <div className="bg-white border-2 border-gray-900 p-8 md:p-12 relative overflow-hidden transition-transform hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] duration-300 h-full flex flex-col justify-between">
+        <div className="bg-white rounded-sm p-8 md:p-12 relative overflow-hidden transition-transform hover:-translate-y-1 hover:shadow-lg duration-300 h-full flex flex-col justify-between">
           <div className="relative z-10">
-            <span className="inline-block bg-red-700 text-white text-[10px] font-bold px-2 py-1 tracking-widest uppercase mb-6">EXPLORE THE FUTURE</span>
-            <h4 className="text-3xl md:text-5xl font-serif font-black text-gray-900 mb-4 leading-tight">想預見接下來<br/>還有哪些考驗？</h4>
+            <h4 className="text-3xl md:text-4xl font-serif font-black text-gray-900 mb-4 leading-tight">想預見接下來<br/>還有哪些考驗？</h4>
             <p className="text-gray-700 font-medium">探索未來：當憲法法庭進入復健期，您的權益正在哪個路口等候？</p>
           </div>
-          <div className="mt-12 flex items-center gap-2 text-gray-900 font-bold uppercase text-sm tracking-widest group-hover:gap-4 transition-all border-b-2 border-gray-900 w-max pb-1">
-            進入：憲政復健現狀 (TRACK 03) →
-          </div>
-          {/* Decorative stamp */}
-          <div className="absolute -bottom-6 -right-6 w-32 h-32 border-4 border-red-700/20 rounded-full flex items-center justify-center rotate-12 group-hover:rotate-0 transition-transform duration-700">
-             <span className="text-red-700/20 font-black text-2xl uppercase tracking-tighter">FUTURE</span>
+          <div className="mt-12 flex items-center gap-2 text-gray-900 font-bold text-sm group-hover:gap-4 transition-all w-max pb-1">
+            看看未來 →
           </div>
         </div>
       </a>
@@ -201,8 +178,8 @@ const NarrativeLoopFooter = () => (
 const ScholarCard = ({ item }: { item: DiscussionItem }) => {
   const domain = item.link.startsWith('http') ? new URL(item.link).hostname : 'scholar.org';
   return (
-  <Link href={`/present/${item.id}`} className="bg-white border border-gray-200 rounded-lg flex flex-col h-full shadow-sm overflow-hidden group hover:shadow-md transition-shadow">
-    {/* Masthead */}
+  <Link href={`/present/${item.id}`} className="bg-white rounded-lg flex flex-col h-full shadow-sm overflow-hidden group hover:shadow-md transition-shadow">
+    {/* Browser Chrome — signals external source */}
     <div className="bg-gray-100 p-2 flex items-center gap-2 border-b border-gray-200">
       <div className="flex gap-1.5 px-2">
         <div className="w-2.5 h-2.5 rounded-full bg-red-400 border border-red-500/20"></div>
@@ -228,8 +205,8 @@ const ScholarCard = ({ item }: { item: DiscussionItem }) => {
       {item.owl_comment && <JudgeOwlComment comment={item.owl_comment} />}
       
       <div className="mt-auto pt-4 flex justify-between items-center text-sm font-medium">
-        <div className="text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1 group-hover:underline w-full justify-center border border-blue-100 bg-blue-50/50 py-2 rounded-sm hover:bg-blue-100">
-          開啟詳法與導讀 <ExternalLink size={14} />
+        <div className="text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1 group-hover:underline w-full justify-center bg-blue-50/50 py-2 rounded-sm hover:bg-blue-100">
+          看完整介紹 <ExternalLink size={14} />
         </div>
       </div>
     </div>
@@ -240,7 +217,8 @@ const ScholarCard = ({ item }: { item: DiscussionItem }) => {
 const NGOCard = ({ item }: { item: DiscussionItem }) => {
   const domain = item.link.startsWith('http') ? new URL(item.link).hostname : 'ngo-report.org';
   return (
-  <Link href={`/present/${item.id}`} className="bg-white border border-gray-200 rounded-lg flex flex-col h-full shadow-sm overflow-hidden group hover:shadow-md transition-shadow">
+  <Link href={`/present/${item.id}`} className="bg-white rounded-lg flex flex-col h-full shadow-sm overflow-hidden group hover:shadow-md transition-shadow">
+    {/* Browser Chrome — signals external source */}
     <div className="bg-gray-100 p-2 flex items-center gap-2 border-b border-gray-200">
       <div className="flex gap-1.5 px-2">
         <div className="w-2.5 h-2.5 rounded-full bg-red-400 border border-red-500/20"></div>
@@ -266,8 +244,8 @@ const NGOCard = ({ item }: { item: DiscussionItem }) => {
       {item.owl_comment && <JudgeOwlComment comment={item.owl_comment} />}
       
       <div className="mt-auto pt-4 flex justify-between items-center text-sm font-medium">
-        <div className="text-gray-700 hover:text-gray-900 transition-colors flex items-center justify-center w-full gap-1 border border-gray-200 py-2 rounded-sm hover:bg-white bg-gray-50">
-          查看專題報告與導讀 <ExternalLink size={14} />
+        <div className="text-gray-700 hover:text-gray-900 transition-colors flex items-center justify-center w-full gap-1 py-2 rounded-sm hover:bg-white bg-gray-50">
+          看完整介紹 <ExternalLink size={14} />
         </div>
       </div>
     </div>
@@ -278,7 +256,8 @@ const NGOCard = ({ item }: { item: DiscussionItem }) => {
 const ReelCard = ({ item }: { item: DiscussionItem }) => {
   const domain = item.link.startsWith('http') ? new URL(item.link).hostname : 'youtube.com/shorts';
   return (
-  <Link href={`/present/${item.id}`} className="bg-gray-900 border border-gray-800 rounded-lg flex flex-col h-full shadow-lg overflow-hidden group hover:shadow-xl transition-shadow">
+  <Link href={`/present/${item.id}`} className="bg-gray-900 rounded-lg flex flex-col h-full shadow-lg overflow-hidden group hover:shadow-xl transition-shadow">
+    {/* Browser Chrome — signals external source */}
     <div className="bg-black p-2 flex items-center gap-2 border-b border-gray-800">
       <div className="flex gap-1.5 px-2 opacity-50">
         <div className="w-2.5 h-2.5 rounded-full bg-gray-600 border border-white/10"></div>
@@ -289,7 +268,6 @@ const ReelCard = ({ item }: { item: DiscussionItem }) => {
         {domain}
       </div>
     </div>
-    
     <div className="p-3 bg-gray-900 flex flex-col flex-grow">
       {/* Image / Video frame */}
       <div className="bg-[#0A0A0A] rounded-sm w-full aspect-[4/5] relative overflow-hidden flex flex-col items-center justify-center border border-gray-800">
@@ -325,7 +303,7 @@ const ReelCard = ({ item }: { item: DiscussionItem }) => {
         )}
         
         <div className="mt-auto border-t border-gray-800 pt-3 flex justify-between items-center">
-          <span className="text-xs text-blue-400 font-medium tracking-tighter">查看由貓頭鷹轉譯的影片說明</span>
+          <span className="text-xs text-blue-400 font-medium tracking-tighter">看貓頭鷹的影片筆記</span>
           <div className="text-gray-400 group-hover:text-white transition-colors">
             <ExternalLink size={14} />
           </div>
@@ -370,15 +348,15 @@ export default function PresentTrack() {
       <div className="flex flex-col md:flex-row justify-between items-end md:items-center mb-12 gap-6 pb-6 border-b border-gray-200">
         <div className="border-l-4 border-gray-800 pl-4 w-full md:w-auto">
           <h1 className="text-3xl font-bold text-gray-900 mb-1 flex items-center gap-3">
-            <span className="bg-gray-800 text-white text-xs px-2 py-0.5 rounded-sm uppercase tracking-widest font-mono select-none">Present</span>
-            憲庭熱搜榜
+            <span className="bg-gray-800 text-white text-xs px-2 py-0.5 rounded-sm select-none">熱門</span>
+            大家在討論什麼？
           </h1>
-          <p className="text-gray-500 font-medium font-serif mt-2 text-lg">公民必讀的憲政剪貼簿：看專家與民間如何解讀判決</p>
+          <p className="text-gray-500 font-medium font-serif mt-2 text-lg">看看專家和民間團體怎麼說</p>
         </div>
-        <div className="flex bg-white rounded-sm shadow-sm border border-gray-300 w-full md:w-96 transition-all focus-within:border-gray-500 focus-within:shadow-md">
+        <div className="flex bg-white rounded-sm shadow-sm w-full md:w-96 transition-all focus-within:shadow-md">
           <input
             type="text"
-            placeholder="在檔案庫中搜尋關鍵字、法案..."
+            placeholder="搜尋文章標題、作者..."
             className="flex-grow bg-transparent px-4 py-3 outline-none text-gray-700 font-sans"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -405,17 +383,17 @@ export default function PresentTrack() {
           <OfficialTLDR item={DISCUSSIONS_DATA.find(item => item.id === 'tldr')} />
           
           <div className="flex justify-between items-center border-b-2 border-gray-900 pb-3 mb-12">
-            <h3 className="text-xl font-bold text-gray-900 font-serif tracking-wider">PUBLIC VOICES <span className="text-gray-400 font-sans font-normal ml-2">問題怎麼看</span></h3>
+            <h3 className="text-xl font-bold text-gray-900 font-serif">大家怎麼看？</h3>
           </div>
 
           {/* Scholars Section */}
           <section>
             <div className="flex items-center justify-between mb-6 border-b border-gray-200 pb-2">
               <h4 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                <span className="w-2 h-2 bg-blue-600 rounded-full"></span> 學者文章 (Scholar Perspectives)
+                <span className="w-2 h-2 bg-blue-600 rounded-full"></span> 學者怎麼說
               </h4>
-              <span className="text-xs bg-gray-100 text-gray-500 font-mono px-2 py-1 rounded">
-                {scholarItems.length} Articles
+              <span className="text-xs text-gray-500 font-mono px-2 py-1">
+                {scholarItems.length} 篇
               </span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -429,10 +407,10 @@ export default function PresentTrack() {
           <section>
             <div className="flex items-center justify-between mb-6 border-b border-gray-200 pb-2">
               <h4 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                <span className="w-2 h-2 bg-[#D32F2F] rounded-full"></span> NGO 倡議 (NGO Reports)
+                <span className="w-2 h-2 bg-[#D32F2F] rounded-full"></span> 民間團體怎麼說
               </h4>
-              <span className="text-xs bg-gray-100 text-gray-500 font-mono px-2 py-1 rounded">
-                {ngoItems.length} Articles
+              <span className="text-xs text-gray-500 font-mono px-2 py-1">
+                {ngoItems.length} 篇
               </span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -446,10 +424,10 @@ export default function PresentTrack() {
           <section>
             <div className="flex items-center justify-between mb-6 border-b border-gray-200 pb-2">
               <h4 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                <span className="w-2 h-2 bg-green-500 rounded-full"></span> 影音轉譯 (Reels & Shorts)
+                <span className="w-2 h-2 bg-green-500 rounded-full"></span> 影片摘要
               </h4>
-               <span className="text-xs bg-gray-100 text-gray-500 font-mono px-2 py-1 rounded">
-                 {reelItems.length} Videos
+               <span className="text-xs text-gray-500 font-mono px-2 py-1">
+                 {reelItems.length} 部
                </span>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 gap-6">

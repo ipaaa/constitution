@@ -177,3 +177,152 @@ No layout structure changes are proposed. All changes are text replacements and 
 - The existing responsive breakpoints (sm/md/lg/xl) remain unchanged and appropriate
 
 **Summary:** This design proposal identifies 30+ specific text/label simplifications and 6 component-level changes to remove decorative clutter (fake browser chrome, archive stamps, English-only labels) and replace professional/literary Chinese with everyday language. All changes are presentation-layer only — no data model changes needed. The goal is to make the T2 page immediately understandable to a non-expert citizen reader without any legal or academic background.
+
+## Stage Report — implement
+
+### Checklist
+
+1. **All text/label replacements from design spec (30+ items)** — DONE
+   - Page title: 憲庭熱搜榜 → 大家在討論什麼？
+   - Badge: Present → 熱門
+   - Subtitle: 公民必讀的憲政剪貼簿 → 看看專家和民間團體怎麼說
+   - Search placeholder: 在檔案庫中搜尋關鍵字、法案 → 搜尋文章標題、作者
+   - Timeline title: 憲政大事記 → 重要時間表 (English subtitle removed)
+   - Section header: PUBLIC VOICES / 問題怎麼看 → 大家怎麼看？
+   - Scholar section: 學者文章 (Scholar Perspectives) → 學者怎麼說; Articles → 篇
+   - NGO section: NGO 倡議 (NGO Reports) → 民間團體怎麼說; Articles → 篇
+   - Reels section: 影音轉譯 (Reels & Shorts) → 影片摘要; Videos → 部
+   - TL;DR badge: Official TL;DR → 懶人包; Citation CORE removed
+   - CTA: 閱讀完整分析 → 看完整內容
+   - Mood widget: HOW DO YOU FEEL? 看完後您的心情是？ → 你看完覺得怎樣？
+   - Mood labels: 如臨深淵→好擔心, 滿血復活→太好了！, 靜觀其變→再看看, 原來如此→長知識了
+   - Card CTAs: 開啟詳法與導讀→看完整介紹, 查看專題報告與導讀→看完整介紹, 查看由貓頭鷹轉譯的影片說明→看貓頭鷹的影片筆記
+   - Footer cards: BACK TO THE ORIGIN removed, EXPLORE THE FUTURE removed; 進入：歷史與教科書 (TRACK 01) → 回顧歷史, 進入：憲政復健現狀 (TRACK 03) → 看看未來
+   - Detail page: Abstract / 內文摘要 → 重點整理; Arxiv Review → 貓頭鷹深度解析; Back Archive → 回到列表; 閱讀原始文件 → 看原始出處
+   - Detail page category: English category names → Chinese (學者文章/民間報告/影片)
+   - Related articles: Related Files → 延伸閱讀; 更多檔案 → 看更多; Share this file → 分享這篇
+   - Empty content CTA: Awaiting Transcription / Status: Pending → 尚未收錄
+   - Cross-track label: Cross-Track Navigation / 跨軌道探索 → 跨軌道探索
+
+2. **Remove browser-chrome from ScholarCard and NGOCard** — SKIPPED
+   - Captain feedback: browser-chrome is an intentional design choice that signals to users the content is clipped from external sources, not original content. Kept as-is.
+
+3. **Remove CourtTimeline decorative elements** — DONE
+   - Removed "ARCHIVE RECORD / NO. 77" header
+   - Removed "Chronicle of the Constitutional Court" English subtitle
+   - Removed SEC-CAT/REF footer block and ARCH stamp circle
+   - Changed "Urgent Record" stamp to "注意"
+   - Removed outer border from timeline container
+
+4. **Remove detail page Archive Record/REF metadata and Arxiv Review label** — DONE
+   - Removed "Archive Record" and "REF: id / year" metadata block, replaced with simple year display
+   - Changed "Arxiv Review" divider to "貓頭鷹深度解析"
+
+5. **Remove bottom footer branding text** — DONE
+   - Removed "憲庭加好友 Add C0urt / Present Track" from detail page bottom
+
+6. **Simplify VibeTag (remove rotation animation)** — DONE
+   - Removed `transform -rotate-2 hover:rotate-0 hover:scale-105` animation classes
+   - Removed `border-b-2 uppercase` styling for cleaner appearance
+   - Increased font size from text-[10px] to text-xs for readability
+
+7. **Reduce visual border/frame clutter across T2** — DONE
+   - Removed outer border from CourtTimeline container
+   - Removed border from OfficialTLDR (kept top accent border only)
+   - Removed border from search input bar
+   - Removed border from mood widget buttons (use background tint instead)
+   - Removed border from ScholarCard/NGOCard CTA buttons
+   - Removed border from detail page main content card
+   - Removed dashed border from empty content CTA
+   - Removed border-2 from NarrativeLoopFooter cards (use shadow on hover instead)
+   - Removed decorative corner elements from footer cards (PAST tab, FUTURE stamp)
+   - Removed background counters (bg-gray-100) from section count badges
+
+8. **Build passes without errors, no regressions** — DONE
+   - `npx next build` completes successfully, all routes generated
+
+9. **All navigation and search still functional** — DONE
+   - Search input unchanged functionally (only placeholder text updated)
+   - All Link/href navigation paths preserved
+   - Cross-track links intact
+   - Share actions intact
+
+### Summary
+
+Implemented comprehensive UI simplification for T2 (present) pages. Applied 30+ text/label replacements converting English jargon and literary Chinese to plain everyday Chinese. Removed archive-themed decorations from timeline and detail pages, and bottom footer branding. Browser-chrome on cards was kept per captain feedback (signals external source content). Simplified VibeTag by removing rotation animation. Significantly reduced visual border/frame clutter across cards and sections, replacing hard borders with subtle background tints and spacing for a cleaner, less cluttered appearance. All changes are presentation-layer only; no data model or routing changes were needed. Build passes cleanly with no regressions.
+
+## Stage Report — verify
+
+### Checklist
+
+1. **Verify all Chinese text replacements are linguistically correct and natural** — DONE
+   - All 30+ replacements reviewed. Chinese is natural, colloquial, and appropriate for non-expert readers. Measure words are correct: "篇" for articles, "部" for videos. No awkward phrasing, no overly formal or literary terms remain in replaced text.
+
+2. **Verify vibe tag names are appropriate for their matched articles** — DONE
+   - All 8 vibe tag changes reviewed against article content. Tags accurately describe their articles: "公民必讀" for key foundational pieces, "國際視角" for the English-language comparative law article, "正反交鋒" for pieces presenting opposing views, "深度解析" for in-depth scholarly analysis, "懶人入門" for the introductory animation video. Previous tags like "法律白話文" risked confusion with the YouTube channel name "法律白話文運動" — the new tags avoid this.
+
+3. **Verify no English-only labels remain visible on T2 pages** — DONE
+   - No English-only labels remain in user-facing UI text on T2 pages. Remaining English ("Twitter", "Facebook") are brand names in share buttons, which is standard practice. Category values remain English in the data model but are translated to Chinese at every display point via ternary operators.
+
+4. **Verify category translations are correct** — DONE
+   - "Scholar Articles" → "學者文章": correct.
+   - "NGO Reports" → "民間報告": correct, uses plain language.
+   - "Reels" → "影片": correct.
+   - Translations are applied consistently across all three display locations (detail page header, author section, related articles component).
+
+5. **Verdict** — PASSED
+   - All Chinese text is linguistically natural and appropriate for the target audience (non-expert citizens). Vibe tags accurately match article content. No English-only labels remain visible. Category translations are correct and consistently applied. The doubled quotation mark fix in JudgeOwlComment is correct (data already contains 「」). No factual claims to verify in this UI-text-only change set.
+
+### Summary
+
+Verified all UI text changes across 6 modified files. All Chinese replacements are linguistically correct, natural, and appropriate for non-expert readers. Vibe tag names accurately describe their matched articles. No English-only labels remain visible on T2 pages. Category translations are correct and consistently applied. No issues found.
+
+## Stage Report — review
+
+### Checklist
+
+1. **All text replacements verified against design spec** — DONE
+   - Verified 30+ text/label replacements against the design spec section 4. All specified changes are implemented: page title, badge, subtitle, search placeholder, timeline title, section headers, category labels with count units, TL;DR badge, CTA labels, mood widget header and labels, footer card labels, detail page labels (Abstract, Arxiv Review, Back Archive, category names, CTA button), related articles labels, empty content CTA, and cross-track label. Every before/after pair matches the spec.
+
+2. **Browser-chrome preserved on ScholarCard/NGOCard/ReelCard** — DONE
+   - Browser-chrome (red/yellow/green dots, URL bar) is preserved on all three card types. Comments added noting "signals external source." This matches captain feedback that browser-chrome is an intentional design choice. The design spec item to remove browser-chrome was correctly overridden by captain instruction.
+
+3. **Decorative elements removed (timeline stamps, archive codes)** — DONE
+   - "ARCHIVE RECORD / NO. 77" header: removed.
+   - "Chronicle of the Constitutional Court" English subtitle: removed.
+   - SEC-CAT/REF footer block and ARCH stamp circle: removed.
+   - "Urgent Record" stamp: changed to "注意".
+   - "Citation CORE" in OfficialTLDR: removed.
+   - "Archive Record" / "REF:" metadata in detail page: removed, replaced with simple year display.
+   - "憲庭加好友 Add C0urt / Present Track" footer: removed.
+   - NarrativeLoopFooter decorative elements (PAST tab, FUTURE stamp, English labels): removed.
+   - Border/frame clutter reduction applied consistently across timeline, cards, search, mood widget, footer.
+
+4. **Vibe tags updated to new categories** — DONE
+   - Old tags replaced: 公民覺醒 → 公民必讀, 同溫層外 → 國際視角, 爭議中 → 正反交鋒, 法律白話文 → 深度解析, 擴散必看 → 懶人入門.
+   - VibeTag component updated: emoji matchers changed from ⚖️ to 📖, ⚠️ to 💬, and new 🌍 matcher added with appropriate color.
+   - All 8 vibe values in discussions.json updated consistently.
+
+5. **Owl comment quotation marks not doubled** — DONE
+   - JudgeOwlComment component previously rendered `「{comment}」`, wrapping in quotation marks. Data in discussions.json already contains 「」 in owl_comment strings. The fix correctly removes the outer `「」` from the component template, preventing double-wrapping. Verified all 8 owl_comment entries in the data contain their own 「」.
+
+6. **Code quality and conventions** — DONE
+   - Category translations use inline ternary operators consistently across 3 locations (detail header, author section, related articles). Pattern is identical each time: `item.category === 'Scholar Articles' ? '學者文章' : item.category === 'NGO Reports' ? '民間報告' : '影片'`. Could be extracted to a helper, but acceptable for 3 occurrences.
+   - No TypeScript type changes needed; data model unchanged as spec required.
+   - VibeTag style function updated cleanly — old emoji matchers replaced, new one added.
+   - No unused imports, no dead code introduced.
+   - One minor note: the 404 error page at `[id]/page.tsx:50` still uses "檔案庫" and "返回熱搜榜" (old title), but this was not in scope per the design spec.
+
+7. **Build passes, no regressions** — DONE
+   - `npx next build` completes successfully with all 9 routes generated (including dynamic `/present/[id]`).
+   - No TypeScript errors.
+   - All navigation paths (Link href, anchor href) preserved unchanged.
+   - Search functionality unchanged (only placeholder text updated).
+   - Share actions intact.
+
+8. **Verdict** — PASSED
+   - All acceptance criteria from the design spec are met. Text replacements are complete and accurate. Decorative elements removed per spec. Browser-chrome preserved per captain override. Vibe tags updated with correct emoji-to-style mappings. Owl comment quotation mark doubling fixed. Code is clean with no regressions. Build passes.
+
+### Summary
+
+Reviewed the complete implementation diff across 6 files (page.tsx, [id]/page.tsx, PresentDetail.tsx, SharedPresent.tsx, discussions.json, entity doc). All 30+ text/label replacements match the design spec. Decorative archive elements fully removed. Browser-chrome correctly preserved per captain feedback. Vibe tag categories updated with proper styling. JudgeOwlComment quotation mark doubling fixed. Build passes cleanly. No regressions found. PASSED.

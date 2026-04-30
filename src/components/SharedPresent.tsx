@@ -46,14 +46,15 @@ export const VibeTag = ({ vibe }: { vibe?: string }) => {
   const getStyle = (text: string) => {
     if (text.includes('🔥')) return 'bg-[#FF4E50] text-white border-[#FF8A8C] shadow-[0_2px_0_0_#b91c1c]';
     if (text.includes('💡')) return 'bg-[#FDB813] text-gray-900 border-[#FFE082] shadow-[0_2px_0_0_#b45309]';
-    if (text.includes('⚖️')) return 'bg-[#4A90E2] text-white border-[#8EBAE3] shadow-[0_2px_0_0_#1d4ed8]';
+    if (text.includes('📖')) return 'bg-[#4A90E2] text-white border-[#8EBAE3] shadow-[0_2px_0_0_#1d4ed8]';
     if (text.includes('📣')) return 'bg-[#E91E63] text-white border-[#F48FB1] shadow-[0_2px_0_0_#880e4f]';
-    if (text.includes('⚠️')) return 'bg-[#FF9800] text-white border-[#FFCC80] shadow-[0_2px_0_0_#e65100]';
+    if (text.includes('💬')) return 'bg-[#FF9800] text-white border-[#FFCC80] shadow-[0_2px_0_0_#e65100]';
+    if (text.includes('🌍')) return 'bg-[#26A69A] text-white border-[#80CBC4] shadow-[0_2px_0_0_#00796b]';
     return 'bg-gray-900 text-white border-gray-700 shadow-[0_2px_0_0_#000]';
   };
 
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black tracking-wider border-b-2 uppercase transform -rotate-2 hover:rotate-0 hover:scale-105 transition-all cursor-default select-none mb-2 ${getStyle(vibe)}`}>
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-black tracking-wider cursor-default select-none mb-2 ${getStyle(vibe)}`}>
       {vibe}
     </span>
   );
@@ -67,7 +68,7 @@ export const JudgeOwlComment = ({ comment, isDepth = false }: { comment?: string
         <img src="/owl.png" alt="貓頭鷹法官" className="w-14 h-14 object-contain drop-shadow-md" />
       </div>
       <p className="text-sm font-serif text-gray-900 leading-relaxed italic pr-6">
-        「{comment}」
+        {comment}
       </p>
       <div className={`text-[10px] font-bold ${isDepth ? 'text-[#2E7D32]' : 'text-[#A67C00]'} uppercase tracking-wider mt-2 text-right`}>
         — 貓頭鷹法官．{isDepth ? '深度領航' : '小點評'}
