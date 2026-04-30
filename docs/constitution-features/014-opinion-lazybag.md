@@ -261,3 +261,13 @@ Implemented the opinion lazybag feature: a configurable scatter plot + sortable 
 ### Summary
 
 Reviewed the opinion lazybag implementation against all 14 acceptance criteria in the design spec. All criteria are met. Build passes, data flow is correct end-to-end, neutral presentation is enforced at schema and UI level, responsive behavior covers desktop/tablet/mobile breakpoints, and a11y baseline is satisfied. Code quality follows project conventions. Verdict: PASSED.
+
+## Stage Report
+
+### implement — justice names in tooltip
+
+1. Add optional justiceName field to OpinionEntry type — DONE
+2. Populate justiceName for all 12 seed opinions with real justice names — DONE (許宗力, 吳陳鐶, 黃昭元, 詹森林, 黃虹霞, 蔡烱燉, 黃瑞明, 謝銘洋, 蔡明誠, 呂太郎, 林俊益, 楊惠欽)
+3. Show justiceName in OpinionTooltip only (hover/tap) — NOT on dots or table — DONE (desktop tooltip + mobile bottom sheet)
+4. Scatter plot visual remains argument-based with no name labels — DONE
+5. Build passes without errors — DONE (all 9 routes generated successfully)
