@@ -164,6 +164,7 @@
 .decade-body.expanded {
   max-height: none;
   opacity: 1;
+  overflow: visible;
 }
 
 /* Search landing: ~1.5s highlight pulse on the target entry */

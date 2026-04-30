@@ -112,7 +112,7 @@ function DecadeSection({ group, expanded, onToggle, registerEntryRef }: DecadeSe
     <section
       ref={sectionRef}
       id={`decade-${group.decade}`}
-      className="relative border-t border-black/10 bg-[var(--color-textbook-bg)]"
+      className="relative border-t border-black/10 bg-[var(--color-textbook-bg)] mb-8 md:mb-12"
     >
       {/* Section header (always visible; acts as the collapsible toggle) */}
       <button
