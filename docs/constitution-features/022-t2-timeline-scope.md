@@ -9,7 +9,7 @@ verdict:
 score: 0.7
 worktree: .worktrees/spacedock-ensign-022-t2-timeline-scope
 issue:
-pr:
+pr: #16
 mod-block: merge:pr-merge
 ---
 
