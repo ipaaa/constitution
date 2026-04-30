@@ -224,3 +224,48 @@ Implementation detail: In `src/app/present/[id]/page.tsx`, add a conditional ren
 ### Summary
 
 Designed an opposing views integration system that embeds counterarguments directly into existing Track 2 detail pages (`/present/[id]`). Each opposing view is presented as a collapsible card with a neutral stance label, source attribution (author + affiliation, no party labels), and a required editorial annotation providing critical context. The design enforces neutrality at the data schema level (no fields for political camp) and through editorial guidelines (analytical annotations, not value judgments). Data flows through the existing `discussions.json` frozen-snapshot pattern via a new optional `opposing_views` field on `DiscussionItem`. Visual treatment uses a distinct blue-gray accent to differentiate from main content and owl commentary while maintaining the project's "refined archive document" aesthetic. Mobile responsive with collapsible cards that keep the reading flow scannable.
+
+## Stage Report — implement
+
+### Checklist
+
+1. All components created: OpposingViewCard, EditorialAnnotation, OpposingViewsSection — **DONE**
+   - `src/components/opposing-views/OpposingViewCard.tsx` — collapsible card with stance label, summary, source attribution, expand/collapse toggle, editorial annotation
+   - `src/components/opposing-views/EditorialAnnotation.tsx` — neutral callout with "編輯註記" label and optional source links
+   - `src/components/opposing-views/OpposingViewsSection.tsx` — container with heading, framing text, expand/collapse state management
+
+2. OpposingViewsSection integrated into /present/[id] detail page between content and owl commentary — **DONE**
+   - Conditional render in `src/app/present/[id]/page.tsx` after full content div and before deep owl commentary section
+
+3. Data types added: SourceRef, OpposingView, opposing_views field on DiscussionItem with seed data in discussions.json — **DONE**
+   - `SourceRef` and `OpposingView` interfaces added to `src/components/SharedPresent.tsx`
+   - `opposing_views?: OpposingView[]` added to `DiscussionItem` type
+   - Two seed opposing views added to `d1` entry in `discussions.json` (one with fullArgument, one without)
+
+4. Collapsible cards with neutral framing, editorial annotations, source attribution — **DONE**
+   - Cards collapsed by default; `展開全文`/`收合全文` toggle with ChevronDown/ChevronUp icons
+   - Smooth `max-height` transition for expand/collapse animation
+   - Editorial annotation rendered below each view with distinct visual treatment
+
+5. Neutral presentation: no party labels, stance-based labeling only, gray-blue accent — **DONE**
+   - Stance labels describe legal positions, not political camps
+   - Left border accent `border-[#78909C]` (blue-gray) with `bg-[#F5F7FA]` background
+   - No fields for political leaning in the data schema
+   - Section heading: "不同立場的論述" with framing text explaining purpose
+
+6. Mobile/desktop responsive behavior matches design spec — **DONE**
+   - Desktop: `p-6 md:p-8` padding, `md:ml-4` indent on editorial annotations
+   - Mobile: `p-4` padding, `ml-0` full-width annotations, cards stack vertically
+   - Section renders within existing `max-w-4xl` content column
+
+7. No regressions to existing Track 1/2/3 functionality — **DONE**
+   - `opposing_views` field is optional; all existing articles without it render unchanged
+   - No changes to listing page, cross-track links, related articles, or search
+   - Build succeeds with no TypeScript errors
+
+8. Feature renders without errors — **DONE**
+   - `npx next build` compiles successfully with 0 errors
+   - All 8 routes generate correctly including dynamic `/present/[id]`
+
+### Summary
+Implemented the opposing views integration feature with three new components in `src/components/opposing-views/`. Added `SourceRef` and `OpposingView` types to `SharedPresent.tsx`, extended `DiscussionItem` with optional `opposing_views` field, and added two seed opposing views to the `d1` discussion entry. The section renders between article content and owl commentary on detail pages, with collapsible cards using neutral blue-gray accent styling, stance-based labels (no party names), required editorial annotations, and keyboard-accessible expand/collapse toggles. Build passes cleanly.
