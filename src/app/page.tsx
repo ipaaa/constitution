@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Clock, Search, Workflow } from "lucide-react";
 import { CRISIS_STATS } from "@/data/future";
+import LazybagCtaSection from "@/components/home/LazybagCtaSection";
 
 export default function Home() {
   return (
@@ -155,6 +156,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Lazybag CTA */}
+      <LazybagCtaSection />
 
     </div>
   );
