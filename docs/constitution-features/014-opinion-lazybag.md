@@ -1,13 +1,13 @@
 ---
 id: "014"
 title: 大法官意見懶人包（多元觀點視覺化）
-status: design
+status: implement
 source: meetup-20260416
 started: 2026-04-30T15:36:55Z
 completed:
 verdict:
 score: 0.75
-worktree:
+worktree: .worktrees/spacedock-ensign-014-opinion-lazybag
 issue:
 pr:
 ---
