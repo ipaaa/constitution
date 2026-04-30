@@ -89,7 +89,7 @@ const OfficialTLDR = ({ item }: { item?: DiscussionItem }) => {
       <div className="w-full h-auto overflow-hidden border-b border-gray-200">
         <Image
           src="/tldr-illustration.png"
-          alt="Constitutional Court Status"
+          alt="憲法法庭現況示意圖"
           width={1024}
           height={503}
           priority
@@ -120,8 +120,8 @@ const OfficialTLDR = ({ item }: { item?: DiscussionItem }) => {
 
         <div className="pt-6 border-t border-gray-300 mt-4 flex flex-col md:flex-row justify-between items-center gap-4">
           <span className="text-[10px] font-bold text-gray-400 tracking-widest uppercase hidden lg:block">Citation {item.id === 'tldr' ? 'CORE' : item.id}</span>
-          <a href={item.link} className="inline-flex items-center gap-1.5 text-gray-900 border border-gray-300 px-4 py-2 text-sm font-bold hover:bg-gray-900 hover:text-white transition-colors w-full justify-center md:w-max rounded-sm shadow-sm">
-            閱讀完整分析 <ExternalLink size={14} />
+          <a href={item.link} target="_blank" rel="noopener noreferrer" aria-label="閱讀完整分析（開啟新分頁）" className="inline-flex items-center gap-1.5 text-gray-900 border border-gray-300 px-4 py-2 text-sm font-bold hover:bg-gray-900 hover:text-white transition-colors w-full justify-center md:w-max rounded-sm shadow-sm">
+            閱讀完整分析 <ExternalLink size={14} aria-hidden="true" />
           </a>
         </div>
 
@@ -145,11 +145,12 @@ const ConstitutionalMoodWidget = () => {
       <p className="text-xs font-bold text-gray-400 tracking-widest uppercase mb-4 text-center">HOW DO YOU FEEL? <span className="text-gray-300 ml-2">看完後您的心情是？</span></p>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {moods.map((mood, idx) => (
-          <button 
+          <button
             key={idx}
-            className={`flex flex-col items-center justify-center p-4 border border-gray-200 bg-white rounded-sm transition-all duration-300 group shadow-sm ${mood.color}`}
+            aria-label={mood.label}
+            className={`flex flex-col items-center justify-center p-4 border border-gray-200 bg-white rounded-sm transition-all duration-300 group shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 ${mood.color}`}
           >
-            <span className="text-3xl mb-2 group-hover:scale-125 transition-transform duration-300">{mood.emoji}</span>
+            <span className="text-3xl mb-2 group-hover:scale-125 transition-transform duration-300" aria-hidden="true">{mood.emoji}</span>
             <span className="text-xs font-bold tracking-tighter">{mood.label}</span>
           </button>
         ))}
@@ -385,7 +386,7 @@ export default function PresentTrack() {
             onChange={(e) => setSearchTerm(e.target.value)}
             aria-label="搜尋標題、作者、摘要"
           />
-          <button className="text-gray-500 hover:text-gray-900 px-4 hover:bg-gray-50 transition-colors border-l border-gray-200">
+          <button className="text-gray-500 hover:text-gray-900 px-4 hover:bg-gray-50 transition-colors border-l border-gray-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500" aria-label="搜尋">
             <Search size={20} />
           </button>
         </div>

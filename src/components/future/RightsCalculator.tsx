@@ -21,7 +21,7 @@ export default function RightsCalculator({
   return (
     <div className="bg-white border border-gray-200 rounded-sm p-6 shadow-sm">
       <div className="flex items-center gap-3 mb-4">
-        <div className="font-mono text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">
+        <div className="font-mono text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">
           Rights.filter()
         </div>
         <div className="flex-grow h-px bg-gray-100" />
@@ -50,7 +50,8 @@ export default function RightsCalculator({
             <button
               key={tag}
               onClick={() => onToggleTag(tag)}
-              className={`transition-all border px-3.5 py-1.5 rounded-sm text-sm font-medium flex items-center gap-2 ${
+              aria-pressed={isActive}
+              className={`transition-all border px-3.5 py-1.5 rounded-sm text-sm font-medium flex items-center gap-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 ${
                 isActive
                   ? `${colors.bg} ${colors.border} ${colors.text} shadow-sm`
                   : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
@@ -67,10 +68,10 @@ export default function RightsCalculator({
       <div className={`border-t border-gray-100 pt-4 transition-all ${hasFilter ? 'opacity-100' : 'opacity-50'}`}>
         <div className="flex items-baseline gap-2">
           <span className="font-mono text-2xl font-bold text-gray-900">{filteredCount}</span>
-          <span className="text-sm text-gray-500">/ {totalCount} 件案件與您相關</span>
+          <span className="text-sm text-gray-600">/ {totalCount} 件案件與您相關</span>
         </div>
         {hasFilter && (
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-xs text-gray-500 mt-1">
             包含 {activeTags.join('、')} 相關權益
           </p>
         )}

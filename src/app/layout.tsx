@@ -17,8 +17,9 @@ export default function RootLayout({
   return (
     <html lang="zh-TW">
       <body className="antialiased min-h-screen flex flex-col font-sans">
+        <a href="#main-content" className="skip-link">跳至主要內容</a>
         <Navbar />
-        <main className="flex-grow flex flex-col w-full relative">
+        <main id="main-content" className="flex-grow flex flex-col w-full relative">
           {children}
         </main>
         <Footer />
