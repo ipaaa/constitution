@@ -10,6 +10,7 @@ score: 0.75
 worktree: .worktrees/spacedock-ensign-014-opinion-lazybag
 issue:
 pr:
+mod-block: merge:pr-merge
 ---
 
 以論證角度分類不同大法官立場的懶人包，避免以人物或黨派標籤引導偏見。
@@ -111,12 +112,12 @@ export interface OpinionEntry {
 
 #### Dimensions (initial set from meeting discussion)
 
-| id | label | supportLabel | opposeLabel |
-|---|---|---|---|
-| `court-halt-stance` | 是否支持法庭停止運作 | 支持繼續運作 | 支持停止運作 |
-| `legal-level` | 法律層次判斷 | 憲法層次論證 | 法律層次論證 |
-| `urgency` | 急迫性判斷 | 具有急迫性 | 不具急迫性 |
-| `criminal-law-logic` | 刑事法邏輯立場 | 嚴格限縮解釋 | 擴張適用解釋 |
+| id                   | label      | supportLabel | opposeLabel |
+| -------------------- | ---------- | ------------ | ----------- |
+| `court-halt-stance`  | 是否支持法庭停止運作 | 支持繼續運作       | 支持停止運作      |
+| `legal-level`        | 法律層次判斷     | 憲法層次論證       | 法律層次論證      |
+| `urgency`            | 急迫性判斷      | 具有急迫性        | 不具急迫性       |
+| `criminal-law-logic` | 刑事法邏輯立場    | 嚴格限縮解釋       | 擴張適用解釋      |
 
 #### Data source & workflow
 
