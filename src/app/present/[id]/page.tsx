@@ -3,15 +3,17 @@
 import { use } from 'react';
 import _DISCUSSIONS_DATA from '@/data/discussions.json';
 import { VibeTag, JudgeOwlComment, type DiscussionItem } from '@/components/SharedPresent';
+import { Markdown } from '@/components/Markdown';
+import { EmptyContentCTA, ShareActions, RelatedArticles } from '@/components/PresentDetail';
 import Link from 'next/link';
-import { ChevronLeft, ExternalLink, Share2, Printer } from 'lucide-react';
+import { ChevronLeft, ExternalLink, Printer } from 'lucide-react';
 
 const DISCUSSIONS_DATA = _DISCUSSIONS_DATA as DiscussionItem[];
 
 export default function ArticleDetail({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const { id } = resolvedParams;
-  
+
   const item = DISCUSSIONS_DATA.find(d => d.id === id);
 
   if (!item) {
@@ -26,6 +28,8 @@ export default function ArticleDetail({ params }: { params: Promise<{ id: string
     );
   }
 
+  const depthComment = item.owl_depth_comment || item.owl_comment;
+
   return (
     <div className="min-h-screen bg-[#fcfcfc] pb-20">
       {/* Sticky Header */}
@@ -39,9 +43,17 @@ export default function ArticleDetail({ params }: { params: Promise<{ id: string
             <span className="text-[11px] font-black uppercase tracking-[0.2em] opacity-60">{item.category}</span>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <button className="p-2 hover:bg-gray-800 rounded-full transition-colors opacity-40 hover:opacity-100"><Share2 size={18} /></button>
-          <button className="p-2 hover:bg-gray-800 rounded-full transition-colors opacity-40 hover:opacity-100"><Printer size={18} /></button>
+        <div className="flex items-center gap-1">
+          <ShareActions title={item.title} variant="header" />
+          <button
+            type="button"
+            onClick={() => { if (typeof window !== 'undefined') window.print(); }}
+            aria-label="列印"
+            title="列印"
+            className="p-2 hover:bg-gray-800 rounded-full transition-colors opacity-60 hover:opacity-100"
+          >
+            <Printer size={18} />
+          </button>
         </div>
       </header>
 
@@ -60,7 +72,7 @@ export default function ArticleDetail({ params }: { params: Promise<{ id: string
           <h1 className="text-3xl md:text-5xl font-serif font-black text-gray-900 leading-[1.2] mb-6 tracking-tight">
             {item.title}
           </h1>
-          
+
           <div className="flex items-center gap-4 mb-12 pb-8 border-b border-gray-100">
              <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-[#D32F2F] font-black text-lg border border-gray-200 shadow-inner">
                {item.author.substring(0, 1)}
@@ -80,43 +92,50 @@ export default function ArticleDetail({ params }: { params: Promise<{ id: string
           </div>
 
           {/* Full Content (or Placeholder) */}
-          <div className="prose prose-lg prose-serif max-w-none text-gray-800 leading-relaxed text-justify mb-20 font-serif">
+          <div className="max-w-none mb-20">
              {item.full_content ? (
-               <div className="whitespace-pre-wrap">{item.full_content}</div>
+               <article className="prose-serif">
+                 <Markdown source={item.full_content} />
+               </article>
              ) : (
-               <div className="bg-gray-50 border border-dashed border-gray-300 p-12 rounded-sm text-center">
-                  <p className="text-gray-400 font-serif italic mb-4">此檔案的完整轉譯內容正在由貓頭鷹檔案課編寫中...</p>
-                  <p className="text-xs text-gray-300 font-mono uppercase tracking-widest">Awaiting Transcription / Status: Pending</p>
-               </div>
+               <EmptyContentCTA item={item} />
              )}
           </div>
 
           {/* Deep Owl Commentary */}
-          <section className="mt-20 pt-12 border-t-2 border-gray-900 relative">
-             <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-white px-4">
-                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Arxiv Review</span>
-             </div>
-             <div className="max-w-2xl mx-auto">
-                <JudgeOwlComment comment={item.owl_depth_comment || item.owl_comment} isDepth={true} />
-                <div className="mt-4 text-xs text-gray-400 text-center font-serif italic italic pr-4">
-                  「別急著走！這裡的深度解析能幫您更有層次地理解這個憲政難題。」
-                </div>
-             </div>
-          </section>
+          {depthComment && (
+            <section className="mt-20 pt-12 border-t-2 border-gray-900 relative">
+               <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-white px-4">
+                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Arxiv Review</span>
+               </div>
+               <div className="max-w-2xl mx-auto">
+                  <JudgeOwlComment comment={depthComment} isDepth={true} />
+                  <div className="mt-4 text-xs text-gray-400 text-center font-serif italic pr-4">
+                    「別急著走！這裡的深度解析能幫您更有層次地理解這個憲政難題。」
+                  </div>
+               </div>
+            </section>
+          )}
 
           {/* Action Footer */}
-          <div className="mt-20 flex flex-col items-center border-t border-gray-100 pt-12">
-             <p className="text-sm text-gray-400 font-serif mb-6 italic italic">想對對看與原文的精確度嗎？或者想看更多原始圖表？</p>
-             <a 
-               href={item.link} 
-               target="_blank" 
-               rel="noopener noreferrer"
-               className="bg-[#D32F2F] text-white px-10 py-5 rounded shadow-[0_4px_0_0_#8e1e1e] hover:shadow-[0_2px_0_0_#8e1e1e] hover:translate-y-[2px] active:translate-y-[4px] active:shadow-none transition-all font-black text-lg flex items-center gap-3 tracking-widest uppercase"
-             >
-               閱讀原始文件 <ExternalLink size={20} />
-             </a>
+          <div className="mt-20 flex flex-col items-center border-t border-gray-100 pt-12 gap-10">
+             <div className="flex flex-col items-center">
+               <p className="text-sm text-gray-400 font-serif mb-6 italic">想對對看與原文的精確度嗎？或者想看更多原始圖表？</p>
+               <a
+                 href={item.link}
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 className="bg-[#D32F2F] text-white px-10 py-5 rounded shadow-[0_4px_0_0_#8e1e1e] hover:shadow-[0_2px_0_0_#8e1e1e] hover:translate-y-[2px] active:translate-y-[4px] active:shadow-none transition-all font-black text-lg flex items-center gap-3 tracking-widest uppercase"
+               >
+                 閱讀原始文件 <ExternalLink size={20} />
+               </a>
+             </div>
+             <ShareActions title={item.title} />
           </div>
         </div>
+
+        {/* Related Articles */}
+        <RelatedArticles current={item} all={DISCUSSIONS_DATA} />
 
         {/* Bottom Nav */}
         <div className="mt-12 flex justify-between items-center px-4">
