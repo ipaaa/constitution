@@ -46,7 +46,7 @@ export default function JusticeTermTimeline() {
               return (
                 <div key={year} className="absolute top-0 bottom-0" style={{ left: `${x}%` }}>
                   <div className="w-px h-full bg-gray-800" />
-                  <span className="absolute -bottom-5 -translate-x-1/2 font-mono text-[10px] text-gray-500">
+                  <span className="absolute -bottom-5 -translate-x-1/2 font-mono text-[10px] text-gray-300">
                     {year}
                   </span>
                 </div>
@@ -98,17 +98,17 @@ export default function JusticeTermTimeline() {
                     }`}
                   >
                     <div className={`text-[10px] font-mono font-bold ${
-                      isPast ? 'text-gray-600' : isFinalCliff ? 'text-red-400' : 'text-amber-400'
+                      isPast ? 'text-gray-500' : isFinalCliff ? 'text-red-400' : 'text-amber-400'
                     }`}>
                       -{event.justicesExpiring} 席
                     </div>
                     <div className={`text-[9px] font-mono ${
-                      isPast ? 'text-gray-700' : 'text-gray-500'
+                      isPast ? 'text-gray-500' : 'text-gray-300'
                     }`}>
                       {event.label}
                     </div>
                     <div className={`text-[9px] font-mono ${
-                      isPast ? 'text-gray-700' : 'text-gray-500'
+                      isPast ? 'text-gray-500' : 'text-gray-300'
                     }`}>
                       剩 {event.justicesRemaining} 人
                     </div>
@@ -141,7 +141,7 @@ export default function JusticeTermTimeline() {
           </div>
 
           {/* Bottom label */}
-          <div className="mt-8 text-[10px] font-mono text-gray-600 uppercase tracking-widest">
+          <div className="mt-8 text-[10px] font-mono text-gray-400 uppercase tracking-widest">
             Justice Term Timeline / 大法官任期時間軸
           </div>
         </div>
@@ -171,15 +171,15 @@ export default function JusticeTermTimeline() {
                             : 'bg-amber-500 border-amber-400'
                       }`}
                     />
-                    <div className={`text-xs font-mono ${isPast ? 'text-gray-600' : isFinalCliff ? 'text-red-400' : 'text-gray-400'}`}>
+                    <div className={`text-xs font-mono ${isPast ? 'text-gray-500' : isFinalCliff ? 'text-red-400' : 'text-gray-300'}`}>
                       {event.date.slice(0, 7)}
                     </div>
                     <div className={`text-sm font-serif font-bold mt-0.5 ${
-                      isPast ? 'text-gray-600' : isFinalCliff ? 'text-red-400' : 'text-white'
+                      isPast ? 'text-gray-500' : isFinalCliff ? 'text-red-400' : 'text-white'
                     }`}>
                       {event.label} — {event.justicesExpiring} 席屆滿
                     </div>
-                    <div className="text-xs text-gray-500 font-mono mt-0.5">
+                    <div className="text-xs text-gray-300 font-mono mt-0.5">
                       剩餘 {event.justicesRemaining} / 15 席
                     </div>
                   </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { DAYS_UNTIL_CLIFF, TERM_EVENTS, ACTIVE_JUSTICES } from '@/data/future';
+import { DAYS_UNTIL_CLIFF, TERM_EVENTS, ATTENDING_JUSTICES } from '@/data/future';
 
 export default function JusticeCountdown() {
   const nextCliff = TERM_EVENTS[TERM_EVENTS.length - 1];
@@ -26,7 +26,7 @@ export default function JusticeCountdown() {
 
       <div className="mt-3 pt-3 border-t border-gray-800">
         <p className="text-xs text-gray-500 leading-relaxed font-serif">
-          {nextCliff.date.slice(0, 7).replace('-', '年')}月，最後 {ACTIVE_JUSTICES.length} 名大法官任期屆滿。届時憲法法庭將
+          {nextCliff.date.slice(0, 7).replace('-', '年')}月，最後 {ATTENDING_JUSTICES.length} 名大法官任期屆滿。届時憲法法庭將
           <strong className="text-red-400">無任何成員</strong>。
         </p>
       </div>
