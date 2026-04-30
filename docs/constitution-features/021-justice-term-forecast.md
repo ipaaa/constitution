@@ -3,7 +3,7 @@ id: "021"
 title: 大法官席次變化預測與呈現
 status: design
 source: captain-filed
-started:
+started: 2026-04-30T18:26:39Z
 completed:
 verdict:
 score: 0.75
