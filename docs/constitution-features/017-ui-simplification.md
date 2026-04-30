@@ -204,9 +204,8 @@ No layout structure changes are proposed. All changes are text replacements and 
    - Empty content CTA: Awaiting Transcription / Status: Pending → 尚未收錄
    - Cross-track label: Cross-Track Navigation / 跨軌道探索 → 跨軌道探索
 
-2. **Remove browser-chrome from ScholarCard and NGOCard** — DONE
-   - Removed fake window dots (red/yellow/green circles) and URL bar from ScholarCard, NGOCard, and ReelCard
-   - Replaced with clean card design using subtle top-border color indicator (blue for scholar, red for NGO)
+2. **Remove browser-chrome from ScholarCard and NGOCard** — SKIPPED
+   - Captain feedback: browser-chrome is an intentional design choice that signals to users the content is clipped from external sources, not original content. Kept as-is.
 
 3. **Remove CourtTimeline decorative elements** — DONE
    - Removed "ARCHIVE RECORD / NO. 77" header
@@ -250,4 +249,4 @@ No layout structure changes are proposed. All changes are text replacements and 
 
 ### Summary
 
-Implemented comprehensive UI simplification for T2 (present) pages. Applied 30+ text/label replacements converting English jargon and literary Chinese to plain everyday Chinese. Removed all browser-chrome decorative elements from cards, archive-themed decorations from timeline and detail pages, and bottom footer branding. Simplified VibeTag by removing rotation animation. Significantly reduced visual border/frame clutter across all cards and sections, replacing hard borders with subtle background tints and spacing for a cleaner, less cluttered appearance. All changes are presentation-layer only; no data model or routing changes were needed. Build passes cleanly with no regressions.
+Implemented comprehensive UI simplification for T2 (present) pages. Applied 30+ text/label replacements converting English jargon and literary Chinese to plain everyday Chinese. Removed archive-themed decorations from timeline and detail pages, and bottom footer branding. Browser-chrome on cards was kept per captain feedback (signals external source content). Simplified VibeTag by removing rotation animation. Significantly reduced visual border/frame clutter across cards and sections, replacing hard borders with subtle background tints and spacing for a cleaner, less cluttered appearance. All changes are presentation-layer only; no data model or routing changes were needed. Build passes cleanly with no regressions.

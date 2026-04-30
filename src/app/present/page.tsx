@@ -176,9 +176,21 @@ const NarrativeLoopFooter = () => (
 
 
 const ScholarCard = ({ item }: { item: DiscussionItem }) => {
+  const domain = item.link.startsWith('http') ? new URL(item.link).hostname : 'scholar.org';
   return (
-  <Link href={`/present/${item.id}`} className="bg-[#FDFCF8] rounded-lg flex flex-col h-full overflow-hidden group hover:shadow-md transition-shadow border-t-[3px] border-t-blue-600">
-    <div className="p-6 flex flex-col flex-grow">
+  <Link href={`/present/${item.id}`} className="bg-white rounded-lg flex flex-col h-full shadow-sm overflow-hidden group hover:shadow-md transition-shadow">
+    {/* Browser Chrome — signals external source */}
+    <div className="bg-gray-100 p-2 flex items-center gap-2 border-b border-gray-200">
+      <div className="flex gap-1.5 px-2">
+        <div className="w-2.5 h-2.5 rounded-full bg-red-400 border border-red-500/20"></div>
+        <div className="w-2.5 h-2.5 rounded-full bg-yellow-400 border border-yellow-500/20"></div>
+        <div className="w-2.5 h-2.5 rounded-full bg-green-400 border border-green-500/20"></div>
+      </div>
+      <div className="bg-white text-[10px] text-gray-500 font-mono px-3 py-1 flex-grow rounded text-center truncate border border-gray-200 shadow-inner group-hover:text-blue-600 transition-colors">
+        {domain}
+      </div>
+    </div>
+    <div className="p-6 bg-[#FDFCF8] flex flex-col flex-grow">
       <div className="mb-2">
         <VibeTag vibe={item.vibe} />
       </div>
@@ -203,9 +215,21 @@ const ScholarCard = ({ item }: { item: DiscussionItem }) => {
 };
 
 const NGOCard = ({ item }: { item: DiscussionItem }) => {
+  const domain = item.link.startsWith('http') ? new URL(item.link).hostname : 'ngo-report.org';
   return (
-  <Link href={`/present/${item.id}`} className="bg-[#FDFCF8] rounded-lg flex flex-col h-full overflow-hidden group hover:shadow-md transition-shadow border-t-[3px] border-t-[#D32F2F]">
-    <div className="p-6 flex flex-col flex-grow">
+  <Link href={`/present/${item.id}`} className="bg-white rounded-lg flex flex-col h-full shadow-sm overflow-hidden group hover:shadow-md transition-shadow">
+    {/* Browser Chrome — signals external source */}
+    <div className="bg-gray-100 p-2 flex items-center gap-2 border-b border-gray-200">
+      <div className="flex gap-1.5 px-2">
+        <div className="w-2.5 h-2.5 rounded-full bg-red-400 border border-red-500/20"></div>
+        <div className="w-2.5 h-2.5 rounded-full bg-yellow-400 border border-yellow-500/20"></div>
+        <div className="w-2.5 h-2.5 rounded-full bg-green-400 border border-green-500/20"></div>
+      </div>
+      <div className="bg-white text-[10px] text-gray-500 font-mono px-3 py-1 flex-grow rounded text-center truncate border border-gray-200 shadow-inner group-hover:text-blue-600 transition-colors">
+        {domain}
+      </div>
+    </div>
+    <div className="p-6 bg-[#FDFCF8] flex flex-col flex-grow border-t-4 border-t-[#D32F2F]">
       <div className="mb-2">
         <VibeTag vibe={item.vibe} />
       </div>
@@ -230,9 +254,21 @@ const NGOCard = ({ item }: { item: DiscussionItem }) => {
 };
 
 const ReelCard = ({ item }: { item: DiscussionItem }) => {
+  const domain = item.link.startsWith('http') ? new URL(item.link).hostname : 'youtube.com/shorts';
   return (
   <Link href={`/present/${item.id}`} className="bg-gray-900 rounded-lg flex flex-col h-full shadow-lg overflow-hidden group hover:shadow-xl transition-shadow">
-    <div className="p-3 flex flex-col flex-grow">
+    {/* Browser Chrome — signals external source */}
+    <div className="bg-black p-2 flex items-center gap-2 border-b border-gray-800">
+      <div className="flex gap-1.5 px-2 opacity-50">
+        <div className="w-2.5 h-2.5 rounded-full bg-gray-600 border border-white/10"></div>
+        <div className="w-2.5 h-2.5 rounded-full bg-gray-600 border border-white/10"></div>
+        <div className="w-2.5 h-2.5 rounded-full bg-gray-600 border border-white/10"></div>
+      </div>
+      <div className="bg-gray-900 text-[10px] text-gray-500 font-mono px-3 py-1 flex-grow rounded text-center truncate border border-gray-800 shadow-inner group-hover:text-blue-400 transition-colors">
+        {domain}
+      </div>
+    </div>
+    <div className="p-3 bg-gray-900 flex flex-col flex-grow">
       {/* Image / Video frame */}
       <div className="bg-[#0A0A0A] rounded-sm w-full aspect-[4/5] relative overflow-hidden flex flex-col items-center justify-center border border-gray-800">
         <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center text-gray-900 shadow-md group-hover:scale-110 group-hover:bg-white transition-transform z-10 cursor-pointer">
