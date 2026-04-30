@@ -9,7 +9,7 @@ verdict:
 score: 0.6
 worktree: .worktrees/spacedock-ensign-017-ui-simplification
 issue:
-pr:
+pr: #17
 mod-block: merge:pr-merge
 ---
 
