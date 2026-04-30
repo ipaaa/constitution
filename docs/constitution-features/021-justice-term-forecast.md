@@ -224,3 +224,35 @@ Rationale:
 ### Summary
 
 All 5 remaining Constitutional Court justices belong to the same 2019 appointment cohort and expire in September 2027, creating a cliff event where the court drops from 5 (already paralyzed) to 0 (non-existent). The visualization is designed as an embedded section in the existing Track 3 Future page, using three sub-components (timeline, countdown, seat grid) that follow the established dark/crisis visual language. Data types extend the existing `src/data/future.ts` module, and `CRISIS_STATS.activeJustices` will be derived from the justice array for consistency.
+
+## Stage Report
+
+### implement
+
+1. Justice term data file created with real justice data and term expiry dates — **DONE**
+   - Added `Justice` interface, `TermEvent` interface, `JUSTICES` array (15 entries), `ACTIVE_JUSTICES`, `TERM_EVENTS`, and `DAYS_UNTIL_CLIFF` to `src/data/future.ts`
+   - `CRISIS_STATS.activeJustices` and `vacantSeats` now derived from `ACTIVE_JUSTICES.length`
+
+2. Forecast timeline visualization component built — **DONE**
+   - `src/components/future/JusticeTermTimeline.tsx`: Horizontal timeline (desktop) spanning 2023-2029 with year grid lines, event markers for all 4 term expiry waves, "YOU ARE HERE" indicator at REFERENCE_DATE, red danger zone after 2027-09 cliff, and dashed line representing the void
+   - Vertical timeline (mobile) with the same events in top-to-bottom layout
+
+3. Quorum impact analysis component showing threshold effects — **DONE**
+   - `src/components/future/JusticeSeatGrid.tsx`: 15-seat grid (5 columns x 3 rows) showing 5 active (red with pulse animation) and 10 vacant (gray) seats, with hover tooltips showing justice name and term expiry
+   - `src/components/future/JusticeCountdown.tsx`: Countdown card showing days until 2027-09 cliff with contextual text
+
+4. Integrated into Track 3 (future) page per design spec — **DONE**
+   - Inserted between Crisis Banner and Main Layout in `src/app/future/page.tsx`
+   - Layout: `[Crisis Banner] → [Justice Term Section] → [Sidebar + Funnel + Cases] → [Explanation]`
+
+5. Mobile/desktop responsive behavior — **DONE**
+   - Desktop (md+): Horizontal timeline, countdown and seat grid side-by-side
+   - Mobile: Vertical timeline, countdown and seat grid stacked
+   - All uses `grid-cols-1 md:grid-cols-2` pattern consistent with existing components
+
+6. Build passes without errors, no regressions — **DONE**
+   - `npm run build` compiles successfully, all 9 routes generated without errors
+
+### Summary
+
+Implemented the justice term forecast feature as a new section in the Track 3 Future page. Added 15 justice records and 4 term expiry events to `src/data/future.ts`, with `CRISIS_STATS` values now derived from data rather than hardcoded. Created three components: `JusticeTermTimeline` (timeline visualization with desktop horizontal / mobile vertical layouts), `JusticeCountdown` (days-until-cliff card), and `JusticeSeatGrid` (15-seat visual grid with active/vacant states). All components follow the existing dark/crisis visual language (`bg-gray-900`, `#D32F2F` accents, `font-mono` data, `font-serif` editorial text, `animate-pulse` for urgency).
