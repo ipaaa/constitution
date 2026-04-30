@@ -9,7 +9,7 @@ verdict:
 score: 0.75
 worktree: .worktrees/spacedock-ensign-024-t1-timeline-navigation
 issue:
-pr:
+pr: #18
 mod-block: merge:pr-merge
 ---
 
