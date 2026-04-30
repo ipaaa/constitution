@@ -238,7 +238,7 @@ export interface Justice {
   /** Whether the justice is absent from court sessions (未出席) */
   absent?: boolean;
   /** Appointment cohort identifier for grouping */
-  cohort: '2016' | '2019' | '2023-nominated' | '2024';
+  cohort: '2016' | '2019' | '2024';
 }
 
 export interface TermEvent {
@@ -325,12 +325,6 @@ export const FAILED_NOMINATIONS: FailedNomination[] = [
     date: '2025-01-14',
     label: '第二次提名遭否決',
     detail: '總統再度送出大法官提名咨文，立法院以多數決退回咨文，拒絕行使同意權。',
-    nomineesCount: 7,
-  },
-  {
-    date: '2025-05-20',
-    label: '第三次提名未獲同意',
-    detail: '總統第三度提名大法官人選，立法院仍未進行實質審查，提名案未獲行使同意權。',
     nomineesCount: 7,
   },
 ];
