@@ -1,7 +1,7 @@
 ---
 id: "024"
 title: T1 時光機釋憲案瀏覽問題修復
-status: implement
+status: verify
 source: captain-filed
 started: 2026-04-30T21:30:40Z
 completed:
