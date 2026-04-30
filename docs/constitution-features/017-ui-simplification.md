@@ -177,3 +177,77 @@ No layout structure changes are proposed. All changes are text replacements and 
 - The existing responsive breakpoints (sm/md/lg/xl) remain unchanged and appropriate
 
 **Summary:** This design proposal identifies 30+ specific text/label simplifications and 6 component-level changes to remove decorative clutter (fake browser chrome, archive stamps, English-only labels) and replace professional/literary Chinese with everyday language. All changes are presentation-layer only — no data model changes needed. The goal is to make the T2 page immediately understandable to a non-expert citizen reader without any legal or academic background.
+
+## Stage Report — implement
+
+### Checklist
+
+1. **All text/label replacements from design spec (30+ items)** — DONE
+   - Page title: 憲庭熱搜榜 → 大家在討論什麼？
+   - Badge: Present → 熱門
+   - Subtitle: 公民必讀的憲政剪貼簿 → 看看專家和民間團體怎麼說
+   - Search placeholder: 在檔案庫中搜尋關鍵字、法案 → 搜尋文章標題、作者
+   - Timeline title: 憲政大事記 → 重要時間表 (English subtitle removed)
+   - Section header: PUBLIC VOICES / 問題怎麼看 → 大家怎麼看？
+   - Scholar section: 學者文章 (Scholar Perspectives) → 學者怎麼說; Articles → 篇
+   - NGO section: NGO 倡議 (NGO Reports) → 民間團體怎麼說; Articles → 篇
+   - Reels section: 影音轉譯 (Reels & Shorts) → 影片摘要; Videos → 部
+   - TL;DR badge: Official TL;DR → 懶人包; Citation CORE removed
+   - CTA: 閱讀完整分析 → 看完整內容
+   - Mood widget: HOW DO YOU FEEL? 看完後您的心情是？ → 你看完覺得怎樣？
+   - Mood labels: 如臨深淵→好擔心, 滿血復活→太好了！, 靜觀其變→再看看, 原來如此→長知識了
+   - Card CTAs: 開啟詳法與導讀→看完整介紹, 查看專題報告與導讀→看完整介紹, 查看由貓頭鷹轉譯的影片說明→看貓頭鷹的影片筆記
+   - Footer cards: BACK TO THE ORIGIN removed, EXPLORE THE FUTURE removed; 進入：歷史與教科書 (TRACK 01) → 回顧歷史, 進入：憲政復健現狀 (TRACK 03) → 看看未來
+   - Detail page: Abstract / 內文摘要 → 重點整理; Arxiv Review → 貓頭鷹深度解析; Back Archive → 回到列表; 閱讀原始文件 → 看原始出處
+   - Detail page category: English category names → Chinese (學者文章/民間報告/影片)
+   - Related articles: Related Files → 延伸閱讀; 更多檔案 → 看更多; Share this file → 分享這篇
+   - Empty content CTA: Awaiting Transcription / Status: Pending → 尚未收錄
+   - Cross-track label: Cross-Track Navigation / 跨軌道探索 → 跨軌道探索
+
+2. **Remove browser-chrome from ScholarCard and NGOCard** — DONE
+   - Removed fake window dots (red/yellow/green circles) and URL bar from ScholarCard, NGOCard, and ReelCard
+   - Replaced with clean card design using subtle top-border color indicator (blue for scholar, red for NGO)
+
+3. **Remove CourtTimeline decorative elements** — DONE
+   - Removed "ARCHIVE RECORD / NO. 77" header
+   - Removed "Chronicle of the Constitutional Court" English subtitle
+   - Removed SEC-CAT/REF footer block and ARCH stamp circle
+   - Changed "Urgent Record" stamp to "注意"
+   - Removed outer border from timeline container
+
+4. **Remove detail page Archive Record/REF metadata and Arxiv Review label** — DONE
+   - Removed "Archive Record" and "REF: id / year" metadata block, replaced with simple year display
+   - Changed "Arxiv Review" divider to "貓頭鷹深度解析"
+
+5. **Remove bottom footer branding text** — DONE
+   - Removed "憲庭加好友 Add C0urt / Present Track" from detail page bottom
+
+6. **Simplify VibeTag (remove rotation animation)** — DONE
+   - Removed `transform -rotate-2 hover:rotate-0 hover:scale-105` animation classes
+   - Removed `border-b-2 uppercase` styling for cleaner appearance
+   - Increased font size from text-[10px] to text-xs for readability
+
+7. **Reduce visual border/frame clutter across T2** — DONE
+   - Removed outer border from CourtTimeline container
+   - Removed border from OfficialTLDR (kept top accent border only)
+   - Removed border from search input bar
+   - Removed border from mood widget buttons (use background tint instead)
+   - Removed border from ScholarCard/NGOCard CTA buttons
+   - Removed border from detail page main content card
+   - Removed dashed border from empty content CTA
+   - Removed border-2 from NarrativeLoopFooter cards (use shadow on hover instead)
+   - Removed decorative corner elements from footer cards (PAST tab, FUTURE stamp)
+   - Removed background counters (bg-gray-100) from section count badges
+
+8. **Build passes without errors, no regressions** — DONE
+   - `npx next build` completes successfully, all routes generated
+
+9. **All navigation and search still functional** — DONE
+   - Search input unchanged functionally (only placeholder text updated)
+   - All Link/href navigation paths preserved
+   - Cross-track links intact
+   - Share actions intact
+
+### Summary
+
+Implemented comprehensive UI simplification for T2 (present) pages. Applied 30+ text/label replacements converting English jargon and literary Chinese to plain everyday Chinese. Removed all browser-chrome decorative elements from cards, archive-themed decorations from timeline and detail pages, and bottom footer branding. Simplified VibeTag by removing rotation animation. Significantly reduced visual border/frame clutter across all cards and sections, replacing hard borders with subtle background tints and spacing for a cleaner, less cluttered appearance. All changes are presentation-layer only; no data model or routing changes were needed. Build passes cleanly with no regressions.
