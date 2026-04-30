@@ -3,7 +3,7 @@ id: "025"
 title: 社群貼文內容規劃
 status: design
 source: captain-filed
-started:
+started: 2026-04-30T22:48:37Z
 completed:
 verdict:
 score: 0.7
