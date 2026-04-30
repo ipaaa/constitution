@@ -261,6 +261,9 @@ export default function OpinionScatterPlot({
                 {op.category && (
                   <div className="text-[10px] font-medium text-gray-500 mb-1">{op.category}</div>
                 )}
+                {op.justiceName && (
+                  <div className="text-[10px] text-gray-400 mb-1">大法官：{op.justiceName}</div>
+                )}
                 <p className="text-sm text-gray-800 font-serif leading-relaxed mb-2">
                   {op.argumentSummary}
                 </p>

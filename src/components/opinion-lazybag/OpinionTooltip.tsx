@@ -21,7 +21,10 @@ export default function OpinionTooltip({ opinion, xDim, yDim, style }: OpinionTo
         {opinion.rulingRef}
       </div>
       {opinion.category && (
-        <div className="text-[10px] font-medium text-gray-500 mb-2">{opinion.category}</div>
+        <div className="text-[10px] font-medium text-gray-500 mb-1">{opinion.category}</div>
+      )}
+      {opinion.justiceName && (
+        <div className="text-[10px] text-gray-400 mb-2">大法官：{opinion.justiceName}</div>
       )}
       <p className="text-sm text-gray-800 font-serif leading-relaxed mb-3">
         {opinion.argumentSummary}
