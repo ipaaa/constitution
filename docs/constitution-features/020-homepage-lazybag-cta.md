@@ -10,6 +10,7 @@ score: 0.8
 worktree: .worktrees/spacedock-ensign-020-homepage-lazybag-cta
 issue:
 pr:
+mod-block: merge:pr-merge
 ---
 
 在首頁三軌道區塊下方新增獨立的 CTA section，連結到 `/opinion-lazybag`（大法官意見懶人包）。
