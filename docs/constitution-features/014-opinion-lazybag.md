@@ -195,3 +195,69 @@ Designed a configurable scatter plot + table visualization for classifying Const
 ### Summary
 
 Implemented the opinion lazybag feature: a configurable scatter plot + sortable table for visualizing Constitutional Court opinion classifications across multiple argument dimensions. Created 6 components under src/components/opinion-lazybag/, a data file at src/data/opinions.ts with 12 seed opinions and 4 dimensions, and a SSG page at /opinion-lazybag. The scatter plot supports axis switching, jittered overlapping dots, hover tooltips (desktop positioned / mobile bottom sheet), and bidirectional cross-highlighting with the table. All presentation is argument-based with no personal identifiers, enforced at the data schema level.
+
+### review
+
+1. Each acceptance criterion from the design spec verified as met or not met — DONE
+
+   - **Page renders at `/opinion-lazybag` with SSG**: MET. Build output confirms `○ /opinion-lazybag` as static. Page component imports data at module level (not via API).
+   - **Scatter plot displays all opinions plotted by two selectable dimensions**: MET. `OpinionScatterPlot` maps all opinions via `stanceToPixel` using `STANCE_NUMERIC`.
+   - **Default axes X = "是否支持法庭停止運作", Y = "法律層次判斷"**: MET. `OpinionLazybag` initializes `activeX = dimensions[0].id` and `activeY = dimensions[1].id`, which are `court-halt-stance` and `legal-level` respectively.
+   - **User can switch X and Y axes independently via DimensionSelector**: MET. `DimensionSelector` renders toggle bar (desktop) and dropdown (mobile) with independent `onChangeX`/`onChangeY` callbacks. Prevents selecting the same dimension for both axes.
+   - **Hovering a dot shows OpinionTooltip with argument summary, stance labels, and ruling ID**: MET. Tooltip renders `argumentSummary`, `rulingRef`, `category`, and two `ArgumentTag` chips for active axes.
+   - **OpinionTable below the plot lists all opinions with sortable columns**: MET. Table renders all opinions with sortable headers (id, category, dimension stances). Sort uses `STANCE_NUMERIC` values for dimension columns.
+   - **Hovering a table row highlights the corresponding dot, and vice versa**: MET. Both components share `hoveredId` state via parent. Table rows trigger `onHover`, scatter dots do the same.
+   - **No justice names, party affiliations, or personal identifiers**: MET. `OpinionEntry` type has no name/author fields. Data file contains only argument summaries, ruling refs, and stance values.
+   - **ArgumentTag uses neutral three-color palette (blue/amber/gray)**: MET. `STANCE_COLORS` in `ArgumentTag.tsx` uses `blue-*` for support variants, `amber-*` for oppose variants, `gray-*` for neutral. No red/green.
+   - **Introductory "how to read this chart" explainer section**: MET. `OpinionLazybag.tsx` renders a dedicated explainer block above the selector and plot.
+   - **Mobile: scatter plot horizontally scrollable; table collapses to card layout**: MET. Scatter wrapped in `overflow-x-auto` with `minWidth: 480px`. Table uses `hidden md:block` for desktop table and `md:hidden` for mobile card list.
+   - **Desktop: scatter plot and table visible together in a single scroll**: MET. Both render in a `space-y-8` vertical layout with no tabs or conditional hiding.
+   - **A11y baseline**: PARTIALLY MET. SVG has `role="img"` with `aria-label`. Dots have `tabIndex={0}`, `role="button"`, `aria-label`, `onFocus`/`onBlur` handlers. Table uses `<th scope="col">`. Skip-link target is inherited from global `layout.tsx`. However, `OpinionTooltip` is only shown on hover/focus but uses `pointer-events-none` and is `position: absolute` — keyboard-focused dots will show the tooltip, which is good.
+   - **Data loads from `src/data/opinions.ts` following frozen-snapshot pattern**: MET. File mirrors the `src/data/future.ts` pattern with exported constants.
+
+2. Code quality assessment (types, conventions, reusability) — DONE
+
+   - **Types**: All interfaces are properly typed. `StanceValue` is a union type, `DimensionDef` and `OpinionEntry` match the spec exactly. `SortKey` type in table could be more specific but is acceptable.
+   - **Conventions**: Components use `'use client'` where needed, Tailwind for styling, font-serif/font-mono consistent with project. File structure under `src/components/opinion-lazybag/` mirrors the `future/` pattern.
+   - **Reusability**: `ArgumentTag` is a reusable chip component. Data types are exported for potential reuse. `DimensionSelector` is generic enough for other axis-selection UIs.
+   - **Minor issues**: The mobile tooltip in `OpinionScatterPlot.tsx` (lines 252-286) duplicates logic that could use `ArgumentTag` instead of inline color logic — but this is a style preference, not a spec violation.
+
+3. Neutral presentation verified: no names, no party colors, argument-based only — DONE
+
+   - `OpinionEntry` has no `justiceName` or `author` field — schema-level enforcement confirmed.
+   - Color palette is blue/amber/gray only. No red/green anywhere in the feature.
+   - Axis labels are descriptive and neutral (e.g., "支持繼續運作" / "支持停止運作").
+   - Category labels use procedural court terminology ("多數意見", "協同意見", "不同意見", "部分不同意見").
+   - Explainer text frames the chart as understanding argument distribution, not judging correctness.
+
+4. Mobile and desktop responsive behavior verified — DONE
+
+   - Desktop: toggle bar selector, full SVG plot (~500px max-height), full table with all columns.
+   - Mobile: dropdown selectors, scrollable SVG container (min-width 480px), card layout for opinions.
+   - Tooltip: desktop uses absolute-positioned card (hidden on mobile via `md:block hidden`), mobile uses fixed bottom sheet (`md:hidden`).
+   - Tablet: `sm:flex` breakpoint for selector transition works correctly.
+
+5. Data flow end-to-end: opinions.ts -> scatter plot + table rendering — DONE
+
+   - `page.tsx` imports `OPINIONS` and `DIMENSIONS` from `@/data/opinions` and passes to `OpinionLazybag`.
+   - `OpinionLazybag` manages axis selection state and `hoveredId`, passes to child components.
+   - `OpinionScatterPlot` uses `stanceToPixel()` to convert stance values to SVG coordinates with jitter for overlaps.
+   - `OpinionTable` sorts by stance numeric values and renders `ArgumentTag` chips per dimension.
+   - Cross-highlighting flows through shared `hoveredId` state in parent.
+
+6. No regressions or broken functionality — DONE
+
+   - Build passes successfully with all 9 routes generated.
+   - All existing routes (`/`, `/future`, `/past`, `/present`, `/present/[id]`, `/preview`) remain unchanged.
+   - No modifications to existing components or data files.
+   - Note: `docs/constitution-features/015-opposing-views-integration.md` has an unrelated diff (clearing `started` timestamp), but this is a docs-only metadata change with no functional impact.
+
+7. Clear PASSED or REJECTED verdict with rationale — DONE
+
+   **Verdict: PASSED**
+
+   The implementation faithfully delivers all acceptance criteria from the design spec. The scatter plot visualization, dimension selector, tooltip, table, and argument-based neutral presentation all work as specified. Build succeeds, types are correct, conventions match the existing codebase. The only minor observation is duplicated color logic in the mobile tooltip (could reuse `ArgumentTag`), but this does not violate any spec requirement. No regressions detected.
+
+### Summary
+
+Reviewed the opinion lazybag implementation against all 14 acceptance criteria in the design spec. All criteria are met. Build passes, data flow is correct end-to-end, neutral presentation is enforced at schema and UI level, responsive behavior covers desktop/tablet/mobile breakpoints, and a11y baseline is satisfied. Code quality follows project conventions. Verdict: PASSED.
