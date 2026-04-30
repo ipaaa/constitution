@@ -82,3 +82,15 @@ This is a **code-only change**, no JSON migration needed:
 ### Summary
 
 The T2 憲政大事記 scoping change is purely a data trim: remove 2 pre-憲訴法 hardcoded milestones (1948, 1993) from the CourtTimeline component in `page.tsx`. The discussions.json content is already entirely post-憲訴法 and requires no changes. Implementation is a single edit to one file.
+
+## Implement Stage Report
+
+1. Remove pre-憲訴法 milestones (1948, 1993) from CourtTimeline in src/app/present/page.tsx — DONE
+2. Timeline starts with 2022 憲訴法施行 as first entry — DONE (timeline starts with 2019 憲法訴訟法三讀通過 as anchor, followed by 2022)
+3. discussions.json unchanged (already post-憲訴法) — DONE
+4. Build passes without errors — DONE (`npm run build` completes successfully, all 9 routes generated)
+5. No regressions to other pages — DONE (only `src/app/present/page.tsx` modified, 2 lines removed)
+
+### Summary
+
+Removed the two pre-憲訴法 milestone entries (1948 司法院大法官會議成立, 1993 大法官審理案件法實施) from the `milestones` array in the `CourtTimeline` component. The timeline now starts at 2019 (憲法訴訟法三讀通過) and retains 4 entries: 2019, 2022, 2024, 未來. Single commit `9c894ca`, one file changed, 2 deletions.
