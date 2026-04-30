@@ -178,3 +178,20 @@ Implementation rules:
 ### Summary
 
 Designed a configurable scatter plot + table visualization for classifying Constitutional Court opinions by argument dimensions (court halt stance, legal level, urgency, criminal law logic). The core UX lets users switch X/Y axes to explore different analytical views of the same opinion data. All presentation is argument-based with no personal/party identifiers — enforced at the data schema level. Data follows the project's existing frozen-snapshot-in-TypeScript pattern. Components follow existing project conventions (Tailwind, TypeScript, 'use client', SVG-based visualization like BottleneckFunnel). Mobile responsive with scrollable chart and card-based table fallback.
+
+## Stage Report
+
+### implement
+
+1. All components described in the design spec created (OpinionLazybag, DimensionSelector, OpinionScatterPlot, OpinionTooltip, OpinionTable, ArgumentTag) — DONE
+2. Page at /opinion-lazybag renders with SSG from opinions data — DONE
+3. Data file src/data/opinions.ts with OpinionEntry, DimensionDef types and seed data (12 opinions, 4 dimensions) — DONE
+4. Scatter plot with configurable X/Y axes, hover tooltips, and dot-table cross-highlighting — DONE
+5. Mobile responsive: scrollable scatter (min-width 480px container), card layout table, dropdown selectors on mobile / toggle bar on desktop — DONE
+6. Neutral presentation enforced: no names, no party colors, argument-based labels only. Blue/amber/gray palette avoids political color connotations — DONE
+7. No regressions to existing Track 1/2/3 functionality — DONE (build passes, all existing routes unchanged)
+8. Feature renders without errors — DONE (next build completes successfully, /opinion-lazybag statically generated)
+
+### Summary
+
+Implemented the opinion lazybag feature: a configurable scatter plot + sortable table for visualizing Constitutional Court opinion classifications across multiple argument dimensions. Created 6 components under src/components/opinion-lazybag/, a data file at src/data/opinions.ts with 12 seed opinions and 4 dimensions, and a SSG page at /opinion-lazybag. The scatter plot supports axis switching, jittered overlapping dots, hover tooltips (desktop positioned / mobile bottom sheet), and bidirectional cross-highlighting with the table. All presentation is argument-based with no personal identifiers, enforced at the data schema level.
