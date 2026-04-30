@@ -1,7 +1,7 @@
 ---
 id: "020"
 title: 首頁懶人包入口區塊
-status: implement
+status: review
 source: captain-filed
 started: 2026-04-30T17:46:10Z
 completed:
