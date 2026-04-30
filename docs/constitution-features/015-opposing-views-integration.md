@@ -3,7 +3,7 @@ id: "015"
 title: 反方意見與中立呈現
 status: design
 source: meetup-20260416
-started:
+started: 2026-04-30T15:46:56Z
 completed:
 verdict:
 score: 0.7
