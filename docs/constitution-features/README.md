@@ -1,5 +1,5 @@
 ---
-commissioned-by: spacedock@0.9.3
+commissioned-by: spacedock@0.9.5
 entity-type: feature
 entity-label: feature
 entity-label-plural: features
@@ -13,6 +13,11 @@ stages:
       initial: true
     - name: implement
       worktree: true
+    - name: verify
+      fresh: true
+      worktree: true
+      gate: true
+      feedback-to: implement
     - name: review
       fresh: true
       worktree: true
@@ -56,7 +61,7 @@ pr:
 |-------|------|-------------|
 | `id` | string | Unique identifier, format determined by id-style in README frontmatter |
 | `title` | string | Human-readable feature name |
-| `status` | enum | One of: design, implement, review, complete |
+| `status` | enum | One of: design, implement, verify, review, complete |
 | `source` | string | Where this feature came from |
 | `started` | ISO 8601 | When active work began |
 | `completed` | ISO 8601 | When the feature reached terminal status |
@@ -93,6 +98,19 @@ A worker builds the feature in a worktree branch based on the design spec. This 
   - No regressions to existing Track 1/Track 2 functionality
 - **Good:** Follows Next.js app router conventions, uses Tailwind consistently with existing pages, TypeScript types are complete, components are reusable where the design spec calls for it
 - **Bad:** Inline styles mixed with Tailwind, `any` types, copy-pasting large blocks from other tracks without adapting, breaking existing navigation or layout
+
+### `verify`
+
+A fresh agent performs factual verification of AI-generated content. This stage catches errors in names, dates, events, statistics, and other factual claims before code review. If issues are found, findings are routed back to `implement` for correction.
+
+- **Inputs:** Implementation diff on the worktree branch, entity body with design spec, external reference sources (司法院, 立法院, news archives)
+- **Outputs:**
+  - Each factual claim identified and verified against authoritative sources
+  - Incorrect facts flagged with the correct information and source
+  - Data accuracy assessment: names (人名), dates (日期), events (事件), statistics (數據)
+  - Clear PASSED or REJECTED verdict with rationale
+- **Good:** Cross-references every factual claim against authoritative sources; flags uncertain claims rather than assuming correctness; provides correct values with citations for each error found
+- **Bad:** Only checking surface-level formatting without verifying facts, accepting plausible-sounding but unverified claims, skipping data files that contain seed content
 
 ### `review`
 

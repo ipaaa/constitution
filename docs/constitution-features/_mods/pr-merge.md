@@ -1,7 +1,7 @@
 ---
 name: pr-merge
 description: Push branches and create/track GitHub PRs for workflow entities
-version: 0.9.4
+version: 0.9.5
 ---
 
 # PR Merge
@@ -37,22 +37,24 @@ Wait for the captain's explicit approval before pushing. Do NOT infer approval f
 
 **On approval:** First, push main to ensure the remote is up to date with local state commits: `git push origin main`. Then rebase the worktree branch onto main: `git rebase main` (from the worktree directory). Then push the worktree branch: `git push origin {branch}`. If any step fails (no remote, auth error, rebase conflict), report to the captain and fall back to local merge.
 
+Before constructing the PR body, compute the short SHA for the audit link by running `git rev-parse --short HEAD` in the worktree directory. If the command exits non-zero (no commits, detached HEAD), substitute the literal string `main` into the audit-link template instead and report the fallback to the captain. Resolve the owner/repo via `gh repo view --json nameWithOwner --jq '.nameWithOwner'`.
+
 Create a PR. Build the PR body using the template below, then run: `gh pr create --base main --head {branch} --title "{entity title}" --body "{constructed body}"`. If `gh` is not available, warn the captain and fall back to local merge.
 
 ### PR body template
 
-Lead with motivation + end-user value; audit metadata goes at the bottom. The goal is that a reviewer or future debugger sees the "why" first and the `Workflow entity:` line last.
+Lead with motivation + end-user value; audit metadata goes at the bottom. The goal is that a reviewer or future debugger sees the "why" first and the audit link last.
 
 **Template structure (top to bottom):**
 
 | Section | Required | Content |
 |---|---|---|
-| Motivation lead | **yes** | 1-2 sentences blending motivation (problem) + end-user value (what the reader gets) |
-| `## What changed` | **yes** | Action-verb bullets, ≤ 6 |
-| `## Evidence` | **yes when validation ran** | Test suites with `N/N passed` format; include quantitative results if stage reports called them out |
+| Motivation lead | **yes** | 1 sentence, ≤ 25 words, blending motivation and end-user value. No parentheticals. |
+| `## What changed` | **yes** | Action-verb bullets, 3–5 total, each ≤ 15 words. One change per bullet. No rationale inside the bullet — if a change needs justification, it belongs in the task body, not the PR. |
+| `## Evidence` | **yes when validation ran** | Test suites with `N/N passed` format, 1–2 bullets. Do not include per-test-class breakdowns or enumerated suite lists — one pass ratio per suite, plus at most one line confirming live-probe verification. |
 | `## Review guidance` | optional | 1 line pointing reviewer at the critical file or risky change — include only when a stage report explicitly flagged it |
-| `---` separator + `Workflow entity: {entity title}` | **yes** | Audit metadata, at the bottom |
-| `Closes {issue}` | **yes when issue set** | Under the Workflow entity line, using the value exactly as it appears in frontmatter, e.g., `#48` or `owner/repo#48` |
+| `---` separator + `[{entity-id}](/{owner}/{repo}/blob/{short-sha}/{path-to-entity-file})` | **yes** | Audit link, at the bottom |
+| `Closes {issue}` | **yes when issue set** | Under the audit link, using the value exactly as it appears in frontmatter, e.g., `#48` or `owner/repo#48` |
 | `Related: {siblings}` | optional | Under Closes, only when stage reports flagged follow-ups |
 
 **Extraction rules (apply deterministically from the entity file):**
@@ -60,18 +62,18 @@ Lead with motivation + end-user value; audit metadata goes at the bottom. The go
 | PR body section | Source in entity file | Transformation |
 |---|---|---|
 | Motivation lead | Entity body paragraph(s) between closing `---` and the first `##` heading | Condense first paragraph to 1-2 sentences. Lead with impact or action verb — not "This PR" or "This task". Blend motivation + value. |
-| What changed | Implementation stage report's `[x]` DONE items | One action-verb bullet per meaningful unit. Collapse sibling bullets that describe the same thing. Drop `[x]` markers. |
+| What changed | Implementation stage report's `[x]` DONE items | One action-verb bullet per meaningful unit. Collapse sibling bullets that describe the same thing. Drop `[x]` markers. Do NOT include "what we deliberately did NOT change" bullets — scope boundaries belong in the task body, not the PR, unless a validation stage report flagged them as risk. |
 | Evidence | Validation stage report items that assert AC verification (typically rerun-test items) | One bullet per suite with `N/N passed` format. Include any quantitative result the stage report explicitly called out (wallclock delta, size %, perf). Fallback to implementation report's self-test items if no validation stage exists. |
 | Review guidance | Explicit "focus on X" / "risk here" notes in either stage report | 1 line. **Omit if no such note exists.** |
-| Workflow entity line | Entity title verbatim | Prefix `Workflow entity: ` |
+| Audit link | Entity id from frontmatter, path from the file's repo-relative location, short SHA from `git rev-parse --short HEAD` run in the worktree directory | Format as `[{id}](/{owner}/{repo}/blob/{short-sha}/{path})` |
 | Closes | Entity frontmatter `issue` field (exactly as written) | Prefix `Closes ` |
 | Related | Explicit "related task" / "follow-up" mentions in stage reports | 1 line. **Omit if none.** |
 
-Target total length: **100-200 words**.
+Target total length: **60-120 words**.
 
 **Key design decisions:**
 
-1. **Lead with motivation + end-user value.** First content is a 1-2 sentence user-facing impact statement. The `Workflow entity:` line moves to the bottom as audit metadata.
+1. **Lead with motivation + end-user value.** First content is a 1-2 sentence user-facing impact statement. The audit link moves to the bottom as audit metadata.
 2. **Prescribed sections + extraction rules** — not a strict verbatim template, not free-form. The mod specifies headings and source subsections; the FO paraphrases rather than pasting.
 3. **Evidence section is conditional on validation stage.** Non-validated workflows fall back to implementation self-test evidence.
 4. **Review guidance and Related are opt-in.** They appear only when stage reports explicitly flagged them, to prevent bloat.
