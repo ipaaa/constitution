@@ -1,13 +1,13 @@
 ---
 id: "002"
 title: Homepage Track 3 Entry
-status: review
+status: complete
 source: commission seed
 started: 2026-04-16T22:13:15Z
-completed:
-verdict:
+completed: 2026-04-30T02:28:28Z
+verdict: PASSED
 score: 0.7
-worktree: .worktrees/spacedock-ensign-002-homepage-track-3-entry
+worktree: 
 issue:
 pr: #9
 mod-block: 
