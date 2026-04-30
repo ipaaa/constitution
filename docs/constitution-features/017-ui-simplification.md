@@ -250,3 +250,29 @@ No layout structure changes are proposed. All changes are text replacements and 
 ### Summary
 
 Implemented comprehensive UI simplification for T2 (present) pages. Applied 30+ text/label replacements converting English jargon and literary Chinese to plain everyday Chinese. Removed archive-themed decorations from timeline and detail pages, and bottom footer branding. Browser-chrome on cards was kept per captain feedback (signals external source content). Simplified VibeTag by removing rotation animation. Significantly reduced visual border/frame clutter across cards and sections, replacing hard borders with subtle background tints and spacing for a cleaner, less cluttered appearance. All changes are presentation-layer only; no data model or routing changes were needed. Build passes cleanly with no regressions.
+
+## Stage Report — verify
+
+### Checklist
+
+1. **Verify all Chinese text replacements are linguistically correct and natural** — DONE
+   - All 30+ replacements reviewed. Chinese is natural, colloquial, and appropriate for non-expert readers. Measure words are correct: "篇" for articles, "部" for videos. No awkward phrasing, no overly formal or literary terms remain in replaced text.
+
+2. **Verify vibe tag names are appropriate for their matched articles** — DONE
+   - All 8 vibe tag changes reviewed against article content. Tags accurately describe their articles: "公民必讀" for key foundational pieces, "國際視角" for the English-language comparative law article, "正反交鋒" for pieces presenting opposing views, "深度解析" for in-depth scholarly analysis, "懶人入門" for the introductory animation video. Previous tags like "法律白話文" risked confusion with the YouTube channel name "法律白話文運動" — the new tags avoid this.
+
+3. **Verify no English-only labels remain visible on T2 pages** — DONE
+   - No English-only labels remain in user-facing UI text on T2 pages. Remaining English ("Twitter", "Facebook") are brand names in share buttons, which is standard practice. Category values remain English in the data model but are translated to Chinese at every display point via ternary operators.
+
+4. **Verify category translations are correct** — DONE
+   - "Scholar Articles" → "學者文章": correct.
+   - "NGO Reports" → "民間報告": correct, uses plain language.
+   - "Reels" → "影片": correct.
+   - Translations are applied consistently across all three display locations (detail page header, author section, related articles component).
+
+5. **Verdict** — PASSED
+   - All Chinese text is linguistically natural and appropriate for the target audience (non-expert citizens). Vibe tags accurately match article content. No English-only labels remain visible. Category translations are correct and consistently applied. The doubled quotation mark fix in JudgeOwlComment is correct (data already contains 「」). No factual claims to verify in this UI-text-only change set.
+
+### Summary
+
+Verified all UI text changes across 6 modified files. All Chinese replacements are linguistically correct, natural, and appropriate for non-expert readers. Vibe tag names accurately describe their matched articles. No English-only labels remain visible on T2 pages. Category translations are correct and consistently applied. No issues found.
