@@ -13,8 +13,6 @@ import Image from 'next/image';
 
 const CourtTimeline = () => {
   const milestones = [
-    { year: '1948', label: '司法院大法官會議成立', detail: '標誌著中華民國憲法解釋制度的開啟，確立了由大法官掌理憲法解釋與統一解釋法令之權。', status: 'history' },
-    { year: '1993', label: '大法官審理案件法實施', detail: '程序制度化的重要里程碑，細化了審理程序，並在此基礎上誕生了許多影響深遠的解釋。', status: 'history' },
     { year: '2019', label: '憲法訴訟法三讀通過', detail: '從「會議制」轉向「法院制」的法源基礎，將案件審理司法化、裁判化。', status: 'history' },
     { year: '2022', label: '憲法法庭正式揭牌', detail: '裁判化轉型正式啟動，大法官改以「憲法法庭」名義行使職權並公告裁判。', status: 'present' },
     { year: '2024', label: '114年憲判字第1號', detail: '關於國會職權修法之重大判決，確立了權力分立與法律明確性原則的當代界線。', status: 'critical' },
