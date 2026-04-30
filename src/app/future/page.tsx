@@ -5,6 +5,7 @@ import { PENDING_CASES, CRISIS_STATS, IdentityTag } from '@/data/future';
 import RightsCalculator from '@/components/future/RightsCalculator';
 import BottleneckFunnel from '@/components/future/BottleneckFunnel';
 import CaseCard from '@/components/future/CaseCard';
+import JusticeTermTimeline from '@/components/future/JusticeTermTimeline';
 
 type SortMode = 'urgency' | 'recent';
 
@@ -68,6 +69,9 @@ export default function FutureTrack() {
           </p>
         </div>
       </div>
+
+      {/* Justice Term Forecast */}
+      <JusticeTermTimeline />
 
       {/* Main Layout: Sidebar + Content */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
