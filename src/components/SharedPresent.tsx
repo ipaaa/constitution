@@ -53,7 +53,7 @@ export const VibeTag = ({ vibe }: { vibe?: string }) => {
   };
 
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black tracking-wider border-b-2 uppercase transform -rotate-2 hover:rotate-0 hover:scale-105 transition-all cursor-default select-none mb-2 ${getStyle(vibe)}`}>
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-black tracking-wider cursor-default select-none mb-2 ${getStyle(vibe)}`}>
       {vibe}
     </span>
   );

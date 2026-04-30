@@ -23,7 +23,7 @@ function CrossTrackSection({ discussionId }: { discussionId: string }) {
       <div className="flex items-center gap-3 mb-6">
         <div className="w-8 h-px bg-gray-300" />
         <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-          Cross-Track Navigation / 跨軌道探索
+          跨軌道探索
         </span>
         <div className="flex-1 h-px bg-gray-300" />
       </div>
@@ -67,7 +67,7 @@ export default function ArticleDetail({ params }: { params: Promise<{ id: string
           </Link>
           <div className="hidden md:flex items-center gap-2">
             <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
-            <span className="text-[11px] font-black uppercase tracking-[0.2em] opacity-60">{item.category}</span>
+            <span className="text-[11px] font-black tracking-[0.2em] opacity-60">{item.category === 'Scholar Articles' ? '學者文章' : item.category === 'NGO Reports' ? '民間報告' : '影片'}</span>
           </div>
         </div>
         <div className="flex items-center gap-1">
@@ -85,14 +85,11 @@ export default function ArticleDetail({ params }: { params: Promise<{ id: string
       </header>
 
       <main className="max-w-4xl mx-auto px-6 pt-12 md:pt-20">
-        <div className="bg-white border border-gray-200 shadow-sm p-8 md:p-16 rounded-sm relative overflow-hidden">
+        <div className="bg-white shadow-sm p-8 md:p-16 rounded-sm relative overflow-hidden">
           {/* Top Metadata */}
           <div className="flex flex-wrap justify-between items-start gap-4 mb-8">
             <VibeTag vibe={item.vibe} />
-            <div className="flex flex-col items-end">
-              <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest font-mono">Archive Record</span>
-              <span className="text-xs font-bold text-gray-500 font-mono">REF: {item.id} / {item.year}</span>
-            </div>
+            <span className="text-xs font-mono text-gray-400">{item.year}</span>
           </div>
 
           {/* Title Area */}
@@ -106,15 +103,15 @@ export default function ArticleDetail({ params }: { params: Promise<{ id: string
              </div>
              <div className="flex flex-col">
                <span className="text-lg font-bold text-gray-900">{item.author}</span>
-               <span className="text-xs text-blue-600 font-bold uppercase tracking-widest flex items-center gap-1">
-                 <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span> 分類：{item.category}
+               <span className="text-xs text-blue-600 font-bold flex items-center gap-1">
+                 <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span> 分類：{item.category === 'Scholar Articles' ? '學者文章' : item.category === 'NGO Reports' ? '民間報告' : '影片'}
                </span>
              </div>
           </div>
 
           {/* Abstract / Summary Card */}
           <div className="bg-[#f8f9fa] border-l-4 border-gray-900 p-6 md:p-8 mb-12 shadow-inner italic font-serif text-lg leading-relaxed text-gray-700">
-             <span className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 not-italic">Abstract / 內文摘要</span>
+             <span className="block text-[10px] font-black text-gray-400 tracking-widest mb-2 not-italic">重點整理</span>
              {item.abstract}
           </div>
 
@@ -138,7 +135,7 @@ export default function ArticleDetail({ params }: { params: Promise<{ id: string
           {depthComment && (
             <section className="mt-20 pt-12 border-t-2 border-gray-900 relative">
                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-white px-4">
-                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Arxiv Review</span>
+                  <span className="text-[10px] font-black text-gray-400 tracking-widest">貓頭鷹深度解析</span>
                </div>
                <div className="max-w-2xl mx-auto">
                   <JudgeOwlComment comment={depthComment} isDepth={true} />
@@ -160,10 +157,10 @@ export default function ArticleDetail({ params }: { params: Promise<{ id: string
                  href={item.link}
                  target="_blank"
                  rel="noopener noreferrer"
-                 aria-label="閱讀原始文件（開啟新分頁）"
-                 className="bg-[#D32F2F] text-white px-10 py-5 rounded shadow-[0_4px_0_0_#8e1e1e] hover:shadow-[0_2px_0_0_#8e1e1e] hover:translate-y-[2px] active:translate-y-[4px] active:shadow-none transition-all font-black text-lg flex items-center gap-3 tracking-widest uppercase"
+                 aria-label="看原始出處（開啟新分頁）"
+                 className="bg-[#D32F2F] text-white px-10 py-5 rounded shadow-[0_4px_0_0_#8e1e1e] hover:shadow-[0_2px_0_0_#8e1e1e] hover:translate-y-[2px] active:translate-y-[4px] active:shadow-none transition-all font-black text-lg flex items-center gap-3"
                >
-                 閱讀原始文件 <ExternalLink size={20} aria-hidden="true" />
+                 看原始出處 <ExternalLink size={20} aria-hidden="true" />
                </a>
              </div>
              <ShareActions title={item.title} />
@@ -175,10 +172,9 @@ export default function ArticleDetail({ params }: { params: Promise<{ id: string
 
         {/* Bottom Nav */}
         <div className="mt-12 flex justify-between items-center px-4">
-          <Link href="/present" className="text-gray-400 hover:text-gray-900 transition-colors font-bold uppercase text-[10px] tracking-widest flex items-center gap-1">
-            <ChevronLeft size={14} /> Back Archive
+          <Link href="/present" className="text-gray-400 hover:text-gray-900 transition-colors font-bold text-[10px] tracking-widest flex items-center gap-1">
+            <ChevronLeft size={14} /> 回到列表
           </Link>
-          <div className="text-[10px] text-gray-300 font-mono uppercase tracking-tighter">憲庭加好友 Add C0urt / Present Track</div>
         </div>
       </main>
     </div>

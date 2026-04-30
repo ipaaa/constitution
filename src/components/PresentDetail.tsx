@@ -8,10 +8,10 @@ import { VibeTag, type DiscussionItem } from '@/components/SharedPresent';
 // --- Empty content CTA -----------------------------------------------------
 
 export const EmptyContentCTA = ({ item }: { item: DiscussionItem }) => (
-  <div className="bg-[#fdfaf4] border border-dashed border-[#c9b88a] p-8 md:p-10 rounded-sm">
+  <div className="bg-[#fdfaf4] p-8 md:p-10 rounded-sm">
     <div className="flex flex-col items-center text-center">
-      <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-3 font-mono">
-        Awaiting Transcription / Status: Pending
+      <span className="text-[10px] font-black text-gray-500 tracking-[0.2em] mb-3 font-mono">
+        尚未收錄
       </span>
       <h3 className="text-xl md:text-2xl font-serif font-black text-gray-900 mb-3 leading-snug">
         完整轉譯尚未收錄
@@ -110,7 +110,7 @@ export const ShareActions = ({ title, variant = 'inline' }: { title: string; var
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Share this file</span>
+      <span className="text-[10px] font-black text-gray-400 tracking-[0.2em]">分享這篇</span>
       <div className="flex flex-wrap items-center justify-center gap-3">
         <button
           type="button"
@@ -187,16 +187,16 @@ export const RelatedArticles = ({
     <section className="mt-16 pt-12 border-t border-gray-200">
       <div className="flex items-end justify-between mb-8">
         <div>
-          <span className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1 font-mono">
-            Related Files
+          <span className="block text-[10px] font-black text-gray-400 tracking-[0.2em] mb-1 font-mono">
+            延伸閱讀
           </span>
           <h3 className="text-2xl md:text-3xl font-serif font-black text-gray-900 tracking-tight">延伸閱讀</h3>
         </div>
         <Link
           href="/present"
-          className="hidden md:inline-flex items-center gap-1 text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-gray-900 transition-colors"
+          className="hidden md:inline-flex items-center gap-1 text-xs font-bold tracking-widest text-gray-500 hover:text-gray-900 transition-colors"
         >
-          更多檔案 →
+          看更多 →
         </Link>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -215,8 +215,8 @@ export const RelatedArticles = ({
             </h4>
             <div className="flex items-center justify-between pt-3 border-t border-gray-100">
               <span className="text-xs font-medium text-[#D32F2F] truncate">{item.author}</span>
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest shrink-0 ml-2">
-                {item.category}
+              <span className="text-[10px] font-bold text-gray-400 tracking-widest shrink-0 ml-2">
+                {item.category === 'Scholar Articles' ? '學者文章' : item.category === 'NGO Reports' ? '民間報告' : '影片'}
               </span>
             </div>
           </Link>
