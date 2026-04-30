@@ -9,7 +9,7 @@ verdict:
 score: 0.75
 worktree: .worktrees/spacedock-ensign-014-opinion-lazybag
 issue:
-pr:
+pr: #13
 mod-block: merge:pr-merge
 ---
 

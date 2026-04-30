@@ -9,7 +9,7 @@ verdict:
 score: 0.7
 worktree: .worktrees/spacedock-ensign-015-opposing-views-integration
 issue:
-pr:
+pr: #14
 mod-block: merge:pr-merge
 ---
 
