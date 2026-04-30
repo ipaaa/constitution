@@ -1,13 +1,13 @@
 ---
 id: "022"
 title: T2 憲政大事記範圍調整（限憲訴法後）
-status: review
+status: complete
 source: captain-filed
 started: 2026-04-30T18:13:00Z
-completed:
-verdict:
+completed: 2026-04-30T18:26:28Z
+verdict: PASSED
 score: 0.7
-worktree: .worktrees/spacedock-ensign-022-t2-timeline-scope
+worktree: 
 issue:
 pr: #16
 mod-block: 
