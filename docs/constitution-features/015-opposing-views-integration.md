@@ -10,6 +10,7 @@ score: 0.7
 worktree: .worktrees/spacedock-ensign-015-opposing-views-integration
 issue:
 pr:
+mod-block: merge:pr-merge
 ---
 
 在現有內容中加入反方意見與論證重點標示，確保中立性。
