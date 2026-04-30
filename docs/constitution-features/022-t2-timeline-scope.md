@@ -1,7 +1,7 @@
 ---
 id: "022"
 title: T2 憲政大事記範圍調整（限憲訴法後）
-status: implement
+status: review
 source: captain-filed
 started: 2026-04-30T18:13:00Z
 completed:
