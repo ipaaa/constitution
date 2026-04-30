@@ -3,7 +3,7 @@ id: "024"
 title: T1 時光機釋憲案瀏覽問題修復
 status: design
 source: captain-filed
-started:
+started: 2026-04-30T21:30:40Z
 completed:
 verdict:
 score: 0.75
