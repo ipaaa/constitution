@@ -54,13 +54,13 @@ const CourtTimeline = () => {
             </div>
             {/* Important Stamp for danger status */}
             {m.status === 'danger' && (
-              <div className="absolute -top-1 -right-2 rotate-12 border-2 border-[#D32F2F] text-[#D32F2F] px-2 py-1 text-[10px] font-black tracking-tighter opacity-70 select-none">
+              <div className="absolute top-2 right-2 rotate-12 border-2 border-[#D32F2F] text-[#D32F2F] px-2 py-1 text-[10px] font-black tracking-tighter opacity-70 select-none pointer-events-none">
                 注意
               </div>
             )}
             {/* Blocked stamp for failed nominations */}
             {m.status === 'blocked' && (
-              <div className="absolute -top-1 -right-2 -rotate-6 border-2 border-orange-500 text-orange-500 px-2 py-1 text-[10px] font-black uppercase tracking-tighter opacity-60 select-none">
+              <div className="absolute top-2 right-2 -rotate-6 border-2 border-orange-500 text-orange-500 px-2 py-1 text-[10px] font-black uppercase tracking-tighter opacity-60 select-none pointer-events-none">
                 Blocked
               </div>
             )}

@@ -39,7 +39,7 @@ export default function JusticeTermTimeline() {
       <div className="bg-gray-900 rounded-sm p-4 md:p-6 mb-4">
         {/* Horizontal Timeline — Desktop */}
         <div className="hidden md:block">
-          <div className="relative h-40">
+          <div className="relative h-56">
             {/* Year grid lines and labels */}
             {YEAR_MARKERS.map((year) => {
               const x = pct(`${year}-01-01`);
@@ -94,7 +94,7 @@ export default function JusticeTermTimeline() {
                   {/* Event label — alternate above/below */}
                   <div
                     className={`absolute -translate-x-1/2 whitespace-nowrap ${
-                      i % 2 === 0 ? 'top-5' : '-top-12'
+                      i % 2 === 0 ? 'top-6' : '-top-16'
                     }`}
                   >
                     <div className={`text-[10px] font-mono font-bold ${
@@ -130,11 +130,9 @@ export default function JusticeTermTimeline() {
                   <div className="w-4 h-4 -translate-x-1/2 flex items-center justify-center">
                     <span className="text-red-400 font-mono font-bold text-sm leading-none select-none">✕</span>
                   </div>
-                  {/* Label — alternate above/below, offset from term events */}
+                  {/* Label — always above the axis, well clear of term event labels */}
                   <div
-                    className={`absolute -translate-x-1/2 whitespace-nowrap ${
-                      i % 2 === 0 ? '-top-16' : 'top-5'
-                    }`}
+                    className="absolute -translate-x-1/2 whitespace-nowrap -top-[5.5rem]"
                   >
                     <div className="text-[10px] font-mono font-bold text-red-400/80">
                       提名 {nom.nomineesCount} 人
