@@ -10,7 +10,7 @@ score: 0.6
 worktree: .worktrees/spacedock-ensign-007-accessibility-pass
 issue:
 pr: #12
-mod-block: merge:pr-merge
+mod-block: 
 ---
 
 目前整站缺少基本的無障礙支援，作為公民教育網站，應該盡可能讓所有人都能使用。
