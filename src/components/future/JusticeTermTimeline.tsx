@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { TERM_EVENTS, REFERENCE_DATE } from '@/data/future';
+import { TERM_EVENTS, REFERENCE_DATE, FAILED_NOMINATIONS } from '@/data/future';
 import JusticeCountdown from './JusticeCountdown';
 import JusticeSeatGrid from './JusticeSeatGrid';
 
@@ -117,6 +117,36 @@ export default function JusticeTermTimeline() {
               );
             })}
 
+            {/* Failed nomination events */}
+            {FAILED_NOMINATIONS.map((nom, i) => {
+              const x = pct(nom.date);
+              return (
+                <div
+                  key={`nom-${nom.date}`}
+                  className="absolute top-1/2 -translate-y-1/2 z-10"
+                  style={{ left: `${x}%` }}
+                >
+                  {/* X marker for blocked nomination */}
+                  <div className="w-4 h-4 -translate-x-1/2 flex items-center justify-center">
+                    <span className="text-red-400 font-mono font-bold text-sm leading-none select-none">✕</span>
+                  </div>
+                  {/* Label — alternate above/below, offset from term events */}
+                  <div
+                    className={`absolute -translate-x-1/2 whitespace-nowrap ${
+                      i % 2 === 0 ? '-top-16' : 'top-5'
+                    }`}
+                  >
+                    <div className="text-[10px] font-mono font-bold text-red-400/80">
+                      提名 {nom.nomineesCount} 人
+                    </div>
+                    <div className="text-[9px] font-mono text-red-400/60">
+                      {nom.label}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+
             {/* Danger zone: from last active date to end */}
             {(() => {
               const cliffPct = pct(TERM_EVENTS[TERM_EVENTS.length - 1].date);
@@ -149,53 +179,84 @@ export default function JusticeTermTimeline() {
         {/* Vertical Timeline — Mobile */}
         <div className="block md:hidden">
           <div className="relative ml-4 border-l border-gray-700 pl-6 space-y-6 py-2">
-            {TERM_EVENTS.map((event, i) => {
-              const isPast = Date.parse(event.date) < Date.parse(REFERENCE_DATE);
-              const isFinalCliff = i === TERM_EVENTS.length - 1;
-              const isBeforeRef = isPast;
-              const showRefMarker =
-                i < TERM_EVENTS.length - 1 &&
-                Date.parse(TERM_EVENTS[i].date) < Date.parse(REFERENCE_DATE) &&
-                Date.parse(TERM_EVENTS[i + 1].date) >= Date.parse(REFERENCE_DATE);
+            {/* Merge term events and failed nominations, sorted by date */}
+            {[
+              ...TERM_EVENTS.map((e, i) => ({ type: 'term' as const, date: e.date, event: e, originalIndex: i })),
+              ...FAILED_NOMINATIONS.map((n) => ({ type: 'nomination' as const, date: n.date, nomination: n })),
+            ]
+              .sort((a, b) => Date.parse(a.date) - Date.parse(b.date))
+              .map((item, idx, arr) => {
+                const isPast = Date.parse(item.date) < Date.parse(REFERENCE_DATE);
+                const showRefMarker =
+                  isPast &&
+                  idx < arr.length - 1 &&
+                  Date.parse(arr[idx + 1].date) >= Date.parse(REFERENCE_DATE);
 
-              return (
-                <React.Fragment key={event.date}>
-                  <div className="relative">
-                    {/* Dot on the timeline axis */}
-                    <div
-                      className={`absolute -left-[calc(1.5rem+0.5rem+1px)] w-3 h-3 rounded-full border-2 ${
-                        isPast
-                          ? 'bg-gray-700 border-gray-600'
-                          : isFinalCliff
-                            ? 'bg-[#D32F2F] border-red-400 animate-pulse'
-                            : 'bg-amber-500 border-amber-400'
-                      }`}
-                    />
-                    <div className={`text-xs font-mono ${isPast ? 'text-gray-500' : isFinalCliff ? 'text-red-400' : 'text-gray-300'}`}>
-                      {event.date.slice(0, 7)}
-                    </div>
-                    <div className={`text-sm font-serif font-bold mt-0.5 ${
-                      isPast ? 'text-gray-500' : isFinalCliff ? 'text-red-400' : 'text-white'
-                    }`}>
-                      {event.label} — {event.justicesExpiring} 席屆滿
-                    </div>
-                    <div className="text-xs text-gray-300 font-mono mt-0.5">
-                      剩餘 {event.justicesRemaining} / 15 席
-                    </div>
-                  </div>
+                if (item.type === 'nomination') {
+                  return (
+                    <React.Fragment key={`nom-${item.date}`}>
+                      <div className="relative">
+                        <div className="absolute -left-[calc(1.5rem+0.5rem+1px)] w-3 h-3 flex items-center justify-center">
+                          <span className="text-red-400 font-mono font-bold text-xs leading-none select-none">✕</span>
+                        </div>
+                        <div className="text-xs font-mono text-red-400/80">
+                          {item.date.slice(0, 7)}
+                        </div>
+                        <div className="text-sm font-serif font-bold mt-0.5 text-red-400/80">
+                          {item.nomination.label} — 提名 {item.nomination.nomineesCount} 人
+                        </div>
+                        <div className="text-xs text-red-400/60 font-mono mt-0.5">
+                          {item.nomination.detail.slice(0, 40)}…
+                        </div>
+                      </div>
+                      {showRefMarker && (
+                        <div className="relative">
+                          <div className="absolute -left-[calc(1.5rem+0.5rem+1px)] w-3 h-3 rounded-full bg-white border-2 border-white" />
+                          <div className="bg-white text-gray-900 text-[10px] font-mono font-bold px-2 py-1 rounded-sm inline-block uppercase tracking-wider">
+                            You are here — {REFERENCE_DATE}
+                          </div>
+                        </div>
+                      )}
+                    </React.Fragment>
+                  );
+                }
 
-                  {/* "YOU ARE HERE" marker inserted between past and future events */}
-                  {showRefMarker && (
+                const isFinalCliff = item.originalIndex === TERM_EVENTS.length - 1;
+                return (
+                  <React.Fragment key={item.date}>
                     <div className="relative">
-                      <div className="absolute -left-[calc(1.5rem+0.5rem+1px)] w-3 h-3 rounded-full bg-white border-2 border-white" />
-                      <div className="bg-white text-gray-900 text-[10px] font-mono font-bold px-2 py-1 rounded-sm inline-block uppercase tracking-wider">
-                        You are here — {REFERENCE_DATE}
+                      <div
+                        className={`absolute -left-[calc(1.5rem+0.5rem+1px)] w-3 h-3 rounded-full border-2 ${
+                          isPast
+                            ? 'bg-gray-700 border-gray-600'
+                            : isFinalCliff
+                              ? 'bg-[#D32F2F] border-red-400 animate-pulse'
+                              : 'bg-amber-500 border-amber-400'
+                        }`}
+                      />
+                      <div className={`text-xs font-mono ${isPast ? 'text-gray-500' : isFinalCliff ? 'text-red-400' : 'text-gray-300'}`}>
+                        {item.date.slice(0, 7)}
+                      </div>
+                      <div className={`text-sm font-serif font-bold mt-0.5 ${
+                        isPast ? 'text-gray-500' : isFinalCliff ? 'text-red-400' : 'text-white'
+                      }`}>
+                        {item.event.label} — {item.event.justicesExpiring} 席屆滿
+                      </div>
+                      <div className="text-xs text-gray-300 font-mono mt-0.5">
+                        剩餘 {item.event.justicesRemaining} / 15 席
                       </div>
                     </div>
-                  )}
-                </React.Fragment>
-              );
-            })}
+                    {showRefMarker && (
+                      <div className="relative">
+                        <div className="absolute -left-[calc(1.5rem+0.5rem+1px)] w-3 h-3 rounded-full bg-white border-2 border-white" />
+                        <div className="bg-white text-gray-900 text-[10px] font-mono font-bold px-2 py-1 rounded-sm inline-block uppercase tracking-wider">
+                          You are here — {REFERENCE_DATE}
+                        </div>
+                      </div>
+                    )}
+                  </React.Fragment>
+                );
+              })}
           </div>
         </div>
       </div>

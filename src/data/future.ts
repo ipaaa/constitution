@@ -293,6 +293,48 @@ export const TERM_EVENTS: TermEvent[] = [
   { date: '2027-09-30', justicesExpiring: 5, justicesRemaining: 0, label: '第三波屆滿（全部）' },
 ];
 
+// ---------------------------------------------------------------------------
+// Failed nomination events — nominations not confirmed by the legislature
+// ---------------------------------------------------------------------------
+
+export interface FailedNomination {
+  /** ISO 8601 date of the nomination submission or key event */
+  date: string;
+  /** Display label */
+  label: string;
+  /** Additional detail */
+  detail: string;
+  /** Number of nominees proposed */
+  nomineesCount: number;
+}
+
+/**
+ * Presidential nominations to the Constitutional Court that were blocked or
+ * not confirmed by the legislature (立法院). These explain the persistent
+ * vacancy crisis — the president attempted to fill seats but the legislature
+ * refused to hold confirmation votes.
+ */
+export const FAILED_NOMINATIONS: FailedNomination[] = [
+  {
+    date: '2024-09-02',
+    label: '第一次提名遭退回',
+    detail: '賴清德總統提名7名大法官人選送立法院行使同意權，國民黨與民眾黨多數杯葛，未排入議程審查。',
+    nomineesCount: 7,
+  },
+  {
+    date: '2025-01-14',
+    label: '第二次提名遭否決',
+    detail: '總統再度送出大法官提名咨文，立法院以多數決退回咨文，拒絕行使同意權。',
+    nomineesCount: 7,
+  },
+  {
+    date: '2025-05-20',
+    label: '第三次提名未獲同意',
+    detail: '總統第三度提名大法官人選，立法院仍未進行實質審查，提名案未獲行使同意權。',
+    nomineesCount: 7,
+  },
+];
+
 /** Days from REFERENCE_DATE to the next (future) term expiry cliff. */
 export const DAYS_UNTIL_CLIFF: number = daysBetween(
   REFERENCE_DATE,
