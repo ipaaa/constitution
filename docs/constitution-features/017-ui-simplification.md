@@ -10,6 +10,7 @@ score: 0.6
 worktree: .worktrees/spacedock-ensign-017-ui-simplification
 issue:
 pr:
+mod-block: merge:pr-merge
 ---
 
 簡化網站介面，減少專業術語與複雜性，降低非專業用戶理解門檻。
