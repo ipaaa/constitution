@@ -238,7 +238,7 @@ export interface Justice {
   /** Whether the justice is absent from court sessions (未出席) */
   absent?: boolean;
   /** Appointment cohort identifier for grouping */
-  cohort: '2016' | '2019' | '2024';
+  cohort: '2016' | '2019' | '2023';
 }
 
 export interface TermEvent {
@@ -261,24 +261,24 @@ export interface TermEvent {
  * count) are consistent with public reporting.
  */
 export const JUSTICES: Justice[] = [
-  // 2016 cohort — terms expired October 2023 (Wave 1); seats j01 & j02 refilled by 2024 cohort
-  { id: 'j01', name: '蔡宗珍', nameEn: 'Tsai Tsung-chen', appointedDate: '2024-11-01', termExpiry: '2032-10-31', appointingPresident: '賴清德', isActive: true, absent: true, cohort: '2024' },
-  { id: 'j02', name: '楊惠欽', nameEn: 'Yang Hui-chin', appointedDate: '2024-11-01', termExpiry: '2032-10-31', appointingPresident: '賴清德', isActive: true, absent: true, cohort: '2024' },
-  { id: 'j03', name: '黃虹霞', nameEn: 'Huang Hong-hsia', appointedDate: '2016-11-01', termExpiry: '2023-10-31', appointingPresident: '蔡英文', isActive: false, cohort: '2016' },
-  { id: 'j04', name: '吳陳鐶', nameEn: 'Wu Chen-huan', appointedDate: '2016-11-01', termExpiry: '2023-10-31', appointingPresident: '蔡英文', isActive: false, cohort: '2016' },
-  { id: 'j05', name: '林俊益', nameEn: 'Lin Chun-yi', appointedDate: '2016-11-01', termExpiry: '2023-10-31', appointingPresident: '蔡英文', isActive: false, cohort: '2016' },
-  { id: 'j06', name: '張瓊文', nameEn: 'Chang Chiung-wen', appointedDate: '2016-11-01', termExpiry: '2023-10-31', appointingPresident: '蔡英文', isActive: false, cohort: '2016' },
-  { id: 'j07', name: '黃璽君', nameEn: 'Huang Hsi-chun', appointedDate: '2016-11-01', termExpiry: '2023-10-31', appointingPresident: '蔡英文', isActive: false, cohort: '2016' },
-  // 2019 cohort, sub-group A — terms expired October/November 2024 (Wave 2)
-  { id: 'j08', name: '蔡彩貞', nameEn: 'Tsai Tsai-chen', appointedDate: '2019-10-01', termExpiry: '2024-10-31', appointingPresident: '蔡英文', isActive: false, cohort: '2019' },
-  { id: 'j09', name: '朱富美', nameEn: 'Chu Fu-mei', appointedDate: '2019-10-01', termExpiry: '2024-10-31', appointingPresident: '蔡英文', isActive: true, absent: true, cohort: '2019' },
-  { id: 'j10', name: '陳忠五', nameEn: 'Chen Chung-wu', appointedDate: '2019-10-01', termExpiry: '2024-11-30', appointingPresident: '蔡英文', isActive: false, cohort: '2019' },
-  // 2019 cohort, sub-group B — the 5 remaining active justices, expiring September 2027
-  { id: 'j11', name: '許志雄', nameEn: 'Hsu Chih-hsiung', appointedDate: '2019-10-01', termExpiry: '2027-09-30', appointingPresident: '蔡英文', isActive: true, cohort: '2019' },
-  { id: 'j12', name: '黃瑞明', nameEn: 'Huang Jui-ming', appointedDate: '2019-10-01', termExpiry: '2027-09-30', appointingPresident: '蔡英文', isActive: true, cohort: '2019' },
-  { id: 'j13', name: '詹森林', nameEn: 'Chan Sen-lin', appointedDate: '2019-10-01', termExpiry: '2027-09-30', appointingPresident: '蔡英文', isActive: true, cohort: '2019' },
-  { id: 'j14', name: '黃昭元', nameEn: 'Huang Chao-yuan', appointedDate: '2019-10-01', termExpiry: '2027-09-30', appointingPresident: '蔡英文', isActive: true, cohort: '2019' },
-  { id: 'j15', name: '謝銘洋', nameEn: 'Hsieh Ming-yang', appointedDate: '2019-10-01', termExpiry: '2027-09-30', appointingPresident: '蔡英文', isActive: true, cohort: '2019' },
+  // 2016 cohort — terms expired 2024-10-31 (7 justices); all inactive
+  { id: 'j01', name: '許志雄', nameEn: 'Hsu Chih-hsiung', appointedDate: '2016-11-01', termExpiry: '2024-10-31', appointingPresident: '蔡英文', isActive: false, cohort: '2016' },
+  { id: 'j02', name: '黃瑞明', nameEn: 'Huang Jui-ming', appointedDate: '2016-11-01', termExpiry: '2024-10-31', appointingPresident: '蔡英文', isActive: false, cohort: '2016' },
+  { id: 'j03', name: '詹森林', nameEn: 'Chan Sen-lin', appointedDate: '2016-11-01', termExpiry: '2024-10-31', appointingPresident: '蔡英文', isActive: false, cohort: '2016' },
+  { id: 'j04', name: '黃昭元', nameEn: 'Huang Chao-yuan', appointedDate: '2016-11-01', termExpiry: '2024-10-31', appointingPresident: '蔡英文', isActive: false, cohort: '2016' },
+  { id: 'j05', name: '黃虹霞', nameEn: 'Huang Hong-hsia', appointedDate: '2016-11-01', termExpiry: '2024-10-31', appointingPresident: '蔡英文', isActive: false, cohort: '2016' },
+  { id: 'j06', name: '吳陳鐶', nameEn: 'Wu Chen-huan', appointedDate: '2016-11-01', termExpiry: '2024-10-31', appointingPresident: '蔡英文', isActive: false, cohort: '2016' },
+  { id: 'j07', name: '林俊益', nameEn: 'Lin Chun-yi', appointedDate: '2016-11-01', termExpiry: '2024-10-31', appointingPresident: '蔡英文', isActive: false, cohort: '2016' },
+  // 2019 cohort — 4 justices, appointed 2019-10-01, expires 2027-09-30
+  { id: 'j08', name: '謝銘洋', nameEn: 'Hsieh Ming-yang', appointedDate: '2019-10-01', termExpiry: '2027-09-30', appointingPresident: '蔡英文', isActive: true, cohort: '2019' },
+  { id: 'j09', name: '呂太郎', nameEn: 'Lu Tai-lang', appointedDate: '2019-10-01', termExpiry: '2027-09-30', appointingPresident: '蔡英文', isActive: true, cohort: '2019' },
+  { id: 'j10', name: '楊惠欽', nameEn: 'Yang Hui-chin', appointedDate: '2019-10-01', termExpiry: '2027-09-30', appointingPresident: '蔡英文', isActive: true, absent: true, cohort: '2019' },
+  { id: 'j11', name: '蔡宗珍', nameEn: 'Tsai Tsung-chen', appointedDate: '2019-10-01', termExpiry: '2027-09-30', appointingPresident: '蔡英文', isActive: true, absent: true, cohort: '2019' },
+  // 2023 cohort — 4 justices, appointed 2023-10-01, expires 2031-09-30
+  { id: 'j12', name: '蔡彩貞', nameEn: 'Tsai Tsai-chen', appointedDate: '2023-10-01', termExpiry: '2031-09-30', appointingPresident: '蔡英文', isActive: true, cohort: '2023' },
+  { id: 'j13', name: '朱富美', nameEn: 'Chu Fu-mei', appointedDate: '2023-10-01', termExpiry: '2031-09-30', appointingPresident: '蔡英文', isActive: true, absent: true, cohort: '2023' },
+  { id: 'j14', name: '陳忠五', nameEn: 'Chen Chung-wu', appointedDate: '2023-10-01', termExpiry: '2031-09-30', appointingPresident: '蔡英文', isActive: true, cohort: '2023' },
+  { id: 'j15', name: '尤伯祥', nameEn: 'Yu Po-hsiang', appointedDate: '2023-10-01', termExpiry: '2031-09-30', appointingPresident: '蔡英文', isActive: true, cohort: '2023' },
 ];
 
 export const ACTIVE_JUSTICES: Justice[] = JUSTICES.filter((j) => j.isActive);
@@ -287,10 +287,9 @@ export const ACTIVE_JUSTICES: Justice[] = JUSTICES.filter((j) => j.isActive);
 export const ATTENDING_JUSTICES: Justice[] = ACTIVE_JUSTICES.filter((j) => !j.absent);
 
 export const TERM_EVENTS: TermEvent[] = [
-  { date: '2023-10-31', justicesExpiring: 7, justicesRemaining: 8, label: '第一波屆滿' },
-  { date: '2024-10-31', justicesExpiring: 2, justicesRemaining: 6, label: '第二波屆滿（上）' },
-  { date: '2024-11-30', justicesExpiring: 1, justicesRemaining: 5, label: '第二波屆滿（下）' },
-  { date: '2027-09-30', justicesExpiring: 5, justicesRemaining: 0, label: '第三波屆滿（全部）' },
+  { date: '2024-10-31', justicesExpiring: 7, justicesRemaining: 8, label: '第一波屆滿（2016梯次）' },
+  { date: '2027-09-30', justicesExpiring: 4, justicesRemaining: 4, label: '第二波屆滿（2019梯次）' },
+  { date: '2031-09-30', justicesExpiring: 4, justicesRemaining: 0, label: '第三波屆滿（2023梯次）' },
 ];
 
 // ---------------------------------------------------------------------------
@@ -316,15 +315,15 @@ export interface FailedNomination {
  */
 export const FAILED_NOMINATIONS: FailedNomination[] = [
   {
-    date: '2024-09-02',
-    label: '第一次提名遭退回',
-    detail: '賴清德總統提名7名大法官人選送立法院行使同意權，國民黨與民眾黨多數杯葛，未排入議程審查。',
+    date: '2024-08-30',
+    label: '第一次提名遭否決',
+    detail: '賴清德總統提名7名大法官人選送立法院行使同意權，立法院於2024年12月24日投票否決全部人選。',
     nomineesCount: 7,
   },
   {
-    date: '2025-01-14',
+    date: '2025-03-21',
     label: '第二次提名遭否決',
-    detail: '總統再度送出大法官提名咨文，立法院以多數決退回咨文，拒絕行使同意權。',
+    detail: '總統再度送出大法官提名咨文，立法院於2025年7月25日投票否決全部人選。',
     nomineesCount: 7,
   },
 ];
@@ -345,7 +344,10 @@ export const CRISIS_STATS = {
   activeJustices: ATTENDING_JUSTICES.length,
   requiredForRuling: 10,
   designatedTotal: 15,
-  vacantSeats: 15 - ATTENDING_JUSTICES.length,
+  /** Seats where the term has expired and no replacement appointed */
+  vacantSeats: 15 - ACTIVE_JUSTICES.length,
+  /** Justices in office but not attending deliberations */
+  absentJustices: ACTIVE_JUSTICES.length - ATTENDING_JUSTICES.length,
   avgDaysPerCase: 120,
   estimatedClearanceYears: 3.4,
 };
