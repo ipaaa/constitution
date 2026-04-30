@@ -68,7 +68,7 @@ export const JudgeOwlComment = ({ comment, isDepth = false }: { comment?: string
         <img src="/owl.png" alt="貓頭鷹法官" className="w-14 h-14 object-contain drop-shadow-md" />
       </div>
       <p className="text-sm font-serif text-gray-900 leading-relaxed italic pr-6">
-        「{comment}」
+        {comment}
       </p>
       <div className={`text-[10px] font-bold ${isDepth ? 'text-[#2E7D32]' : 'text-[#A67C00]'} uppercase tracking-wider mt-2 text-right`}>
         — 貓頭鷹法官．{isDepth ? '深度領航' : '小點評'}
