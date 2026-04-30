@@ -9,7 +9,43 @@
     "link": "https://www.mirrormedia.mg/external/dailycolumn_39929",
     "owl_comment": "「憲法法庭沒死，只是被鎖在抽屜裡——這篇說的是誰把鑰匙拿回來了。」",
     "vibe": "🔥 公民覺醒",
-    "sticky": true
+    "sticky": true,
+    "opposing_views": [
+      {
+        "id": "ov-d1-01",
+        "stanceLabel": "認為法庭應尊重國會多數決",
+        "summary": "部分學者主張憲法法庭不應推翻經立法院三讀通過的法律，否則有違民主多數決原則。",
+        "fullArgument": "此觀點認為，立法院作為民意代表機關，其多數決所通過之法律具有高度民主正當性。憲法法庭若頻繁宣告法律違憲，將形成「少數菁英凌駕多數民意」的反多數決困境（counter-majoritarian difficulty）。持此立場者進一步主張，大法官應採取司法節制（judicial restraint）的態度，除非法律明顯違反憲法文本，否則應尊重立法者的政策判斷空間。",
+        "source": {
+          "author": "某學者",
+          "affiliation": "某大學法律系",
+          "year": "2025"
+        },
+        "editorialNote": "此論點預設「多數決即民主」，但未回應少數權利保障作為立憲主義核心的論述。學者張嘉尹指出，公投複決違憲審查判決恰恰可能瓦解基本權保障機制。",
+        "editorialSources": [
+          {
+            "label": "張嘉尹，公投複決憲法法庭判決分析",
+            "url": "https://www.facebook.com/Dr.iur.Chang/posts/pfbid0bjDFgzJLh761NNUth3CEWv7giprRezRsxhKGFMDmW6qdKWbk87iqTH2pgXTEvUgnl"
+          }
+        ]
+      },
+      {
+        "id": "ov-d1-02",
+        "stanceLabel": "認為大法官自行解除門檻限制缺乏程序正當性",
+        "summary": "反對意見認為，大法官以判決方式排除立法院所定之開會門檻，等同自己當自己案件的法官，有違正當法律程序。",
+        "source": {
+          "author": "某法官",
+          "affiliation": "司法院",
+          "year": "2026"
+        },
+        "editorialNote": "此質疑涉及「自我授權」的程序爭議。然而支持方指出，當立法院以程序手段實質癱瘓違憲審查機制時，法庭若不自救，將導致憲政秩序出現無法填補的真空。學者蘇彥圖亦承認此路不漂亮，但追問除此之外有何替代方案。",
+        "editorialSources": [
+          {
+            "label": "蘇彥圖，114年憲判字第1號判決的艱難"
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "d2",

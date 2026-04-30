@@ -2,6 +2,27 @@ import React from 'react';
 
 export type DiscussionCategory = 'Scholar Articles' | 'NGO Reports' | 'Reels';
 
+/** A source reference for an opposing view or annotation. */
+export interface SourceRef {
+  label: string;
+  url?: string;
+}
+
+/** A single opposing/counterargument view. */
+export interface OpposingView {
+  id: string;
+  stanceLabel: string;
+  summary: string;
+  fullArgument?: string;
+  source: {
+    author: string;
+    affiliation?: string;
+    year?: string;
+  };
+  editorialNote: string;
+  editorialSources?: SourceRef[];
+}
+
 export type DiscussionItem = {
   id: string;
   category: DiscussionCategory;
@@ -16,6 +37,7 @@ export type DiscussionItem = {
   vibe?: string;
   sticky?: boolean;
   full_content?: string;
+  opposing_views?: OpposingView[];
 };
 
 export const VibeTag = ({ vibe }: { vibe?: string }) => {
