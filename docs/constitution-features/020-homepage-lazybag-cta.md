@@ -9,7 +9,7 @@ verdict:
 score: 0.8
 worktree: .worktrees/spacedock-ensign-020-homepage-lazybag-cta
 issue:
-pr:
+pr: #15
 mod-block: merge:pr-merge
 ---
 
