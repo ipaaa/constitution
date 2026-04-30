@@ -3,7 +3,7 @@ id: "017"
 title: 介面簡化與用戶體驗優化
 status: design
 source: meetup-20260416
-started:
+started: 2026-04-30T20:33:44Z
 completed:
 verdict:
 score: 0.6
