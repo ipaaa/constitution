@@ -3,7 +3,7 @@ id: "020"
 title: 首頁懶人包入口區塊
 status: design
 source: captain-filed
-started:
+started: 2026-04-30T17:46:10Z
 completed:
 verdict:
 score: 0.8
