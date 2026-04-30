@@ -10,7 +10,7 @@ score: 0.75
 worktree: .worktrees/spacedock-ensign-014-opinion-lazybag
 issue:
 pr: #13
-mod-block: merge:pr-merge
+mod-block: 
 ---
 
 以論證角度分類不同大法官立場的懶人包，避免以人物或黨派標籤引導偏見。
