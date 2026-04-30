@@ -9,7 +9,7 @@ verdict:
 score: 0.7
 worktree: .worktrees/spacedock-ensign-002-homepage-track-3-entry
 issue:
-pr:
+pr: #9
 mod-block: merge:pr-merge
 ---
 

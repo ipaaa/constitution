@@ -9,7 +9,7 @@ verdict:
 score: 0.7
 worktree: .worktrees/spacedock-ensign-008-t2-detail-pages
 issue:
-pr:
+pr: #10
 mod-block: merge:pr-merge
 ---
 
