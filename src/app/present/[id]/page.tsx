@@ -5,6 +5,7 @@ import _DISCUSSIONS_DATA from '@/data/discussions.json';
 import { VibeTag, JudgeOwlComment, type DiscussionItem } from '@/components/SharedPresent';
 import { Markdown } from '@/components/Markdown';
 import { EmptyContentCTA, ShareActions, RelatedArticles } from '@/components/PresentDetail';
+import { OpposingViewsSection } from '@/components/opposing-views/OpposingViewsSection';
 import Link from 'next/link';
 import { ChevronLeft, ExternalLink, Printer } from 'lucide-react';
 import { getLinksForDiscussion } from '@/data/cross-track-links';
@@ -127,6 +128,11 @@ export default function ArticleDetail({ params }: { params: Promise<{ id: string
                <EmptyContentCTA item={item} />
              )}
           </div>
+
+          {/* Opposing Views */}
+          {item.opposing_views && item.opposing_views.length > 0 && (
+            <OpposingViewsSection views={item.opposing_views} articleId={item.id} />
+          )}
 
           {/* Deep Owl Commentary */}
           {depthComment && (
