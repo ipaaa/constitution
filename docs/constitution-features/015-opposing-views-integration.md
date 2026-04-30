@@ -269,3 +269,60 @@ Designed an opposing views integration system that embeds counterarguments direc
 
 ### Summary
 Implemented the opposing views integration feature with three new components in `src/components/opposing-views/`. Added `SourceRef` and `OpposingView` types to `SharedPresent.tsx`, extended `DiscussionItem` with optional `opposing_views` field, and added two seed opposing views to the `d1` discussion entry. The section renders between article content and owl commentary on detail pages, with collapsible cards using neutral blue-gray accent styling, stance-based labels (no party names), required editorial annotations, and keyboard-accessible expand/collapse toggles. Build passes cleanly.
+
+## Stage Report — review
+
+### Checklist
+
+1. Each acceptance criterion from the design spec verified as met or not met — **DONE**
+   - OpposingViewsSection renders on `/present/[id]` when opposing views exist: **MET** (page.tsx:133-135)
+   - Section does not render when no opposing views: **MET** (OpposingViewsSection.tsx:28 returns null for empty array; page.tsx:133 checks length > 0)
+   - OpposingViewCard shows summary, source attribution, expand toggle: **MET** (OpposingViewCard.tsx:31-62)
+   - EditorialAnnotation renders with distinct visual treatment and "編輯註記" label: **MET** (EditorialAnnotation.tsx:12-16)
+   - Editorial annotations use neutral language — no value judgments: **MET** (seed data uses analytical phrasing: "此論點預設...", "未回應...")
+   - Visual distinction with left-border accent `border-[#78909C]` and `bg-[#F5F7FA]`: **MET** (OpposingViewCard.tsx:26)
+   - Section heading includes framing text: **MET** (OpposingViewsSection.tsx:47-49) — slightly expanded from spec with added sentence about editorial context, which is an improvement
+   - No party labels or camp names in UI: **MET** — grep confirmed zero matches for 進步派/藍白/國民黨/民進黨/民眾黨 across all source files
+   - Data loads from discussions.json via opposing_views field: **MET** (discussions.json adds opposing_views to d1; SharedPresent.tsx adds the field to DiscussionItem)
+   - Cards collapsed by default: **MET** (useState initializes empty Set at OpposingViewsSection.tsx:14)
+   - Screen readers: `role="region"` with `aria-label`: **MET** (OpposingViewsSection.tsx:32-33)
+   - Keyboard-accessible toggle with `aria-expanded`: **MET** (OpposingViewCard.tsx:48-51, uses `<button>` with `focus-visible` styles)
+   - Mobile full-width stacking: **MET** (flex-col layout, responsive padding `p-4 md:p-6`)
+   - Desktop within max-w-4xl column: **MET** (section inherits from parent main element at page.tsx:87)
+
+2. Code quality assessment — **DONE**
+   - Types are well-defined: `SourceRef`, `OpposingView` interfaces are clean and match the spec exactly
+   - Conventions: follows existing project patterns (component folder structure mirrors `opinion-lazybag/`, heading style mirrors `CrossTrackSection`, accent border pattern mirrors `JudgeOwlComment`)
+   - Reusability: `EditorialAnnotation` is a standalone component usable outside of `OpposingViewCard` if needed
+   - `useCallback` for toggle handler prevents unnecessary re-renders
+   - Minor note: card padding is `p-4 md:p-6` vs spec's `p-6 md:p-8` — a slight deviation but reasonable for visual balance with the nested editorial annotation
+
+3. Neutral presentation verified — **DONE**
+   - No party labels anywhere in source code or seed data
+   - Stance labels describe legal positions only (e.g. "認為法庭應尊重國會多數決")
+   - Source attribution uses author + affiliation + year format
+   - Data schema has no field for political leaning — neutrality enforced at schema level
+   - Editorial annotations use analytical language ("此論點預設...", "未回應...", "此質疑涉及...")
+
+4. Mobile and desktop responsive behavior verified — **DONE**
+   - Cards: `p-4 md:p-6` responsive padding
+   - Editorial annotation: `ml-0 md:ml-4` indent pattern
+   - Section uses `mt-16 pt-12` spacing consistent with other detail page sections
+   - All components stack vertically in flex-col layout
+   - No horizontal overflow risks
+
+5. Data flow end-to-end — **DONE**
+   - `discussions.json` -> `DiscussionItem` (with `opposing_views?: OpposingView[]`) -> `page.tsx` conditional render -> `OpposingViewsSection` -> `OpposingViewCard` -> `EditorialAnnotation`
+   - Two seed entries in d1: one with `fullArgument` (ov-d1-01) and one without (ov-d1-02), testing both code paths
+
+6. No regressions or broken functionality — **DONE**
+   - `npx next build` compiles with 0 TypeScript errors
+   - All 8 routes generate correctly
+   - `opposing_views` field is optional — existing articles without it are unaffected
+   - No changes to listing page, cross-track links, related articles, or search
+
+7. Verdict — **PASSED**
+   Implementation faithfully follows the design spec. All 14 acceptance criteria are met. The three components are clean, well-structured, and consistent with existing project conventions. Neutral presentation is enforced at both the UI and data schema level. The only minor deviation is card padding (`p-4 md:p-6` vs spec `p-6 md:p-8`), which is a reasonable adjustment and does not affect functionality or readability.
+
+### Summary
+Reviewed the opposing views integration implementation against the design spec. All 14 acceptance criteria pass. Code quality is good — types match the spec, component structure follows existing project patterns, and neutral presentation is enforced at the schema level (no political camp fields) and UI level (no party labels, analytical editorial language). Build succeeds cleanly with no TypeScript errors or regressions. Data flow from discussions.json through to rendered components is verified end-to-end with two seed entries testing both the full-argument and no-full-argument code paths. PASSED.
