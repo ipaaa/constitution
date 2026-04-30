@@ -276,3 +276,53 @@ Implemented comprehensive UI simplification for T2 (present) pages. Applied 30+ 
 ### Summary
 
 Verified all UI text changes across 6 modified files. All Chinese replacements are linguistically correct, natural, and appropriate for non-expert readers. Vibe tag names accurately describe their matched articles. No English-only labels remain visible on T2 pages. Category translations are correct and consistently applied. No issues found.
+
+## Stage Report — review
+
+### Checklist
+
+1. **All text replacements verified against design spec** — DONE
+   - Verified 30+ text/label replacements against the design spec section 4. All specified changes are implemented: page title, badge, subtitle, search placeholder, timeline title, section headers, category labels with count units, TL;DR badge, CTA labels, mood widget header and labels, footer card labels, detail page labels (Abstract, Arxiv Review, Back Archive, category names, CTA button), related articles labels, empty content CTA, and cross-track label. Every before/after pair matches the spec.
+
+2. **Browser-chrome preserved on ScholarCard/NGOCard/ReelCard** — DONE
+   - Browser-chrome (red/yellow/green dots, URL bar) is preserved on all three card types. Comments added noting "signals external source." This matches captain feedback that browser-chrome is an intentional design choice. The design spec item to remove browser-chrome was correctly overridden by captain instruction.
+
+3. **Decorative elements removed (timeline stamps, archive codes)** — DONE
+   - "ARCHIVE RECORD / NO. 77" header: removed.
+   - "Chronicle of the Constitutional Court" English subtitle: removed.
+   - SEC-CAT/REF footer block and ARCH stamp circle: removed.
+   - "Urgent Record" stamp: changed to "注意".
+   - "Citation CORE" in OfficialTLDR: removed.
+   - "Archive Record" / "REF:" metadata in detail page: removed, replaced with simple year display.
+   - "憲庭加好友 Add C0urt / Present Track" footer: removed.
+   - NarrativeLoopFooter decorative elements (PAST tab, FUTURE stamp, English labels): removed.
+   - Border/frame clutter reduction applied consistently across timeline, cards, search, mood widget, footer.
+
+4. **Vibe tags updated to new categories** — DONE
+   - Old tags replaced: 公民覺醒 → 公民必讀, 同溫層外 → 國際視角, 爭議中 → 正反交鋒, 法律白話文 → 深度解析, 擴散必看 → 懶人入門.
+   - VibeTag component updated: emoji matchers changed from ⚖️ to 📖, ⚠️ to 💬, and new 🌍 matcher added with appropriate color.
+   - All 8 vibe values in discussions.json updated consistently.
+
+5. **Owl comment quotation marks not doubled** — DONE
+   - JudgeOwlComment component previously rendered `「{comment}」`, wrapping in quotation marks. Data in discussions.json already contains 「」 in owl_comment strings. The fix correctly removes the outer `「」` from the component template, preventing double-wrapping. Verified all 8 owl_comment entries in the data contain their own 「」.
+
+6. **Code quality and conventions** — DONE
+   - Category translations use inline ternary operators consistently across 3 locations (detail header, author section, related articles). Pattern is identical each time: `item.category === 'Scholar Articles' ? '學者文章' : item.category === 'NGO Reports' ? '民間報告' : '影片'`. Could be extracted to a helper, but acceptable for 3 occurrences.
+   - No TypeScript type changes needed; data model unchanged as spec required.
+   - VibeTag style function updated cleanly — old emoji matchers replaced, new one added.
+   - No unused imports, no dead code introduced.
+   - One minor note: the 404 error page at `[id]/page.tsx:50` still uses "檔案庫" and "返回熱搜榜" (old title), but this was not in scope per the design spec.
+
+7. **Build passes, no regressions** — DONE
+   - `npx next build` completes successfully with all 9 routes generated (including dynamic `/present/[id]`).
+   - No TypeScript errors.
+   - All navigation paths (Link href, anchor href) preserved unchanged.
+   - Search functionality unchanged (only placeholder text updated).
+   - Share actions intact.
+
+8. **Verdict** — PASSED
+   - All acceptance criteria from the design spec are met. Text replacements are complete and accurate. Decorative elements removed per spec. Browser-chrome preserved per captain override. Vibe tags updated with correct emoji-to-style mappings. Owl comment quotation mark doubling fixed. Code is clean with no regressions. Build passes.
+
+### Summary
+
+Reviewed the complete implementation diff across 6 files (page.tsx, [id]/page.tsx, PresentDetail.tsx, SharedPresent.tsx, discussions.json, entity doc). All 30+ text/label replacements match the design spec. Decorative archive elements fully removed. Browser-chrome correctly preserved per captain feedback. Vibe tag categories updated with proper styling. JudgeOwlComment quotation mark doubling fixed. Build passes cleanly. No regressions found. PASSED.
