@@ -1,13 +1,13 @@
 ---
 id: "020"
 title: 首頁懶人包入口區塊
-status: review
+status: complete
 source: captain-filed
 started: 2026-04-30T17:46:10Z
-completed:
-verdict:
+completed: 2026-04-30T18:10:24Z
+verdict: PASSED
 score: 0.8
-worktree: .worktrees/spacedock-ensign-020-homepage-lazybag-cta
+worktree: 
 issue:
 pr: #15
 mod-block: 
