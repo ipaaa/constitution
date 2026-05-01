@@ -2,7 +2,7 @@ import ContributorGrid from "@/components/about/ContributorGrid";
 import { contributors } from "@/data/contributors";
 
 export const metadata = {
-  title: "關於我們 — Add C0urt 憲庭加好友",
+  title: "關於 — Add C0urt 憲庭加好友",
   description: "了解 Add C0urt 專案的緣起、價值觀、貢獻者，以及如何參與。",
 };
 
@@ -17,7 +17,7 @@ export default function AboutPage() {
           </span>
         </div>
         <h1 className="text-4xl md:text-5xl font-bold text-gray-900 font-serif border-l-[6px] border-gray-900 pl-6">
-          關於我們
+          關於
         </h1>
         <p className="text-lg text-gray-600 font-medium mt-4 pl-8 border-l border-gray-300">
           為什麼我們做這個網站，以及你可以如何參與。

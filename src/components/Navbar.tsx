@@ -34,7 +34,7 @@ export default function Navbar() {
             </li>
             <li>
               <Link href="/about" className={`px-3 py-1.5 text-sm font-bold transition-all rounded-sm flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${pathname === '/about' ? 'text-gray-900 border-gray-300 border shadow-sm' : 'text-gray-600 hover:text-gray-900 border border-transparent hover:border-gray-200 hover:bg-gray-50'}`}>
-                關於我們
+                關於
               </Link>
             </li>
           </ul>
