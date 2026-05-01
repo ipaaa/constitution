@@ -7,6 +7,7 @@
     "year": "2026.1.14",
     "abstract": "114年憲判字第1號判決是台灣憲政制度的不自殺聲明。風雨如晦，我們總算聽得一聲雞啼。",
     "link": "https://www.mirrormedia.mg/external/dailycolumn_39929",
+<<<<<<< Updated upstream
     "owl_comment": "「憲法法庭沒死，只是被鎖在抽屜裡——這篇說的是誰把鑰匙拿回來了。」",
     "vibe": "🔥 公民必讀",
     "sticky": true,
@@ -46,6 +47,11 @@
         ]
       }
     ]
+=======
+    "owl_comment": "「這篇太長，我看完了：大法官說快來開會啦！」",
+    "vibe": "💡 腦袋升級",
+    "sticky": true
+>>>>>>> Stashed changes
   },
   {
     "id": "d2",
@@ -55,8 +61,13 @@
     "year": "2026.1.20",
     "abstract": "快速了解最新判決的5個重點，不再被複雜的法律用語卡住！",
     "link": "https://www.iconnectblog.com/judicial-bootstrapping-or-constitutional-hardball-the-unconventionality-of-the-taiwan-constitutional-courts-invalidation-of-the-2025-amendment-of-the-constitutional-procedure-act-part-i/?fbclid=IwY2xjawPguQNleHRuA2FlbQIxMABicmlkETEweHBucTk0Y01oemlZb3h5c3J0YwZhcHBfaWQQMjIyMDM5MTc4ODIwMDg5MgABHjtsJJgGtdmX5Q7vWEMbhcJaP3jPvKqpt4LZeCWoGN_F7CRtdzH2ioOCJpVP_aem_YrTige_T7ZhcQuuotNECwQ",
+<<<<<<< Updated upstream
     "owl_comment": "「英文寫給國際看的版本，翻成白話就是：『這一球大法官自己發、自己接，但規則還在。』」",
     "vibe": "🌍 國際視角",
+=======
+    "owl_comment": "「這篇太長，我看完了：大法官說快來開會啦！」",
+    "vibe": "💡 腦袋升級",
+>>>>>>> Stashed changes
     "sticky": false
   },
   {
@@ -67,8 +78,13 @@
     "year": "2026.1.21",
     "abstract": "快速了解最新判決的5個重點，不再被複雜的法律用語卡住！",
     "link": "https://www.facebook.com/Dr.iur.Chang/posts/pfbid0bjDFgzJLh761NNUth3CEWv7giprRezRsxhKGFMDmW6qdKWbk87iqTH2pgXTEvUgnl",
+<<<<<<< Updated upstream
     "owl_comment": "「『交給人民公投』聽起來很民主，但憲法本來就是用來擋多數暴力的——這篇在講為什麼。」",
     "vibe": "💬 正反交鋒",
+=======
+    "owl_comment": "「這篇太長，我看完了：大法官說快來開會啦！」",
+    "vibe": "💡 腦袋升級",
+>>>>>>> Stashed changes
     "sticky": false
   },
   {
@@ -79,8 +95,13 @@
     "year": "2025.12.30",
     "abstract": "依法而治（rule of law）本身就包含程序性和實質性的內涵。固然，法治必須依照形式上符合民主程序通過的法律，以彰顯人民主治。然而，法治的實質內涵更是在公共溝通的過程中，推促人民進行思辨，就重要的政治價值，形成周全且真摯的共識。",
     "link": "https://www.twreporter.org/a/opinion-taiwan-constitutional-court-facing-a-crisis-of-legitimacy",
+<<<<<<< Updated upstream
     "owl_comment": "「法治不是走完三讀就算數，它還得通過人民的共識檢驗——作者把這個門檻說得很清楚。」",
     "vibe": "📖 深度解析",
+=======
+    "owl_comment": "「這篇太長，我看完了：大法官說快來開會啦！」",
+    "vibe": "💡 腦袋升級",
+>>>>>>> Stashed changes
     "sticky": true
   },
   {
@@ -91,8 +112,13 @@
     "year": "2026.1.2",
     "abstract": "快速了解最新判決的5個重點，不再被複雜的法律用語卡住！",
     "link": "https://www.facebook.com/story.php?story_fbid=10166530536591124&id=737496123&rdid=j42vvETWhmE07Xr0",
+<<<<<<< Updated upstream
     "owl_comment": "「作者沒有粉飾太平：這個判決是硬著頭皮做的，不做會更糟——這就是所謂的艱難。」",
     "vibe": "📖 深度解析",
+=======
+    "owl_comment": "「這篇太長，我看完了：大法官說快來開會啦！」",
+    "vibe": "💡 腦袋升級",
+>>>>>>> Stashed changes
     "sticky": false
   },
   {
@@ -103,8 +129,13 @@
     "year": "2026",
     "abstract": "快速了解最新判決的5個重點，不再被複雜的法律用語卡住！",
     "link": "https://www.youtube.com/watch?v=xTSqqUYJ7iI",
+<<<<<<< Updated upstream
     "owl_comment": "「動畫上車專用：不想讀判決書也沒關係，看完這支你大概就懂為什麼有人說這是『復活戰』。」",
     "vibe": "📣 懶人入門",
+=======
+    "owl_comment": "「這篇太長，我看完了：大法官說快來開會啦！」",
+    "vibe": "💡 腦袋升級",
+>>>>>>> Stashed changes
     "sticky": false
   },
   {
@@ -115,8 +146,13 @@
     "year": "2026",
     "abstract": "快速了解最新判決的5個重點，不再被複雜的法律用語卡住！",
     "link": "https://www.youtube.com/watch?v=qeaPDdok2JU",
+<<<<<<< Updated upstream
     "owl_comment": "「反方不是反派，他們在問一個很硬的問題：大法官自己鬆開自己的手銬，憲法上站得住嗎？」",
     "vibe": "💬 正反交鋒",
+=======
+    "owl_comment": "「這篇太長，我看完了：大法官說快來開會啦！」",
+    "vibe": "💡 腦袋升級",
+>>>>>>> Stashed changes
     "sticky": false
   },
   {
@@ -127,8 +163,13 @@
     "year": "2026",
     "abstract": "快速了解最新判決的5個重點，不再被複雜的法律用語卡住！",
     "link": "https://www.youtube.com/watch?v=e0u_RKGGIWY",
+<<<<<<< Updated upstream
     "owl_comment": "「原來反方也很崩潰：他們不是不想開會，是被那份條文氣到。立法草率的代價這集一次算清。」",
     "vibe": "🔥 公民必讀",
+=======
+    "owl_comment": "「這篇太長，我看完了：大法官說快來開會啦！」",
+    "vibe": "💡 腦袋升級",
+>>>>>>> Stashed changes
     "sticky": false
   },
   {
