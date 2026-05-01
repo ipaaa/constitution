@@ -10,6 +10,7 @@ score: 0.8
 worktree: .worktrees/spacedock-ensign-029-court-controversy-timeline
 issue:
 pr:
+mod-block: merge:pr-merge
 ---
 
 新增一個懶人包頁面，以張娟芬的文章為基底，製作「憲法法庭爭議時序懶人包」，讓讀者可以回顧整個爭議從頭到尾發生了什麼事。
