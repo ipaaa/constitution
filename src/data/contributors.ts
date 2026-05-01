@@ -25,7 +25,7 @@ export const contributors: Contributor[] = [
   {
     name: "法律文案",
     role: "法律文案",
-    description: "法律白話文撰寫與校對",
+    description: "法律簡明文案撰寫與校對",
   },
   {
     name: "資料整理志工",

@@ -3,7 +3,7 @@ import ControversyTimeline from '@/components/controversy-timeline/ControversyTi
 
 export const metadata = {
   title: '憲法法庭爭議時序懶人包 | Add C0urt 憲庭加好友',
-  description: '以互動式時間軸呈現2024至2026年間，立法院與憲法法庭的憲政爭議完整始末。白話文解說，讓每個人都能看懂。',
+  description: '以互動式時間軸呈現2024至2026年間，立法院與憲法法庭的憲政爭議完整始末。淺顯說明，讓每個人都能看懂。',
 };
 
 export default function ControversyTimelinePage() {
@@ -33,7 +33,7 @@ export default function ControversyTimelinePage() {
             憲法法庭宣告違憲，隨後國會反過來試圖癱瘓憲法法庭——這場對抗最終在2026年初以一個里程碑判決收場。
           </p>
           <p>
-            以下時間軸以白話文整理了整個爭議的15個關鍵時間點。點擊任一事件可展開完整說明。
+            以下時間軸以淺顯易懂的方式整理了整個爭議的15個關鍵時間點。點擊任一事件可展開完整說明。
             你也可以使用上方的分類標籤來篩選特定類型的事件。
           </p>
         </div>
@@ -53,7 +53,7 @@ export default function ControversyTimelinePage() {
           >
             憲法法庭，歡迎回來——兼評114年憲判字第1號判決
           </a>
-          〉（鏡週刊，2026年1月14日）及公開資料整理而成。時間軸為編輯團隊以白話文改寫，
+          〉（鏡週刊，2026年1月14日）及公開資料整理而成。時間軸為編輯團隊以簡明語言改寫，
           目的是幫助讀者理解事件脈絡，非法律意見。
         </p>
       </div>
