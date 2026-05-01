@@ -3,7 +3,7 @@ id: "028"
 title: About 頁面
 status: design
 source: captain-filed
-started:
+started: 2026-05-01T17:52:40Z
 completed:
 verdict:
 score: 0.7
