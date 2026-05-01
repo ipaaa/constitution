@@ -1,4 +1,3 @@
-import { Github, FileText, AlertCircle } from "lucide-react";
 import ContributorGrid from "@/components/about/ContributorGrid";
 import { contributors } from "@/data/contributors";
 
@@ -52,65 +51,6 @@ export default function AboutPage() {
             </span>
           </div>
           <ContributorGrid contributors={contributors} />
-        </div>
-      </section>
-
-      {/* Section 4: Call for Action */}
-      <section className="bg-gray-900 text-white py-12 md:py-24">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16">
-            {/* Left: Join Us */}
-            <div>
-              <h2 className="text-3xl font-bold font-serif mb-6">
-                一起參與
-              </h2>
-              <p className="text-gray-400 leading-relaxed mb-8">
-                不管你會寫程式、翻譯法律白話文、還是單純分享我們的內容——你都是這個專案的一份子。
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <span className="border border-gray-700 text-gray-300 px-4 py-2 rounded-sm text-sm font-medium">
-                  UI/UX 設計師
-                </span>
-                <span className="border border-gray-700 text-gray-300 px-4 py-2 rounded-sm text-sm font-medium">
-                  前端工程師
-                </span>
-                <span className="border border-gray-700 text-gray-300 px-4 py-2 rounded-sm text-sm font-medium">
-                  法律文案 & 資料志工
-                </span>
-              </div>
-            </div>
-
-            {/* Right: Action Links */}
-            <div className="space-y-3">
-              <a
-                href="https://github.com/g0v/Welcome-to-Add-C0urt"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="border border-gray-700 hover:border-white px-6 py-3 rounded-sm transition-colors flex items-center gap-3 text-gray-300 hover:text-white"
-              >
-                <Github size={20} aria-hidden="true" />
-                <span>查看原始碼 & Issues</span>
-              </a>
-              <a
-                href="https://g0v.hackmd.io/njOKlAIVQcmCgomNMr9cUg?view"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="border border-gray-700 hover:border-white px-6 py-3 rounded-sm transition-colors flex items-center gap-3 text-gray-300 hover:text-white"
-              >
-                <FileText size={20} aria-hidden="true" />
-                <span>協作共筆</span>
-              </a>
-              <a
-                href="https://github.com/g0v/Welcome-to-Add-C0urt/issues/new"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="border border-gray-700 hover:border-white px-6 py-3 rounded-sm transition-colors flex items-center gap-3 text-gray-300 hover:text-white"
-              >
-                <AlertCircle size={20} aria-hidden="true" />
-                <span>回報錯誤或建議</span>
-              </a>
-            </div>
-          </div>
         </div>
       </section>
     </div>
