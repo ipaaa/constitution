@@ -3,7 +3,7 @@ id: "003"
 title: 漫畫式懶人包 — 114年憲判字第1號
 status: brief
 source: captain-filed
-started:
+started: 2026-05-01T21:03:43Z
 completed:
 verdict:
 score: 0.8
