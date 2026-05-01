@@ -10,7 +10,7 @@ score: 0.8
 worktree: .worktrees/spacedock-ensign-027-opinion-lazybag-redesign
 issue:
 pr: #20
-mod-block: merge:pr-merge
+mod-block: 
 ---
 
 重新調整 014 大法官意見懶人包（/opinion-lazybag）：
