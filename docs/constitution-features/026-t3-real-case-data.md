@@ -9,7 +9,7 @@ verdict:
 score: 0.85
 worktree: .worktrees/spacedock-ensign-026-t3-real-case-data
 issue:
-pr:
+pr: #23
 mod-block: merge:pr-merge
 ---
 
