@@ -1,7 +1,7 @@
 ---
 id: "028"
 title: About 頁面
-status: implement
+status: review
 source: captain-filed
 started: 2026-05-01T17:52:40Z
 completed:
