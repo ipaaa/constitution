@@ -1,8 +1,9 @@
 import DecisionFlowchart from '@/components/opinion-lazybag/DecisionFlowchart';
+import StanceSpectrum from '@/components/opinion-lazybag/StanceSpectrum';
 
 export const metadata = {
   title: '國會職權修法判決解析 | Add C0urt 憲庭加好友',
-  description: '以決策流程圖呈現憲法法庭如何審理114年憲判字第1號——理解合議制的論理過程。',
+  description: '以決策流程圖與意見光譜呈現憲法法庭如何審理114年憲判字第1號——理解合議制的論理過程。',
 };
 
 export default function OpinionLazybagPage() {
@@ -21,7 +22,40 @@ export default function OpinionLazybagPage() {
         </p>
       </div>
 
-      <DecisionFlowchart />
+      {/* Section 1: Decision Flowchart */}
+      <section className="mb-16">
+        <div className="mb-6">
+          <h2 className="font-serif text-xl font-bold text-gray-900 mb-2">
+            法庭怎麼判的
+          </h2>
+          <p className="text-sm text-gray-600 font-serif">
+            憲法法庭是合議制，以下是他們的推理過程。
+          </p>
+        </div>
+        <DecisionFlowchart />
+      </section>
+
+      {/* Visual separator */}
+      <div className="flex items-center gap-4 my-12">
+        <div className="flex-1 h-px bg-gray-200" />
+        <span className="text-xs text-gray-400 font-mono tracking-wider">
+          ◆
+        </span>
+        <div className="flex-1 h-px bg-gray-200" />
+      </div>
+
+      {/* Section 2: Stance Spectrum */}
+      <section>
+        <div className="mb-6">
+          <h2 className="font-serif text-xl font-bold text-gray-900 mb-2">
+            大法官怎麼想的
+          </h2>
+          <p className="text-sm text-gray-600 font-serif">
+            雖然結論一致，但各大法官的思路不同——以下是他們的個別意見。
+          </p>
+        </div>
+        <StanceSpectrum />
+      </section>
     </div>
   );
 }
