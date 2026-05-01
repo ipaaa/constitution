@@ -159,9 +159,9 @@ const RAW_CASES: RawCase[] = [
 
   // --- Criminal defendants (刑事被告) ---
   // 偵查中卷證資訊獲知權
-  { id: '113憲民324', topic: '偵查中限制辯護人獲知卷證資訊之合憲性', applicant: '劉奕村、黃敦彥', tags: ['刑事被告', '隱私權'], filingDate: '2024-07-17' },
+  { id: '113憲民324', topic: '偵查中限制辯護人獲知卷證資訊之合憲性', applicant: '劉益村、黃敦彥', tags: ['刑事被告', '隱私權'], filingDate: '2024-07-17' },
   // 刑法沒收規定
-  { id: '112憲民1071', topic: '刑法沒收規定之合憲性爭議', applicant: '甲', tags: ['刑事被告', '稅務財產'], filingDate: '2024-06-26' },
+  { id: '112憲民1071', topic: '刑法沒收規定之合憲性爭議', applicant: '曹安娜', tags: ['刑事被告', '稅務財產'], filingDate: '2024-06-26' },
   // 槍砲彈藥刀械管制條例量刑與不自證己罪
   { id: '112憲審6', topic: '槍砲條例量刑規定與不自證己罪原則之合憲性', applicant: '彰化地方法院刑事第三庭', tags: ['刑事被告'], filingDate: '2024-04-17' },
   // 假釋門檻（刑法第77條）
@@ -340,9 +340,9 @@ export const JUSTICES: Justice[] = [
   { id: 'j02', name: '黃瑞明', nameEn: 'Huang Jui-ming', appointedDate: '2016-11-01', termExpiry: '2024-10-31', appointingPresident: '蔡英文', isActive: false, cohort: '2016' },
   { id: 'j03', name: '詹森林', nameEn: 'Chan Sen-lin', appointedDate: '2016-11-01', termExpiry: '2024-10-31', appointingPresident: '蔡英文', isActive: false, cohort: '2016' },
   { id: 'j04', name: '黃昭元', nameEn: 'Huang Chao-yuan', appointedDate: '2016-11-01', termExpiry: '2024-10-31', appointingPresident: '蔡英文', isActive: false, cohort: '2016' },
-  { id: 'j05', name: '黃虹霞', nameEn: 'Huang Hong-hsia', appointedDate: '2016-11-01', termExpiry: '2024-10-31', appointingPresident: '蔡英文', isActive: false, cohort: '2016' },
-  { id: 'j06', name: '吳陳鐶', nameEn: 'Wu Chen-huan', appointedDate: '2016-11-01', termExpiry: '2024-10-31', appointingPresident: '蔡英文', isActive: false, cohort: '2016' },
-  { id: 'j07', name: '林俊益', nameEn: 'Lin Chun-yi', appointedDate: '2016-11-01', termExpiry: '2024-10-31', appointingPresident: '蔡英文', isActive: false, cohort: '2016' },
+  { id: 'j05', name: '許宗力', nameEn: 'Hsu Tzong-li', appointedDate: '2016-11-01', termExpiry: '2024-10-31', appointingPresident: '蔡英文', isActive: false, cohort: '2016' },
+  { id: 'j06', name: '蔡烱燉', nameEn: 'Tsai Chiung-tun', appointedDate: '2016-11-01', termExpiry: '2024-10-31', appointingPresident: '蔡英文', isActive: false, cohort: '2016' },
+  { id: 'j07', name: '張瓊文', nameEn: 'Chang Chiung-wen', appointedDate: '2016-11-01', termExpiry: '2024-10-31', appointingPresident: '蔡英文', isActive: false, cohort: '2016' },
   // 2019 cohort — 4 justices, appointed 2019-10-01, expires 2027-09-30
   { id: 'j08', name: '謝銘洋', nameEn: 'Hsieh Ming-yang', appointedDate: '2019-10-01', termExpiry: '2027-09-30', appointingPresident: '蔡英文', isActive: true, cohort: '2019' },
   { id: 'j09', name: '呂太郎', nameEn: 'Lu Tai-lang', appointedDate: '2019-10-01', termExpiry: '2027-09-30', appointingPresident: '蔡英文', isActive: true, cohort: '2019' },
