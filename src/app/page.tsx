@@ -106,7 +106,7 @@ export default function Home() {
             <Link
               href="/future"
               className="group relative bg-gray-900 text-white border border-gray-900 p-8 shadow-sm rounded-sm hover:shadow-lg hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D32F2F] focus-visible:ring-offset-2 transition-all flex flex-col items-start h-full overflow-hidden"
-              aria-label={`進入憲庭載入中：${CRISIS_STATS.totalPending} 件案件待審，僅存 ${CRISIS_STATS.activeJustices} 名大法官運作`}
+              aria-label={`進入憲庭載入中：${CRISIS_STATS.totalPending} 件案件待審，僅存 ${CRISIS_STATS.activeJustices} 名大法官運作（三名不參與評議會）`}
             >
               {/* Ambient red glow to echo /future crisis banner */}
               <div aria-hidden className="pointer-events-none absolute -top-16 -right-16 w-48 h-48 bg-[#D32F2F] rounded-full blur-[90px] opacity-25 group-hover:opacity-40 transition-opacity" />
