@@ -26,63 +26,44 @@ export default function AboutPage() {
       </section>
 
       {/* Section 1: 專案緣由 */}
+      {/* SSOT: docs/about-content.md — sync content from there */}
       <section className="border-t border-gray-200 py-12 md:py-24">
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 font-serif border-l-[6px] border-gray-900 pl-6 mb-10">
             專案緣由
           </h2>
-          <div className="space-y-6 text-gray-700 leading-relaxed text-lg pl-8 border-l border-gray-300">
+          <div className="space-y-6 text-gray-500 leading-relaxed text-lg pl-8 border-l border-gray-300 italic">
             <p>
-              對大多數台灣公民來說，憲法法庭是一個遙遠而模糊的存在。它的運作被厚重的法律語言包裹，被政治口水淹沒，被媒體的片段報導切割得支離破碎。然而，這個機構守護的正是每一位公民最根本的權利——當它癱瘓時，受傷的不是政治人物，而是你我。
-            </p>
-            <p>
-              現有的資訊來源不是太學術、就是太黨派、或者太零散。學術論文對一般民眾來說門檻太高；政論節目的討論充滿立場預設；新聞報導往往只抓住爭議的片段，缺乏結構化的脈絡整理。公民需要一個中立、易懂、完整的資訊入口，卻找不到。
-            </p>
-            <p>
-              Add C0urt 憲庭加好友是一個開源的公民科技專案，試圖填補這個空缺。我們將枯燥的法律程序轉化為清晰、可分享、零門檻的資訊。我們不說教、不站隊——我們提供工具，讓公民自己理解、自己判斷、自己行動。
-            </p>
-            <p>
-              這個專案誕生於 g0v 零時政府社群，遵循開源、去中心化的協作模式。從第一行程式碼到每一段白話文解釋，都是志工貢獻的成果。我們相信，降低理解門檻本身就是一種公民行動。
+              （專案緣由文案撰寫中，請參閱 docs/about-content.md）
             </p>
           </div>
         </div>
       </section>
 
-      {/* Section 2: 前言/宣言 */}
+      {/* Section 2: 工作方法 */}
+      {/* SSOT: docs/about-content.md — sync content from there */}
       <section className="bg-[#f8f6f0] border-t-2 border-b-2 border-gray-300 py-12 md:py-16">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 font-serif mb-12">
-            我們的宣言
+            工作方法
           </h2>
           <div className="space-y-10 font-serif text-xl md:text-2xl leading-relaxed text-gray-800">
             <div>
-              <h3 className="font-bold text-gray-900 text-2xl md:text-3xl mb-3">透明</h3>
+              <h3 className="font-bold text-gray-900 text-2xl md:text-3xl mb-3">固定開會</h3>
               <p>
-                我們相信每位公民都有權理解守護自身權利的制度，不需要法律學位也能看懂。
+                貢獻者定期開會討論進度與方向
               </p>
             </div>
             <div>
-              <h3 className="font-bold text-gray-900 text-2xl md:text-3xl mb-3">客觀</h3>
+              <h3 className="font-bold text-gray-900 text-2xl md:text-3xl mb-3">AI 協作程式</h3>
               <p>
-                我們呈現事實與多元觀點。我們不是任何政黨或意識形態的傳聲筒。
+                使用 AI 工具協助程式開發，加速迭代
               </p>
             </div>
             <div>
-              <h3 className="font-bold text-gray-900 text-2xl md:text-3xl mb-3">開源</h3>
+              <h3 className="font-bold text-gray-900 text-2xl md:text-3xl mb-3">學者專家驗證</h3>
               <p>
-                我們的程式碼、資料與編輯流程完全公開。任何人都可以驗證、貢獻或分支。
-              </p>
-            </div>
-            <div>
-              <h3 className="font-bold text-gray-900 text-2xl md:text-3xl mb-3">行動</h3>
-              <p>
-                理解是第一步。我們打造工具，將意識轉化為公民參與。
-              </p>
-            </div>
-            <div>
-              <h3 className="font-bold text-gray-900 text-2xl md:text-3xl mb-3">共創</h3>
-              <p>
-                這不是一個團隊的專案。它屬於每一位貢獻了一行程式碼、一段白話文摘要、或一次社群分享的公民。
+                所有內容經法律學者與專家審核確認正確性
               </p>
             </div>
           </div>
