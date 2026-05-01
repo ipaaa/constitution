@@ -1,7 +1,7 @@
 ---
 id: "030"
 title: T1 前言：為何回顧憲法釋憲案
-status: implement
+status: review
 source: captain-filed
 started: 2026-05-01T20:23:06Z
 completed:
@@ -10,6 +10,7 @@ score: 0.65
 worktree: .worktrees/spacedock-ensign-030-t1-intro-text
 issue:
 pr:
+mod-block: merge:pr-merge
 ---
 
 在 T1（時光機）頁面加一段前言，說明為什麼要回顧歷史上的憲法釋憲案，幫助讀者理解這些過去的判決跟現在的生活有什麼關係。
