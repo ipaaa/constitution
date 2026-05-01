@@ -103,8 +103,8 @@ export default function FutureTrack() {
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-serif font-bold text-gray-900 text-xl">
                 {activeTags.length === 0 ? '代表性待審案件' : '相關待審案件'}
-                <span className="text-gray-500 font-mono text-base ml-2">
-                  ({filteredCases.length}{activeTags.length === 0 ? ` / 共 ${CRISIS_STATS.totalPending}+ 件待審` : ''})
+                <span className="text-gray-500 font-mono text-sm ml-2">
+                  （顯示 {PENDING_CASES.length} 件公開書狀 / 全部 {CRISIS_STATS.totalPending}+ 件）
                 </span>
               </h3>
               <div className="flex gap-1 bg-gray-100 rounded-sm p-0.5">
@@ -145,10 +145,6 @@ export default function FutureTrack() {
                 <p className="text-sm mt-2">請嘗試其他身分標籤組合</p>
               </div>
             )}
-
-            <p className="text-xs text-gray-500 mt-4 font-serif">
-              顯示 {PENDING_CASES.length} 件公開書狀案件 / 全部待審 {CRISIS_STATS.totalPending}+ 件
-            </p>
 
             <p className="text-[11px] text-gray-400 mt-6 font-serif">
               以上為具代表性之待審案件，完整清單請見
