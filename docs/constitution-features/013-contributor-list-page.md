@@ -1,11 +1,11 @@
 ---
 id: "013"
 title: Contributor List Page
-status: design
+status: complete
 source: captain-filed
 started:
-completed:
-verdict:
+completed: 2026-05-01T20:56:57Z
+verdict: PASSED
 score: 0.5
 worktree:
 issue:
