@@ -12,8 +12,8 @@ import JusticeSeatGrid from './JusticeSeatGrid';
 
 // Chart dimensions
 const CHART_W = 720;
-const CHART_H = 340;
-const PAD = { top: 30, right: 30, bottom: 90, left: 50 };
+const CHART_H = 360;
+const PAD = { top: 40, right: 70, bottom: 90, left: 50 };
 const PLOT_W = CHART_W - PAD.left - PAD.right;
 const PLOT_H = CHART_H - PAD.top - PAD.bottom;
 
@@ -189,14 +189,15 @@ export default function JusticeTermTimeline() {
             opacity={0.5}
           />
           <text
-            x={PAD.left + PLOT_W + 5}
-            y={yForCount(QUORUM) + 4}
+            x={PAD.left + 4}
+            y={yForCount(QUORUM) - 6}
+            textAnchor="start"
             fontFamily="monospace"
-            fontSize="10"
-            className="fill-red-500"
+            fontSize="9"
             fill="#D32F2F"
+            opacity={0.7}
           >
-            表決門檻
+            表決門檻 (10人)
           </text>
 
           {/* "You are here" vertical line */}
@@ -263,17 +264,17 @@ export default function JusticeTermTimeline() {
                   }}
                   onMouseLeave={() => setHoveredDrop(null)}
                 />
-                {/* Drop annotation */}
+                {/* Drop annotation — offset to the right of circle */}
                 <text
-                  x={cx}
-                  y={cy - 12}
-                  textAnchor="middle"
+                  x={cx + 12}
+                  y={cy + 4}
+                  textAnchor="start"
                   fontFamily="monospace"
-                  fontSize="10"
+                  fontSize="9"
                   fontWeight="bold"
                   fill="#D32F2F"
                 >
-                  -{dp.justicesExpiring}
+                  -{dp.justicesExpiring} 席
                 </text>
               </g>
             );
