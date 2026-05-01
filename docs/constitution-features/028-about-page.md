@@ -186,3 +186,23 @@ Key responsive notes:
 ### Summary
 
 Designed the `/about` page as a four-section editorial page: Origin story (why this project exists), Manifesto (5 core values), Contributor grid (dynamic cards from data file, merging feature 013), and a dark Call for Action section with links to GitHub/HackMD/feedback. The design follows the project's "Refined Document" aesthetic — serif headings, clean borders, restrained color palette — and is fully responsive. Three new files are needed: the page route, a ContributorGrid component, and a contributors data file.
+
+## Implement Report
+
+### Files created
+- `src/app/about/page.tsx` — Server component page route with all four sections inline (Origin, Manifesto, Contributors, CTA)
+- `src/components/about/ContributorGrid.tsx` — Responsive grid + card component with initials avatar fallback
+- `src/data/contributors.ts` — Contributor interface and placeholder seed data (6 contributors with roles: 專案發起人, 前端工程師 x2, 法律文案, 資料整理, 顧問)
+
+### Files modified
+- `src/components/Navbar.tsx` — Added "關於我們" link to `/about`
+
+### Implementation notes
+- All four sections implemented per design spec: editorial origin story (4 paragraphs, left border accent), centered serif manifesto (5 values on warm bg), contributor grid (responsive 1/2/3 columns), dark CTA (2-column with role pills + action link buttons)
+- Page uses `bg-white` background to differentiate from homepage's `bg-[#F6F8FA]`
+- Content column uses `max-w-4xl mx-auto px-6` for reading-optimized width
+- External links use `target="_blank" rel="noopener noreferrer"` with aria-labels
+- Heading hierarchy: h1 (page title) > h2 (sections) > h3 (manifesto values)
+- Contributor cards show initials fallback when no avatar provided
+- Build passes (`next build`) with no errors or warnings
+- Contributors are placeholder data — captain to fill in real names later
