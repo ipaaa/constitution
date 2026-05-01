@@ -116,13 +116,6 @@ export default function StanceSpectrum() {
                     transform: isSelected ? 'scale(1.5)' : 'scale(1)',
                   }}
                 />
-                {/* Name label (desktop only) */}
-                <span
-                  className={`hidden md:block absolute left-full ml-1 top-1/2 -translate-y-1/2 whitespace-nowrap text-[10px] font-medium transition-opacity ${isSelected ? 'opacity-100 text-gray-900' : 'opacity-60 text-gray-500'}`}
-                >
-                  {justice.name}
-                </span>
-
                 {/* Desktop tooltip */}
                 {isSelected && (
                   <div
