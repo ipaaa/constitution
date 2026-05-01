@@ -9,7 +9,7 @@ verdict:
 score: 0.8
 worktree: .worktrees/spacedock-ensign-029-court-controversy-timeline
 issue:
-pr:
+pr: #21
 mod-block: merge:pr-merge
 ---
 
