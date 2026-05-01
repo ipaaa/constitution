@@ -1,13 +1,13 @@
 ---
 id: "026"
 title: T3 待審案件替換為真實資料
-status: verify
+status: complete
 source: captain-filed
 started: 2026-04-30T23:17:40Z
-completed:
-verdict:
+completed: 2026-05-01T21:00:24Z
+verdict: PASSED
 score: 0.85
-worktree: .worktrees/spacedock-ensign-026-t3-real-case-data
+worktree: 
 issue:
 pr: #23
 mod-block: 

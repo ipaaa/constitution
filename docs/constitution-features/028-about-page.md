@@ -1,13 +1,13 @@
 ---
 id: "028"
 title: About 頁面
-status: review
+status: complete
 source: captain-filed
 started: 2026-05-01T17:52:40Z
-completed:
-verdict:
+completed: 2026-05-01T21:00:24Z
+verdict: PASSED
 score: 0.7
-worktree: .worktrees/spacedock-ensign-028-about-page
+worktree: 
 issue:
 pr: #22
 mod-block: 

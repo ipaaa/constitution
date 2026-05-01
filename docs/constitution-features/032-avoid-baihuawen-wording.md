@@ -1,13 +1,13 @@
 ---
 id: "032"
 title: 全站文案避免使用「白話文」
-status: implement
+status: complete
 source: captain-filed
 started: 2026-05-01T20:45:49Z
-completed:
-verdict:
+completed: 2026-05-01T21:00:24Z
+verdict: PASSED
 score: 0.6
-worktree: .worktrees/spacedock-ensign-032-avoid-baihuawen
+worktree: 
 issue:
 pr: #26
 mod-block: 

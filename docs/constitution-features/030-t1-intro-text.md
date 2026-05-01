@@ -1,13 +1,13 @@
 ---
 id: "030"
 title: T1 前言：為何回顧憲法釋憲案
-status: review
+status: complete
 source: captain-filed
 started: 2026-05-01T20:23:06Z
-completed:
-verdict:
+completed: 2026-05-01T21:00:24Z
+verdict: PASSED
 score: 0.65
-worktree: .worktrees/spacedock-ensign-030-t1-intro-text
+worktree: 
 issue:
 pr: #24
 mod-block: 
