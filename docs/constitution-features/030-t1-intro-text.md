@@ -3,7 +3,7 @@ id: "030"
 title: T1 前言：為何回顧憲法釋憲案
 status: design
 source: captain-filed
-started:
+started: 2026-05-01T20:23:06Z
 completed:
 verdict:
 score: 0.65
