@@ -1,28 +1,112 @@
 'use client';
 
-import React from 'react';
-import { TERM_EVENTS, REFERENCE_DATE, FAILED_NOMINATIONS } from '@/data/future';
+import React, { useState } from 'react';
+import { TERM_EVENTS, REFERENCE_DATE, FAILED_NOMINATIONS, JUSTICES } from '@/data/future';
 import JusticeCountdown from './JusticeCountdown';
 import JusticeSeatGrid from './JusticeSeatGrid';
 
 /**
- * Timeline events with pixel positioning data for the visualization.
- * Spans 2023-01 to 2029-01 (6 years = 100% width).
+ * SVG Line Chart showing justice seat count over time (2024–2032).
+ * Drop points show when justices expire; hover reveals names.
  */
-const TIMELINE_START = Date.parse('2023-01-01');
-const TIMELINE_END = Date.parse('2029-01-01');
-const TIMELINE_SPAN = TIMELINE_END - TIMELINE_START;
 
-function pct(isoDate: string): number {
-  const t = Date.parse(isoDate);
-  return Math.max(0, Math.min(100, ((t - TIMELINE_START) / TIMELINE_SPAN) * 100));
+// Chart dimensions
+const CHART_W = 720;
+const CHART_H = 300;
+const PAD = { top: 30, right: 30, bottom: 50, left: 50 };
+const PLOT_W = CHART_W - PAD.left - PAD.right;
+const PLOT_H = CHART_H - PAD.top - PAD.bottom;
+
+// Time range: 2024-01-01 to 2032-01-01
+const T_START = Date.parse('2024-01-01');
+const T_END = Date.parse('2032-01-01');
+const T_SPAN = T_END - T_START;
+
+// Y range: 0 to 15
+const Y_MAX = 15;
+
+function xForDate(iso: string): number {
+  const t = Date.parse(iso);
+  return PAD.left + ((t - T_START) / T_SPAN) * PLOT_W;
 }
 
-const YEAR_MARKERS = [2023, 2024, 2025, 2026, 2027, 2028, 2029];
+function yForCount(count: number): number {
+  return PAD.top + PLOT_H - (count / Y_MAX) * PLOT_H;
+}
 
-const REFERENCE_PCT = pct(REFERENCE_DATE);
+// Build the step-line data points
+// Start: before first drop, all 15 active
+// Each TERM_EVENT causes a drop
+interface DataPoint {
+  date: string;
+  count: number;
+  justicesExpiring: number;
+  names: string[];
+  label: string;
+}
+
+function buildDataPoints(): DataPoint[] {
+  const points: DataPoint[] = [];
+
+  // Starting point
+  points.push({ date: '2024-01-01', count: 15, justicesExpiring: 0, names: [], label: '' });
+
+  // Before each drop (just before the date)
+  let currentCount = 15;
+  for (const event of TERM_EVENTS) {
+    // Point just before the drop (same count)
+    points.push({ date: event.date, count: currentCount, justicesExpiring: 0, names: [], label: '' });
+
+    // Find justices expiring at this date
+    const expiringJustices = JUSTICES.filter((j) => j.termExpiry === event.date);
+    const names = expiringJustices.map((j) => j.name);
+
+    currentCount = event.justicesRemaining;
+    // Point after the drop
+    points.push({
+      date: event.date,
+      count: currentCount,
+      justicesExpiring: event.justicesExpiring,
+      names,
+      label: event.label,
+    });
+  }
+
+  // End point
+  points.push({ date: '2032-01-01', count: currentCount, justicesExpiring: 0, names: [], label: '' });
+
+  return points;
+}
+
+// Quorum threshold
+const QUORUM = 10;
+
+// Year markers for X axis
+const YEAR_MARKS = [2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032];
 
 export default function JusticeTermTimeline() {
+  const [hoveredDrop, setHoveredDrop] = useState<DataPoint | null>(null);
+  const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+
+  const dataPoints = buildDataPoints();
+
+  // Build SVG path for the step line
+  const pathParts: string[] = [];
+  for (let i = 0; i < dataPoints.length; i++) {
+    const p = dataPoints[i];
+    const x = xForDate(p.date);
+    const y = yForCount(p.count);
+    if (i === 0) {
+      pathParts.push(`M ${x} ${y}`);
+    } else {
+      pathParts.push(`L ${x} ${y}`);
+    }
+  }
+  const linePath = pathParts.join(' ');
+
+  // Drop points (where justicesExpiring > 0)
+  const dropPoints = dataPoints.filter((p) => p.justicesExpiring > 0);
+
   return (
     <section className="mb-8">
       {/* Section Header */}
@@ -35,227 +119,222 @@ export default function JusticeTermTimeline() {
         </p>
       </div>
 
-      {/* Dark container for the timeline visualization */}
-      <div className="bg-gray-900 rounded-sm p-4 md:p-6 mb-4">
-        {/* Horizontal Timeline — Desktop */}
-        <div className="hidden md:block">
-          <div className="relative h-56">
-            {/* Year grid lines and labels */}
-            {YEAR_MARKERS.map((year) => {
-              const x = pct(`${year}-01-01`);
-              return (
-                <div key={year} className="absolute top-0 bottom-0" style={{ left: `${x}%` }}>
-                  <div className="w-px h-full bg-gray-800" />
-                  <span className="absolute -bottom-5 -translate-x-1/2 font-mono text-[10px] text-gray-300">
-                    {year}
-                  </span>
-                </div>
-              );
-            })}
+      {/* Light container for the line chart */}
+      <div className="bg-white border border-gray-200 rounded-sm p-4 md:p-6 mb-4 relative">
+        <svg
+          viewBox={`0 0 ${CHART_W} ${CHART_H}`}
+          className="w-full h-auto"
+          preserveAspectRatio="xMidYMid meet"
+        >
+          {/* Y axis grid lines */}
+          {[0, 5, 10, 15].map((v) => (
+            <g key={`y-${v}`}>
+              <line
+                x1={PAD.left}
+                y1={yForCount(v)}
+                x2={PAD.left + PLOT_W}
+                y2={yForCount(v)}
+                stroke="#e5e7eb"
+                strokeWidth={1}
+              />
+              <text
+                x={PAD.left - 10}
+                y={yForCount(v) + 4}
+                textAnchor="end"
+                className="text-[11px] fill-gray-500"
+                fontFamily="monospace"
+                fontSize="11"
+              >
+                {v}
+              </text>
+            </g>
+          ))}
 
-            {/* Main axis line */}
-            <div className="absolute top-1/2 left-0 right-0 h-px bg-gray-700" />
+          {/* X axis year labels and grid */}
+          {YEAR_MARKS.map((year) => {
+            const x = xForDate(`${year}-01-01`);
+            return (
+              <g key={`x-${year}`}>
+                <line
+                  x1={x}
+                  y1={PAD.top}
+                  x2={x}
+                  y2={PAD.top + PLOT_H}
+                  stroke="#f3f4f6"
+                  strokeWidth={1}
+                />
+                <text
+                  x={x}
+                  y={PAD.top + PLOT_H + 20}
+                  textAnchor="middle"
+                  fontFamily="monospace"
+                  fontSize="11"
+                  className="fill-gray-500"
+                >
+                  {year}
+                </text>
+              </g>
+            );
+          })}
 
-            {/* "YOU ARE HERE" marker */}
-            <div
-              className="absolute top-1/2 -translate-y-1/2 z-10"
-              style={{ left: `${REFERENCE_PCT}%` }}
-            >
-              <div className="w-3 h-3 bg-white rounded-full border-2 border-white -translate-x-1/2" />
-              <div className="absolute -top-7 -translate-x-1/2 whitespace-nowrap">
-                <span className="bg-white text-gray-900 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-sm uppercase tracking-wider">
-                  You are here
-                </span>
-              </div>
+          {/* Quorum threshold dashed line */}
+          <line
+            x1={PAD.left}
+            y1={yForCount(QUORUM)}
+            x2={PAD.left + PLOT_W}
+            y2={yForCount(QUORUM)}
+            stroke="#D32F2F"
+            strokeWidth={1}
+            strokeDasharray="6 4"
+            opacity={0.5}
+          />
+          <text
+            x={PAD.left + PLOT_W + 5}
+            y={yForCount(QUORUM) + 4}
+            fontFamily="monospace"
+            fontSize="10"
+            className="fill-red-500"
+            fill="#D32F2F"
+          >
+            表決門檻
+          </text>
+
+          {/* "You are here" vertical line */}
+          <line
+            x1={xForDate(REFERENCE_DATE)}
+            y1={PAD.top}
+            x2={xForDate(REFERENCE_DATE)}
+            y2={PAD.top + PLOT_H}
+            stroke="#6b7280"
+            strokeWidth={1}
+            strokeDasharray="3 3"
+            opacity={0.6}
+          />
+          <text
+            x={xForDate(REFERENCE_DATE)}
+            y={PAD.top - 8}
+            textAnchor="middle"
+            fontFamily="monospace"
+            fontSize="9"
+            fill="#6b7280"
+          >
+            TODAY
+          </text>
+
+          {/* Step line */}
+          <path
+            d={linePath}
+            fill="none"
+            stroke="#D32F2F"
+            strokeWidth={2.5}
+            strokeLinejoin="round"
+          />
+
+          {/* Area fill under line */}
+          <path
+            d={`${linePath} L ${xForDate('2032-01-01')} ${yForCount(0)} L ${xForDate('2024-01-01')} ${yForCount(0)} Z`}
+            fill="#D32F2F"
+            opacity={0.06}
+          />
+
+          {/* Drop point circles (interactive) */}
+          {dropPoints.map((dp) => {
+            const cx = xForDate(dp.date);
+            const cy = yForCount(dp.count);
+            return (
+              <g key={`drop-${dp.date}-${dp.count}`}>
+                <circle
+                  cx={cx}
+                  cy={cy}
+                  r={6}
+                  fill="#D32F2F"
+                  stroke="white"
+                  strokeWidth={2}
+                  className="cursor-pointer"
+                  onMouseEnter={(e) => {
+                    setHoveredDrop(dp);
+                    const svg = e.currentTarget.closest('svg');
+                    if (svg) {
+                      const rect = svg.getBoundingClientRect();
+                      const scaleX = rect.width / CHART_W;
+                      const scaleY = rect.height / CHART_H;
+                      setTooltipPos({ x: cx * scaleX, y: cy * scaleY });
+                    }
+                  }}
+                  onMouseLeave={() => setHoveredDrop(null)}
+                />
+                {/* Drop annotation */}
+                <text
+                  x={cx}
+                  y={cy - 12}
+                  textAnchor="middle"
+                  fontFamily="monospace"
+                  fontSize="10"
+                  fontWeight="bold"
+                  fill="#D32F2F"
+                >
+                  -{dp.justicesExpiring}
+                </text>
+              </g>
+            );
+          })}
+
+          {/* Failed nomination markers */}
+          {FAILED_NOMINATIONS.map((nom) => {
+            const cx = xForDate(nom.date);
+            const cy = PAD.top + PLOT_H + 38;
+            return (
+              <g key={`nom-${nom.date}`}>
+                <text
+                  x={cx}
+                  y={cy}
+                  textAnchor="middle"
+                  fontFamily="monospace"
+                  fontSize="10"
+                  fill="#D32F2F"
+                  opacity={0.7}
+                >
+                  ✕ 提名{nom.nomineesCount}人遭否決
+                </text>
+              </g>
+            );
+          })}
+
+          {/* Y axis label */}
+          <text
+            x={14}
+            y={PAD.top + PLOT_H / 2}
+            textAnchor="middle"
+            fontFamily="serif"
+            fontSize="11"
+            fill="#6b7280"
+            transform={`rotate(-90, 14, ${PAD.top + PLOT_H / 2})`}
+          >
+            在任人數
+          </text>
+        </svg>
+
+        {/* Tooltip (HTML overlay) */}
+        {hoveredDrop && (
+          <div
+            className="absolute z-30 pointer-events-none bg-gray-900 text-white text-xs font-mono rounded px-3 py-2 shadow-lg -translate-x-1/2 -translate-y-full"
+            style={{ left: tooltipPos.x, top: tooltipPos.y - 16 }}
+          >
+            <div className="font-bold mb-1">
+              {hoveredDrop.date} — {hoveredDrop.justicesExpiring} 席屆滿
             </div>
-
-            {/* Term events */}
-            {TERM_EVENTS.map((event, i) => {
-              const x = pct(event.date);
-              const isPast = Date.parse(event.date) < Date.parse(REFERENCE_DATE);
-              const isFinalCliff = i === TERM_EVENTS.length - 1;
-
-              return (
-                <div
-                  key={event.date}
-                  className="absolute top-1/2 -translate-y-1/2 z-10"
-                  style={{ left: `${x}%` }}
-                >
-                  {/* Event marker */}
-                  <div
-                    className={`w-4 h-4 rounded-full -translate-x-1/2 border-2 ${
-                      isPast
-                        ? 'bg-gray-700 border-gray-600'
-                        : isFinalCliff
-                          ? 'bg-[#D32F2F] border-red-400 animate-pulse'
-                          : 'bg-amber-500 border-amber-400'
-                    }`}
-                  />
-                  {/* Event label — alternate above/below */}
-                  <div
-                    className={`absolute -translate-x-1/2 whitespace-nowrap ${
-                      i % 2 === 0 ? 'top-6' : '-top-16'
-                    }`}
-                  >
-                    <div className={`text-[10px] font-mono font-bold ${
-                      isPast ? 'text-gray-500' : isFinalCliff ? 'text-red-400' : 'text-amber-400'
-                    }`}>
-                      -{event.justicesExpiring} 席
-                    </div>
-                    <div className={`text-[9px] font-mono ${
-                      isPast ? 'text-gray-500' : 'text-gray-300'
-                    }`}>
-                      {event.label}
-                    </div>
-                    <div className={`text-[9px] font-mono ${
-                      isPast ? 'text-gray-500' : 'text-gray-300'
-                    }`}>
-                      剩 {event.justicesRemaining} 人
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-
-            {/* Failed nomination events */}
-            {FAILED_NOMINATIONS.map((nom, i) => {
-              const x = pct(nom.date);
-              return (
-                <div
-                  key={`nom-${nom.date}`}
-                  className="absolute top-1/2 -translate-y-1/2 z-10"
-                  style={{ left: `${x}%` }}
-                >
-                  {/* X marker for blocked nomination */}
-                  <div className="w-4 h-4 -translate-x-1/2 flex items-center justify-center">
-                    <span className="text-red-400 font-mono font-bold text-sm leading-none select-none">✕</span>
-                  </div>
-                  {/* Label — always above the axis, well clear of term event labels */}
-                  <div
-                    className="absolute -translate-x-1/2 whitespace-nowrap -top-[5.5rem]"
-                  >
-                    <div className="text-[10px] font-mono font-bold text-red-400/80">
-                      提名 {nom.nomineesCount} 人
-                    </div>
-                    <div className="text-[9px] font-mono text-red-400/60">
-                      {nom.label}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-
-            {/* Danger zone: from last active date to end */}
-            {(() => {
-              const cliffPct = pct(TERM_EVENTS[TERM_EVENTS.length - 1].date);
-              return (
-                <div
-                  className="absolute top-0 bottom-0 bg-[#D32F2F] opacity-[0.06] rounded-r-sm"
-                  style={{ left: `${cliffPct}%`, right: 0 }}
-                />
-              );
-            })()}
-
-            {/* Dashed line after cliff */}
-            {(() => {
-              const cliffPct = pct(TERM_EVENTS[TERM_EVENTS.length - 1].date);
-              return (
-                <div
-                  className="absolute top-1/2 h-px border-t border-dashed border-gray-700"
-                  style={{ left: `${cliffPct}%`, right: 0 }}
-                />
-              );
-            })()}
+            <div className="text-gray-300">
+              {hoveredDrop.names.length > 0
+                ? hoveredDrop.names.join('、')
+                : hoveredDrop.label}
+            </div>
+            <div className="text-gray-400 mt-1">剩餘 {hoveredDrop.count} / 15 席</div>
           </div>
+        )}
 
-          {/* Bottom label */}
-          <div className="mt-8 text-[10px] font-mono text-gray-400 uppercase tracking-widest">
-            Justice Term Timeline / 大法官任期時間軸
-          </div>
-        </div>
-
-        {/* Vertical Timeline — Mobile */}
-        <div className="block md:hidden">
-          <div className="relative ml-4 border-l border-gray-700 pl-6 space-y-6 py-2">
-            {/* Merge term events and failed nominations, sorted by date */}
-            {[
-              ...TERM_EVENTS.map((e, i) => ({ type: 'term' as const, date: e.date, event: e, originalIndex: i })),
-              ...FAILED_NOMINATIONS.map((n) => ({ type: 'nomination' as const, date: n.date, nomination: n })),
-            ]
-              .sort((a, b) => Date.parse(a.date) - Date.parse(b.date))
-              .map((item, idx, arr) => {
-                const isPast = Date.parse(item.date) < Date.parse(REFERENCE_DATE);
-                const showRefMarker =
-                  isPast &&
-                  idx < arr.length - 1 &&
-                  Date.parse(arr[idx + 1].date) >= Date.parse(REFERENCE_DATE);
-
-                if (item.type === 'nomination') {
-                  return (
-                    <React.Fragment key={`nom-${item.date}`}>
-                      <div className="relative">
-                        <div className="absolute -left-[calc(1.5rem+0.5rem+1px)] w-3 h-3 flex items-center justify-center">
-                          <span className="text-red-400 font-mono font-bold text-xs leading-none select-none">✕</span>
-                        </div>
-                        <div className="text-xs font-mono text-red-400/80">
-                          {item.date.slice(0, 7)}
-                        </div>
-                        <div className="text-sm font-serif font-bold mt-0.5 text-red-400/80">
-                          {item.nomination.label} — 提名 {item.nomination.nomineesCount} 人
-                        </div>
-                        <div className="text-xs text-red-400/60 font-mono mt-0.5">
-                          {item.nomination.detail.slice(0, 40)}…
-                        </div>
-                      </div>
-                      {showRefMarker && (
-                        <div className="relative">
-                          <div className="absolute -left-[calc(1.5rem+0.5rem+1px)] w-3 h-3 rounded-full bg-white border-2 border-white" />
-                          <div className="bg-white text-gray-900 text-[10px] font-mono font-bold px-2 py-1 rounded-sm inline-block uppercase tracking-wider">
-                            You are here — {REFERENCE_DATE}
-                          </div>
-                        </div>
-                      )}
-                    </React.Fragment>
-                  );
-                }
-
-                const isFinalCliff = item.originalIndex === TERM_EVENTS.length - 1;
-                return (
-                  <React.Fragment key={item.date}>
-                    <div className="relative">
-                      <div
-                        className={`absolute -left-[calc(1.5rem+0.5rem+1px)] w-3 h-3 rounded-full border-2 ${
-                          isPast
-                            ? 'bg-gray-700 border-gray-600'
-                            : isFinalCliff
-                              ? 'bg-[#D32F2F] border-red-400 animate-pulse'
-                              : 'bg-amber-500 border-amber-400'
-                        }`}
-                      />
-                      <div className={`text-xs font-mono ${isPast ? 'text-gray-500' : isFinalCliff ? 'text-red-400' : 'text-gray-300'}`}>
-                        {item.date.slice(0, 7)}
-                      </div>
-                      <div className={`text-sm font-serif font-bold mt-0.5 ${
-                        isPast ? 'text-gray-500' : isFinalCliff ? 'text-red-400' : 'text-white'
-                      }`}>
-                        {item.event.label} — {item.event.justicesExpiring} 席屆滿
-                      </div>
-                      <div className="text-xs text-gray-300 font-mono mt-0.5">
-                        剩餘 {item.event.justicesRemaining} / 15 席
-                      </div>
-                    </div>
-                    {showRefMarker && (
-                      <div className="relative">
-                        <div className="absolute -left-[calc(1.5rem+0.5rem+1px)] w-3 h-3 rounded-full bg-white border-2 border-white" />
-                        <div className="bg-white text-gray-900 text-[10px] font-mono font-bold px-2 py-1 rounded-sm inline-block uppercase tracking-wider">
-                          You are here — {REFERENCE_DATE}
-                        </div>
-                      </div>
-                    )}
-                  </React.Fragment>
-                );
-              })}
-          </div>
+        {/* Bottom label */}
+        <div className="mt-2 text-[10px] font-mono text-gray-400 uppercase tracking-widest">
+          Justice Seat Count / 大法官席次變化折線圖
         </div>
       </div>
 
@@ -267,3 +346,4 @@ export default function JusticeTermTimeline() {
     </section>
   );
 }
+
