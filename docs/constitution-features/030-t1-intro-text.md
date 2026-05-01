@@ -9,7 +9,7 @@ verdict:
 score: 0.65
 worktree: .worktrees/spacedock-ensign-030-t1-intro-text
 issue:
-pr:
+pr: #24
 mod-block: merge:pr-merge
 ---
 
