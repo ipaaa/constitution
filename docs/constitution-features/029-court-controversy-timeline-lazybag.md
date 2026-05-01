@@ -3,7 +3,7 @@ id: "029"
 title: 憲法法庭爭議時序懶人包
 status: design
 source: captain-filed
-started:
+started: 2026-05-01T16:51:58Z
 completed:
 verdict:
 score: 0.8
