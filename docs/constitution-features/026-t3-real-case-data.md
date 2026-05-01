@@ -1,7 +1,7 @@
 ---
 id: "026"
 title: T3 待審案件替換為真實資料
-status: implement
+status: verify
 source: captain-filed
 started: 2026-04-30T23:17:40Z
 completed:
