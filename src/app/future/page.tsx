@@ -60,7 +60,7 @@ export default function FutureTrack() {
             </div>
           </div>
           <h2 className="font-serif text-2xl md:text-3xl font-bold leading-tight mb-3">
-            {CRISIS_STATS.designatedTotal} 名大法官，僅存 {CRISIS_STATS.activeJustices} 名運作
+            {CRISIS_STATS.designatedTotal} 名大法官，僅存 {CRISIS_STATS.activeJustices} 名運作（三名不參與評議會）
           </h2>
           <p className="text-gray-400 max-w-2xl leading-relaxed">
             由於立法院未行使新任大法官人事同意權，加上憲法法庭法修正將判決門檻提高至法定總額

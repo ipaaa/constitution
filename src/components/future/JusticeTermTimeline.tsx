@@ -242,8 +242,21 @@ export default function JusticeTermTimeline() {
           {dropPoints.map((dp) => {
             const cx = xForDate(dp.date);
             const cy = yForCount(dp.count);
+            // Position label above the pre-drop horizontal line segment
+            const preDropY = yForCount(dp.count + dp.justicesExpiring);
+            const labelY = preDropY - 20;
             return (
               <g key={`drop-${dp.date}-${dp.count}`}>
+                {/* Thin connector line from label down to circle */}
+                <line
+                  x1={cx}
+                  y1={labelY + 5}
+                  x2={cx}
+                  y2={cy - 8}
+                  stroke="#D32F2F"
+                  strokeWidth={0.75}
+                  opacity={0.35}
+                />
                 <circle
                   cx={cx}
                   cy={cy}
@@ -264,11 +277,11 @@ export default function JusticeTermTimeline() {
                   }}
                   onMouseLeave={() => setHoveredDrop(null)}
                 />
-                {/* Drop annotation — offset to the right of circle */}
+                {/* Drop annotation — above the pre-drop line, clear of chart */}
                 <text
-                  x={cx + 12}
-                  y={cy + 4}
-                  textAnchor="start"
+                  x={cx}
+                  y={labelY}
+                  textAnchor="middle"
                   fontFamily="monospace"
                   fontSize="9"
                   fontWeight="bold"
