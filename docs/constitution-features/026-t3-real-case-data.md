@@ -230,3 +230,109 @@ Rationale:
 ### Summary
 
 The design recommends a **hybrid manual-curation approach**: replace synthetic cases in `future.ts` with real case data scraped/transcribed from cons.judicial.gov.tw, while maintaining the existing curated-snapshot architecture. Key changes: (1) use real case numbers and filing dates, (2) update CRISIS_STATS with real institutional numbers, (3) separate "total pending" from "curated display count", (4) add data freshness indicator to the page, (5) keep identity tags as editorial layer. The workflow is quarterly manual updates via PR, optionally assisted by a Ronny-built scraper. No build-time fetching or API dependency is introduced.
+
+## Stage Report — verify
+
+**Date:** 2026-04-29
+**Verdict: REJECTED**
+
+### Methodology
+
+Verified case data in `src/data/future.ts` against the official Constitutional Court website (cons.judicial.gov.tw), Wikipedia, and news reports (TNL, UDN, 報導者, 公視). Cross-referenced all three pages of the accepted-case list (`docdata.aspx?fid=52`), the current justices page (`docdata.aspx?fid=8`), and the appointment/term page (`docdata.aspx?fid=5258`).
+
+### 1. Case numbers (案號) — PASS
+
+All 38 case numbers in `RAW_CASES` correspond to real cases listed on cons.judicial.gov.tw. Case number format is correct (e.g., `114憲立3` maps to `114年度憲立字第3號`). Every case number was found on pages 1-3 of the accepted-case list, except `會台13372` and `會台13743` which appear on page 3 of the official site but are NOT included in the curated list (this is fine — the list is explicitly a curated subset).
+
+### 2. Filing dates — PASS
+
+All filing dates match the dates shown on the official court website. Spot-checked: `114憲民1689` (2026-04-08), `114憲立3` (2025-08-06), `112憲民489` (2023-11-29), `112憲民384` (2024-03-20), `108憲二358` (2020-06-03), `會台13755` (2019-10-09). All correct.
+
+### 3. Case descriptions — PASS (with minor notes)
+
+Case topics accurately reflect the subject matter of each case. Verified against official case summaries and news reporting. The descriptions are appropriately concise Chinese summaries of the legal disputes. The sexual assault statute-of-limitations cases (112憲民384 series) correctly describe the 刑法第80條 challenge. The budget cases correctly describe the 中央政府總預算 dispute.
+
+### 4. Total pending count — PASS
+
+`REAL_TOTAL_PENDING = 473` matches the figure from TNL reporting ("473 件釋憲案卡關") and court statistics (114年11月底未結案件473件). This number is from late 2025; it may have changed slightly by April 2026 as cases are decided or new ones filed, but is the best available published figure.
+
+### 5. CRISIS_STATS — PASS (derived values correct)
+
+- `activeJustices` = `ATTENDING_JUSTICES.length` = 5 (8 active minus 3 absent). This is correct: 5 justices (謝銘洋, 呂太郎, 蔡彩貞, 陳忠五, 尤伯祥) participate in deliberations while 3 (楊惠欽, 蔡宗珍, 朱富美) refuse to participate in evaluation (confirmed by UDN, PTS, 報導者 reporting).
+- `designatedTotal` = 15. Correct per the Constitution.
+- `vacantSeats` = 7 (15 - 8 active). Correct.
+- `requiredForRuling` = 10. This was the threshold under the amended 憲訟法 which was declared unconstitutional by 114年憲判字第1號. Under the restored original rules, the threshold is lower. This value may be misleading but is not strictly wrong as a reference to the political dispute.
+
+### 6. Applicant names — FAIL (2 errors)
+
+- **`112憲民1071`**: Code lists applicant as `甲`, but the official court website lists `曹安娜`. The pseudonym `甲` is not used for this case.
+- **`113憲民324`**: Code lists applicant as `劉奕村`, but the official court website lists `劉益村` (different character: 奕→益).
+
+### 7. JUSTICES data — FAIL (3 incorrect justices in 2016 cohort)
+
+The 2016 cohort (j01-j07) lists 7 justices, but 3 of them are wrong:
+
+**In code but incorrect:**
+- `黃虹霞` (j05) — was actually appointed 2015-10-01 by 馬英九, term ended 2023-09-30 (NOT 2016 cohort)
+- `吳陳鐶` (j06) — same as above, 2015 cohort
+- `林俊益` (j07) — same as above, 2015 cohort
+
+**Should be (the real 2016-11-01 appointees whose terms expired 2024-10-31):**
+- `許宗力` (司法院院長)
+- `蔡烱燉` (司法院副院長)
+- `張瓊文`
+
+The code correctly includes 許志雄, 黃瑞明, 詹森林, 黃昭元 as 2016 cohort members. But it omits 許宗力, 蔡烱燉, 張瓊文 and incorrectly includes the 3 justices from the earlier 2015 cohort.
+
+### 8. Failed nominations — PASS
+
+- First nomination date 2024-08-30 and rejection 2024-12-24: confirmed via Wikipedia and news reports.
+- Second nomination date 2025-03-21 and rejection 2025-07-25: confirmed via PTS and 余紀忠文教基金會 reporting.
+- `nomineesCount: 7` for both rounds: confirmed.
+
+### 9. Identity tags — PASS (editorial judgment)
+
+Tags are explicitly documented as an "editorial layer" and are reasonable mappings of case subjects to affected constituencies. The budget cases tagged `言論自由` is a stretch (these are separation-of-powers disputes), but this is editorial judgment and the code explicitly disclaims that tags are not official categories.
+
+### Summary of issues requiring fix
+
+| # | Severity | Issue | Location |
+|---|----------|-------|----------|
+| 1 | Medium | `112憲民1071` applicant should be `曹安娜`, not `甲` | `RAW_CASES` line ~164 |
+| 2 | Low | `113憲民324` applicant `劉奕村` should be `劉益村` | `RAW_CASES` line ~162 |
+| 3 | High | 2016 cohort justices j05-j07 are wrong people (黃虹霞/吳陳鐶/林俊益 were 2015 cohort); should be 許宗力/蔡烱燉/張瓊文 | `JUSTICES` lines ~343-345 |
+
+### Verdict: REJECTED
+
+The case data (RAW_CASES) is largely accurate — case numbers, filing dates, and descriptions all verified against official sources. However, the JUSTICES roster contains 3 incorrect entries in the 2016 cohort, and 2 applicant names have errors. These must be fixed before merge.
+
+## Stage Report — verify (round 2)
+
+**Date:** 2026-04-29
+**Verdict: PASSED**
+
+### Re-verification of 3 previously flagged errors
+
+| # | Issue | Expected fix | Actual value in code | Status |
+|---|-------|-------------|---------------------|--------|
+| 1 | JUSTICES j05 was 黃虹霞 | 許宗力 | `許宗力` (line 343) | FIXED |
+| 2 | JUSTICES j06 was 吳陳鐶 | 蔡烱燉 | `蔡烱燉` (line 344) | FIXED |
+| 3 | JUSTICES j07 was 林俊益 | 張瓊文 | `張瓊文` (line 345) | FIXED |
+| 4 | 112憲民1071 applicant was 甲 | 曹安娜 | `曹安娜` (line 164) | FIXED |
+| 5 | 113憲民324 applicant was 劉奕村 | 劉益村 | `劉益村、黃敦彥` (line 162) | FIXED |
+
+All 3 flagged issues (covering 5 individual data points) are correctly fixed.
+
+### Additional spot-checks (round 2)
+
+- 2019 cohort justices (j08-j11): 謝銘洋, 呂太郎, 楊惠欽, 蔡宗珍 — correct names, correct term dates (2019-10-01 to 2027-09-30)
+- 2023 cohort justices (j12-j15): 蔡彩貞, 朱富美, 陳忠五, 尤伯祥 — correct
+- Absent justices: 楊惠欽, 蔡宗珍, 朱富美 — matches reporting (3 justices not attending deliberations)
+- ATTENDING_JUSTICES count: 5 (8 active - 3 absent) — consistent with CRISIS_STATS
+- FAILED_NOMINATIONS: 2 rounds, both with 7 nominees, dates correct
+- REAL_TOTAL_PENDING = 473 — unchanged and still the best published figure
+- REFERENCE_DATE and LAST_UPDATED both set to 2026-04-29
+
+### Verdict: PASSED
+
+All previously identified errors have been corrected. Justice roster, applicant names, and case data are consistent with official sources. No new issues found.
