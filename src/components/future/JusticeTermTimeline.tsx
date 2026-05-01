@@ -12,8 +12,8 @@ import JusticeSeatGrid from './JusticeSeatGrid';
 
 // Chart dimensions
 const CHART_W = 720;
-const CHART_H = 300;
-const PAD = { top: 30, right: 30, bottom: 50, left: 50 };
+const CHART_H = 340;
+const PAD = { top: 30, right: 30, bottom: 90, left: 50 };
 const PLOT_W = CHART_W - PAD.left - PAD.right;
 const PLOT_H = CHART_H - PAD.top - PAD.bottom;
 
@@ -279,26 +279,88 @@ export default function JusticeTermTimeline() {
             );
           })}
 
-          {/* Failed nomination markers */}
-          {FAILED_NOMINATIONS.map((nom) => {
+          {/* Failed nomination markers — positioned below X axis, stacked */}
+          {FAILED_NOMINATIONS.map((nom, i) => {
             const cx = xForDate(nom.date);
-            const cy = PAD.top + PLOT_H + 38;
+            const baseY = PAD.top + PLOT_H + 40;
+            const cy = baseY + i * 18;
             return (
               <g key={`nom-${nom.date}`}>
+                {/* Vertical tick from axis to label */}
+                <line
+                  x1={cx}
+                  y1={PAD.top + PLOT_H}
+                  x2={cx}
+                  y2={cy - 6}
+                  stroke="#D32F2F"
+                  strokeWidth={1}
+                  strokeDasharray="2 2"
+                  opacity={0.4}
+                />
                 <text
                   x={cx}
                   y={cy}
                   textAnchor="middle"
                   fontFamily="monospace"
-                  fontSize="10"
+                  fontSize="9"
                   fill="#D32F2F"
-                  opacity={0.7}
+                  opacity={0.8}
                 >
-                  ✕ 提名{nom.nomineesCount}人遭否決
+                  ✕ {nom.label}
                 </text>
               </g>
             );
           })}
+
+          {/* Worst-case projection annotation */}
+          {(() => {
+            // Dashed continuation line from last drop to end at 0
+            const lastDrop = TERM_EVENTS[TERM_EVENTS.length - 1];
+            const x1 = xForDate(lastDrop.date);
+            const y1 = yForCount(lastDrop.justicesRemaining);
+            const x2 = xForDate('2032-01-01');
+            const y2 = yForCount(0);
+            // Annotation at midpoint of 2027 drop
+            const mid2027x = xForDate('2028-06-01');
+            const mid2027y = yForCount(2);
+            return (
+              <g>
+                {/* Projection dashed line continues at 0 after 2031 */}
+                <line
+                  x1={x1}
+                  y1={y1}
+                  x2={x2}
+                  y2={y2}
+                  stroke="#D32F2F"
+                  strokeWidth={1.5}
+                  strokeDasharray="4 3"
+                  opacity={0.4}
+                />
+                {/* Annotation box */}
+                <rect
+                  x={mid2027x - 100}
+                  y={mid2027y - 12}
+                  width={200}
+                  height={28}
+                  rx={3}
+                  fill="#fef2f2"
+                  stroke="#D32F2F"
+                  strokeWidth={0.5}
+                  opacity={0.9}
+                />
+                <text
+                  x={mid2027x}
+                  y={mid2027y + 2}
+                  textAnchor="middle"
+                  fontFamily="serif"
+                  fontSize="10"
+                  fill="#991b1b"
+                >
+                  若持續無法增補：2027年僅剩4人，2031年歸零
+                </text>
+              </g>
+            );
+          })()}
 
           {/* Y axis label */}
           <text
