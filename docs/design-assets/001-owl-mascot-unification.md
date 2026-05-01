@@ -3,7 +3,7 @@ id: "001"
 title: 貓頭鷹法官視覺統一
 status: brief
 source: constitution-features/023
-started:
+started: 2026-05-01T19:58:11Z
 completed:
 verdict:
 score: 0.7
