@@ -146,6 +146,10 @@ export default function FutureTrack() {
               </div>
             )}
 
+            <p className="text-xs text-gray-500 mt-4 font-serif">
+              顯示 {PENDING_CASES.length} 件公開書狀案件 / 全部待審 {CRISIS_STATS.totalPending}+ 件
+            </p>
+
             <p className="text-[11px] text-gray-400 mt-6 font-serif">
               以上為具代表性之待審案件，完整清單請見
               <a href="https://cons.judicial.gov.tw/docdata.aspx?fid=52" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">司法院憲法法庭網站</a>。
