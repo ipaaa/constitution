@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { PENDING_CASES, CRISIS_STATS, IdentityTag } from '@/data/future';
+import { PENDING_CASES, CRISIS_STATS, LAST_UPDATED, IdentityTag } from '@/data/future';
 import RightsCalculator from '@/components/future/RightsCalculator';
 import BottleneckFunnel from '@/components/future/BottleneckFunnel';
 import CaseCard from '@/components/future/CaseCard';
@@ -58,6 +58,9 @@ export default function FutureTrack() {
                 Constitutional Emergency
               </span>
             </div>
+            <div className="font-mono text-[10px] text-gray-500">
+              資料更新日期：{LAST_UPDATED}
+            </div>
           </div>
           <h2 className="font-serif text-2xl md:text-3xl font-bold leading-tight mb-3">
             {CRISIS_STATS.designatedTotal} 名大法官，僅存 {CRISIS_STATS.activeJustices} 名運作（三名不參與評議會）
@@ -99,8 +102,10 @@ export default function FutureTrack() {
           <div>
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-serif font-bold text-gray-900 text-xl">
-                {activeTags.length === 0 ? '所有待審案件' : '相關待審案件'}
-                <span className="text-gray-500 font-mono text-base ml-2">({filteredCases.length})</span>
+                {activeTags.length === 0 ? '代表性待審案件' : '相關待審案件'}
+                <span className="text-gray-500 font-mono text-sm ml-2">
+                  （顯示 {PENDING_CASES.length} 件公開書狀 / 全部 {CRISIS_STATS.totalPending}+ 件）
+                </span>
               </h3>
               <div className="flex gap-1 bg-gray-100 rounded-sm p-0.5">
                 <button
@@ -140,6 +145,12 @@ export default function FutureTrack() {
                 <p className="text-sm mt-2">請嘗試其他身分標籤組合</p>
               </div>
             )}
+
+            <p className="text-[11px] text-gray-400 mt-6 font-serif">
+              以上為具代表性之待審案件，完整清單請見
+              <a href="https://cons.judicial.gov.tw/docdata.aspx?fid=52" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">司法院憲法法庭網站</a>。
+              身分標籤為本站編輯判斷，非官方分類。
+            </p>
           </div>
         </div>
       </div>
