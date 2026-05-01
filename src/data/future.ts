@@ -4,28 +4,35 @@
 //
 // Source & methodology
 // --------------------
-// The cases below are **researched synthetic records**: each topic is modelled
-// on a real ongoing category of dispute before Taiwan's Constitutional Court
-// (憲法法庭) as reported in public discourse, judicial yuan annual reports, and
-// civil-society petitions. Applicant fields use **organizational roles** (e.g.
-// "台灣國際勞工協會", "法律扶助基金會") — not fabricated individual plaintiffs.
+// The cases below are **real cases** accepted by Taiwan's Constitutional Court
+// (憲法法庭), sourced from the official case list at:
+//   https://cons.judicial.gov.tw/docdata.aspx?fid=52
+// (公開書狀之案件列表 — 已受理)
 //
-// Filing dates (ISO 8601) are approximations consistent with public reporting
-// of each dispute's emergence. `daysPending` is derived from `filingDate`
-// against `REFERENCE_DATE` (the snapshot date below) so the pipeline is
-// deterministic — not a hand-written literal.
+// This is a **curated subset** of notable/representative cases. The full
+// backlog (~473+ cases) includes many cases whose documents are not publicly
+// disclosed. The crisis banner shows the real total pending count; the card
+// list shows curated notable cases. This distinction is intentional.
+//
+// Case numbers (案號), filing dates, applicants, and subjects are taken
+// directly from the court website. Individual citizen petitioners use the
+// court's own pseudonyms (甲、乙、丙 etc.) to protect privacy.
+//
+// Identity tags (勞工, 性別, 原住民, etc.) are an **editorial layer** —
+// they represent this project's civic journalism judgment about which
+// constituencies are affected by each case. They are not official categories.
+//
+// `daysPending` is derived from `filingDate` against `REFERENCE_DATE` (the
+// snapshot date below) so the pipeline is deterministic.
 //
 // Refresh procedure
 // -----------------
-// 1. Update `REFERENCE_DATE` below to the new snapshot date.
-// 2. Replace / amend the `RAW_CASES` entries. Keep `filingDate` ISO-8601 and
-//    let `daysPending` recompute.
-// 3. If a new constituency is needed, add it to `IdentityTag`, `AVAILABLE_TAGS`,
+// 1. Update `REFERENCE_DATE` and `LAST_UPDATED` below to the new snapshot date.
+// 2. Visit cons.judicial.gov.tw/docdata.aspx?fid=52 and update `RAW_CASES`.
+// 3. Update `REAL_TOTAL_PENDING` from aggregate statistics or media reports.
+// 4. Update `CRISIS_STATS` institutional numbers if justices change.
+// 5. If a new constituency is needed, add it to `IdentityTag`, `AVAILABLE_TAGS`,
 //    and `TAG_COLORS` atomically — all three are checked by TypeScript.
-// 4. Upstream sources worth consulting on refresh:
-//    - 司法院憲法法庭案件公開資訊 (constitutionalcourt.judicial.gov.tw)
-//    - g0v 司法開放資料 (g0v.tw / judicial.g0v.ronny.tw)
-//    - 民間司法改革基金會 annual reports
 //
 // The data is **not** scraped at build time; it is curated, reviewed, and
 // committed. Treat it as a frozen research snapshot, not a live feed.
@@ -65,7 +72,23 @@ export interface PendingCase {
 }
 
 /** Snapshot date used to derive `daysPending` from each `filingDate`. */
-export const REFERENCE_DATE = '2026-04-16';
+export const REFERENCE_DATE = '2026-04-29';
+
+/**
+ * Human-readable date string for display on the page.
+ * Update this whenever the dataset is refreshed.
+ */
+export const LAST_UPDATED = '2026-04-29';
+
+/**
+ * Real total number of pending cases before the Constitutional Court,
+ * including cases whose documents are not publicly disclosed.
+ * Source: 民間司法改革基金會 / media reports (TNL, UDN), cross-referenced
+ * with cons.judicial.gov.tw aggregate statistics.
+ *
+ * The curated RAW_CASES list below is a representative subset.
+ */
+export const REAL_TOTAL_PENDING = 473;
 
 export const AVAILABLE_TAGS: IdentityTag[] = [
   '勞工',
@@ -112,63 +135,107 @@ export const TAG_COLORS: Record<IdentityTag, { bg: string; text: string; border:
 type RawCase = Omit<PendingCase, 'daysPending'>;
 
 /**
- * Pre-derivation source rows. Keep these ordered by constituency for diff
- * readability; UI ordering is a pure view concern and lives in the consumer.
+ * Real cases from cons.judicial.gov.tw/docdata.aspx?fid=52 (accessed 2026-04-29).
+ *
+ * This is a curated subset of notable/representative cases. The full backlog
+ * (~473+ cases) is tracked by REAL_TOTAL_PENDING above.
+ *
+ * Identity tags are an editorial layer — they map real cases to the
+ * constituencies affected by each dispute, enabling the RightsCalculator.
  */
 const RAW_CASES: RawCase[] = [
-  // Labour
-  { id: 'c01', topic: '勞工退休準備金提撥違憲審查', applicant: '某外送員工會', tags: ['勞工', '退休年金'], filingDate: '2025-01-22' },
-  { id: 'c06', topic: '移工轉換雇主限制違憲審查', applicant: '台灣國際勞工協會', tags: ['勞工', '移民新住民'], filingDate: '2024-10-04' },
-  { id: 'c09', topic: '平台工作者勞動權益保障案', applicant: '外送產業工會', tags: ['勞工', '消費者'], filingDate: '2025-07-10' },
-  { id: 'c10', topic: '責任制工時規範違憲爭議', applicant: '科技業勞工團體', tags: ['勞工'], filingDate: '2025-03-23' },
-  // Gender
-  { id: 'c02', topic: '代理孕母合法化釋憲草案', applicant: '婚姻平權倡議團體', tags: ['性別', '醫療健康'], filingDate: '2024-06-06' },
-  { id: 'c11', topic: '跨性別身分證變更免手術案', applicant: '跨性別權益推動聯盟', tags: ['性別', '隱私權'], filingDate: '2024-11-12' },
-  { id: 'c12', topic: '職場性騷擾雇主責任範圍案', applicant: '性別平等工作協會', tags: ['性別', '勞工'], filingDate: '2025-06-10' },
-  // Indigenous
-  { id: 'c03', topic: '原住民狩獵槍枝管制條例違憲案', applicant: 'Bunun 獵人協會', tags: ['原住民'], filingDate: '2025-05-31' },
-  { id: 'c07', topic: '原住民保留地開發限制補償案', applicant: '多個原鄉部落代表', tags: ['原住民', '環境保護'], filingDate: '2025-11-17' },
-  { id: 'c13', topic: '傳統領域劃設諮商同意權案', applicant: '原住民族青年聯合會', tags: ['原住民', '環境保護'], filingDate: '2024-08-14' },
-  // Criminal defendants
-  { id: 'c04', topic: '死刑存廢之正當法律程序再審', applicant: '廢死聯盟', tags: ['刑事被告'], filingDate: '2023-11-08' },
-  { id: 'c08', topic: '羈押法關於通信限制規定違憲案', applicant: '多名在押被告', tags: ['刑事被告'], filingDate: '2025-03-02' },
-  { id: 'c14', topic: '強制採尿程序正當性違憲案', applicant: '法律扶助基金會', tags: ['刑事被告', '隱私權'], filingDate: '2025-05-11' },
-  // Environment
-  { id: 'c05', topic: '國道開墾環評審查標準違憲案', applicant: '地球公民基金會', tags: ['環境保護'], filingDate: '2025-09-18' },
-  { id: 'c15', topic: '農地工廠合法化環境權爭議', applicant: '環境法律人協會', tags: ['環境保護', '居住正義'], filingDate: '2025-01-02' },
-  // Free speech
-  { id: 'c16', topic: '網路言論審查機制違憲案', applicant: '台灣網路透明報告協會', tags: ['言論自由', '隱私權'], filingDate: '2025-03-31' },
-  { id: 'c17', topic: '公務員政治言論限制違憲案', applicant: '基層公務員自救會', tags: ['言論自由', '軍公教'], filingDate: '2024-10-14' },
-  // Housing
-  { id: 'c18', topic: '都市更新強制拆除程序違憲案', applicant: '反迫遷聯盟', tags: ['居住正義'], filingDate: '2024-04-26' },
-  { id: 'c19', topic: '社會住宅分配標準平等權案', applicant: '居住正義改革聯盟', tags: ['居住正義'], filingDate: '2025-07-30' },
-  // Disability
-  { id: 'c20', topic: '身心障礙者無障礙設施標準案', applicant: '殘障聯盟', tags: ['身心障礙'], filingDate: '2025-02-10' },
-  { id: 'c21', topic: '精神障礙者強制住院程序違憲案', applicant: '心理衛生法律人協會', tags: ['身心障礙', '刑事被告', '醫療健康'], filingDate: '2024-09-03' },
-  // Children
-  { id: 'c22', topic: '少年事件處理法隱私權保障案', applicant: '兒童權利公約聯盟', tags: ['兒少權益', '隱私權'], filingDate: '2025-04-27' },
-  { id: 'c23', topic: '體罰禁止與管教權界限違憲案', applicant: '人本教育基金會', tags: ['兒少權益'], filingDate: '2024-12-19' },
-  // Privacy
-  { id: 'c24', topic: '數位身分證個資蒐集違憲案', applicant: '台灣人權促進會', tags: ['隱私權'], filingDate: '2024-07-15' },
-  // Assembly
-  { id: 'c25', topic: '集會遊行法事前許可制違憲案', applicant: '民間司法改革基金會', tags: ['集會遊行', '言論自由'], filingDate: '2024-02-27' },
-  { id: 'c26', topic: '警察驅離集會群眾武力標準案', applicant: '多名社運參與者', tags: ['集會遊行'], filingDate: '2025-06-30' },
-  // Tax / property
-  { id: 'c27', topic: '房屋稅差別稅率違反平等權案', applicant: '稅改聯盟', tags: ['稅務財產', '居住正義'], filingDate: '2024-11-22' },
-  { id: 'c28', topic: '土地徵收補償標準違憲案', applicant: '苗栗大埔自救會', tags: ['稅務財產', '環境保護'], filingDate: '2023-12-07' },
-  // Military / public employees (expanded constituency)
-  { id: 'c29', topic: '軍人年金改革信賴保護原則違憲案', applicant: '八百壯士捍衛中華協會', tags: ['軍公教', '退休年金'], filingDate: '2024-05-20' },
-  { id: 'c30', topic: '教師法不適任教師停聘程序案', applicant: '全國教師工會總聯合會', tags: ['軍公教', '勞工'], filingDate: '2025-08-08' },
-  // Immigrants / new residents
-  { id: 'c31', topic: '新住民配偶面談制度違憲案', applicant: '南洋台灣姊妹會', tags: ['移民新住民', '性別'], filingDate: '2025-02-28' },
-  { id: 'c32', topic: '難民法遲未立法不作為違憲案', applicant: '台灣人權促進會', tags: ['移民新住民'], filingDate: '2024-06-18' },
-  // Health / medical
-  { id: 'c33', topic: '全民健保重大傷病資料查調爭議', applicant: '醫療人權促進會', tags: ['醫療健康', '隱私權'], filingDate: '2025-05-02' },
-  { id: 'c34', topic: '強制預防接種例外條款違憲案', applicant: '家長權益促進聯盟', tags: ['醫療健康', '兒少權益'], filingDate: '2024-12-01' },
-  // Academic freedom
-  { id: 'c35', topic: '大學自治與教師評鑑制度違憲案', applicant: '高等教育產業工會', tags: ['學術自由', '勞工'], filingDate: '2025-04-04' },
-  // Consumers
-  { id: 'c36', topic: '個資外洩消費者求償舉證責任案', applicant: '消費者文教基金會', tags: ['消費者', '隱私權'], filingDate: '2025-09-25' },
+  // --- Budget & government power (預算與政府權力) ---
+  // 立法院刪減中央政府預算案，行政院與立委分別聲請釋憲
+  { id: '114憲立3', topic: '中央政府總預算案遭立法院大幅刪減之合憲性爭議', applicant: '立法委員柯建銘等51人', tags: ['言論自由'], filingDate: '2025-08-06' },
+  { id: '114憲國3', topic: '立法院刪減中央政府預算案之合憲性爭議', applicant: '行政院', tags: ['言論自由'], filingDate: '2025-08-06' },
+  { id: '114憲國1', topic: '立法院刪減預算違憲及溯及失效聲請案', applicant: '監察院', tags: ['言論自由'], filingDate: '2025-05-28' },
+
+  // --- Labour (勞工) ---
+  // 勞基法第32條第1項加班工時規定之合憲性，多家企業分別聲請
+  { id: '112憲民489', topic: '勞動基準法第32條第1項加班工時規定違憲案', applicant: '家福股份有限公司', tags: ['勞工'], filingDate: '2023-11-29' },
+  { id: '115憲民332', topic: '勞動基準法第32條第1項加班工時規定違憲案', applicant: '家福股份有限公司', tags: ['勞工'], filingDate: '2026-03-18' },
+  { id: '115憲民387', topic: '勞動基準法第32條第1項加班工時規定違憲案', applicant: '台灣富士軟片資訊股份有限公司', tags: ['勞工'], filingDate: '2026-03-18' },
+  { id: '114憲民1174', topic: '勞動基準法第32條第1項加班工時規定違憲案', applicant: '南山人壽保險股份有限公司', tags: ['勞工'], filingDate: '2025-10-22' },
+
+  // --- Criminal defendants (刑事被告) ---
+  // 偵查中卷證資訊獲知權
+  { id: '113憲民324', topic: '偵查中限制辯護人獲知卷證資訊之合憲性', applicant: '劉奕村、黃敦彥', tags: ['刑事被告', '隱私權'], filingDate: '2024-07-17' },
+  // 刑法沒收規定
+  { id: '112憲民1071', topic: '刑法沒收規定之合憲性爭議', applicant: '甲', tags: ['刑事被告', '稅務財產'], filingDate: '2024-06-26' },
+  // 槍砲彈藥刀械管制條例量刑與不自證己罪
+  { id: '112憲審6', topic: '槍砲條例量刑規定與不自證己罪原則之合憲性', applicant: '彰化地方法院刑事第三庭', tags: ['刑事被告'], filingDate: '2024-04-17' },
+  // 假釋門檻（刑法第77條）
+  { id: '112憲民886', topic: '刑法第77條第2項第2款假釋門檻規定違憲案', applicant: '王綜焱', tags: ['刑事被告'], filingDate: '2023-11-08' },
+  // 槍砲違規上訴案
+  { id: '112憲民828', topic: '槍砲管制違規案之上訴審判決違憲爭議', applicant: '鄭丞傑', tags: ['刑事被告'], filingDate: '2023-10-25' },
+  // 受刑人勞動權（監獄行刑法）
+  { id: '109憲二508', topic: '監獄行刑法受刑人勞動權益保障之明確性爭議', applicant: '陳啟彬', tags: ['刑事被告', '勞工'], filingDate: '2023-03-22' },
+  // 毒品案刑法第47條累犯加重
+  { id: '108憲二358', topic: '刑法第47條累犯加重規定之合憲性（毒品案）', applicant: '賴建元', tags: ['刑事被告', '醫療健康'], filingDate: '2020-06-03' },
+
+  // --- Gender & sexual offenses (性別 / 性犯罪追訴時效) ---
+  // 刑法第80條性侵害追訴時效系列案（主案+併案）
+  { id: '112憲民384', topic: '刑法第80條性侵害犯罪追訴權時效規定違憲案', applicant: '甲（主案）', tags: ['性別', '刑事被告'], filingDate: '2024-03-20' },
+  { id: '115憲民84', topic: '性侵害犯罪追訴權時效規定違憲案（併案）', applicant: '壬', tags: ['性別', '刑事被告'], filingDate: '2026-01-07' },
+  { id: '114憲民691', topic: '性侵害犯罪追訴權時效規定違憲案（併案）', applicant: '乙', tags: ['性別', '刑事被告'], filingDate: '2025-10-01' },
+
+  // --- Children & family (兒少權益) ---
+  // 兒少福利法未成年子女最佳利益
+  { id: '112憲審10', topic: '兒童及少年福利法第16條第1項平等權與比例原則爭議', applicant: '花蓮地方法院家事庭', tags: ['兒少權益'], filingDate: '2024-06-05' },
+  // 未成年監護權爭議
+  { id: '111憲民3704', topic: '未成年子女監護權認定標準違憲爭議', applicant: '甲', tags: ['兒少權益', '性別'], filingDate: '2023-09-28' },
+
+  // --- Immigration (移民新住民) ---
+  // 入出國移民法言論自由爭議
+  { id: '112憲審21', topic: '入出國及移民法第56條第4項、第79條第1項第4款言論自由爭議', applicant: '臺北高等行政法院（主案）', tags: ['移民新住民', '言論自由'], filingDate: '2024-03-28' },
+  { id: '113憲民347', topic: '入出國及移民法規定合憲性爭議（併案）', applicant: '志富移民顧問有限公司', tags: ['移民新住民'], filingDate: '2024-11-20' },
+
+  // --- Privacy & stalking (隱私權) ---
+  // 跟蹤騷擾防制法
+  { id: '112憲審19', topic: '跟蹤騷擾防制法第4條第5款隱私權與訴訟權爭議', applicant: '高雄高等行政法院（主案）', tags: ['隱私權', '性別'], filingDate: '2024-03-21' },
+
+  // --- Free speech (言論自由) ---
+  // 刑法第140條侮辱公務員罪（法官聲請）
+  { id: '109憲三14', topic: '刑法第140條侮辱公務員罪之合憲性', applicant: '臺中地方法院刑事第五庭', tags: ['言論自由', '集會遊行'], filingDate: '2022-03-10' },
+  // 刑法第160條侮辱國旗/國徽罪系列案
+  { id: '會台10106', topic: '刑法第160條侮辱國旗國徽罪言論自由爭議', applicant: '王獻極', tags: ['言論自由'], filingDate: '2022-02-23' },
+  { id: '110憲二543', topic: '刑法第160條侮辱國旗國徽罪違憲爭議', applicant: '李佳玗', tags: ['言論自由'], filingDate: '2022-03-10' },
+  { id: '108憲三23', topic: '刑法第160條第2項侮辱國徽罪合憲性', applicant: '高雄地方法院刑事第十五庭', tags: ['言論自由'], filingDate: '2022-03-02' },
+
+  // --- Property & tax (稅務財產) ---
+  // 損害賠償請求權
+  { id: '114憲民1689', topic: '民法第197條第1項損害賠償請求權時效規定違憲案', applicant: '甲', tags: ['稅務財產'], filingDate: '2026-04-08' },
+  // 土地重劃
+  { id: '114憲統12', topic: '市地重劃會員會議表決門檻之法律解釋爭議', applicant: '臺中高鐵新市鎮自辦市地重劃區', tags: ['稅務財產', '居住正義'], filingDate: '2025-10-22' },
+  // 不動產估價師懲戒
+  { id: '會台13755', topic: '不動產估價師懲戒規定合憲性爭議', applicant: '蔡政穎', tags: ['稅務財產'], filingDate: '2019-10-09' },
+
+  // --- Election (集會遊行 / 言論自由) ---
+  // 選罷法爭議
+  { id: '111憲民4196', topic: '公職人員選舉罷免法第53條第2項、第110條第5項違憲案', applicant: '鍾淑姬', tags: ['集會遊行', '言論自由'], filingDate: '2023-02-15' },
+  { id: '112憲民383', topic: '選舉違規案之言論自由爭議', applicant: '震傳媒股份有限公司、謝家鼎', tags: ['言論自由'], filingDate: '2023-04-26' },
+
+  // --- Corruption & due process ---
+  // 貪污治罪條例
+  { id: '112憲民245', topic: '貪污治罪條例相關規定之合憲性爭議', applicant: '黃明仁', tags: ['刑事被告'], filingDate: '2024-02-21' },
+  // 再審程序聲請權
+  { id: '111憲民3040', topic: '再審程序與訴訟權保障之合憲性爭議', applicant: '林秉弘', tags: ['刑事被告'], filingDate: '2023-12-06' },
+
+  // --- Tobacco & consumer (消費者) ---
+  { id: '112憲民469', topic: '菸酒管理法第37條處罰規定合憲性爭議', applicant: '酒藝商貿有限公司', tags: ['消費者'], filingDate: '2023-06-02' },
+
+  // --- Forgery / financial crime ---
+  { id: '會台13747', topic: '偽造有價證券案之平等權與訴訟權爭議', applicant: '李忠成', tags: ['刑事被告'], filingDate: '2023-07-26' },
+
+  // --- Homicide / criminal law transition ---
+  { id: '111憲民546', topic: '刑法施行法第8條之2過渡規定合憲性（殺人案）', applicant: '陳諭詩', tags: ['刑事被告'], filingDate: '2022-09-30' },
+
+  // --- Civil procedure / property rights ---
+  { id: '110憲二546', topic: '損害賠償民事訴訟程序與憲法權利保障爭議', applicant: '黃曉鋒', tags: ['稅務財產'], filingDate: '2021-12-24' },
+  { id: '110憲二50', topic: '稅法解釋之合憲性爭議', applicant: '王梓蓉', tags: ['稅務財產'], filingDate: '2021-09-08' },
+
+  // --- Property rights / petition ---
+  { id: '111憲民786', topic: '財產損害賠償之財產權與訴訟權爭議', applicant: '詹正為', tags: ['稅務財產'], filingDate: '2023-02-15' },
 ];
 
 /**
@@ -191,8 +258,15 @@ export const PENDING_CASES: PendingCase[] = RAW_CASES.map((c) => ({
 // Aggregate / derived helpers
 // ---------------------------------------------------------------------------
 
-/** Total number of cases in the backlog snapshot. */
-export const TOTAL_BACKLOG: number = PENDING_CASES.length;
+/** Number of curated/displayed cases (subset of total backlog). */
+export const CURATED_COUNT: number = PENDING_CASES.length;
+
+/**
+ * Total number of cases in the real backlog.
+ * This is the number shown in the crisis banner ("473+ 件案件").
+ * It comes from REAL_TOTAL_PENDING, not from the curated list length.
+ */
+export const TOTAL_BACKLOG: number = REAL_TOTAL_PENDING;
 
 /** Mean days-pending across the backlog, rounded to the nearest day. */
 export const AVG_DAYS_PENDING: number =
@@ -339,8 +413,13 @@ export const DAYS_UNTIL_CLIFF: number = daysBetween(
 // ---------------------------------------------------------------------------
 
 export const CRISIS_STATS = {
-  /** Derived from the dataset so the headline stat matches the visible case list. */
-  totalPending: TOTAL_BACKLOG,
+  /**
+   * Real total pending count (not just curated list).
+   * Source: 民間司改會 / media reports, ~473 as of 2026-04.
+   */
+  totalPending: REAL_TOTAL_PENDING,
+  /** Number of curated cases displayed in the card list. */
+  curatedCount: CURATED_COUNT,
   activeJustices: ATTENDING_JUSTICES.length,
   requiredForRuling: 10,
   designatedTotal: 15,
