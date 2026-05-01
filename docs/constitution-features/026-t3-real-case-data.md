@@ -10,7 +10,7 @@ score: 0.85
 worktree: .worktrees/spacedock-ensign-026-t3-real-case-data
 issue:
 pr: #23
-mod-block: merge:pr-merge
+mod-block: 
 ---
 
 目前 T3 的待審案件資料（src/data/future.ts）是「researched synthetic records」——主題基於真實爭議，但案件數量、立案日期、等待天數都是合成的模擬值。
