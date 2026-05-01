@@ -392,6 +392,27 @@ export default function PastTrack() {
         </div>
       </section>
 
+      {/* Intro: Why look back at constitutional rulings */}
+      <section
+        className="bg-[var(--color-textbook-bg)] bg-paper-texture px-6 py-16 md:py-24"
+        aria-label="前言：為什麼要回顧釋憲案"
+      >
+        <div className="max-w-2xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-black font-serif text-[var(--color-textbook-text)] border-t-2 border-[var(--color-accent-red)] pt-6 mb-8">
+            為什麼要回頭看這些釋憲案？
+          </h2>
+          <p className="text-base md:text-lg leading-relaxed text-[var(--color-textbook-text)]/80 font-serif mb-6">
+            你可能從來沒想過，每天自由上網、出門不需要跟警察報備、說錯話不會被關——這些「理所當然」的事，其實都是有人打過仗才換來的。那些仗，打在憲法法庭裡。
+          </p>
+          <p className="text-base md:text-lg leading-relaxed text-[var(--color-textbook-text)]/80 font-serif mb-6">
+            從 1990 年代開始，大法官透過一次又一次的釋憲，把寫在紙上的憲法變成真正保護人民的盾牌。集會自由、言論自由、隱私權、訴訟權……每一條權利的背後，都有一個真實的案件、一群真實的人。
+          </p>
+          <p className="text-base md:text-lg leading-relaxed text-[var(--color-textbook-text)]/80 font-serif">
+            現在，這道防線正因為政治僵局面臨癱瘓。如果你想知道我們可能失去什麼，最好的方式就是先看看我們曾經贏得了什麼。往下滑，翻開這本課本。
+          </p>
+        </div>
+      </section>
+
       {/* Sticky Search Bar — sits below the 72px Navbar */}
       <div
         ref={searchRef}
