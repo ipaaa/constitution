@@ -10,6 +10,7 @@ score: 0.7
 worktree: .worktrees/spacedock-ensign-028-about-page
 issue:
 pr:
+mod-block: merge:pr-merge
 ---
 
 新增 About 頁面（/about），包含：
