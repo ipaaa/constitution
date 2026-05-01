@@ -1,7 +1,7 @@
 ---
 id: "021"
 title: 大法官席次變化預測與呈現
-status: verify
+status: implement
 source: captain-filed
 started: 2026-04-30T18:26:39Z
 completed:
