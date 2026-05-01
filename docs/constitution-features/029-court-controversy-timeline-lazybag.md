@@ -1,13 +1,13 @@
 ---
 id: "029"
 title: 憲法法庭爭議時序懶人包
-status: verify
+status: complete
 source: captain-filed
 started: 2026-05-01T16:51:58Z
-completed:
-verdict:
+completed: 2026-05-01T17:28:59Z
+verdict: PASSED
 score: 0.8
-worktree: .worktrees/spacedock-ensign-029-court-controversy-timeline
+worktree: 
 issue:
 pr: #21
 mod-block: 

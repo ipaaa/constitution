@@ -1,13 +1,13 @@
 ---
 id: "024"
 title: T1 時光機釋憲案瀏覽問題修復
-status: review
+status: complete
 source: captain-filed
 started: 2026-04-30T21:30:40Z
-completed:
-verdict:
+completed: 2026-05-01T17:28:59Z
+verdict: PASSED
 score: 0.75
-worktree: .worktrees/spacedock-ensign-024-t1-timeline-navigation
+worktree: 
 issue:
 pr: #18
 mod-block: 

@@ -1,13 +1,13 @@
 ---
 id: "027"
 title: 意見懶人包重新設計（114年憲判字第1號）
-status: implement
+status: complete
 source: captain-filed
 started: 2026-05-01T15:51:55Z
-completed:
-verdict:
+completed: 2026-05-01T17:28:59Z
+verdict: PASSED
 score: 0.8
-worktree: .worktrees/spacedock-ensign-027-opinion-lazybag-redesign
+worktree: 
 issue:
 pr: #20
 mod-block: 

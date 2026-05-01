@@ -1,15 +1,15 @@
 ---
 id: "021"
 title: 大法官席次變化預測與呈現
-status: implement
+status: complete
 source: captain-filed
 started: 2026-04-30T18:26:39Z
-completed:
-verdict:
+completed: 2026-05-01T17:29:06Z
+verdict: PASSED
 score: 0.75
-worktree: .worktrees/spacedock-ensign-021-justice-term-forecast
+worktree: 
 issue:
-pr:
+pr: #19
 mod-block: 
 ---
 
