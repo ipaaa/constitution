@@ -51,7 +51,7 @@ export default function OpinionLazybagPage() {
             大法官怎麼想的
           </h2>
           <p className="text-sm text-gray-600 font-serif">
-            雖然結論一致，但各大法官的思路不同——以下是他們的個別意見。
+            雖然結論一致，但各大法官的思路不同——以下是他們的立場分布。
           </p>
         </div>
         <StanceSpectrum />
