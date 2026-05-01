@@ -40,37 +40,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Section 2: 工作方法 */}
-      {/* SSOT: docs/about-content.md — sync content from there */}
-      <section className="bg-[#f8f6f0] border-t-2 border-b-2 border-gray-300 py-12 md:py-16">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 font-serif mb-12">
-            工作方法
-          </h2>
-          <div className="space-y-10 font-serif text-xl md:text-2xl leading-relaxed text-gray-800">
-            <div>
-              <h3 className="font-bold text-gray-900 text-2xl md:text-3xl mb-3">固定開會</h3>
-              <p>
-                貢獻者定期開會討論進度與方向
-              </p>
-            </div>
-            <div>
-              <h3 className="font-bold text-gray-900 text-2xl md:text-3xl mb-3">AI 協作程式</h3>
-              <p>
-                使用 AI 工具協助程式開發，加速迭代
-              </p>
-            </div>
-            <div>
-              <h3 className="font-bold text-gray-900 text-2xl md:text-3xl mb-3">學者專家驗證</h3>
-              <p>
-                所有內容經法律學者與專家審核確認正確性
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Section 3: 貢獻者列表 */}
+      {/* Section 2: 貢獻者列表 */}
       <section className="border-t border-gray-200 py-12 md:py-24">
         <div className="max-w-4xl mx-auto px-6">
           <div className="flex items-center gap-3 mb-10">
