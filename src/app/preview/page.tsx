@@ -51,7 +51,7 @@ export default function PreviewPage() {
                 <li>聽證調查權部分合憲，但需符合正當程序。</li>
               </ul>
               <div className="w-full text-right mt-6 pt-4 border-t border-gray-100">
-                <span className="text-blue-600 font-medium hover:text-blue-800 cursor-pointer transition-colors">閱讀完整白話文案由 →</span>
+                <span className="text-blue-600 font-medium hover:text-blue-800 cursor-pointer transition-colors">閱讀完整易懂說明 →</span>
               </div>
            </div>
            {/* Sidebar clips */}

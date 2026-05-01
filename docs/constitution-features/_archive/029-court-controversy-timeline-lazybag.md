@@ -19,7 +19,7 @@ mod-block:
 
 目標：
 - 以時間軸形式呈現憲法法庭爭議的完整時序
-- 白話文，讓沒有法律背景的讀者也能看懂
+- 淺顯說明，讓沒有法律背景的讀者也能看懂
 - 每個時間點標注：發生什麼事、為什麼重要、影響是什麼
 - 互動式，可展開/收合細節
 
@@ -202,7 +202,7 @@ The timeline covers the full arc from the origins of the controversy through res
 - [ ] Clicking again collapses the node
 - [ ] Category filter chips at top allow filtering events by category
 - [ ] When a filter is active, only matching events are shown; timeline adjusts smoothly
-- [ ] All text is in plain Chinese (白話文), no unexplained legal jargon
+- [ ] All text is in plain Chinese (簡明語言), no unexplained legal jargon
 - [ ] Each event's "consequence" field is written as a concrete "so what?" statement
 - [ ] Timeline data lives in `src/data/controversy-timeline.ts` as a typed static dataset
 - [ ] Page has proper Next.js metadata (title, description) for SEO/OG
