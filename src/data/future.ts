@@ -218,16 +218,136 @@ export function countCasesForTags(tags: IdentityTag[]): number {
 }
 
 // ---------------------------------------------------------------------------
+// Justice term data (Constitutional Court seats)
+// ---------------------------------------------------------------------------
+
+export interface Justice {
+  id: string;
+  /** Justice name in Chinese */
+  name: string;
+  /** Romanized name */
+  nameEn: string;
+  /** ISO 8601 date of appointment */
+  appointedDate: string;
+  /** ISO 8601 date term expires */
+  termExpiry: string;
+  /** President who appointed this justice */
+  appointingPresident: string;
+  /** Whether currently active (term not expired relative to REFERENCE_DATE) */
+  isActive: boolean;
+  /** Whether the justice is absent from court sessions (未出席) */
+  absent?: boolean;
+  /** Appointment cohort identifier for grouping */
+  cohort: '2016' | '2019' | '2023';
+}
+
+export interface TermEvent {
+  /** ISO 8601 date */
+  date: string;
+  /** Number of justices whose terms expire on this date */
+  justicesExpiring: number;
+  /** Number of justices remaining after this event */
+  justicesRemaining: number;
+  /** Display label */
+  label: string;
+}
+
+/**
+ * All 15 Constitutional Court justice seats.
+ *
+ * Researched synthetic records following the same methodology as the case
+ * dataset above — modelled on real appointment patterns and public reporting.
+ * The key structural facts (cohort sizes, expiry timing, current vacancy
+ * count) are consistent with public reporting.
+ */
+export const JUSTICES: Justice[] = [
+  // 2016 cohort — terms expired 2024-10-31 (7 justices); all inactive
+  { id: 'j01', name: '許志雄', nameEn: 'Hsu Chih-hsiung', appointedDate: '2016-11-01', termExpiry: '2024-10-31', appointingPresident: '蔡英文', isActive: false, cohort: '2016' },
+  { id: 'j02', name: '黃瑞明', nameEn: 'Huang Jui-ming', appointedDate: '2016-11-01', termExpiry: '2024-10-31', appointingPresident: '蔡英文', isActive: false, cohort: '2016' },
+  { id: 'j03', name: '詹森林', nameEn: 'Chan Sen-lin', appointedDate: '2016-11-01', termExpiry: '2024-10-31', appointingPresident: '蔡英文', isActive: false, cohort: '2016' },
+  { id: 'j04', name: '黃昭元', nameEn: 'Huang Chao-yuan', appointedDate: '2016-11-01', termExpiry: '2024-10-31', appointingPresident: '蔡英文', isActive: false, cohort: '2016' },
+  { id: 'j05', name: '黃虹霞', nameEn: 'Huang Hong-hsia', appointedDate: '2016-11-01', termExpiry: '2024-10-31', appointingPresident: '蔡英文', isActive: false, cohort: '2016' },
+  { id: 'j06', name: '吳陳鐶', nameEn: 'Wu Chen-huan', appointedDate: '2016-11-01', termExpiry: '2024-10-31', appointingPresident: '蔡英文', isActive: false, cohort: '2016' },
+  { id: 'j07', name: '林俊益', nameEn: 'Lin Chun-yi', appointedDate: '2016-11-01', termExpiry: '2024-10-31', appointingPresident: '蔡英文', isActive: false, cohort: '2016' },
+  // 2019 cohort — 4 justices, appointed 2019-10-01, expires 2027-09-30
+  { id: 'j08', name: '謝銘洋', nameEn: 'Hsieh Ming-yang', appointedDate: '2019-10-01', termExpiry: '2027-09-30', appointingPresident: '蔡英文', isActive: true, cohort: '2019' },
+  { id: 'j09', name: '呂太郎', nameEn: 'Lu Tai-lang', appointedDate: '2019-10-01', termExpiry: '2027-09-30', appointingPresident: '蔡英文', isActive: true, cohort: '2019' },
+  { id: 'j10', name: '楊惠欽', nameEn: 'Yang Hui-chin', appointedDate: '2019-10-01', termExpiry: '2027-09-30', appointingPresident: '蔡英文', isActive: true, absent: true, cohort: '2019' },
+  { id: 'j11', name: '蔡宗珍', nameEn: 'Tsai Tsung-chen', appointedDate: '2019-10-01', termExpiry: '2027-09-30', appointingPresident: '蔡英文', isActive: true, absent: true, cohort: '2019' },
+  // 2023 cohort — 4 justices, appointed 2023-10-01, expires 2031-09-30
+  { id: 'j12', name: '蔡彩貞', nameEn: 'Tsai Tsai-chen', appointedDate: '2023-10-01', termExpiry: '2031-09-30', appointingPresident: '蔡英文', isActive: true, cohort: '2023' },
+  { id: 'j13', name: '朱富美', nameEn: 'Chu Fu-mei', appointedDate: '2023-10-01', termExpiry: '2031-09-30', appointingPresident: '蔡英文', isActive: true, absent: true, cohort: '2023' },
+  { id: 'j14', name: '陳忠五', nameEn: 'Chen Chung-wu', appointedDate: '2023-10-01', termExpiry: '2031-09-30', appointingPresident: '蔡英文', isActive: true, cohort: '2023' },
+  { id: 'j15', name: '尤伯祥', nameEn: 'Yu Po-hsiang', appointedDate: '2023-10-01', termExpiry: '2031-09-30', appointingPresident: '蔡英文', isActive: true, cohort: '2023' },
+];
+
+export const ACTIVE_JUSTICES: Justice[] = JUSTICES.filter((j) => j.isActive);
+
+/** Justices who are active AND actually attending deliberation meetings. */
+export const ATTENDING_JUSTICES: Justice[] = ACTIVE_JUSTICES.filter((j) => !j.absent);
+
+export const TERM_EVENTS: TermEvent[] = [
+  { date: '2024-10-31', justicesExpiring: 7, justicesRemaining: 8, label: '第一波屆滿（2016梯次）' },
+  { date: '2027-09-30', justicesExpiring: 4, justicesRemaining: 4, label: '第二波屆滿（2019梯次）' },
+  { date: '2031-09-30', justicesExpiring: 4, justicesRemaining: 0, label: '第三波屆滿（2023梯次）' },
+];
+
+// ---------------------------------------------------------------------------
+// Failed nomination events — nominations not confirmed by the legislature
+// ---------------------------------------------------------------------------
+
+export interface FailedNomination {
+  /** ISO 8601 date of the nomination submission or key event */
+  date: string;
+  /** Display label */
+  label: string;
+  /** Additional detail */
+  detail: string;
+  /** Number of nominees proposed */
+  nomineesCount: number;
+}
+
+/**
+ * Presidential nominations to the Constitutional Court that were blocked or
+ * not confirmed by the legislature (立法院). These explain the persistent
+ * vacancy crisis — the president attempted to fill seats but the legislature
+ * refused to hold confirmation votes.
+ */
+export const FAILED_NOMINATIONS: FailedNomination[] = [
+  {
+    date: '2024-08-30',
+    label: '第一次提名遭否決',
+    detail: '賴清德總統提名7名大法官人選送立法院行使同意權，立法院於2024年12月24日投票否決全部人選。',
+    nomineesCount: 7,
+  },
+  {
+    date: '2025-03-21',
+    label: '第二次提名遭否決',
+    detail: '總統再度送出大法官提名咨文，立法院於2025年7月25日投票否決全部人選。',
+    nomineesCount: 7,
+  },
+];
+
+/** Days from REFERENCE_DATE to the next (future) term expiry cliff. */
+export const DAYS_UNTIL_CLIFF: number = daysBetween(
+  REFERENCE_DATE,
+  TERM_EVENTS[TERM_EVENTS.length - 1].date,
+);
+
+// ---------------------------------------------------------------------------
 // Crisis statistics (institutional context, not per-case)
 // ---------------------------------------------------------------------------
 
 export const CRISIS_STATS = {
   /** Derived from the dataset so the headline stat matches the visible case list. */
   totalPending: TOTAL_BACKLOG,
-  activeJustices: 5,
+  activeJustices: ATTENDING_JUSTICES.length,
   requiredForRuling: 10,
   designatedTotal: 15,
-  vacantSeats: 10,
+  /** Seats where the term has expired and no replacement appointed */
+  vacantSeats: 15 - ACTIVE_JUSTICES.length,
+  /** Justices in office but not attending deliberations */
+  absentJustices: ACTIVE_JUSTICES.length - ATTENDING_JUSTICES.length,
   avgDaysPerCase: 120,
   estimatedClearanceYears: 3.4,
 };

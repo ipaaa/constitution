@@ -5,6 +5,7 @@ import { PENDING_CASES, CRISIS_STATS, IdentityTag } from '@/data/future';
 import RightsCalculator from '@/components/future/RightsCalculator';
 import BottleneckFunnel from '@/components/future/BottleneckFunnel';
 import CaseCard from '@/components/future/CaseCard';
+import JusticeTermTimeline from '@/components/future/JusticeTermTimeline';
 
 type SortMode = 'urgency' | 'recent';
 
@@ -68,6 +69,9 @@ export default function FutureTrack() {
           </p>
         </div>
       </div>
+
+      {/* Justice Term Forecast */}
+      <JusticeTermTimeline />
 
       {/* Main Layout: Sidebar + Content */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -154,9 +158,10 @@ export default function FutureTrack() {
               立法院人事卡關
             </h3>
             <p className="text-gray-600 leading-relaxed font-serif text-sm">
-              原定 {CRISIS_STATS.designatedTotal} 名大法官，由於立法院針對新任大法官人事同意權遲未進行實質審查，
-              導致 2024 年 11 月起，有 {CRISIS_STATS.vacantSeats} 名大法官卸任後無法補足。
-              目前僅依靠剩餘的 {CRISIS_STATS.activeJustices} 名大法官（因部份案件需迴避）辛苦支撐整個國家的釋憲機制。
+              原定 {CRISIS_STATS.designatedTotal} 名大法官，由於立法院兩度投票否決總統提名人選，
+              導致 2024 年 11 月起，有 {CRISIS_STATS.vacantSeats} 席空缺無法補足。
+              在職 8 名大法官中，有 {CRISIS_STATS.absentJustices} 名未出席審理，
+              實際僅 {CRISIS_STATS.activeJustices} 名大法官辛苦支撐整個國家的釋憲機制。
             </p>
           </div>
           <div className="bg-white p-6 md:p-8 border border-gray-200 shadow-sm rounded-sm">

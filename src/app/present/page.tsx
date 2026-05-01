@@ -16,6 +16,8 @@ const CourtTimeline = () => {
     { year: '2019', label: '憲法訴訟法三讀通過', detail: '從「會議制」轉向「法院制」的法源基礎，將案件審理司法化、裁判化。', status: 'history' },
     { year: '2022', label: '憲法法庭正式揭牌', detail: '裁判化轉型正式啟動，大法官改以「憲法法庭」名義行使職權並公告裁判。', status: 'present' },
     { year: '2024', label: '114年憲判字第1號', detail: '關於國會職權修法之重大判決，確立了權力分立與法律明確性原則的當代界線。', status: 'critical' },
+    { year: '2024.08', label: '大法官提名遭立院否決', detail: '賴清德總統於8月30日提名7名大法官填補缺額，立法院於12月24日投票否決全部人選。', status: 'blocked' },
+    { year: '2025.03', label: '第二次提名再遭否決', detail: '總統於3月21日再度送出提名咨文，立法院於7月25日投票否決全部人選，大法官缺額持續無法補齊。', status: 'blocked' },
     { year: '未來', label: '憲政體制的韌性考驗', detail: '面臨大法官缺額、預算凍結與程序法修法等爭議，憲法法庭的功能完整性將受挑戰。', status: 'danger' },
   ];
 
@@ -32,12 +34,12 @@ const CourtTimeline = () => {
             {/* Folder Tab Aesthetic */}
             <div className="flex items-start">
               <div className={`w-14 shrink-0 font-mono text-sm pt-1 border-r-2 mr-4 text-right pr-4 mb-4 transition-colors
-                ${m.status === 'danger' ? 'border-[#D32F2F] text-[#D32F2F]' : 'border-gray-900 text-gray-900'}`}>
+                ${m.status === 'danger' ? 'border-[#D32F2F] text-[#D32F2F]' : m.status === 'blocked' ? 'border-orange-500 text-orange-600' : 'border-gray-900 text-gray-900'}`}>
                 {m.year}
               </div>
               <div className="flex-1 pb-6 relative">
                 <h4 className={`text-lg font-serif font-bold leading-tight mb-2 group-hover:text-blue-900 transition-colors
-                  ${m.status === 'danger' ? 'text-[#D32F2F]' : 'text-gray-900'}`}>
+                  ${m.status === 'danger' ? 'text-[#D32F2F]' : m.status === 'blocked' ? 'text-orange-600' : 'text-gray-900'}`}>
                   {m.label}
                 </h4>
                 <p className="text-sm text-gray-600 font-serif leading-relaxed text-justify">
@@ -51,8 +53,14 @@ const CourtTimeline = () => {
             </div>
             {/* Important Stamp for danger status */}
             {m.status === 'danger' && (
-              <div className="absolute -top-1 -right-2 rotate-12 border-2 border-[#D32F2F] text-[#D32F2F] px-2 py-1 text-[10px] font-black tracking-tighter opacity-70 select-none">
+              <div className="absolute top-2 right-2 rotate-12 border-2 border-[#D32F2F] text-[#D32F2F] px-2 py-1 text-[10px] font-black tracking-tighter opacity-70 select-none pointer-events-none">
                 注意
+              </div>
+            )}
+            {/* Blocked stamp for failed nominations */}
+            {m.status === 'blocked' && (
+              <div className="absolute top-2 right-2 -rotate-6 border-2 border-orange-500 text-orange-500 px-2 py-1 text-[10px] font-black uppercase tracking-tighter opacity-60 select-none pointer-events-none">
+                Blocked
               </div>
             )}
           </div>
