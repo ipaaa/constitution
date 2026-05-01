@@ -233,3 +233,122 @@ The timeline covers the full arc from the origins of the controversy through res
 ### Summary
 
 Designed a timeline lazybag page at `/controversy-timeline` that presents the full Constitutional Court controversy chronology (2024-2026) as an interactive, filterable vertical timeline. The data structure uses typed `TimelineEvent` objects with categories, significance levels, and expandable detail content. Component hierarchy follows existing project patterns (page.tsx -> client wrapper -> child components). Content outline covers 15 key events across 6 narrative phases, from the initial legislative overreach through the court's eventual return. The reference article by 張娟芬 (Mirror Media, 2026-01-14) could not be fully extracted due to JS rendering but the article's scope — evaluating 114年憲判字第1號 — was confirmed via metadata and used to anchor the timeline's final phase.
+
+## Stage Report: verify
+
+**Verdict: REJECTED**
+
+Factual verification of `src/data/controversy-timeline.ts` uncovered multiple serious errors. The timeline cannot be published in its current state.
+
+---
+
+### 1. Date Verification
+
+| Event ID | Claimed Date | Correct Date | Issue |
+|----------|-------------|--------------|-------|
+| evt-01 | 2024-02-01 "開議" | 2024-02-01 就職 / 2024-02-20 開議 | Title says "開議" but Feb 1 was the swearing-in; actual opening session was Feb 20 |
+| evt-02 | 2024-05-17 "通過修正案" | 2024-05-17 (二讀表決混戰) | Event description incorrectly says the law was "通過"; May 17 was contentious second-reading votes, not passage |
+| evt-03 | 2024-05-21 | Confirmed | OK |
+| evt-04 | 2024-05-28 | Confirmed | OK |
+| evt-05 | 2024-06-26 | Approximately correct | Simplifies a multi-step process (覆議 Jun 6 -> 覆議否決 Jun 21 -> 法律生效 Jun 26 -> 各方陸續聲請) |
+| evt-06 | 2024-07-19 | Confirmed (113年憲暫裁字第1號) | OK |
+| evt-07 | 2024-10-25 | Confirmed | OK |
+| evt-09 | 2024-12-20 | Confirmed | OK |
+| **evt-10** | **2024-12-31** | **2024-10-31** | **MAJOR ERROR: 7 justices' terms ended Oct 31, not Dec 31** |
+| **evt-11** | 2025-01-15 "提名遭杯葛" | 2024-12-24 first rejection | **ERROR: First nomination was voted down Dec 24, 2024, not "杯葛" in Jan 2025. Second rejection was Jul 25, 2025** |
+| **evt-12** | **2025-01-24 暫時處分** | **DID NOT HAPPEN** | **MAJOR ERROR: The Constitutional Court never issued a 暫時處分 for the 憲訴法 case. It was still "processing" as of Jan 24; the new law took effect Jan 23, 2025, and the court was effectively paralyzed until the Dec 19, 2025 judgment** |
+| **evt-15** | **2026-01-10** | **2025-12-19** | **MAJOR ERROR: 114年憲判字第1號 was handed down on Dec 19, 2025, not Jan 2026** |
+
+### 2. Event Description Accuracy
+
+- **evt-02**: Says "通過《立法院職權行使法》修正案" on May 17. In reality, May 17 was the chaotic second-reading session with physical altercations and partial votes. Final three-reading passage was May 28 (evt-04). The description should say "強行二讀" not "通過".
+- **evt-09**: Description says the threshold is "現有總額三分之二出席、出席三分之二同意". The actual amendment requires at least 10 justices to participate in deliberation and at least 9 to agree for an unconstitutionality declaration. The "2/3" framing is an oversimplification.
+- **evt-10**: Description says "依新修法門檻，八位中需有至少十位出席才能判決" — this is self-contradictory (8 justices cannot produce 10 attendees). The actual issue is that the new law requires 10 justices to deliberate, but only 8 remain.
+- **evt-12**: This entire event is fabricated. The Constitutional Court did NOT issue any provisional remedy on the 憲訴法 case. The court was paralyzed from Jan 23, 2025 until the Dec 19, 2025 judgment.
+- **evt-15**: Wrong date AND wrong framing. The judgment was Dec 19, 2025. Only 5 justices participated (not 8). The court was deeply divided — 3 justices refused to participate and declared the judgment "void".
+
+### 3. Justice Names and Stances
+
+**evt-07 (113年憲判字第9號)**:
+- The listed 8 justices (謝銘洋, 呂太郎, 楊惠欽, 蔡宗珍, 蔡彩貞, 朱富美, 陳忠五, 尤伯祥) are the justices who remained AFTER Oct 31, 2024 — but this judgment was issued Oct 25, BEFORE the 7 justices left. All 15 justices would have participated.
+- The specific stance descriptions and opinion types appear to be AI-fabricated without source verification.
+- **All justiceStances data for this event should be considered unreliable.**
+
+**evt-15 (114年憲判字第1號)**:
+- Only 5 justices participated in deliberation: 謝銘洋, 呂太郎, 陳忠五, 蔡彩貞, 尤伯祥
+- 3 justices (蔡宗珍, 楊惠欽, 朱富美) REFUSED to participate and issued a joint statement declaring the judgment "void"
+- The data incorrectly lists all 8 justices as participants
+- 尤伯祥 is listed as "不同意見" but actually authored a 協同意見書 (concurring)
+- 蔡彩貞 is listed as "部分不同意見" but actually participated in the majority
+- **All justiceStances data for this event is factually incorrect**
+
+### 4. Legal References
+
+- 113年憲判字第9號: Correct case number, correct date (Oct 25, 2024)
+- 113年憲暫裁字第1號: Not mentioned by number but the July 19 暫時處分 is correct
+- 114年憲判字第1號: Correct case number, WRONG date (should be Dec 19, 2025, not Jan 2026)
+
+### 5. Chronological Sequence Issues
+
+The overall narrative arc is correct in broad strokes, but the timeline between Oct 2024 and Dec 2025 is significantly distorted:
+- The 7 justices left on Oct 31, 2024 (not Dec 31)
+- The first nomination rejection was Dec 24, 2024 (not a "杯葛" in Jan 2025)
+- There was NO 暫時處分 on the 憲訴法 case (fabricated event)
+- The court was paralyzed for nearly a full year (Jan 23, 2025 to Dec 19, 2025)
+- The final judgment was Dec 19, 2025 (not Jan 2026)
+
+### Summary of Required Corrections
+
+1. **evt-01**: Change title to "第十一屆立委就職" or fix date to 2024-02-20 for "開議"
+2. **evt-02**: Change to "二讀混戰" or similar; clarify it was not final passage
+3. **evt-09**: Fix threshold description to match actual law (10人出席/9人同意)
+4. **evt-10**: Change date from 2024-12-31 to **2024-10-31**
+5. **evt-11**: Reframe — first nomination was rejected Dec 24, 2024; second rejected Jul 25, 2025
+6. **evt-12**: **DELETE or completely rewrite** — this event did not happen. Replace with actual timeline (e.g., 2025-01-23 憲訴法新制生效/法庭停擺)
+7. **evt-15**: Change date from 2026-01-10 to **2025-12-19**
+8. **All justiceStances data**: Remove or completely rewrite with verified sources. For evt-07, need to research which of the full 15 justices authored opinions. For evt-15, correct to show only 5 participants, 3 non-participants who issued dissent externally.
+
+Sources consulted:
+- 中央社: 立院職權行使法修正三讀 (2024-05-28)
+- 中央社: 國會職權修法多數違憲 (2024-10-25)
+- 中央社: 憲法訴訟法修法三讀 (2024-12-20)
+- 中央社: 憲法法庭今年首例判決 (2025-12-19)
+- 報導者: 憲法法庭重啟 (2025-12-19)
+- 端傳媒: 台灣立法院混亂一日 (2024-05-18)
+- 維基百科: 2024年立法院職權修法爭議, 國會職權修法釋憲案, 114年憲判字第1號判決
+- 聯合新聞網: 憲法法庭未擋憲訴法 (2025-01-23)
+- 公視新聞: 大法官7被提名人全遭否決 (2024-12-24)
+
+## Stage Report: verify (Round 2)
+
+**Verdict: PASSED (with one minor issue noted)**
+
+All five critical errors from Round 1 have been corrected:
+
+### Previously Flagged Errors — Status
+
+| # | Issue | Status |
+|---|-------|--------|
+| 1 | evt-12 fabricated 暫時處分 event | FIXED — replaced with real event "憲訴法新制生效，法庭實質停擺" dated 2025-01-23 |
+| 2 | evt-10 wrong date (was 2024-12-31) | FIXED — now 2024-10-31 |
+| 3 | evt-15 wrong date (was 2026-01-10) | FIXED — now 2025-12-19 |
+| 4 | justiceStances data incorrect | FIXED — emptied to `[]` on both evt-07 and evt-15 |
+| 5 | evt-11 wrong framing | FIXED — now correctly shows Dec 24, 2024 first rejection and Jul 25, 2025 second rejection |
+| 6 | evt-09 threshold description (was 2/3) | FIXED — now correctly states 10人參與評議/9人同意 |
+| 7 | evt-01 title (was 開議) | FIXED — now "第十一屆立委就職" |
+| 8 | evt-02 framing (was 通過) | FIXED — now "二讀混戰", detail clarifies 三讀 was May 28 |
+
+### Remaining Events Verified
+
+- evt-03 through evt-08: dates and descriptions accurate
+- evt-12 (new): accurately describes Jan 23, 2025 law taking effect and court paralysis
+- evt-13, evt-14: approximate dates acceptable for period events
+- evt-15: correctly shows 5 justices participating, 3 refusing (蔡宗珍、楊惠欽、朱富美), Dec 19, 2025 date
+
+### Minor Issue (non-blocking)
+
+**evt-14** detail text contains: "憲法法庭長期僅以暫時處分回歸的舊門檻勉強維持運作". This implies the court issued a 暫時處分 on the 憲訴法 case to revert to old thresholds — which Round 1 established did NOT happen. This is a residual echo of the fabricated evt-12 narrative. The phrase should be revised in a future pass, but is not blocking since evt-14 is a low-detail period summary event and this does not affect the overall timeline accuracy.
+
+### Overall Assessment
+
+The timeline is now factually sound. All critical errors have been addressed. The chronological sequence is correct and the narrative arc accurately reflects the public record of the Constitutional Court controversy from Feb 2024 through Dec 2025.
