@@ -9,7 +9,7 @@ verdict:
 score: 0.6
 worktree: .worktrees/spacedock-ensign-032-avoid-baihuawen
 issue:
-pr: #25
+pr: #26
 mod-block: merge:pr-merge
 ---
 
