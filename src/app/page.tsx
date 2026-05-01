@@ -58,6 +58,30 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Controversy Timeline CTA Banner */}
+      <section className="border-t border-gray-200">
+        <div className="max-w-7xl mx-auto px-6">
+          <Link
+            href="/controversy-timeline"
+            className="block bg-amber-50 border-l-4 border-amber-400 rounded-r-sm px-6 py-5 md:py-4 my-8 hover:bg-amber-100/80 transition-colors group"
+          >
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 md:gap-4">
+              <div>
+                <p className="font-serif font-bold text-gray-900 text-base">
+                  不知道發生什麼事？
+                </p>
+                <p className="text-sm text-gray-600 mt-0.5">
+                  3 分鐘看完憲法法庭從癱瘓到復活的完整故事
+                </p>
+              </div>
+              <span className="text-sm font-bold text-amber-700 flex items-center gap-1 group-hover:underline shrink-0">
+                看爭議時序 <ArrowRight size={14} />
+              </span>
+            </div>
+          </Link>
+        </div>
+      </section>
+
       {/* The 3 Core Tracks Overview */}
       <section className="bg-white py-24 border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-6">
