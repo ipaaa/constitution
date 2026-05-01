@@ -257,114 +257,109 @@ All 5 remaining Constitutional Court justices belong to the same 2019 appointmen
 
 Implemented the justice term forecast feature as a new section in the Track 3 Future page. Added 15 justice records and 4 term expiry events to `src/data/future.ts`, with `CRISIS_STATS` values now derived from data rather than hardcoded. Created three components: `JusticeTermTimeline` (timeline visualization with desktop horizontal / mobile vertical layouts), `JusticeCountdown` (days-until-cliff card), and `JusticeSeatGrid` (15-seat visual grid with active/vacant states). All components follow the existing dark/crisis visual language (`bg-gray-900`, `#D32F2F` accents, `font-mono` data, `font-serif` editorial text, `animate-pulse` for urgency).
 
-### verify
+### verify (round 1)
 
 **Verdict: REJECTED — Multiple critical factual errors in justice data**
 
-The JUSTICES array in `src/data/future.ts` contains fundamental errors in who the current justices are, their appointment dates, cohorts, and term expiry dates. The narrative structure (vacancy crisis, legislative blockage) is directionally correct, but the underlying data is wrong enough that the visualization would display incorrect names, dates, and seat assignments.
+_(See git history for full round 1 report. Key issues: wrong justices marked active, missing 呂太郎/尤伯祥, wrong cohorts for 蔡彩貞/朱富美/陳忠五, wrong nomination dates, wrong TERM_EVENTS waves.)_
+
+### verify (round 2)
+
+**Verdict: REJECTED — Remaining factual errors in the 2016 cohort composition**
+
+Round 2 fixes correctly addressed the 8 current justices (2019 + 2023 cohorts), their appointment dates, term expiries, active/absent status, TERM_EVENTS wave structure, and FAILED_NOMINATIONS dates. However, the expired 2016 cohort still contains factual errors.
 
 #### 1. Verify all justice names in JUSTICES array match real Constitutional Court justices — FAILED
 
-**Critical errors found:**
+**8 current justices (2019 + 2023 cohorts) are now correct.** All names, romanizations, and cohort assignments verified:
 
-- **許志雄, 黃瑞明, 詹森林, 黃昭元** are listed as active justices (j11-j14) in the 2019 cohort with term expiry 2027-09-30. **WRONG.** These four were part of the **2016 cohort** (appointed 2016-11-01 by 蔡英文) and their terms **expired on 2024-10-31**. They are no longer serving.
-- **呂太郎** (Lü Tai-lang) is a current active justice (2019 cohort, appointed 2019-10-01, term expires 2027-09-30) but is **completely missing** from the JUSTICES array.
-- **尤伯祥** (Yu Po-hsiang) is a current active justice (2023 cohort, appointed 2023-10-01, term expires 2031-09-30) but is **completely missing** from the JUSTICES array.
-- **黃璽君** is listed as 2016 cohort (j07). She was actually from an earlier appointment cohort (馬英九 era, pre-2016). Her term expired around 2016 and she was replaced. She should not be in the 2016 cohort.
-- **張瓊文** is listed as 2016 cohort — this is **correct** (appointed 2016-11-01, expired 2024-10-31).
+- 2019 cohort: 謝銘洋, 呂太郎, 楊惠欽, 蔡宗珍 — all present and correct
+- 2023 cohort: 蔡彩貞, 朱富美, 陳忠五, 尤伯祥 — all present and correct
 
-**The actual 8 current justices per the Constitutional Court website (cons.judicial.gov.tw):**
+**Remaining error in expired justices:** The code lists 黃虹霞 (j05), 吳陳鐶 (j06), and 林俊益 (j07) as 2016 cohort with `appointedDate: '2016-11-01'` and `termExpiry: '2024-10-31'`. This is **WRONG**. These three were appointed **2015-10-01** (by 馬英九) and their terms expired **2023-09-30**. They were replaced by the 2023 cohort (蔡彩貞, 朱富美, 陳忠五, 尤伯祥). They should not be in the "2016" cohort.
 
-| # | Name | Cohort | Appointed | Term Expires |
-|---|------|--------|-----------|-------------|
-| 1 | 謝銘洋 | 2019 | 2019-10-01 | 2027-09-30 |
-| 2 | 呂太郎 | 2019 | 2019-10-01 | 2027-09-30 |
-| 3 | 楊惠欽 | 2019 | 2019-10-01 | 2027-09-30 |
-| 4 | 蔡宗珍 | 2019 | 2019-10-01 | 2027-09-30 |
-| 5 | 蔡彩貞 | 2023 | 2023-10-01 | 2031-09-30 |
-| 6 | 朱富美 | 2023 | 2023-10-01 | 2031-09-30 |
-| 7 | 陳忠五 | 2023 | 2023-10-01 | 2031-09-30 |
-| 8 | 尤伯祥 | 2023 | 2023-10-01 | 2031-09-30 |
+The actual 2016 cohort (7 members, all appointed 2016-11-01, expired 2024-10-31) was: **許宗力** (院長), **蔡烱燉** (副院長), 許志雄, **張瓊文**, 黃瑞明, 詹森林, 黃昭元. The code is missing 許宗力, 蔡烱燉, and 張瓊文, and wrongly includes 黃虹霞, 吳陳鐶, 林俊益 in their place.
 
-Sources: [現任大法官 - 憲法法庭網站](https://cons.judicial.gov.tw/docdata.aspx?fid=8), [司法院大法官 - 維基百科](https://zh.wikipedia.org/wiki/%E5%8F%B8%E6%B3%95%E9%99%A2%E5%A4%A7%E6%B3%95%E5%AE%98)
+Additionally, the code has only 15 total entries (7 "2016" + 4 "2019" + 4 "2023"), but there should be 19 entries if all seats across all relevant cohorts are tracked: 4 from 2015 cohort (黃虹霞, 吳陳鐶, 林俊益, 蔡明誠 — expired 2023-09-30) + 7 from 2016 cohort + 4 from 2019 + 4 from 2023. Alternatively, if the design intent is to show only 15 seats, the 2016 cohort slots should contain the correct 7 names.
+
+Sources: [司法院大法官 - 維基百科](https://zh.wikipedia.org/zh-tw/%E5%8F%B8%E6%B3%95%E9%99%A2%E5%A4%A7%E6%B3%95%E5%AE%98), [黃虹霞等4位大法官到任 - 司法院](https://www.judicial.gov.tw/tw/cp-1429-68763-66f93-1.html), [歡送黃虹霞等4位大法官卸任 - 司法院](https://www.judicial.gov.tw/tw/cp-1429-953002-3e45f-1.html)
 
 #### 2. Verify appointment dates and term expiry dates against official records — FAILED
 
-**Errors found:**
+**Current justices (2019 + 2023 cohorts): ALL CORRECT.**
+- 謝銘洋, 呂太郎, 楊惠欽, 蔡宗珍: `appointedDate: '2019-10-01'`, `termExpiry: '2027-09-30'`, `appointingPresident: '蔡英文'` — verified correct.
+- 蔡彩貞, 朱富美, 陳忠五, 尤伯祥: `appointedDate: '2023-10-01'`, `termExpiry: '2031-09-30'`, `appointingPresident: '蔡英文'` — verified correct.
 
-- **蔡宗珍 (j01)**: Code says `appointedDate: '2024-11-01'`, `termExpiry: '2032-10-31'`, `appointingPresident: '賴清德'`, `cohort: '2024'`. **WRONG.** Actually appointed 2019-10-01 by 蔡英文, term expires 2027-09-30, cohort 2019.
-- **楊惠欽 (j02)**: Same errors as 蔡宗珍 above — actually 2019 cohort appointed by 蔡英文.
-- **蔡彩貞 (j08)**: Code says `appointedDate: '2019-10-01'`, `termExpiry: '2024-10-31'`, `cohort: '2019'`. **WRONG.** Actually appointed 2023-10-01 by 蔡英文, term expires 2031-09-30, cohort 2023.
-- **朱富美 (j09)**: Code says `appointedDate: '2019-10-01'`, `termExpiry: '2024-10-31'`, `cohort: '2019'`. **WRONG.** Actually appointed 2023-10-01 by 蔡英文, term expires 2031-09-30, cohort 2023.
-- **陳忠五 (j10)**: Code says `appointedDate: '2019-10-01'`, `termExpiry: '2024-11-30'`, `cohort: '2019'`. **WRONG.** Actually appointed 2023-10-01 by 蔡英文, term expires 2031-09-30, cohort 2023.
-- **許志雄 (j11)**: Code says active, cohort 2019, expiry 2027-09-30. **WRONG.** He was 2016 cohort, expired 2024-10-31, no longer active.
-- **黃瑞明 (j12)**: Same error as 許志雄.
-- **詹森林 (j13)**: Same error as 許志雄.
-- **黃昭元 (j14)**: Same error as 許志雄.
-- **謝銘洋 (j15)**: Code says `appointedDate: '2019-10-01'`, `termExpiry: '2027-09-30'`, `cohort: '2019'`. **CORRECT.**
+**Expired justices (2016 cohort): PARTIALLY WRONG.**
+- 許志雄, 黃瑞明, 詹森林, 黃昭元: `appointedDate: '2016-11-01'`, `termExpiry: '2024-10-31'` — **CORRECT**.
+- 黃虹霞 (j05), 吳陳鐶 (j06), 林俊益 (j07): `appointedDate: '2016-11-01'`, `termExpiry: '2024-10-31'` — **WRONG**. Actually appointed 2015-10-01, expired 2023-09-30. The 4th member of their cohort (蔡明誠) is also missing.
 
-Source: [任命與任期 - 憲法法庭網站](https://cons.judicial.gov.tw/docdata.aspx?fid=5258)
+Source: [立法院通過許宗力蔡烱燉為司法院大法官 - 司法院](https://www.judicial.gov.tw/tw/cp-1429-68055-0b6a9-1.html)
 
-#### 3. Verify which justices are marked isActive vs inactive matches current reality — FAILED
+#### 3. Verify which justices are marked isActive vs inactive matches current reality — DONE
 
-Code marks 8 justices as `isActive: true`: j01 (蔡宗珍), j02 (楊惠欽), j09 (朱富美), j11 (許志雄), j12 (黃瑞明), j13 (詹森林), j14 (黃昭元), j15 (謝銘洋).
+Code marks 8 justices as `isActive: true`: j08 (謝銘洋), j09 (呂太郎), j10 (楊惠欽), j11 (蔡宗珍), j12 (蔡彩貞), j13 (朱富美), j14 (陳忠五), j15 (尤伯祥). All 7 expired justices (j01-j07) marked `isActive: false`. **This is correct.**
 
-**Actually active:** 謝銘洋, 呂太郎(missing), 楊惠欽, 蔡宗珍, 蔡彩貞(marked inactive), 朱富美, 陳忠五(marked inactive), 尤伯祥(missing).
+`ACTIVE_JUSTICES` = 8 justices, `ATTENDING_JUSTICES` = 5 justices (excluding 3 absent). Both counts are correct.
 
-So 4 of the 8 listed as active are wrong (許志雄, 黃瑞明, 詹森林, 黃昭元 already expired), and 2 actually-active justices (呂太郎, 尤伯祥) are not in the array at all. 蔡彩貞 and 陳忠五 are marked inactive but are actually active.
+Source: [憲法法庭2026年首例判決 3大法官持續拒絕評議 - 公視新聞網](https://news.pts.org.tw/article/788810)
 
 #### 4. Verify absent justices (蔡宗珍, 楊惠欽, 朱富美) are correctly identified — DONE
 
-This is **correct**. Per multiple news sources (中央社, 報導者, 聯合新聞網), justices 蔡宗珍, 楊惠欽, and 朱富美 have refused to participate in Constitutional Court deliberations since October 2025, arguing the court is illegally constituted with fewer than 10 justices. They continue to attend review panel sessions (審查庭) but will not participate in rulings (評議). The 5 justices who do participate in deliberations are: 謝銘洋, 呂太郎, 蔡彩貞, 陳忠五, 尤伯祥.
+Code marks j10 (楊惠欽), j11 (蔡宗珍), j13 (朱富美) with `absent: true`. **This is correct.** These three justices have refused to participate in Constitutional Court deliberations (評議) since October 2025, arguing the court is illegally constituted.
 
-Sources: [大法官蔡宗珍楊惠欽朱富美拒參與評議 - 中央社](https://www.cna.com.tw/news/aipl/202512190239.aspx), [憲法法庭重啟 - 報導者](https://www.twreporter.org/a/amendment-to-constitutional-court-procedure-act-unconstitutional)
+The 5 attending justices are correctly: 謝銘洋, 呂太郎, 蔡彩貞, 陳忠五, 尤伯祥.
 
-#### 5. Verify failed nomination events: dates, descriptions, and that there are exactly 2 — FAILED
+Sources: [大法官蔡宗珍楊惠欽朱富美拒參與評議 - 中央社](https://www.cna.com.tw/news/aipl/202512190239.aspx), [蔡宗珍等3大法官仍拒評議 - 聯合新聞網](https://udn.com/news/story/124686/9241814)
 
-The code lists 2 failed nominations, which is the correct count, but the **dates are wrong**:
+#### 5. Verify failed nomination events: dates, descriptions, and that there are exactly 2 — DONE
 
-- **First nomination**: Code says `date: '2024-09-02'`. **WRONG.** The actual nomination date was **2024-08-30** (咨請立法院), and the vote that rejected all nominees was on **2024-12-24**.
-- **Second nomination**: Code says `date: '2025-01-14'`. **WRONG.** The actual nomination date was **2025-03-21**, and the vote that rejected all nominees was on **2025-07-25**.
-- The descriptions are directionally correct (legislature blocked both rounds) but the detail text for the first nomination says "未排入議程審查" — in reality the legislature did hold a vote on 2024-12-24, it was not simply never scheduled.
-- The detail text for the second nomination says "立法院以多數決退回咨文" — in reality there was a full vote on 2025-07-25 where all 7 nominees were rejected.
-- Both nominations were for 7 nominees each (correct `nomineesCount: 7`).
+Code has exactly 2 entries:
+- First: `date: '2024-08-30'`, `detail: '賴清德總統提名7名大法官人選送立法院行使同意權，立法院於2024年12月24日投票否決全部人選。'` — **CORRECT.** Nomination submitted 2024-08-30, rejected by vote on 2024-12-24.
+- Second: `date: '2025-03-21'`, `detail: '總統再度送出大法官提名咨文，立法院於2025年7月25日投票否決全部人選。'` — **CORRECT.** Nomination submitted 2025-03-21, rejected by vote on 2025-07-25.
+- `nomineesCount: 7` for both — **CORRECT.**
 
-Sources: [2024年司法院大法官提名 - 維基百科](https://zh.wikipedia.org/zh-tw/2024%E5%B9%B4%E5%8F%B8%E6%B3%95%E9%99%A2%E5%A4%A7%E6%B3%95%E5%AE%98%E6%8F%90%E5%90%8D), [2025年司法院大法官提名 - 維基百科](https://zh.wikipedia.org/zh-hant/2025%E5%B9%B4%E5%8F%B8%E6%B3%95%E9%99%A2%E5%A4%A7%E6%B3%95%E5%AE%98%E6%8F%90%E5%90%8D), [賴提7大法官 全軍覆沒 - 立法院](https://www.ly.gov.tw/Pages/Detail.aspx?nodeid=54301&pid=247820)
+Sources: [2024年司法院大法官提名 - 維基百科](https://zh.wikipedia.org/zh-tw/2024%E5%B9%B4%E5%8F%B8%E6%B3%95%E9%99%A2%E5%A4%A7%E6%B3%95%E5%AE%98%E6%8F%90%E5%90%8D), [大法官人事案投票 7位被提名人全遭否決 - 中央社](https://www.cna.com.tw/news/aipl/202507250089.aspx)
 
-#### 6. Verify CRISIS_STATS numbers (activeJustices, totalPending, designatedTotal) are accurate — FAILED
+#### 6. Verify CRISIS_STATS numbers are accurate — DONE (with caveats)
 
 - `designatedTotal: 15` — **Correct.**
-- `activeJustices`: Derived from `ATTENDING_JUSTICES.length`. The output value of 5 (attending) happens to be **correct** (5 justices participate in deliberations), but it is derived from wrong underlying data. The actual 5 attending justices are 謝銘洋, 呂太郎, 蔡彩貞, 陳忠五, 尤伯祥 — not the ones the code thinks.
-- `vacantSeats: 15 - ATTENDING_JUSTICES.length = 10` — The number 10 is misleading. There are 7 vacant seats (no one appointed) and 3 justices who are in-office but refusing to deliberate. The code treats "not attending" as equivalent to "vacant", which conflates two different situations.
-- `requiredForRuling: 10` — This was the modified threshold under the 2024 legislative amendment to 憲法訴訟法. However, the Constitutional Court itself ruled parts of that amendment unconstitutional in December 2025 (114年憲判字第9號). The current operative threshold is contested. This number may be stale.
-- `totalPending` and `avgDaysPerCase` — Not verifiable against specific sources; these are synthetic data per the project methodology.
+- `activeJustices`: Derived from `ATTENDING_JUSTICES.length` = 5 — **Correct.** The 5 attending justices are 謝銘洋, 呂太郎, 蔡彩貞, 陳忠五, 尤伯祥.
+- `vacantSeats: 15 - ACTIVE_JUSTICES.length = 7` — **Correct.** There are 7 seats where the term has expired and no replacement appointed.
+- `absentJustices: ACTIVE_JUSTICES.length - ATTENDING_JUSTICES.length = 3` — **Correct.** 蔡宗珍, 楊惠欽, 朱富美.
+- `requiredForRuling: 10` — **Contested.** The Constitutional Court ruled parts of the 2024 legislative amendment unconstitutional in December 2025 (114年憲判字第9號), so the operative threshold is disputed. This is an acceptable editorial choice but should be noted.
+- `totalPending`, `avgDaysPerCase`, `estimatedClearanceYears` — Synthetic data per project methodology; not independently verifiable.
 
-#### 7. Verify CourtTimeline milestones dates and descriptions in present/page.tsx — SKIPPED
+#### 7. Verify TERM_EVENTS wave structure — DONE (with caveat on 2016 cohort labeling)
 
-No CourtTimeline component exists in `present/page.tsx`. The timeline is in `JusticeTermTimeline.tsx` and its events are driven by `TERM_EVENTS` data, which is covered in items 1-2 and 5 above.
+Code has 3 events:
+- `{ date: '2024-10-31', justicesExpiring: 7, justicesRemaining: 8, label: '第一波屆滿（2016梯次）' }` — **CORRECT.** 7 justices from the 2016 cohort expired on this date, leaving 8 (4 from 2019 + 4 from 2023).
+- `{ date: '2027-09-30', justicesExpiring: 4, justicesRemaining: 4, label: '第二波屆滿（2019梯次）' }` — **CORRECT.** 4 justices from the 2019 cohort will expire, leaving 4 from the 2023 cohort.
+- `{ date: '2031-09-30', justicesExpiring: 4, justicesRemaining: 0, label: '第三波屆滿（2023梯次）' }` — **CORRECT.** 4 justices from the 2023 cohort will expire.
 
-The TERM_EVENTS array has structural errors:
-- `{ date: '2023-10-31', justicesExpiring: 7, justicesRemaining: 8 }` — **WRONG.** In October 2023, only 4 justices expired (黃虹霞, 吳陳鐶, 林俊益, 蔡明誠), and they were immediately replaced by 4 new ones (蔡彩貞, 朱富美, 陳忠五, 尤伯祥). The total remained 15. The 7 who expired on 2024-10-31 were the 2016 cohort (許宗力, 蔡烱燉, 許志雄, 張瓊文, 黃瑞明, 詹森林, 黃昭元).
-- `{ date: '2024-10-31', justicesExpiring: 2, justicesRemaining: 6 }` — **WRONG.** 7 justices expired on this date, not 2. After this, 8 remained.
-- `{ date: '2024-11-30', justicesExpiring: 1, justicesRemaining: 5 }` — **WRONG.** No separate November 2024 expiry event. All 7 from the 2016 cohort expired on 2024-10-31.
-- `{ date: '2027-09-30', justicesExpiring: 5, justicesRemaining: 0 }` — **WRONG.** On this date, 4 justices from the 2019 cohort expire (謝銘洋, 呂太郎, 楊惠欽, 蔡宗珍). 4 from the 2023 cohort (蔡彩貞, 朱富美, 陳忠五, 尤伯祥) will remain until 2031-09-30.
+**Note:** The first event label says "2016梯次" but the code's 2016 cohort entries include 3 wrong justices (黃虹霞, 吳陳鐶, 林俊益 who are actually 2015 cohort). The wave numbers (7 expiring, 8 remaining) are correct even though the individual justice entries are wrong.
 
-The correct TERM_EVENTS should be:
-- 2024-10-31: 7 justices expired, 8 remaining
-- 2027-09-30: 4 justices expire, 4 remaining (2023 cohort)
-- 2031-09-30: 4 justices expire, 0 remaining (unless replacements appointed)
+#### 8. Verify CourtTimeline milestones in present/page.tsx — SKIPPED
 
-#### 8. Clear PASSED or REJECTED verdict with rationale — REJECTED
+No CourtTimeline component exists in `present/page.tsx`. The timeline is in `JusticeTermTimeline.tsx` and driven by `TERM_EVENTS` data verified in item 7.
 
-**Rationale:** The implementation contains pervasive factual errors in the core justice data. The JUSTICES array has the wrong people marked as active, wrong appointment dates, wrong cohorts, wrong term expiry dates, and is missing 2 current justices (呂太郎, 尤伯祥). The TERM_EVENTS array has wrong wave sizes and dates. The FAILED_NOMINATIONS have incorrect dates. The "cliff event in September 2027" narrative is wrong — 4 justices from the 2023 cohort will remain until 2031.
+**Additional observation:** `JusticeCountdown.tsx` uses `TERM_EVENTS[TERM_EVENTS.length - 1]` (the 2031-09-30 event) for the countdown, with text "天後歸零". This is technically accurate (the court goes to 0 in 2031 if no replacements), but the more urgent cliff is 2027-09-30 (4 expire, only 4 remain). This is an editorial choice, not a factual error.
 
-The visualization components themselves (timeline, countdown, seat grid) are well-built and will work correctly once the underlying data is fixed. The structural approach is sound; the factual content needs a complete rewrite of the justice data.
+#### 9. Clear PASSED or REJECTED verdict with rationale — REJECTED
+
+**Verdict: REJECTED**
+
+**Rationale:** The major fixes from round 1 are correctly applied — the 8 current justices are all correct with proper names, cohort assignments, appointment dates, term expiry dates, active/absent markings, and the TERM_EVENTS wave structure is now accurate. FAILED_NOMINATIONS dates and descriptions are correct. CRISIS_STATS numbers are accurate.
+
+However, the expired "2016 cohort" entries still contain factual errors: **3 of the 7 listed expired justices (黃虹霞, 吳陳鐶, 林俊益) are from a different cohort (2015, appointed by 馬英九, expired 2023-09-30) and are incorrectly listed as 2016 cohort members appointed 2016-11-01 with expiry 2024-10-31.** The actual 2016 cohort members missing are: 許宗力 (院長), 蔡烱燉 (副院長), and 張瓊文.
+
+**Severity assessment:** This error only affects the display of expired/inactive justice names in the seat grid tooltip. It does NOT affect:
+- Active justice counts (correct: 8 active, 5 attending)
+- TERM_EVENTS wave sizes (correct: 7, 4, 4)
+- Vacant seat count (correct: 7)
+- The countdown or timeline visualization
+- CRISIS_STATS numbers
 
 **Priority corrections needed (for implement stage):**
-1. Rebuild the JUSTICES array with the correct 8 current justices and correct expired justices
-2. Add missing justices: 呂太郎 and 尤伯祥
-3. Fix all appointment dates, term expiry dates, cohort assignments, and appointing president values
-4. Rebuild TERM_EVENTS to reflect actual wave structure (2024-10-31 = 7 expired; 2027-09-30 = 4 expire; 2031-09-30 = 4 expire)
-5. Fix FAILED_NOMINATIONS dates (first: 2024-08-30; second: 2025-03-21) and descriptions
-6. Update the "cliff" narrative — the court does NOT go to 0 in 2027; it goes from 8 to 4 (or from 5 attending to potentially fewer)
-7. Consider adding the 4 expired Ma-era justices (黃虹霞, 吳陳鐶, 林俊益, 蔡明誠) who were replaced in 2023, and the additional 2016-cohort member 黃璽君 with correct data
+1. Replace j05 (黃虹霞), j06 (吳陳鐶), j07 (林俊益) with the correct 2016 cohort members: 許宗力, 蔡烱燉, 張瓊文 (all appointed 2016-11-01, expired 2024-10-31, appointing president 蔡英文). Note: 許宗力 served as 院長 and 蔡烱燉 as 副院長.
+2. Alternatively, if the project wants to track all historical justices, add a separate 2015 cohort for 黃虹霞, 吳陳鐶, 林俊益, 蔡明誠 (appointed 2015-10-01 by 馬英九, expired 2023-09-30) — but this would exceed 15 entries and require adjusting the seat grid logic.
