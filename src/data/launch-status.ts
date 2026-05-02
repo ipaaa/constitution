@@ -1,4 +1,4 @@
-export const ALL_PAGES = ['/', '/controversy-timeline', '/future', '/opinion-lazybag', '/past', '/present', '/about'];
+export const ALL_PAGES = ['/', '/controversy-timeline', '/future', '/opinion-lazybag', '/past', '/present', '/about', '/quiz'];
 
 export const PUBLIC_PAGES = ['/', '/controversy-timeline', '/future'];
 
