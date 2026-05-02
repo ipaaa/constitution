@@ -150,6 +150,7 @@ The produced owl illustrations are visually cohesive and generally fit the reque
 - 2026-05-02T18:31:25Z — review rejected this cycle. Route back to `draft`: export/commit the cohesive owl assets at the specified filenames and dimensions, replace `public/owl.png` with the transparent 640x640 homepage owl, add `public/owl-past.png` and `public/owl-future.png` at 200x200, and optionally add `public/owl-avatar.png` at 112x112. Keep current visual direction while cropping/scaling for intended page contexts.
 - 2026-05-02T18:37:05Z — review cycle 2 rejected. Route back to `draft`: re-export `public/owl.png`, `public/owl-past.png`, `public/owl-future.png`, and optional `public/owl-avatar.png` with real transparent backgrounds instead of flattened checkerboard pixels; verify alpha contains transparent pixels before returning to review.
 - 2026-05-02T19:09:26Z — captain rejected review cycle 3 because the images were previously made assets, not new drafts. Route back to `draft`: redesign all mascot pictures from scratch or as clearly new visual directions, and discuss the redesign direction with the captain before producing final files.
+- 2026-05-02T19:34:12Z — captain approved production redesign direction B (storybook guide matching `public/tldr-illustration.png`) and added a file-preservation constraint: keep all existing image files unchanged and create a separate new redesign set for review.
 
 ## Stage Report: draft (cycle 2)
 
