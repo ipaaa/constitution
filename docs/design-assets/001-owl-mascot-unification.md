@@ -243,3 +243,16 @@ Fresh redesign review passed. The new assets under `public/mascot-redesign/` mee
 ### Summary
 
 Produced a second fresh draft set in `public/mascot-redesign-v2/` that follows the actual `tldr-illustration.png` owl structure more closely than v1. The v2 set removes the prior fox-like/eyeglass silhouette and uses the reference owl's rounded head/body, facial disk, droopy eyes, purple robe, and small feather tufts as the common character base for all five transparent PNG exports.
+
+## Stage Report: review (fresh redesign v2)
+
+- DONE: Visual quality assessment verifies the v2 files in `public/mascot-redesign-v2/` against dimensions, transparent PNG format, and file-preservation constraints.
+  Inspected `public/mascot-redesign-v2/owl-homepage-storybook-v2.png` 640x640, `owl-past-storybook-v2.png` 200x200, `owl-future-dramatic-storybook-v2.png` 200x200, `owl-future-calm-storybook-v2.png` 200x200, and `owl-avatar-storybook-v2.png` 112x112 with `file`, direct image review, and a `sharp` alpha scan; all are RGBA PNGs with `alpha_min=0`, `alpha_max=255`, and transparent corner alpha `0/0/0/0`.
+- FAILED: Brand/reference consistency check assesses whether v2 clearly resembles `public/tldr-illustration.png` and clearly reads as an owl at first glance across homepage, past, future dramatic, future calm, and avatar contexts.
+  Compared directly against `public/tldr-illustration.png`; v2 is readable as a generic cartoon owl, but it is still a symbolic/local approximation rather than the reference character: the oversized round glasses, very sharp horizontal ear tufts, centered icon posture, simplified line-vector shading, and long upright robe/body do not match the reference owl's bare droopy half-lidded eyes, swept brow feathers, squat weary storybook body, wing/robe silhouette, and painterly travel-guide staging.
+- DONE: Approval or rejection is explicit; reject if resemblance to `tldr-illustration.png` or owl recognizability is weak, and make feedback specific enough to route directly back to draft.
+  REJECTED. Redraft should copy the reference owl more literally: remove the glasses, use the reference's half-lidded droopy eyes and brow-feather shapes, shorten and round the body, preserve the cream facial disk and brown feather masses, use softer storybook shading instead of flat icon geometry, and pose each variant from the same character model rather than a front-facing emblem.
+
+### Summary
+
+The v2 exports satisfy the mechanical requirements for dimensions and real transparency, and protected prior files were not modified: scoped `git diff --name-status` for `public/tldr-illustration.png`, `public/mascot-redesign/`, and prior owl deliverables returned no changes. This review rejects the v2 design on the captain's stated quality bar because it still does not clearly resemble the owl character in `public/tldr-illustration.png`; it reads as a separate glasses-wearing mascot set.
