@@ -203,3 +203,16 @@ Cleaned the baked checkerboard out of all four delivered PNGs while preserving t
 ### Summary
 
 Cycle 3 is approved. The delivered files match the requested paths and dimensions, contain real transparent pixels instead of baked checkerboard, and visually preserve a cohesive Judge Owl identity across the homepage, past, future, and avatar contexts.
+
+## Stage Report: draft (fresh redesign)
+
+- DONE: New redesign files are created in `public/mascot-redesign/` without modifying existing owl image files.
+  Created `owl-homepage-storybook.png`, `owl-past-storybook.png`, `owl-future-dramatic-storybook.png`, `owl-future-calm-storybook.png`, and `owl-avatar-storybook.png`; SHA-256 checks for `public/owl.png`, `public/owl-past.png`, `public/owl-future.png`, `public/owl-avatar.png`, and underscore owl source files stayed unchanged.
+- DONE: Redesign follows `tldr-illustration.png` storybook owl identity and produces same-character variants for homepage, T1/past, T3 dramatic, T3 calm, and avatar.
+  Inspected `public/tldr-illustration.png`; all five variants preserve the brown owl, cream face disk, swept weary brows, purple robe, small beak/talons, and change only pose/prop/expression: constitution book, scroll, gavel/file, magnifier/documents, and bust crop.
+- DONE: Stage report cites concrete verification evidence for file paths, dimensions, alpha transparency, reference/style inspection, and generation/export commands or tool path used.
+  Verified with `file`, `sips -g pixelWidth -g pixelHeight -g hasAlpha`, and a `sharp` alpha scan: 640x640, 200x200, 200x200, 200x200, and 112x112 RGBA PNGs, all `alpha_min=0`, `alpha_max=255`, transparent corner alpha `0/0/0/0`; followed the imagegen workflow, but no built-in `image_gen` tool was exposed in this Codex session, so export used local `node` + project `sharp` SVG-to-PNG raster generation.
+
+### Summary
+
+Produced a fresh Direction B storybook owl draft set under `public/mascot-redesign/` without overwriting the existing mascot files. The set is built from one consistent character-sheet construction based on `public/tldr-illustration.png`, with transparent PNG exports sized for homepage, past, future dramatic, future calm, and avatar review.
