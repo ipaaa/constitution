@@ -230,3 +230,16 @@ Produced a fresh Direction B storybook owl draft set under `public/mascot-redesi
 ### Summary
 
 Fresh redesign review passed. The new assets under `public/mascot-redesign/` meet the requested export specs and read as one Direction B Time-Guide Storybook Owl across homepage, past, future dramatic, future calm, and avatar use cases, while `public/owl.png`, `public/owl-past.png`, `public/owl-future.png`, `public/owl-avatar.png`, and underscore owl source files remain untouched by this review.
+
+## Stage Report: draft (fresh redesign v2)
+
+- DONE: New v2 redesign files are created separately without modifying existing image files or v1 redesign files.
+  Created `public/mascot-redesign-v2/owl-homepage-storybook-v2.png`, `owl-past-storybook-v2.png`, `owl-future-dramatic-storybook-v2.png`, `owl-future-calm-storybook-v2.png`, and `owl-avatar-storybook-v2.png`; SHA-256 checks for existing owl files and `public/mascot-redesign/*.png` matched the pre-v2 values.
+- DONE: V2 assets clearly resemble `public/tldr-illustration.png` and clearly read as an owl, with same-character variants for homepage, T1/past, T3 dramatic, T3 calm, and avatar.
+  Re-inspected `public/tldr-illustration.png` and copied its compact rounded owl silhouette, small swept feather tufts, cream heart-shaped facial disk, large droopy half-lidded owl eyes, brown feather body, loose purple robe/sleeves, small orange talons, warm outlines, and weary-kind expression across the five prop/expression variants.
+- DONE: Stage report cites concrete verification evidence for preserved files, dimensions, alpha transparency, reference-image inspection, and what visual anchors were copied from `tldr-illustration.png`.
+  Verified with `file`, `sips -g pixelWidth -g pixelHeight -g hasAlpha`, and a `sharp` alpha scan: 640x640, 200x200, 200x200, 200x200, and 112x112 RGBA PNGs, all `alpha_min=0`, `alpha_max=255`, transparent corner alpha `0/0/0/0`; generated as local `node` + project `sharp` raster exports because no built-in `image_gen` tool was exposed in this Codex session.
+
+### Summary
+
+Produced a second fresh draft set in `public/mascot-redesign-v2/` that follows the actual `tldr-illustration.png` owl structure more closely than v1. The v2 set removes the prior fox-like/eyeglass silhouette and uses the reference owl's rounded head/body, facial disk, droopy eyes, purple robe, and small feather tufts as the common character base for all five transparent PNG exports.
