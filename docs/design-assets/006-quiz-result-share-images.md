@@ -1,9 +1,9 @@
 ---
 id: "006"
 title: 測驗結果分享圖片
-status: brief
+status: draft
 source: captain-filed
-started:
+started: 2026-05-02T20:48:17Z
 completed:
 verdict:
 score: 0.8
