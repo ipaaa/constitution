@@ -130,8 +130,8 @@ export default function QuizResult({
   resultLevels,
   sourceRoute,
 }: QuizResultProps) {
-  const [saving, setSaving] = useState(false);
   const [sharing, setSharing] = useState(false);
+  const [fallbackMsg, setFallbackMsg] = useState(false);
   const level = getResultLevel(score, resultLevels);
 
   const getImageBlob = useCallback(() => {
@@ -139,29 +139,9 @@ export default function QuizResult({
     return canvasToBlob(canvas);
   }, [quizId, quizTitle, score, total, level.title]);
 
-  const downloadBlob = (blob: Blob) => {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `addcourt-quiz-${quizId}.png`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
-  const handleSave = async () => {
-    setSaving(true);
-    try {
-      const blob = await getImageBlob();
-      downloadBlob(blob);
-    } finally {
-      setSaving(false);
-    }
-  };
-
   const handleShare = async () => {
     setSharing(true);
+    setFallbackMsg(false);
     try {
       const blob = await getImageBlob();
       const file = new File([blob], `addcourt-quiz-${quizId}.png`, {
@@ -171,7 +151,17 @@ export default function QuizResult({
       if (navigator.share && navigator.canShare?.({ files: [file] })) {
         await navigator.share({ files: [file] });
       } else {
-        downloadBlob(blob);
+        // Desktop fallback: download the image
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `addcourt-quiz-${quizId}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        setFallbackMsg(true);
+        setTimeout(() => setFallbackMsg(false), 4000);
       }
     } finally {
       setSharing(false);
@@ -203,20 +193,18 @@ export default function QuizResult({
 
       <div className="flex flex-col gap-3 pt-4 max-w-xs mx-auto">
         <button
-          onClick={handleSave}
-          disabled={saving}
-          className="w-full py-3 rounded-xl bg-royal-purple text-white font-bold text-base hover:bg-midnight transition-colors disabled:opacity-60"
-        >
-          {saving ? "產生中…" : "儲存結果圖片"}
-        </button>
-
-        <button
           onClick={handleShare}
           disabled={sharing}
-          className="w-full py-3 rounded-xl border-2 border-royal-purple text-royal-purple font-bold text-base hover:bg-purple-50 transition-colors disabled:opacity-60"
+          className="w-full py-3 rounded-xl bg-royal-purple text-white font-bold text-base hover:bg-midnight transition-colors disabled:opacity-60"
         >
           {sharing ? "處理中…" : "分享"}
         </button>
+
+        {fallbackMsg && (
+          <p className="text-xs text-gray-500 -mt-1">
+            已下載圖片，請手動分享到社群媒體
+          </p>
+        )}
 
         <Link
           href={sourceRoute}
