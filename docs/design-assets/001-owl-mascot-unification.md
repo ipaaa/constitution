@@ -131,3 +131,16 @@ Fonts: Manrope (sans), Lora/Noto Serif TC (serif), Caveat (handwriting).
 ### Summary
 
 Completed a full audit of owl mascot usage across the site and wrote a detailed design brief. The current `owl.png` (640x640, cartoon judge owl) is used in two places: the homepage hero and the T2 JudgeOwlComment component. T1 and T3 have no owl presence. The brief specifies four deliverables to unify the mascot across all three tracks, with exact dimensions, filenames, poses, color treatments, and placement guidance for each.
+
+## Stage Report: review
+
+- DONE: Visual quality assessment compares each produced owl asset against the requested dimensions, pose, transparency/background needs, and intended page context.
+  Inspected `public/owl.png`, `public/owl_frontpage.png`, `public/owl_past.png`, `public/owl_future.png`, and `public/owl_comment.png` with `file`, `sips -g pixelWidth -g pixelHeight -g hasAlpha`, and direct image review; the new files are polished RGBA 2048x2048 images, but the requested deliverables were 640x640 `owl.png`, 200x200 `owl-past.png`, 200x200 `owl-future.png`, and optional 112x112 `owl-avatar.png`. `public/owl.png` is still 640x640 RGB with a light background and the old ABC book, so the homepage replacement is not actually in place. The T1 image reads correctly as a history/scroll pose but is oversized and named `owl_past.png`; the T3 image reads as urgent/future with gavel and cool overlays but is oversized and named `owl_future.png`; the comment asset is a friendly bust crop but is oversized and named `owl_comment.png`.
+- DONE: Brand consistency check addresses whether the assets read as the same Judge Owl character across homepage, T1/past, T3/future, and comment/avatar usage.
+  The four new assets share the same brown owl face, mortarboard, judicial/academic robe, gold/yellow eyes, and clean cartoon rendering, so they read as one Judge Owl character; however, the future asset's cyber overlay and desaturated green/teal robe treatment push furthest from the purple-robed baseline and should be checked against the dark T3 page at display size.
+- DONE: Approval or rejection is explicit, with specific actionable feedback for any asset that should be revised.
+  Rejected for this cycle. Revision should export/commit the assets at the specified filenames and dimensions: replace `public/owl.png` with the refined 640x640 transparent homepage owl, produce `public/owl-past.png` and `public/owl-future.png` at 200x200 transparent PNG, and optionally produce `public/owl-avatar.png` at 112x112. Keep the current visual direction, but crop/scale each image for its intended context so the T1/T3 decorations remain legible at 80-100 CSS px and the comment avatar remains sharp at 56 CSS px.
+
+### Summary
+
+The produced owl illustrations are visually cohesive and generally fit the requested poses: homepage/book, T1 scroll/history, T3 gavel/crisis, and comment bust crop. This pass should not be approved as final because the deliverables do not match the requested file names or export dimensions, and the actual `public/owl.png` homepage asset remains the old non-transparent ABC-book version.
