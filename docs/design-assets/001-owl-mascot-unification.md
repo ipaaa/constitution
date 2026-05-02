@@ -148,3 +148,16 @@ The produced owl illustrations are visually cohesive and generally fit the reque
 ### Feedback Cycles
 
 - 2026-05-02T18:31:25Z — review rejected this cycle. Route back to `draft`: export/commit the cohesive owl assets at the specified filenames and dimensions, replace `public/owl.png` with the transparent 640x640 homepage owl, add `public/owl-past.png` and `public/owl-future.png` at 200x200, and optionally add `public/owl-avatar.png` at 112x112. Keep current visual direction while cropping/scaling for intended page contexts.
+
+## Stage Report: draft (cycle 2)
+
+- DONE: Designed asset files are present at the exact requested paths, filenames, dimensions, and transparent PNG format.
+  Exported with `sips -z`: `public/owl.png` from `public/owl_frontpage.png`, `public/owl-past.png` from `public/owl_past.png`, `public/owl-future.png` from `public/owl_future.png`, and optional `public/owl-avatar.png` from `public/owl_comment.png`; `file` reports each as PNG RGBA and `sips -g pixelWidth -g pixelHeight -g hasAlpha` reports 640x640/yes, 200x200/yes, 200x200/yes, and 112x112/yes respectively.
+- DONE: Asset exports preserve the cohesive Judge Owl identity while being cropped/scaled for homepage, T1, T3, and optional comment/avatar contexts.
+  Reused the current cohesive Judge Owl sources in `public/`: homepage book owl, T1 glasses/scroll owl, T3 gavel/cool crisis owl, and comment bust crop; the 200px T1/T3 exports keep the head, hat, robe, and prop readable for 80-100 CSS px use, and the 112px bust source is purpose-cropped for 56 CSS px avatar use.
+- DONE: Stage report cites concrete verification evidence for file paths, pixel dimensions, alpha/transparency, and any generation/export commands used.
+  Verification command: `for f in public/owl.png public/owl-past.png public/owl-future.png public/owl-avatar.png; do file "$f"; sips -g pixelWidth -g pixelHeight -g hasAlpha "$f"; done`; export command used `sips -z 640 640`, `sips -z 200 200`, `sips -z 200 200`, and `sips -z 112 112` against the corresponding source files.
+
+### Summary
+
+Replaced the old non-transparent homepage `public/owl.png` with the refined transparent Judge Owl export and added the requested hyphenated T1/T3 filenames. Also produced the optional 112x112 transparent avatar because the provided bust crop source was high enough quality for a sharp 56 CSS px comment icon.
