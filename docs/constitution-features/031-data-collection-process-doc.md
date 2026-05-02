@@ -12,6 +12,10 @@ issue:
 pr:
 ---
 
+**⏸️ PENDING — 由 Captain 補完**
+- T1/T2 的 SOP 需要修改：加入 Google Spreadsheet 作為 SSOT 的編輯流程
+- 目前的 SOP 只描述 JSON 檔案的直接編輯，但實際流程應以 spreadsheet 為起點
+
 建立一份說明文件，記錄三個軌道的資料收集、更新、驗證流程：
 
 - T1（時光機）：釋憲案資料來源、CSV 同步機制、更新頻率
