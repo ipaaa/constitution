@@ -9,9 +9,9 @@ const ALL_PAGES = ['/', '/controversy-timeline', '/future', '/opinion-lazybag', 
 export default function LaunchGate({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const isPreview = searchParams.get('preview') === 'true';
+  const isPublicMode = searchParams.get('public') === 'true' || process.env.NEXT_PUBLIC_PUBLIC_MODE === 'true';
 
-  const pages = isPreview ? ALL_PAGES : LAUNCHED_PAGES;
+  const pages = isPublicMode ? LAUNCHED_PAGES : ALL_PAGES;
 
   const isLaunched = pages.some(
     (page) => pathname === page || (page !== '/' && pathname.startsWith(page + '/'))

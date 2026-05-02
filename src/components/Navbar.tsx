@@ -16,9 +16,9 @@ const NAV_ITEMS = [
 export default function Navbar() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const isPreview = searchParams.get('preview') === 'true';
+  const isPublicMode = searchParams.get('public') === 'true' || process.env.NEXT_PUBLIC_PUBLIC_MODE === 'true';
 
-  const pages = isPreview ? ALL_PAGES_LIST : LAUNCHED_PAGES;
+  const pages = isPublicMode ? LAUNCHED_PAGES : ALL_PAGES_LIST;
   const visibleItems = NAV_ITEMS.filter((item) => pages.includes(item.href));
 
   return (
