@@ -36,6 +36,10 @@ pr:
 ## 風格方向
 
 - 與網站整體視覺一致
+- 貓頭鷹法官必須與 `public/codex/` 中的三張貓頭鷹圖片風格一致：
+  - `public/codex/owl.png`
+  - `public/codex/owl-past.png`
+  - `public/codex/owl-future.png`
 - 適合作為社群分享圖
 - 清楚呈現使用者的測驗結果與行動呼籲
 
@@ -54,3 +58,5 @@ Codex 產出圖片後放到：
 **AC-3** 4 個等級的表情或姿態有明確差異，但整體仍維持一致的網站視覺風格。
 
 **AC-4** 圖片尺寸符合規格：IG / Threads 為 1080x1080px，Facebook 為 1200x630px。
+
+**AC-5** 貓頭鷹法官的角色造型、線條、色彩與表情語言需明確延續 `public/codex/` 圖片風格，不得改成不同吉祥物。
