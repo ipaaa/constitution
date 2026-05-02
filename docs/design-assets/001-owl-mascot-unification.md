@@ -1,7 +1,7 @@
 ---
 id: "001"
 title: 貓頭鷹法官視覺統一
-status: review
+status: draft
 source: constitution-features/023
 started: 2026-05-01T19:58:11Z
 completed:
@@ -148,6 +148,7 @@ The produced owl illustrations are visually cohesive and generally fit the reque
 ### Feedback Cycles
 
 - 2026-05-02T18:31:25Z — review rejected this cycle. Route back to `draft`: export/commit the cohesive owl assets at the specified filenames and dimensions, replace `public/owl.png` with the transparent 640x640 homepage owl, add `public/owl-past.png` and `public/owl-future.png` at 200x200, and optionally add `public/owl-avatar.png` at 112x112. Keep current visual direction while cropping/scaling for intended page contexts.
+- 2026-05-02T18:37:05Z — review cycle 2 rejected. Route back to `draft`: re-export `public/owl.png`, `public/owl-past.png`, `public/owl-future.png`, and optional `public/owl-avatar.png` with real transparent backgrounds instead of flattened checkerboard pixels; verify alpha contains transparent pixels before returning to review.
 
 ## Stage Report: draft (cycle 2)
 
