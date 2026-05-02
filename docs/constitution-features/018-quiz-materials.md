@@ -1,7 +1,7 @@
 ---
 id: "018"
 title: 憲法測驗題功能
-status: implement
+status: verify
 source: meetup-20260416
 started: 2026-05-02T20:18:36Z
 completed:
