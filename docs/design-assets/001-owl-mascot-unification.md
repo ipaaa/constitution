@@ -175,3 +175,16 @@ Replaced the old non-transparent homepage `public/owl.png` with the refined tran
 ### Summary
 
 Cycle 2 fixed the filename and dimension issues from the prior rejection, and the visual direction now fits the brief across homepage, past, future, and avatar use. The asset set still cannot be approved because each delivered PNG is fully opaque despite being RGBA, so it will show a checkerboard box in the UI instead of compositing cleanly over the site backgrounds.
+
+## Stage Report: draft (cycle 3)
+
+- DONE: All four delivered PNGs keep the requested filenames/dimensions and have real transparent background pixels, not flattened checkerboard.
+  `file` and `sips -g pixelWidth -g pixelHeight -g hasAlpha` verify RGBA PNGs at `public/owl.png` 640x640, `public/owl-past.png` 200x200, `public/owl-future.png` 200x200, and `public/owl-avatar.png` 112x112; PNG alpha scan reports alpha_min=0/alpha_max=255 with transparent pixel counts 211107, 21748, 19755, and 7248 respectively.
+- DONE: Visual quality remains usable after transparency cleanup, with the owl/props intact and legible in each target context.
+  Checked magenta-background composites in `/tmp/owl-magenta.png`, `/tmp/owl-past-magenta.png`, `/tmp/owl-future-magenta.png`, and `/tmp/owl-avatar-magenta.png`; the homepage book owl, T1 scroll/book owl, T3 gavel owl, and avatar bust remain intact with the checkerboard removed.
+- DONE: Stage report cites concrete verification evidence for dimensions, alpha min/max or equivalent transparency proof, and commands used.
+  Commands used: stdlib Python PNG cleanup pass flood-filled border-connected checkerboard/background pixels to alpha 0, then kept the largest opaque component to remove detached background islands; verification used `file`, `sips`, and a stdlib Python PNG alpha scan over all four delivered files.
+
+### Summary
+
+Cleaned the baked checkerboard out of all four delivered PNGs while preserving the requested filenames and dimensions. The final files now contain real transparent background pixels (`alpha_min=0`) and opaque owl pixels (`alpha_max=255`) instead of merely reporting `hasAlpha=yes`.
