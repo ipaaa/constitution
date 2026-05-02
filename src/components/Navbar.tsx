@@ -1,8 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { LAUNCHED_PAGES } from '@/data/launch-status';
+
+const ALL_PAGES_LIST = ['/', '/past', '/present', '/future', '/about', '/controversy-timeline', '/opinion-lazybag'];
 
 const NAV_ITEMS = [
   { href: '/past', badge: 'T1', label: '過去：時光機' },
@@ -13,8 +15,11 @@ const NAV_ITEMS = [
 
 export default function Navbar() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const isPreview = searchParams.get('preview') === 'true';
 
-  const visibleItems = NAV_ITEMS.filter((item) => LAUNCHED_PAGES.includes(item.href));
+  const pages = isPreview ? ALL_PAGES_LIST : LAUNCHED_PAGES;
+  const visibleItems = NAV_ITEMS.filter((item) => pages.includes(item.href));
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-all duration-400 border-b border-gray-200">

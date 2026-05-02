@@ -19,6 +19,7 @@ export const metadata: Metadata = {
   },
 };
 
+import { Suspense } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import LaunchGate from "@/components/LaunchGate";
@@ -32,11 +33,15 @@ export default function RootLayout({
     <html lang="zh-TW">
       <body className="antialiased min-h-screen flex flex-col font-sans">
         <a href="#main-content" className="skip-link">跳至主要內容</a>
-        <Navbar />
+        <Suspense>
+          <Navbar />
+        </Suspense>
         <main id="main-content" className="flex-grow flex flex-col w-full relative">
-          <LaunchGate>
-            {children}
-          </LaunchGate>
+          <Suspense>
+            <LaunchGate>
+              {children}
+            </LaunchGate>
+          </Suspense>
         </main>
         <Footer />
       </body>
