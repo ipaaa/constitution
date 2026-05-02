@@ -1,16 +1,16 @@
 ---
 id: "033"
 title: 漸進式上線與分享策略
-status: implement
+status: complete
 source: captain-filed
 started: 2026-05-02T00:42:52Z
-completed:
-verdict:
+completed: 2026-05-02T03:30:23Z
+verdict: PASSED
 score: 0.8
-worktree: .worktrees/spacedock-ensign-033-progressive-launch
+worktree: 
 issue:
 pr: #27
-mod-block: merge:pr-merge
+mod-block: 
 ---
 
 在全站完成前，規劃如何以「一次一個單元」的方式逐步分享已完成的內容。
