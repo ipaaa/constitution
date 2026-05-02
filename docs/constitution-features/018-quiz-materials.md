@@ -1,13 +1,13 @@
 ---
 id: "018"
 title: 憲法測驗題功能
-status: design
+status: implement
 source: meetup-20260416
 started: 2026-05-02T20:18:36Z
 completed:
 verdict:
 score: 0.5
-worktree:
+worktree: .worktrees/spacedock-ensign-018-quiz-materials
 issue:
 pr:
 ---
