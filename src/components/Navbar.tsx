@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { LAUNCHED_PAGES } from '@/data/launch-status';
@@ -16,7 +17,19 @@ const NAV_ITEMS = [
 export default function Navbar() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const isPublicMode = searchParams.get('public') === 'true' || process.env.NEXT_PUBLIC_PUBLIC_MODE === 'true';
+  const [isPublicMode, setIsPublicMode] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get('public') === 'true') {
+      localStorage.setItem('public_mode', 'true');
+      setIsPublicMode(true);
+    } else if (localStorage.getItem('public_mode') === 'true') {
+      setIsPublicMode(true);
+    }
+    if (process.env.NEXT_PUBLIC_PUBLIC_MODE === 'true') {
+      setIsPublicMode(true);
+    }
+  }, [searchParams]);
 
   const pages = isPublicMode ? LAUNCHED_PAGES : ALL_PAGES_LIST;
   const visibleItems = NAV_ITEMS.filter((item) => pages.includes(item.href));
