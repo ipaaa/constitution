@@ -73,3 +73,16 @@ Codex 產出圖片後放到：
 ### Summary
 
 Produced the final eight quiz result share PNGs in `public/quiz/` using the imagegen skill workflow with a deterministic project-bound SVG-to-PNG renderer (`sharp`) instead of model-rendered lettering, so Chinese text and CTA are exact. The layouts follow the site's white editorial card style, dark borders, red/yellow/purple accents, and the existing Judge Owl mascot assets from `public/codex/`.
+
+## Stage Report: review
+
+- DONE: Visual quality assessment verifies all eight `public/quiz/` images against required dimensions, text/CTA contents, readability, and social-share suitability.
+  Evidence: Inspected `public/quiz/quiz-result-{novice,trainee,observer,expert}-{ig,fb}.png`; `file public/quiz/quiz-result-*.png public/codex/owl*.png` confirmed IG outputs are 1080x1080 and FB outputs are 1200x630, and visual review confirmed each card clearly shows the title, score, `來測測你的憲法素養`, and `addcourt.tw`.
+- DONE: Brand consistency check verifies owl usage and overall layout match the existing site and `public/codex/` Judge Owl style.
+  Evidence: Compared outputs against `public/codex/owl.png`, `public/codex/owl-past.png`, and `public/codex/owl-future.png`; all cards preserve the purple judicial outfit, warm owl palette, heavy dark outlines, expressive brows/eyes, and law-themed props while using distinct question, pencil, magnifier, and medal/gavel result treatments.
+- DONE: Approval or rejection is explicit; if rejected, feedback is specific enough to route directly back to draft.
+  Evidence: APPROVED. No draft revision requested; the deterministic SVG-to-PNG `sharp` rendering method supports acceptability because the Chinese text and CTA render as exact designed text rather than model-generated lettering.
+
+### Summary
+
+Approved for entity 006. The eight share images satisfy the 4 levels x 2 sizes requirement, remain legible and balanced for IG/Threads and Facebook crops, and continue the Judge Owl visual language from `public/codex/` while giving each result level a distinct expression or pose.
