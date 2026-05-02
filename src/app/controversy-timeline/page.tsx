@@ -4,6 +4,11 @@ import ControversyTimeline from '@/components/controversy-timeline/ControversyTi
 export const metadata = {
   title: '憲法法庭爭議時序懶人包 | Add C0urt 憲庭加好友',
   description: '以互動式時間軸呈現2024至2026年間，立法院與憲法法庭的憲政爭議完整始末。淺顯說明，讓每個人都能看懂。',
+  openGraph: {
+    title: '憲法法庭爭議時序懶人包 | Add C0urt 憲庭加好友',
+    description: '3 分鐘看完憲法法庭從癱瘓到復活的完整故事。互動式時間軸，淺顯說明。',
+    images: [{ url: '/owl.png', width: 360, height: 360, alt: 'Add C0urt 貓頭鷹法官吉祥物' }],
+  },
 };
 
 export default function ControversyTimelinePage() {
