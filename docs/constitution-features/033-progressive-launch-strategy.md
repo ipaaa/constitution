@@ -1,13 +1,13 @@
 ---
 id: "033"
 title: 漸進式上線與分享策略
-status: design
+status: implement
 source: captain-filed
-started:
+started: 2026-05-02T00:42:52Z
 completed:
 verdict:
 score: 0.8
-worktree:
+worktree: .worktrees/spacedock-ensign-033-progressive-launch
 issue:
 pr:
 ---
