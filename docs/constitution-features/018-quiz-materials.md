@@ -9,7 +9,7 @@ verdict:
 score: 0.5
 worktree: .worktrees/spacedock-ensign-018-quiz-materials
 issue:
-pr:
+pr: #28
 mod-block: merge:pr-merge
 ---
 
