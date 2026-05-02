@@ -1,7 +1,7 @@
 ---
 id: "001"
 title: 貓頭鷹法官視覺統一
-status: review
+status: draft
 source: constitution-features/023
 started: 2026-05-01T19:58:11Z
 completed:
@@ -152,6 +152,7 @@ The produced owl illustrations are visually cohesive and generally fit the reque
 - 2026-05-02T19:09:26Z — captain rejected review cycle 3 because the images were previously made assets, not new drafts. Route back to `draft`: redesign all mascot pictures from scratch or as clearly new visual directions, and discuss the redesign direction with the captain before producing final files.
 - 2026-05-02T19:34:12Z — captain approved production redesign direction B (storybook guide matching `public/tldr-illustration.png`) and added a file-preservation constraint: keep all existing image files unchanged and create a separate new redesign set for review.
 - 2026-05-02T19:51:03Z — captain rejected the fresh redesign: it does not resemble `public/tldr-illustration.png` and does not clearly read as an owl. Route back to `draft`: make the next set directly follow the owl image/shape language in `public/tldr-illustration.png`, with owl recognizability as the primary acceptance criterion.
+- 2026-05-02T20:02:18Z — captain added a production-method constraint: the next image pass must use ChatGPT Image 2 / `gpt-image-2`; do not use local SVG, `sharp`, or hand-built vector rasterization as the production method. If the endpoint is unavailable, stop and report that instead of fabricating substitute assets.
 
 ## Stage Report: draft (cycle 2)
 
