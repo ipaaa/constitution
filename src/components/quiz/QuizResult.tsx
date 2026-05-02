@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { ResultLevel } from "@/data/quizzes/controversy";
@@ -15,7 +15,6 @@ interface QuizResultProps {
 }
 
 function getResultLevel(score: number, levels: ResultLevel[]): ResultLevel {
-  // levels are sorted descending by minScore
   for (const level of levels) {
     if (score >= level.minScore) return level;
   }
@@ -23,6 +22,105 @@ function getResultLevel(score: number, levels: ResultLevel[]): ResultLevel {
 }
 
 const SITE_DOMAIN = "addcourt.tw";
+const CANVAS_SIZE = 1080;
+
+function generateResultImage(
+  quizId: string,
+  quizTitle: string,
+  score: number,
+  total: number,
+  levelTitle: string,
+): HTMLCanvasElement {
+  const canvas = document.createElement("canvas");
+  canvas.width = CANVAS_SIZE;
+  canvas.height = CANVAS_SIZE;
+  const ctx = canvas.getContext("2d")!;
+
+  // Background
+  ctx.fillStyle = "#FFFFFF";
+  ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+
+  // Border
+  ctx.strokeStyle = "#E5E7EB";
+  ctx.lineWidth = 4;
+  ctx.strokeRect(40, 40, CANVAS_SIZE - 80, CANVAS_SIZE - 80);
+
+  // Inner accent line at top
+  ctx.fillStyle = "#6B21A8";
+  ctx.fillRect(40, 40, CANVAS_SIZE - 80, 8);
+
+  // Quiz title (top area)
+  ctx.fillStyle = "#6B7280";
+  ctx.font = "bold 36px sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  wrapText(ctx, quizTitle, CANVAS_SIZE / 2, 200, CANVAS_SIZE - 200, 50);
+
+  // Score
+  ctx.fillStyle = "#6B21A8";
+  ctx.font = "bold 180px serif";
+  ctx.fillText(`${score}/${total}`, CANVAS_SIZE / 2, 440);
+
+  // Result title
+  ctx.fillStyle = "#111827";
+  ctx.font = "bold 80px serif";
+  ctx.fillText(levelTitle, CANVAS_SIZE / 2, 600);
+
+  // Divider line
+  ctx.strokeStyle = "#E5E7EB";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(340, 720);
+  ctx.lineTo(CANVAS_SIZE - 340, 720);
+  ctx.stroke();
+
+  // Site name
+  ctx.fillStyle = "#111827";
+  ctx.font = "bold 32px sans-serif";
+  ctx.fillText("Add C0urt 憲庭加好友", CANVAS_SIZE / 2, 810);
+
+  // URL
+  ctx.fillStyle = "#6B7280";
+  ctx.font = "28px sans-serif";
+  ctx.fillText(`${SITE_DOMAIN}/quiz/${quizId}`, CANVAS_SIZE / 2, 870);
+
+  return canvas;
+}
+
+function wrapText(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  maxWidth: number,
+  lineHeight: number,
+) {
+  const chars = [...text];
+  let line = "";
+  let currentY = y;
+
+  for (const char of chars) {
+    const testLine = line + char;
+    const metrics = ctx.measureText(testLine);
+    if (metrics.width > maxWidth && line.length > 0) {
+      ctx.fillText(line, x, currentY);
+      line = char;
+      currentY += lineHeight;
+    } else {
+      line = testLine;
+    }
+  }
+  ctx.fillText(line, x, currentY);
+}
+
+function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) resolve(blob);
+      else reject(new Error("Canvas toBlob failed"));
+    }, "image/png");
+  });
+}
 
 export default function QuizResult({
   score,
@@ -32,52 +130,52 @@ export default function QuizResult({
   resultLevels,
   sourceRoute,
 }: QuizResultProps) {
-  const [copied, setCopied] = useState(false);
-  const [threadsCopied, setThreadsCopied] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [sharing, setSharing] = useState(false);
   const level = getResultLevel(score, resultLevels);
 
-  const quizUrl = `https://${SITE_DOMAIN}/quiz/${quizId}`;
-  const resultText = `我在「${quizTitle}」測驗中得到 ${score}/${total}「${level.title}」`;
-  const shareText = `${resultText}\n你也來試試 → ${quizUrl}`;
+  const getImageBlob = useCallback(() => {
+    const canvas = generateResultImage(quizId, quizTitle, score, total, level.title);
+    return canvasToBlob(canvas);
+  }, [quizId, quizTitle, score, total, level.title]);
 
-  const copyToClipboard = async (text: string) => {
+  const downloadBlob = (blob: Blob) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `addcourt-quiz-${quizId}.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
     try {
-      await navigator.clipboard.writeText(text);
-    } catch {
-      const textarea = document.createElement("textarea");
-      textarea.value = text;
-      document.body.appendChild(textarea);
-      textarea.select();
-      document.execCommand("copy");
-      document.body.removeChild(textarea);
+      const blob = await getImageBlob();
+      downloadBlob(blob);
+    } finally {
+      setSaving(false);
     }
   };
 
-  const handleCopy = async () => {
-    await copyToClipboard(shareText);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+  const handleShare = async () => {
+    setSharing(true);
+    try {
+      const blob = await getImageBlob();
+      const file = new File([blob], `addcourt-quiz-${quizId}.png`, {
+        type: "image/png",
+      });
 
-  const handleShareLine = () => {
-    const url = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(quizUrl)}`;
-    window.open(url, "_blank", "noopener,noreferrer");
-  };
-
-  const handleShareFB = () => {
-    const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(quizUrl)}&quote=${encodeURIComponent(resultText + "\n你也來試試 →")}`;
-    window.open(url, "_blank", "noopener,noreferrer");
-  };
-
-  const handleShareThreads = async () => {
-    await copyToClipboard(shareText);
-    setThreadsCopied(true);
-    setTimeout(() => setThreadsCopied(false), 3000);
-  };
-
-  const handleShareX = () => {
-    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(resultText + "\n你也來試試 →")}&url=${encodeURIComponent(quizUrl)}`;
-    window.open(url, "_blank", "noopener,noreferrer");
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file] });
+      } else {
+        downloadBlob(blob);
+      }
+    } finally {
+      setSharing(false);
+    }
   };
 
   return (
@@ -105,48 +203,24 @@ export default function QuizResult({
 
       <div className="flex flex-col gap-3 pt-4 max-w-xs mx-auto">
         <button
-          onClick={handleCopy}
-          className="w-full py-3 rounded-xl bg-royal-purple text-white font-bold text-base hover:bg-midnight transition-colors"
+          onClick={handleSave}
+          disabled={saving}
+          className="w-full py-3 rounded-xl bg-royal-purple text-white font-bold text-base hover:bg-midnight transition-colors disabled:opacity-60"
         >
-          {copied ? "已複製！" : "複製結果"}
+          {saving ? "產生中…" : "儲存結果圖片"}
         </button>
 
-        <div className="flex justify-center gap-2 pt-1">
-          <button
-            onClick={handleShareLine}
-            className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-bold text-[#06C755] hover:bg-green-50 transition-colors"
-          >
-            LINE
-          </button>
-          <button
-            onClick={handleShareFB}
-            className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-bold text-[#1877F2] hover:bg-blue-50 transition-colors"
-          >
-            FB
-          </button>
-          <button
-            onClick={handleShareThreads}
-            className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-bold text-gray-900 hover:bg-gray-50 transition-colors relative"
-          >
-            {threadsCopied ? "已複製" : "Threads"}
-          </button>
-          <button
-            onClick={handleShareX}
-            className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-bold text-gray-900 hover:bg-gray-50 transition-colors"
-          >
-            X
-          </button>
-        </div>
-
-        {threadsCopied && (
-          <p className="text-xs text-gray-500 -mt-1">
-            已複製，前往 Threads 貼上
-          </p>
-        )}
+        <button
+          onClick={handleShare}
+          disabled={sharing}
+          className="w-full py-3 rounded-xl border-2 border-royal-purple text-royal-purple font-bold text-base hover:bg-purple-50 transition-colors disabled:opacity-60"
+        >
+          {sharing ? "處理中…" : "分享"}
+        </button>
 
         <Link
           href={sourceRoute}
-          className="w-full py-3 rounded-xl border-2 border-royal-purple text-royal-purple font-bold text-base hover:bg-purple-50 transition-colors block"
+          className="w-full py-3 rounded-xl border border-gray-200 text-gray-700 font-bold text-base hover:bg-gray-50 transition-colors block"
         >
           深入了解這場爭議
         </Link>
