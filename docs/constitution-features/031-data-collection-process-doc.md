@@ -3,7 +3,7 @@ id: "031"
 title: T1/T2/T3 資料收集流程說明文件
 status: design
 source: captain-filed
-started:
+started: 2026-05-02T17:52:29Z
 completed:
 verdict:
 score: 0.7
