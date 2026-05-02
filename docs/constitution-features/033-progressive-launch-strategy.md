@@ -9,7 +9,7 @@ verdict:
 score: 0.8
 worktree: .worktrees/spacedock-ensign-033-progressive-launch
 issue:
-pr:
+pr: #27
 mod-block: merge:pr-merge
 ---
 
