@@ -1,5 +1,8 @@
+'use client';
+
 import Link from 'next/link';
 import { Github, FileText, AlertCircle } from 'lucide-react';
+import { LAUNCHED_PAGES } from '@/data/launch-status';
 
 export default function Footer() {
   return (
@@ -41,9 +44,10 @@ export default function Footer() {
           <div>
             <h5 className="font-bold text-gray-900 mb-4 tracking-wider uppercase text-xs">快速導覽 (Navigation)</h5>
             <ul className="space-y-3 font-medium">
-              <li><Link href="/past" className="hover:text-blue-600 transition-colors">T1. 過去：時光機</Link></li>
-              <li><Link href="/present" className="hover:text-blue-600 transition-colors">T2. 現在：熱搜榜</Link></li>
-              <li><Link href="/future" className="hover:text-blue-600 transition-colors">T3. 未來：載入中</Link></li>
+              {LAUNCHED_PAGES.includes('/past') && <li><Link href="/past" className="hover:text-blue-600 transition-colors">T1. 過去：時光機</Link></li>}
+              {LAUNCHED_PAGES.includes('/present') && <li><Link href="/present" className="hover:text-blue-600 transition-colors">T2. 現在：熱搜榜</Link></li>}
+              {LAUNCHED_PAGES.includes('/future') && <li><Link href="/future" className="hover:text-blue-600 transition-colors">T3. 未來：載入中</Link></li>}
+              {LAUNCHED_PAGES.includes('/controversy-timeline') && <li><Link href="/controversy-timeline" className="hover:text-blue-600 transition-colors">爭議時序懶人包</Link></li>}
             </ul>
           </div>
         </div>

@@ -2,9 +2,19 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { LAUNCHED_PAGES } from '@/data/launch-status';
+
+const NAV_ITEMS = [
+  { href: '/past', badge: 'T1', label: '過去：時光機' },
+  { href: '/present', badge: 'T2', label: '現在：熱搜榜' },
+  { href: '/future', badge: 'T3', label: '未來：載入中' },
+  { href: '/about', badge: null, label: '關於' },
+];
 
 export default function Navbar() {
   const pathname = usePathname();
+
+  const visibleItems = NAV_ITEMS.filter((item) => LAUNCHED_PAGES.includes(item.href));
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] transition-all duration-400 border-b border-gray-200">
@@ -17,26 +27,16 @@ export default function Navbar() {
         </div>
         <nav aria-label="主要導覽" className="flex-grow flex justify-center md:justify-end overflow-x-auto pb-1 md:pb-0 scrollbar-hide">
           <ul className="flex gap-2 sm:gap-6 list-none items-center h-full sm:h-auto">
-             <li>
-              <Link href="/past" className={`px-3 py-1.5 text-sm font-bold transition-all rounded-sm flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${pathname === '/past' ? 'text-gray-900 border-gray-300 border shadow-sm' : 'text-gray-600 hover:text-gray-900 border border-transparent hover:border-gray-200 hover:bg-gray-50'}`}>
-                <span className={`text-[10px] px-1.5 py-0.5 rounded-sm uppercase tracking-widest ${pathname === '/past' ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-500'}`}>T1</span> 過去：時光機
-              </Link>
-            </li>
-            <li>
-              <Link href="/present" className={`px-3 py-1.5 text-sm font-bold transition-all rounded-sm flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${pathname === '/present' ? 'text-gray-900 border-gray-300 border shadow-sm' : 'text-gray-600 hover:text-gray-900 border border-transparent hover:border-gray-200 hover:bg-gray-50'}`}>
-                <span className={`text-[10px] px-1.5 py-0.5 rounded-sm uppercase tracking-widest ${pathname === '/present' ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-500'}`}>T2</span> 現在：熱搜榜
-              </Link>
-            </li>
-            <li>
-              <Link href="/future" className={`px-3 py-1.5 text-sm font-bold transition-all rounded-sm flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${pathname === '/future' ? 'text-gray-900 border-gray-300 border shadow-sm' : 'text-gray-600 hover:text-gray-900 border border-transparent hover:border-gray-200 hover:bg-gray-50'}`}>
-                <span className={`text-[10px] px-1.5 py-0.5 rounded-sm uppercase tracking-widest ${pathname === '/future' ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-500'}`}>T3</span> 未來：載入中
-              </Link>
-            </li>
-            <li>
-              <Link href="/about" className={`px-3 py-1.5 text-sm font-bold transition-all rounded-sm flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${pathname === '/about' ? 'text-gray-900 border-gray-300 border shadow-sm' : 'text-gray-600 hover:text-gray-900 border border-transparent hover:border-gray-200 hover:bg-gray-50'}`}>
-                關於
-              </Link>
-            </li>
+            {visibleItems.map((item) => (
+              <li key={item.href}>
+                <Link href={item.href} className={`px-3 py-1.5 text-sm font-bold transition-all rounded-sm flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${pathname === item.href ? 'text-gray-900 border-gray-300 border shadow-sm' : 'text-gray-600 hover:text-gray-900 border border-transparent hover:border-gray-200 hover:bg-gray-50'}`}>
+                  {item.badge && (
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-sm uppercase tracking-widest ${pathname === item.href ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-500'}`}>{item.badge}</span>
+                  )}
+                  {item.label}
+                </Link>
+              </li>
+            ))}
           </ul>
         </nav>
       </div>
