@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { LAUNCHED_PAGES } from '@/data/launch-status';
+import { LAUNCHED_PAGES, ALL_PAGES } from '@/data/launch-status';
 
-const ALL_PAGES_LIST = ['/', '/past', '/present', '/future', '/about', '/controversy-timeline', '/opinion-lazybag'];
+const ALL_PAGES_LIST = ALL_PAGES;
 
 const NAV_ITEMS = [
   { href: '/past', badge: 'T1', label: '過去：時光機' },
