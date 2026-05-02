@@ -10,6 +10,7 @@ score: 0.5
 worktree: .worktrees/spacedock-ensign-018-quiz-materials
 issue:
 pr:
+mod-block: merge:pr-merge
 ---
 
 基於釋憲案例製作互動測驗題，提升用戶學習參與度。
