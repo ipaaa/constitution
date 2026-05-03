@@ -45,3 +45,16 @@ pr:
 **AC-3** 五種情緒在小尺寸使用時仍能分辨差異，且適合作為網站註解、提示、CTA 或社群素材中的角色表情。
 
 **AC-4** 報告需記錄產出方式、檔案路徑、尺寸、透明度檢查，以及與 `public/owl.png` 的一致性檢查。
+
+## Stage Report: draft
+
+- DONE: Five transparent PNG expression files are created under `public/owl-expressions/` and map to 友善親切, 沉靜閱讀, 正直磊落, 嚴肅正氣, and 精神飽滿.
+  Created `owl-friendly.png`, `owl-reading.png`, `owl-upright.png`, `owl-serious.png`, and `owl-energetic.png`; each is a 640x640 RGBA PNG mapped to the requested mood in filename order.
+- DONE: Each expression clearly preserves the latest `public/owl.png` storybook Judge Owl identity and avoids previously rejected glasses, mortarboard, flat emblem, or alternate mascot styles.
+  Inspected `public/owl.png`, `public/tldr-illustration.png`, and task `001` review context; final variants preserve the rounded brown owl, cream heart face disk, swept brows, half-lidded gold eyes, orange beak/talons, purple robe, red Constitution book, and no-glasses/no-mortarboard model.
+- DONE: Stage report gives concrete evidence for output paths, dimensions, transparency, production method, and small-size distinguishability.
+  Built with the available image generation workflow using five chroma-key sources from `/Users/ipa/.codex/generated_images/019debf6-05bf-7c43-b8ab-2e1b81d99820/`, then converted via project `sharp`; `file`/`sips` and alpha scan verify all five outputs are 640x640 RGBA with alpha `0..255` and corner alpha `0/0/0/0`; 64px preview check distinguishes greeting wing, reading gaze, upright pledge pose, stern caution hand, and energetic raised wing.
+
+### Summary
+
+Produced five transparent storybook Judge Owl expression variants in `public/owl-expressions/` using the latest accepted `public/owl.png` as the identity reference. The set keeps the approved no-glasses, no-mortarboard mascot language while changing only expression, posture, and book/wing staging so the moods remain readable for notes, hints, CTAs, and social-sized uses.
