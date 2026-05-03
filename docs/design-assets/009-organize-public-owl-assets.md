@@ -62,3 +62,16 @@ Do not break runtime references. Update code, metadata, and renderer scripts tha
 ### Summary
 
 Consolidated the kept homepage, past/future/avatar, expression, former `public/codex`, and GPT image evidence owl PNGs under `public/owl-avatars/` without regenerating images. The default `npm run lint` was attempted but fails on existing unrelated `.worktrees/.next` and pre-existing source lint issues; targeted ESLint for the changed files passed with one existing `<img>` warning.
+
+## Stage Report: review
+
+- DONE: Review verifies all kept owl assets are consolidated under `public/owl-avatars/` and removed from root/obsolete folders.
+  Evidence: `find public -maxdepth 3` and `git ls-files public` show active owl PNGs under `public/owl-avatars/`; root `public/owl.png`, `public/owl-past.png`, `public/owl-future.png`, and `public/owl-avatar.png` are absent.
+- DONE: Review verifies active references and render scripts now use the new paths without old-path leftovers.
+  Evidence: strict `rg` across `src` and `public` found no exact active references to root owl PNGs, `public/codex/`, `public/owl-expressions/`, `public/mascot-redesign/`, or `public/mascot-redesign-v2/`; `node --check` passed for both active render scripts.
+- DONE: Approval or rejection includes specific, actionable feedback suitable for the gate decision.
+  Evidence: Verdict recommendation is PASSED; no revision is required for this asset-organization gate.
+
+### Summary
+
+PASSED. The public asset tree now has one canonical owl folder, `public/owl-avatars/`, and the obsolete redesign folders plus root-level owl PNGs are gone. App metadata, homepage/component references, and the comic/quiz renderer scripts point at the new paths, while archived historical briefs still contain old paths only as past-task documentation.
