@@ -126,3 +126,18 @@ pr:
 既然 Navbar 會隱藏未開放頁面，主動遇到「即將推出」的機率很低。建議不需要特別設計「即將推出」頁面。如果有人透過直接輸入 URL 到達未開放頁面，簡單顯示一行「這個頁面即將推出，先看看已經上線的內容 →」並導回首頁即可。把精力放在已開放頁面的品質上。
 
 **轉換成本為零：** 全站上線時只需要把 Navbar 的條件判斷移除，所有頁面自然可見。不需要 redirect、不需要清快取、不需要改 OG meta。這是決定性的技術優勢。
+
+## Stage Report: review
+
+- DONE: Review checks whether the evaluation answers all five requested launch/social questions from the brief.
+  Evidence: The draft explicitly covers URL理解/轉發、首次造訪、「即將推出」、OG meta/社群預覽、正式上線轉換成本, and maps each into the comparison table.
+- DONE: Review judges whether the comparison and recommendation are concrete enough to guide a launch decision.
+  Evidence: The recommendation selects方案 A, explains the social narrative advantage through a week-by-week rollout sequence, and names the operational work avoided by not using `/share/` routes.
+- DONE: Approval or rejection includes specific, actionable feedback suitable for the gate decision.
+  Evidence: Verdict is `PASSED`; follow-up action is to implement方案 A with progressive Navbar exposure, permanent canonical URLs, one-time OG metadata, and a minimal fallback page for direct visits to unopened routes.
+
+### Summary
+
+Verdict recommendation: `PASSED`. I reviewed the produced evaluation against the original 004 brief and the archived source task `docs/constitution-features/_archive/033-progressive-launch-strategy.md`; it answers all five requested launch/social questions and gives a concrete launch decision in favor of方案 A.
+
+The recommendation is actionable enough for implementation: keep the current URLs, hide unopened pages from Navbar, avoid `/share/` route duplication, preserve canonical OG URLs, and use only a small redirecting/wayfinding message for unopened pages reached directly.
