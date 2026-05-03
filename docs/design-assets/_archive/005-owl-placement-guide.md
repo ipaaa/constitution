@@ -10,6 +10,7 @@ score: 0.8
 worktree: 
 issue:
 pr:
+archived: 2026-05-03T02:02:59Z
 ---
 
 使用 `public/codex/` 中的三張貓頭鷹圖片，規劃「貓頭鷹法官」吉祥物在全站的視覺融入策略。
