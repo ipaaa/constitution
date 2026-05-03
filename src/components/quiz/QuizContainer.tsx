@@ -31,6 +31,7 @@ export default function QuizContainer({ quiz }: QuizContainerProps) {
       <QuizResult
         score={score}
         total={quiz.questions.length}
+        quizId={quiz.id}
         quizTitle={quiz.title}
         resultLevels={quiz.resultLevels}
         sourceRoute={quiz.sourceRoute}
