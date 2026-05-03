@@ -10,6 +10,7 @@ score: 0.9
 worktree: .worktrees/spacedock-ensign-035-ux-audit
 issue:
 pr:
+mod-block: merge:pr-merge
 ---
 
 根據 design-assets/007 UX 顧問報告，修正上線前必須解決的問題。
