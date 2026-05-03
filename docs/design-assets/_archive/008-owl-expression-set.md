@@ -10,6 +10,7 @@ score: 0.8
 worktree: 
 issue:
 pr:
+archived: 2026-05-03T04:04:28Z
 ---
 
 使用最新的首頁貓頭鷹 `public/owl.png` 作為角色基準，製作五種不同表情變體：
