@@ -258,3 +258,16 @@ Produced a second fresh draft set in `public/mascot-redesign-v2/` that follows t
 ### Summary
 
 The v2 exports satisfy the mechanical requirements for dimensions and real transparency, and protected prior files were not modified: scoped `git diff --name-status` for `public/tldr-illustration.png`, `public/mascot-redesign/`, and prior owl deliverables returned no changes. This review rejects the v2 design on the captain's stated quality bar because it still does not clearly resemble the owl character in `public/tldr-illustration.png`; it reads as a separate glasses-wearing mascot set.
+
+## Stage Report: draft
+
+- DONE: Homepage primary owl redraw is produced with ChatGPT Image 2 / `gpt-image-2`, or the report clearly states the endpoint was unavailable and stops without substitute fabrication.
+  Produced one new homepage owl through the built-in ChatGPT Image 2 / `gpt-image-2` image workflow; saved raw evidence at `public/mascot-redesign-gpt-image-2/owl-homepage-gpt-image-2-raw-chromakey.png`, transparent full-size output at `public/mascot-redesign-gpt-image-2/owl-homepage-gpt-image-2-transparent-fullsize.png`, and replaced the intended homepage deliverable `public/owl.png`.
+- DONE: Redraw is explicitly compared against the T2/reference owl style and addresses the captain's concern that the homepage owl currently differs.
+  Compared against `public/tldr-illustration.png` and current homepage/T2 usage in `src/app/page.tsx` and `src/components/SharedPresent.tsx`; the new owl removes the rejected glasses/mortarboard/vector-emblem language and uses the reference's rounded brown body, cream heart face disk, swept brow feathers, half-lidded weary eyes, small orange beak/talons, purple robe, soft painterly storybook shading, and `憲法` book.
+- DONE: Stage report gives concrete evidence of created files, preserved/replaced files, dimensions/transparency checks, production method, and any blockers.
+  `file`/`sips` verify raw source 1254x1254 RGB, transparent full-size 1254x1254 RGBA, and final `public/owl.png` 640x640 RGBA; Pillow alpha scan verifies final alpha_min=0, alpha_max=255, transparent=267153, partial=3338, opaque=139109, corner_alpha=0/0/0/0. Existing T1/T3/avatar assets were preserved; only final homepage `public/owl.png` was replaced. No production endpoint blocker was encountered.
+
+### Summary
+
+Focused this repair on the homepage primary owl as requested by the captain. The new `public/owl.png` is a ChatGPT Image 2 / `gpt-image-2` redraw that follows the `public/tldr-illustration.png` owl character language much more closely while preserving a separate raw generation record for review.
