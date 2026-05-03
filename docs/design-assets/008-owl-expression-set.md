@@ -1,9 +1,9 @@
 ---
 id: "008"
 title: 貓頭鷹法官五種表情變體
-status: brief
+status: draft
 source: captain-filed
-started:
+started: 2026-05-03T03:50:42Z
 completed:
 verdict:
 score: 0.8
