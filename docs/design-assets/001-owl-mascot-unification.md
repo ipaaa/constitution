@@ -153,6 +153,7 @@ The produced owl illustrations are visually cohesive and generally fit the reque
 - 2026-05-02T19:34:12Z — captain approved production redesign direction B (storybook guide matching `public/tldr-illustration.png`) and added a file-preservation constraint: keep all existing image files unchanged and create a separate new redesign set for review.
 - 2026-05-02T19:51:03Z — captain rejected the fresh redesign: it does not resemble `public/tldr-illustration.png` and does not clearly read as an owl. Route back to `draft`: make the next set directly follow the owl image/shape language in `public/tldr-illustration.png`, with owl recognizability as the primary acceptance criterion.
 - 2026-05-02T20:02:18Z — captain added a production-method constraint: the next image pass must use ChatGPT Image 2 / `gpt-image-2`; do not use local SVG, `sharp`, or hand-built vector rasterization as the production method. If the endpoint is unavailable, stop and report that instead of fabricating substitute assets.
+- 2026-05-03T03:35:29Z — captain requested dispatch with special focus on the homepage primary owl: redraw it because the current homepage owl still differs from the T2/reference image style. Route to `draft` repair before review; preserve the prior production-method constraint requiring ChatGPT Image 2 / `gpt-image-2` and stop if the endpoint is unavailable.
 
 ## Stage Report: draft (cycle 2)
 
