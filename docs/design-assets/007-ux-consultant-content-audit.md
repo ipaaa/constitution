@@ -1,9 +1,9 @@
 ---
 id: "007"
 title: 使用者體驗顧問檢查目前內容並產出顧問報告
-status: brief
+status: draft
 source: captain-filed
-started:
+started: 2026-05-03T02:17:21Z
 completed:
 verdict:
 score: 0.8
