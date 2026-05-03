@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import Image from "next/image";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import type { ResultLevel } from "@/data/quizzes/controversy";
 
@@ -36,37 +35,30 @@ function generateResultImage(
   canvas.height = CANVAS_SIZE;
   const ctx = canvas.getContext("2d")!;
 
-  // Background
   ctx.fillStyle = "#FFFFFF";
   ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 
-  // Border
   ctx.strokeStyle = "#E5E7EB";
   ctx.lineWidth = 4;
   ctx.strokeRect(40, 40, CANVAS_SIZE - 80, CANVAS_SIZE - 80);
 
-  // Inner accent line at top
   ctx.fillStyle = "#6B21A8";
   ctx.fillRect(40, 40, CANVAS_SIZE - 80, 8);
 
-  // Quiz title (top area)
   ctx.fillStyle = "#6B7280";
   ctx.font = "bold 36px sans-serif";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   wrapText(ctx, quizTitle, CANVAS_SIZE / 2, 200, CANVAS_SIZE - 200, 50);
 
-  // Score
   ctx.fillStyle = "#6B21A8";
   ctx.font = "bold 180px serif";
   ctx.fillText(`${score}/${total}`, CANVAS_SIZE / 2, 440);
 
-  // Result title
   ctx.fillStyle = "#111827";
   ctx.font = "bold 80px serif";
   ctx.fillText(levelTitle, CANVAS_SIZE / 2, 600);
 
-  // Divider line
   ctx.strokeStyle = "#E5E7EB";
   ctx.lineWidth = 2;
   ctx.beginPath();
@@ -74,12 +66,10 @@ function generateResultImage(
   ctx.lineTo(CANVAS_SIZE - 340, 720);
   ctx.stroke();
 
-  // Site name
   ctx.fillStyle = "#111827";
   ctx.font = "bold 32px sans-serif";
   ctx.fillText("Add C0urt 憲庭加好友", CANVAS_SIZE / 2, 810);
 
-  // URL
   ctx.fillStyle = "#6B7280";
   ctx.font = "28px sans-serif";
   ctx.fillText(`${SITE_DOMAIN}/quiz/${quizId}`, CANVAS_SIZE / 2, 870);
@@ -122,6 +112,13 @@ function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
   });
 }
 
+const APP_LINKS = [
+  { label: "LINE", href: "https://line.me/R/nv/chat", color: "text-[#06C755]" },
+  { label: "IG", href: "instagram://library", color: "text-[#E4405F]" },
+  { label: "Threads", href: "barcelona://create", color: "text-gray-900" },
+  { label: "FB", href: "fb://publish", color: "text-[#1877F2]" },
+] as const;
+
 export default function QuizResult({
   score,
   total,
@@ -132,7 +129,14 @@ export default function QuizResult({
 }: QuizResultProps) {
   const [sharing, setSharing] = useState(false);
   const [fallbackMsg, setFallbackMsg] = useState(false);
+  const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
   const level = getResultLevel(score, resultLevels);
+
+  // Generate the preview image on mount
+  useEffect(() => {
+    const canvas = generateResultImage(quizId, quizTitle, score, total, level.title);
+    setImageDataUrl(canvas.toDataURL("image/png"));
+  }, [quizId, quizTitle, score, total, level.title]);
 
   const getImageBlob = useCallback(() => {
     const canvas = generateResultImage(quizId, quizTitle, score, total, level.title);
@@ -151,7 +155,6 @@ export default function QuizResult({
       if (navigator.share && navigator.canShare?.({ files: [file] })) {
         await navigator.share({ files: [file] });
       } else {
-        // Desktop fallback: download the image
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
@@ -170,16 +173,6 @@ export default function QuizResult({
 
   return (
     <div className="text-center space-y-6">
-      <div className="flex justify-center">
-        <Image
-          src="/owl.png"
-          alt="Add C0urt 貓頭鷹"
-          width={120}
-          height={120}
-          className="drop-shadow-lg"
-        />
-      </div>
-
       <div className="space-y-2">
         <p className="text-sm text-gray-500">你的測驗結果</p>
         <p className="text-5xl font-bold text-royal-purple font-serif">
@@ -191,7 +184,22 @@ export default function QuizResult({
         <p className="text-gray-600 text-base md:text-lg">{level.description}</p>
       </div>
 
-      <div className="flex flex-col gap-3 pt-4 max-w-xs mx-auto">
+      {/* Result image preview */}
+      {imageDataUrl && (
+        <div className="space-y-2">
+          <img
+            src={imageDataUrl}
+            alt={`測驗結果：${score}/${total} ${level.title}`}
+            className="w-full max-w-xs mx-auto rounded-xl shadow-md border border-gray-100"
+          />
+          <p className="text-xs text-gray-400">
+            長按圖片儲存，分享到你的社群媒體
+          </p>
+        </div>
+      )}
+
+      <div className="flex flex-col gap-3 pt-2 max-w-xs mx-auto">
+        {/* Primary share button */}
         <button
           onClick={handleShare}
           disabled={sharing}
@@ -205,6 +213,21 @@ export default function QuizResult({
             已下載圖片，請手動分享到社群媒體
           </p>
         )}
+
+        {/* App deeplink buttons */}
+        <div className="flex justify-center gap-2">
+          {APP_LINKS.map(({ label, href, color }) => (
+            <a
+              key={label}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-bold ${color} hover:bg-gray-50 transition-colors text-center`}
+            >
+              {label}
+            </a>
+          ))}
+        </div>
 
         <Link
           href={sourceRoute}
