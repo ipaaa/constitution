@@ -9,7 +9,7 @@ verdict:
 score: 0.9
 worktree: .worktrees/spacedock-ensign-035-ux-audit
 issue:
-pr:
+pr: #31
 mod-block: merge:pr-merge
 ---
 
