@@ -1,13 +1,13 @@
 ---
 id: "006"
 title: 測驗結果分享圖片
-status: review
+status: complete
 source: captain-filed
 started: 2026-05-02T20:48:17Z
-completed:
-verdict:
+completed: 2026-05-03T01:39:10Z
+verdict: PASSED
 score: 0.8
-worktree:
+worktree: 
 issue:
 pr:
 ---
