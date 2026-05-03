@@ -29,18 +29,20 @@ export default function ControversyTimelinePage() {
       </div>
 
       {/* Intro */}
-      <div className="bg-white border border-gray-200 rounded-sm p-6 md:p-8 mb-10 relative">
-        <Image
-          src="/codex/owl-past.png"
-          alt=""
-          width={88}
-          height={88}
-          className="absolute top-4 right-4 md:top-6 md:right-6 w-[72px] md:w-[88px] h-auto opacity-60"
-          aria-hidden="true"
-        />
-        <h2 className="font-serif text-lg font-bold text-gray-900 mb-3">
-          這個頁面在講什麼？
-        </h2>
+      <div className="bg-white border border-gray-200 rounded-sm p-6 md:p-8 mb-10">
+        <div className="flex items-start gap-4 mb-3">
+          <h2 className="font-serif text-lg font-bold text-gray-900 flex-1">
+            這個頁面在講什麼？
+          </h2>
+          <Image
+            src="/codex/owl-past.png"
+            alt=""
+            width={80}
+            height={80}
+            className="w-[60px] md:w-[80px] h-auto opacity-60 flex-shrink-0"
+            aria-hidden="true"
+          />
+        </div>
         <div className="text-sm text-gray-600 leading-relaxed space-y-2 font-serif">
           <p>
             2024年起，台灣經歷了一場圍繞國會權力與憲法法庭的重大憲政爭議。立法院多數通過擴權法案，
