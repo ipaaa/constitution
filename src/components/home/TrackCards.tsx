@@ -1,24 +1,43 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowRight, Clock, Search, Workflow } from 'lucide-react';
-import { PUBLIC_PAGES } from '@/data/launch-status';
+import { PUBLIC_PAGES, LAUNCHED_PAGES, ALL_PAGES } from '@/data/launch-status';
 import { CRISIS_STATS } from '@/data/future';
 
-function isPageLaunched(path: string, isPublicMode: boolean): boolean {
-  if (!isPublicMode) return true;
-  return PUBLIC_PAGES.includes(path);
+function isPageLaunched(path: string, pages: string[]): boolean {
+  return pages.includes(path);
 }
 
 export default function TrackCards() {
   const searchParams = useSearchParams();
-  const isPublicMode = searchParams.get('public') === 'true' ||
-    process.env.NEXT_PUBLIC_PUBLIC_MODE === 'true';
+  const [pages, setPages] = useState<string[]>(ALL_PAGES);
+  const [ready, setReady] = useState(false);
 
-  const pastLaunched = isPageLaunched('/past', isPublicMode);
-  const presentLaunched = isPageLaunched('/present', isPublicMode);
-  const futureLaunched = isPageLaunched('/future', isPublicMode);
+  useEffect(() => {
+    let publicMode = false;
+    // ?public=true sets localStorage, persists across navigation (matches LaunchGate)
+    if (searchParams.get('public') === 'true') {
+      localStorage.setItem('public_mode', 'true');
+      publicMode = true;
+    } else if (localStorage.getItem('public_mode') === 'true') {
+      publicMode = true;
+    }
+    if (process.env.NEXT_PUBLIC_PUBLIC_MODE === 'true') {
+      publicMode = true;
+    }
+    setPages(publicMode ? LAUNCHED_PAGES : ALL_PAGES);
+    setReady(true);
+  }, [searchParams]);
+
+  const pastLaunched = isPageLaunched('/past', pages);
+  const presentLaunched = isPageLaunched('/present', pages);
+  const futureLaunched = isPageLaunched('/future', pages);
+
+  // Don't flash incorrect state before hydration
+  if (!ready) return null;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
