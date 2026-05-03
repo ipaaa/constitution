@@ -17,7 +17,7 @@ export default function LazybagCtaSection() {
                 Analysis Tool
               </div>
               <h2 className="text-2xl md:text-3xl font-bold font-serif text-gray-900">
-                國會職權修法判決解析
+                看看憲法法庭如何產生判決
               </h2>
               <p className="text-gray-600 font-medium max-w-lg">
                 114年憲判字第1號——看法庭如何逐條論理，以及大法官意見的光譜分佈。
