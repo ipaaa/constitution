@@ -9,7 +9,7 @@ verdict:
 score: 0.8
 worktree: .worktrees/spacedock-ensign-034-owl-placement
 issue:
-pr:
+pr: #30
 mod-block: merge:pr-merge
 ---
 
