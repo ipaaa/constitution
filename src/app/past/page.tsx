@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import HISTORY_DATA from '@/data/history.json';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowDown, ChevronDown, Search, X } from 'lucide-react';
 import { getLinksForHistory } from '@/data/cross-track-links';
 import CrossTrackLinks from '@/components/CrossTrackLinks';
@@ -383,7 +384,17 @@ export default function PastTrack() {
     <div className="w-full bg-[var(--color-textbook-bg)] text-[var(--color-textbook-text)] font-sans min-h-screen">
       {/* Intro Section */}
       <section className="h-screen flex flex-col items-center justify-center text-center px-6 relative" aria-label="憲法課本時光機介紹">
-        <h1 className="text-5xl md:text-7xl font-black mb-6 font-serif">憲法課本時光機</h1>
+        <div className="flex items-center justify-center gap-4 mb-6">
+          <h1 className="text-5xl md:text-7xl font-black font-serif">憲法課本時光機</h1>
+          <Image
+            src="/codex/owl-past.png"
+            alt=""
+            width={88}
+            height={88}
+            className="hidden md:block w-[80px] md:w-[88px] h-auto opacity-80"
+            aria-hidden="true"
+          />
+        </div>
         <p className="text-xl md:text-2xl max-w-2xl text-gray-700 leading-relaxed font-serif">
           那些習以為常的權利，不是憑空出現的。<br />讓我們翻開課本，回到當年憲法法庭敲下判決的那一刻。
         </p>

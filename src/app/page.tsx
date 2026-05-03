@@ -45,7 +45,7 @@ export default function Home() {
                 Mascot
               </div>
               <Image 
-                src="/owl.png" 
+                src="/codex/owl.png"
                 alt="貓頭鷹法官吉祥物"
                 width={360} 
                 height={360} 
