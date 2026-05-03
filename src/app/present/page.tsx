@@ -380,7 +380,7 @@ export default function PresentTrack() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-12 items-start relative">
         
         {/* Left Page: System Diagnostics Timeline (Sticky) */}
-        <div className="lg:col-span-4 xl:col-span-3 lg:sticky lg:top-28">
+        <div id="timeline" className="lg:col-span-4 xl:col-span-3 lg:sticky lg:top-28 scroll-mt-24">
            <CourtTimeline />
         </div>
 
@@ -388,9 +388,11 @@ export default function PresentTrack() {
         <div className="lg:col-span-8 xl:col-span-9 flex flex-col lg:pl-4 xl:pl-8 pb-12">
           
           {/* Relocated TL;DR */}
-          <OfficialTLDR item={DISCUSSIONS_DATA.find(item => item.id === 'tldr')} />
+          <div id="tldr" className="scroll-mt-24">
+            <OfficialTLDR item={DISCUSSIONS_DATA.find(item => item.id === 'tldr')} />
+          </div>
           
-          <div className="flex justify-between items-center border-b-2 border-gray-900 pb-3 mb-12">
+          <div id="voices" className="flex justify-between items-center border-b-2 border-gray-900 pb-3 mb-12 scroll-mt-24">
             <h3 className="text-xl font-bold text-gray-900 font-serif">大家怎麼看？</h3>
           </div>
 
