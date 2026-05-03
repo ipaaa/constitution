@@ -1,7 +1,7 @@
 ---
 id: "003"
 title: 漫畫式懶人包 — 114年憲判字第1號
-status: review
+status: draft
 source: captain-filed
 started: 2026-05-01T21:03:43Z
 completed:
@@ -142,3 +142,7 @@ pr:
 Verdict recommendation: `REJECTED`. The brief is detailed and includes the intended palette, typography, mascot usage, layout direction, and output list, but the produced asset directory and all expected files are missing.
 
 Revision feedback: create `public/comic-lazybag/` and deliver `003-comic-lazybag-114-web.svg`, `003-comic-lazybag-114-web@2x.png`, ten `003-comic-lazybag-114-ig-{01-10}.png` carousel panels, `003-comic-lazybag-114-fb.png`, and `003-comic-lazybag-114-line.png`. The next draft should visibly use the owl judge mascot, the specified gray/red/amber/pearl palette, Noto Serif TC/Noto Sans TC/Manrope-style type hierarchy, 10-panel story structure, clear verdict badges, and mobile-safe readable text.
+
+### Feedback Cycles
+
+- 2026-05-03T01:26:51Z — review rejected draft because required produced assets were missing. Route back to `draft` to create `public/comic-lazybag/` and the complete expected asset set before re-review.
