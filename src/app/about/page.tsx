@@ -1,3 +1,4 @@
+import Image from "next/image";
 import ContributorGrid from "@/components/about/ContributorGrid";
 import { contributors } from "@/data/contributors";
 
@@ -31,10 +32,19 @@ export default function AboutPage() {
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 font-serif border-l-[6px] border-gray-900 pl-6 mb-10">
             專案緣由
           </h2>
-          <div className="space-y-6 text-gray-500 leading-relaxed text-lg pl-8 border-l border-gray-300 italic">
-            <p>
-              （專案緣由文案撰寫中，請參閱 docs/about-content.md）
-            </p>
+          <div className="flex gap-6 items-start">
+            <div className="space-y-6 text-gray-500 leading-relaxed text-lg pl-8 border-l border-gray-300 italic flex-1">
+              <p>
+                （專案緣由文案撰寫中，請參閱 docs/about-content.md）
+              </p>
+            </div>
+            <Image
+              src="/codex/owl.png"
+              alt="貓頭鷹法官"
+              width={140}
+              height={140}
+              className="hidden md:block w-[96px] md:w-[140px] h-auto flex-shrink-0"
+            />
           </div>
         </div>
       </section>

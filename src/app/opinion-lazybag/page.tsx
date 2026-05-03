@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import DecisionFlowchart from '@/components/opinion-lazybag/DecisionFlowchart';
 import StanceSpectrum from '@/components/opinion-lazybag/StanceSpectrum';
 
@@ -16,6 +17,14 @@ export default function OpinionLazybagPage() {
             Ruling
           </span>
           <span className="font-serif">國會職權修法判決</span>
+          <Image
+            src="/codex/owl.png"
+            alt=""
+            width={56}
+            height={56}
+            className="w-[48px] md:w-[56px] h-auto opacity-70"
+            aria-hidden="true"
+          />
         </h1>
         <p className="text-gray-500 font-medium font-serif mt-2 text-lg">
           114年憲判字第1號——法庭如何逐條論理，而非投票表決。

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import Image from 'next/image';
 import { PENDING_CASES, CRISIS_STATS, LAST_UPDATED, IdentityTag } from '@/data/future';
 import RightsCalculator from '@/components/future/RightsCalculator';
 import BottleneckFunnel from '@/components/future/BottleneckFunnel';
@@ -50,6 +51,14 @@ export default function FutureTrack() {
       {/* Crisis Banner */}
       <div className="bg-gray-900 text-white p-6 md:p-8 rounded-sm mb-8 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-[#D32F2F] rounded-full blur-[120px] opacity-20" />
+        <Image
+          src="/codex/owl-future.png"
+          alt=""
+          width={120}
+          height={120}
+          className="absolute bottom-4 right-4 md:bottom-6 md:right-6 w-[72px] md:w-[108px] h-auto opacity-60 drop-shadow-lg z-10"
+          aria-hidden="true"
+        />
         <div className="relative z-10">
           <div className="flex flex-col md:flex-row md:items-center gap-4 mb-4">
             <div className="flex items-center gap-2">

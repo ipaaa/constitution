@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { TIMELINE_EVENTS, CATEGORIES } from '@/data/controversy-timeline';
 import ControversyTimeline from '@/components/controversy-timeline/ControversyTimeline';
 
@@ -28,7 +29,15 @@ export default function ControversyTimelinePage() {
       </div>
 
       {/* Intro */}
-      <div className="bg-white border border-gray-200 rounded-sm p-6 md:p-8 mb-10">
+      <div className="bg-white border border-gray-200 rounded-sm p-6 md:p-8 mb-10 relative">
+        <Image
+          src="/codex/owl-past.png"
+          alt=""
+          width={88}
+          height={88}
+          className="absolute top-4 right-4 md:top-6 md:right-6 w-[72px] md:w-[88px] h-auto opacity-60"
+          aria-hidden="true"
+        />
         <h2 className="font-serif text-lg font-bold text-gray-900 mb-3">
           這個頁面在講什麼？
         </h2>
