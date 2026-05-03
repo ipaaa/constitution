@@ -34,7 +34,7 @@ export default function Home() {
             
             <div className="flex flex-wrap gap-4 pt-6 pl-8">
               <Link href="/future" className="bg-gray-900 text-white px-8 py-3.5 font-bold hover:bg-gray-800 transition-colors flex items-center gap-2 shadow-sm rounded-sm">
-                查看癱瘓實況 <ArrowRight size={20} />
+                查看憲法法庭危機現狀 <ArrowRight size={20} />
               </Link>
             </div>
             <div className="pl-8">
