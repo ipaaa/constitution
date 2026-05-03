@@ -1,7 +1,7 @@
 ---
 id: "004"
 title: 漸進式上線方案評估（社群擴散效益）
-status: draft
+status: review
 source: constitution-features/033
 started: 2026-05-01T23:53:26Z
 completed:
