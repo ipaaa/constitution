@@ -271,3 +271,16 @@ The v2 exports satisfy the mechanical requirements for dimensions and real trans
 ### Summary
 
 Focused this repair on the homepage primary owl as requested by the captain. The new `public/owl.png` is a ChatGPT Image 2 / `gpt-image-2` redraw that follows the `public/tldr-illustration.png` owl character language much more closely while preserving a separate raw generation record for review.
+
+## Stage Report: review
+
+- DONE: Review verifies the new homepage `public/owl.png` was produced with the required method evidence and matches 640x640 transparent PNG expectations.
+  Inspected draft evidence `public/mascot-redesign-gpt-image-2/owl-homepage-gpt-image-2-raw-chromakey.png` and `owl-homepage-gpt-image-2-transparent-fullsize.png`, plus final `public/owl.png`; `file`/`sips` report final 640x640 RGBA with alpha, and `sharp` alpha scan reports `alpha=0..255`, transparent=267153, partial=3338, opaque=139109, corner alpha `0/0/0/0`.
+- DONE: Review directly compares the homepage owl against the T2/reference style, especially `public/tldr-illustration.png`, and judges whether it resolves the captain's style-mismatch concern.
+  Direct image review shows the homepage owl now matches the reference character language: rounded brown body, cream heart-shaped face disk, swept brow feathers, half-lidded weary eyes, purple robe, small orange beak/talons, softer storybook shading, and a `憲法` book; homepage and T2 both consume `/owl.png`, so this resolves the homepage/T2 mismatch concern.
+- DONE: Approval or rejection includes specific, actionable feedback suitable for the gate decision.
+  PASSED. Non-blocking feedback: the green-screen raw file is good evidence to preserve, and future variants should use this same no-glasses, no-mortarboard reference model; avoid returning to the flat emblem/glasses style rejected in v2.
+
+### Summary
+
+The latest homepage owl redraw is approved. It meets the required transparent 640x640 PNG expectations, has method evidence under `public/mascot-redesign-gpt-image-2/`, and visually aligns with `public/tldr-illustration.png` closely enough to resolve the captain's stated style-mismatch concern.
