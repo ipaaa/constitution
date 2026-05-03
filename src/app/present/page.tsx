@@ -352,6 +352,13 @@ export default function PresentTrack() {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12 w-full bg-[#fcfcfc] min-h-screen">
+      {/* Quick Reading Guide */}
+      <div className="bg-blue-50 border border-blue-100 rounded-sm px-5 py-3 mb-8">
+        <p className="text-sm text-blue-800">
+          如果你只有 3 分鐘：先看懶人包，再看時間表，最後選一篇觀點深入了解
+        </p>
+      </div>
+
       {/* Search & Filter Bar */}
       <div className="flex flex-col md:flex-row justify-between items-end md:items-center mb-12 gap-6 pb-6 border-b border-gray-200">
         <div className="border-l-4 border-gray-800 pl-4 w-full md:w-auto">

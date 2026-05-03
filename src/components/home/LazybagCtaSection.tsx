@@ -17,10 +17,10 @@ export default function LazybagCtaSection() {
                 Analysis Tool
               </div>
               <h2 className="text-2xl md:text-3xl font-bold font-serif text-gray-900">
-                大法官怎麼想？
+                國會職權修法判決解析
               </h2>
               <p className="text-gray-600 font-medium max-w-lg">
-                不標籤人、不貼黨派——用論證角度看大法官意見的光譜分佈。
+                114年憲判字第1號——看法庭如何逐條論理，以及大法官意見的光譜分佈。
               </p>
             </div>
 
@@ -35,7 +35,7 @@ export default function LazybagCtaSection() {
                 </span>
               </div>
               <span className="text-sm font-bold text-blue-600 flex items-center gap-1 group-hover:underline">
-                探索觀點光譜 <ArrowRight size={14} />
+                看判決推理過程 <ArrowRight size={14} />
               </span>
             </div>
           </div>
