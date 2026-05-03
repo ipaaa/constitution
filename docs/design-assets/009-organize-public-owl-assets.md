@@ -1,9 +1,9 @@
 ---
 id: "009"
 title: 整理 public 內貓頭鷹圖片資產
-status: brief
+status: draft
 source: captain-filed
-started:
+started: 2026-05-03T04:07:19Z
 completed:
 verdict:
 score: 0.8
