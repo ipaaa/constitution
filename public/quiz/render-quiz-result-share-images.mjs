@@ -5,7 +5,7 @@ import sharp from "sharp";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.resolve(__dirname, "..");
-const codexDir = path.join(publicDir, "codex");
+const owlAvatarsDir = path.join(publicDir, "owl-avatars");
 
 const fonts = {
   serif: "Noto Serif TC, Songti TC, Hiragino Sans GB, serif",
@@ -21,7 +21,7 @@ const levels = [
     message: "沒關係，現在開始關心還來得及！",
     accent: "#D32F2F",
     light: "#FFECEC",
-    owl: "owl-past.png",
+    owl: "codex-owl-past.png",
     owlVariant: "tilt-question",
   },
   {
@@ -31,7 +31,7 @@ const levels = [
     message: "你已經比很多人更關心這件事了。",
     accent: "#F7C04A",
     light: "#FFF6D8",
-    owl: "owl.png",
+    owl: "codex-owl.png",
     owlVariant: "front-pencil",
   },
   {
@@ -41,7 +41,7 @@ const levels = [
     message: "你對憲政問題有相當的理解力！",
     accent: "#2563EB",
     light: "#EAF2FF",
-    owl: "owl-past.png",
+    owl: "codex-owl-past.png",
     owlVariant: "magnifier",
   },
   {
@@ -51,7 +51,7 @@ const levels = [
     message: "恭喜你！你的憲政素養令人印象深刻。",
     accent: "#341764",
     light: "#F0E8FF",
-    owl: "owl-future.png",
+    owl: "codex-owl-future.png",
     owlVariant: "gold-rays",
   },
 ];
@@ -202,7 +202,7 @@ function owlImage(level, data, layout) {
 }
 
 function igLayout(level, data) {
-  const isFront = level.owl === "owl.png";
+  const isFront = level.owl === "codex-owl.png";
   const isExpert = level.slug === "expert";
   const owl = isFront
     ? { owlX: 560, owlY: 242, owlW: 388, owlH: 388, overlayX: 780, overlayY: 236 }
@@ -237,7 +237,7 @@ function igLayout(level, data) {
 }
 
 function fbLayout(level, data) {
-  const isFront = level.owl === "owl.png";
+  const isFront = level.owl === "codex-owl.png";
   const isExpert = level.slug === "expert";
   const owl = isFront
     ? { owlX: 780, owlY: 126, owlW: 342, owlH: 342, overlayX: 908, overlayY: 136 }
@@ -274,7 +274,7 @@ async function render() {
   await fs.mkdir(__dirname, { recursive: true });
 
   for (const level of levels) {
-    const owlPath = path.join(codexDir, level.owl);
+    const owlPath = path.join(owlAvatarsDir, level.owl);
     const owlData = await dataUri(owlPath);
 
     for (const [kind, size] of Object.entries(sizes)) {

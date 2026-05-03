@@ -152,7 +152,7 @@ Revision feedback: create `public/comic-lazybag/` and deliver `003-comic-lazybag
 - DONE: Asset directory and expected web/social filenames are created or any missing files have explicit tooling blockers.
   Created `public/comic-lazybag/` with `003-comic-lazybag-114-web.svg`, `003-comic-lazybag-114-web@2x.png`, `003-comic-lazybag-114-ig-01.png` through `003-comic-lazybag-114-ig-10.png`, `003-comic-lazybag-114-fb.png`, and `003-comic-lazybag-114-line.png`.
 - DONE: Produced visuals follow the 10-panel story, owl judge motif, verdict badges, and specified palette/type direction.
-  Source SVG and renderer embed `public/owl.png`, use gray/red/amber/pearl tokens, Noto Serif TC/Noto Sans TC/Manrope font stacks, and include verdict badges for each relevant panel.
+  Source SVG and renderer embed `public/owl-avatars/owl.png`, use gray/red/amber/pearl tokens, Noto Serif TC/Noto Sans TC/Manrope font stacks, and include verdict badges for each relevant panel.
 - DONE: Stage report gives concrete evidence of created files and remaining export limitations, if any.
   `file`/`sharp` checks confirmed PNG sizes: web fallback `1536x6372`, IG cards `1080x1080`, Facebook `1200x630`, LINE `520x520`; no raster export blockers remain.
 

@@ -7,7 +7,7 @@ export default function ComingSoon() {
       <div className="bg-white border border-gray-200 rounded-sm p-10 md:p-16 shadow-sm max-w-lg w-full text-center">
         <div className="mb-8">
           <Image
-            src="/owl.png"
+            src="/owl-avatars/owl.png"
             alt="貓頭鷹法官吉祥物"
             width={160}
             height={160}

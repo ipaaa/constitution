@@ -9,13 +9,13 @@ export const metadata: Metadata = {
     description: "憲政科技平台 - 別讓你的權利已讀不回。降低公民理解憲法法庭價值的門檻，一起守護台灣民主。",
     type: "website",
     locale: "zh_TW",
-    images: [{ url: "/owl.png", width: 360, height: 360, alt: "Add C0urt 貓頭鷹法官吉祥物" }],
+    images: [{ url: "/owl-avatars/owl.png", width: 360, height: 360, alt: "Add C0urt 貓頭鷹法官吉祥物" }],
   },
   twitter: {
     card: "summary",
     title: "Add C0urt 憲庭加好友",
     description: "憲政科技平台 - 別讓你的權利已讀不回",
-    images: ["/owl.png"],
+    images: ["/owl-avatars/owl.png"],
   },
 };
 

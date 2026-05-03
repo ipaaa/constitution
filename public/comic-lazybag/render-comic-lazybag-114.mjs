@@ -345,7 +345,7 @@ async function renderPng(svg, fileName, options = {}) {
 }
 
 async function main() {
-  const owlData = await dataUri("owl.png");
+  const owlData = await dataUri("owl-avatars/owl.png");
   const web = webSvg(owlData);
   await fs.writeFile(path.join(outDir, "003-comic-lazybag-114-web.svg"), web.trimStart());
   await renderPng(web, "003-comic-lazybag-114-web@2x.png", { width: 1536 });

@@ -13,4 +13,4 @@ pr: #30
 mod-block: merge:pr-merge
 ---
 
-根據 design-assets/005 的 placement guide，將 public/codex/ 的貓頭鷹圖片整合到全站各頁面。使用既有圖片素材：owl.png、owl-past.png、owl-future.png。
+根據 design-assets/005 的 placement guide，將集中於 public/owl-avatars/ 的貓頭鷹圖片整合到全站各頁面。使用既有圖片素材：owl.png、owl-past.png、owl-future.png。

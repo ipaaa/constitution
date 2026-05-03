@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "zh_TW",
     images: [
-      { url: "/owl.png", width: 360, height: 360, alt: "Add C0urt 憲法測驗" },
+      { url: "/owl-avatars/owl.png", width: 360, height: 360, alt: "Add C0urt 憲法測驗" },
     ],
   },
 };

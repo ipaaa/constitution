@@ -49,3 +49,16 @@ Do not break runtime references. Update code, metadata, and renderer scripts tha
 **AC-3** All active site references and asset-generation scripts are updated to the new paths and verified by search.
 
 **AC-4** The change preserves existing image files' visual content and does not regenerate or redesign assets.
+
+## Stage Report: draft
+
+- DONE: Owl avatar/mascot PNGs that remain in use are consolidated under `public/owl-avatars/`, with root-level owl PNGs removed.
+  Evidence: `find public -maxdepth 3` shows active owl PNGs under `public/owl-avatars/`; `test ! -e public/owl.png ... ! -e public/owl-avatar.png` passed.
+- DONE: Obsolete `public/mascot-redesign/` and `public/mascot-redesign-v2/` folders are removed and references are cleared.
+  Evidence: `git rm -r public/mascot-redesign public/mascot-redesign-v2`; strict active search found no code/script references to those folders.
+- DONE: Active code, metadata, docs where relevant, and generation scripts are updated and verified by search so runtime asset paths are not broken.
+  Evidence: updated app metadata/components and comic/quiz renderers; strict active old-path `rg` returned no matches, `node --check`, `git diff --check`, and targeted `npx eslint ...` passed.
+
+### Summary
+
+Consolidated the kept homepage, past/future/avatar, expression, former `public/codex`, and GPT image evidence owl PNGs under `public/owl-avatars/` without regenerating images. The default `npm run lint` was attempted but fails on existing unrelated `.worktrees/.next` and pre-existing source lint issues; targeted ESLint for the changed files passed with one existing `<img>` warning.
