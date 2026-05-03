@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import type { ResultLevel } from "@/data/quizzes/controversy";
 
@@ -20,96 +20,17 @@ function getResultLevel(score: number, levels: ResultLevel[]): ResultLevel {
   return levels[levels.length - 1];
 }
 
-const SITE_DOMAIN = "addcourt.tw";
-const CANVAS_SIZE = 1080;
+// Map result level titles to pre-designed share images (IG 1080x1080)
+const RESULT_IMAGE_MAP: Record<string, string> = {
+  "憲法小白": "/quiz/quiz-result-novice-ig.png",
+  "憲法見習生": "/quiz/quiz-result-trainee-ig.png",
+  "憲法觀察家": "/quiz/quiz-result-observer-ig.png",
+  "憲法達人": "/quiz/quiz-result-expert-ig.png",
+};
 
-function generateResultImage(
-  quizId: string,
-  quizTitle: string,
-  score: number,
-  total: number,
-  levelTitle: string,
-): HTMLCanvasElement {
-  const canvas = document.createElement("canvas");
-  canvas.width = CANVAS_SIZE;
-  canvas.height = CANVAS_SIZE;
-  const ctx = canvas.getContext("2d")!;
-
-  ctx.fillStyle = "#FFFFFF";
-  ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
-
-  ctx.strokeStyle = "#E5E7EB";
-  ctx.lineWidth = 4;
-  ctx.strokeRect(40, 40, CANVAS_SIZE - 80, CANVAS_SIZE - 80);
-
-  ctx.fillStyle = "#6B21A8";
-  ctx.fillRect(40, 40, CANVAS_SIZE - 80, 8);
-
-  ctx.fillStyle = "#6B7280";
-  ctx.font = "bold 36px sans-serif";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  wrapText(ctx, quizTitle, CANVAS_SIZE / 2, 200, CANVAS_SIZE - 200, 50);
-
-  ctx.fillStyle = "#6B21A8";
-  ctx.font = "bold 180px serif";
-  ctx.fillText(`${score}/${total}`, CANVAS_SIZE / 2, 440);
-
-  ctx.fillStyle = "#111827";
-  ctx.font = "bold 80px serif";
-  ctx.fillText(levelTitle, CANVAS_SIZE / 2, 600);
-
-  ctx.strokeStyle = "#E5E7EB";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(340, 720);
-  ctx.lineTo(CANVAS_SIZE - 340, 720);
-  ctx.stroke();
-
-  ctx.fillStyle = "#111827";
-  ctx.font = "bold 32px sans-serif";
-  ctx.fillText("Add C0urt 憲庭加好友", CANVAS_SIZE / 2, 810);
-
-  ctx.fillStyle = "#6B7280";
-  ctx.font = "28px sans-serif";
-  ctx.fillText(`${SITE_DOMAIN}/quiz/${quizId}`, CANVAS_SIZE / 2, 870);
-
-  return canvas;
-}
-
-function wrapText(
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  x: number,
-  y: number,
-  maxWidth: number,
-  lineHeight: number,
-) {
-  const chars = [...text];
-  let line = "";
-  let currentY = y;
-
-  for (const char of chars) {
-    const testLine = line + char;
-    const metrics = ctx.measureText(testLine);
-    if (metrics.width > maxWidth && line.length > 0) {
-      ctx.fillText(line, x, currentY);
-      line = char;
-      currentY += lineHeight;
-    } else {
-      line = testLine;
-    }
-  }
-  ctx.fillText(line, x, currentY);
-}
-
-function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
-  return new Promise((resolve, reject) => {
-    canvas.toBlob((blob) => {
-      if (blob) resolve(blob);
-      else reject(new Error("Canvas toBlob failed"));
-    }, "image/png");
-  });
+async function fetchImageBlob(url: string): Promise<Blob> {
+  const response = await fetch(url);
+  return response.blob();
 }
 
 const APP_LINKS = [
@@ -129,25 +50,15 @@ export default function QuizResult({
 }: QuizResultProps) {
   const [sharing, setSharing] = useState(false);
   const [fallbackMsg, setFallbackMsg] = useState(false);
-  const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
   const level = getResultLevel(score, resultLevels);
 
-  // Generate the preview image on mount
-  useEffect(() => {
-    const canvas = generateResultImage(quizId, quizTitle, score, total, level.title);
-    setImageDataUrl(canvas.toDataURL("image/png"));
-  }, [quizId, quizTitle, score, total, level.title]);
-
-  const getImageBlob = useCallback(() => {
-    const canvas = generateResultImage(quizId, quizTitle, score, total, level.title);
-    return canvasToBlob(canvas);
-  }, [quizId, quizTitle, score, total, level.title]);
+  const imageUrl = RESULT_IMAGE_MAP[level.title] || RESULT_IMAGE_MAP["憲法小白"];
 
   const handleShare = async () => {
     setSharing(true);
     setFallbackMsg(false);
     try {
-      const blob = await getImageBlob();
+      const blob = await fetchImageBlob(imageUrl);
       const file = new File([blob], `addcourt-quiz-${quizId}.png`, {
         type: "image/png",
       });
@@ -185,18 +96,16 @@ export default function QuizResult({
       </div>
 
       {/* Result image preview */}
-      {imageDataUrl && (
-        <div className="space-y-2">
-          <img
-            src={imageDataUrl}
-            alt={`測驗結果：${score}/${total} ${level.title}`}
-            className="w-full max-w-xs mx-auto rounded-xl shadow-md border border-gray-100"
-          />
-          <p className="text-xs text-gray-400">
-            長按圖片儲存，分享到你的社群媒體
-          </p>
-        </div>
-      )}
+      <div className="space-y-2">
+        <img
+          src={imageUrl}
+          alt={`測驗結果：${score}/${total} ${level.title}`}
+          className="w-full max-w-xs mx-auto rounded-xl shadow-md border border-gray-100"
+        />
+        <p className="text-xs text-gray-400">
+          長按圖片儲存，分享到你的社群媒體
+        </p>
+      </div>
 
       <div className="flex flex-col gap-3 pt-2 max-w-xs mx-auto">
         {/* Primary share button */}
