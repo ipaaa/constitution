@@ -1,9 +1,9 @@
 ---
 id: "005"
 title: 貓頭鷹法官全站視覺融入策略
-status: brief
+status: draft
 source: captain-filed
-started:
+started: 2026-05-03T01:50:54Z
 completed:
 verdict:
 score: 0.8
