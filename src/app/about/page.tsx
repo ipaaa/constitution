@@ -39,7 +39,7 @@ export default function AboutPage() {
               </p>
             </div>
             <Image
-              src="/codex/owl.png"
+              src="/owl-avatars/codex-owl.png"
               alt="貓頭鷹法官"
               width={140}
               height={140}

@@ -35,7 +35,7 @@ export default function ControversyTimelinePage() {
             這個頁面在講什麼？
           </h2>
           <Image
-            src="/codex/owl-past.png"
+            src="/owl-avatars/codex-owl-past.png"
             alt=""
             width={80}
             height={80}

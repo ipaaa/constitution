@@ -18,7 +18,7 @@ export default function OpinionLazybagPage() {
           </span>
           <span className="font-serif">國會職權修法判決</span>
           <Image
-            src="/codex/owl.png"
+            src="/owl-avatars/codex-owl.png"
             alt=""
             width={56}
             height={56}

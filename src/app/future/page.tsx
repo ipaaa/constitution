@@ -52,7 +52,7 @@ export default function FutureTrack() {
       <div className="bg-gray-900 text-white p-6 md:p-8 rounded-sm mb-8 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-[#D32F2F] rounded-full blur-[120px] opacity-20" />
         <Image
-          src="/codex/owl-future.png"
+          src="/owl-avatars/codex-owl-future.png"
           alt=""
           width={120}
           height={120}

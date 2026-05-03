@@ -387,7 +387,7 @@ export default function PastTrack() {
         <div className="flex items-center justify-center gap-4 mb-6">
           <h1 className="text-5xl md:text-7xl font-black font-serif">憲法課本時光機</h1>
           <Image
-            src="/codex/owl-past.png"
+            src="/owl-avatars/codex-owl-past.png"
             alt=""
             width={88}
             height={88}
