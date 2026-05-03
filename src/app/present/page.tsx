@@ -355,7 +355,7 @@ export default function PresentTrack() {
       {/* Quick Reading Guide */}
       <div className="bg-blue-50 border border-blue-100 rounded-sm px-5 py-3 mb-8">
         <p className="text-sm text-blue-800">
-          如果你只有 3 分鐘：先看懶人包，再看時間表，最後選一篇觀點深入了解
+          如果你只有 3 分鐘：先看<a href="#tldr" className="underline font-bold hover:text-blue-600">懶人包</a>，再看<a href="#timeline" className="underline font-bold hover:text-blue-600">時間表</a>，最後選一篇<a href="#voices" className="underline font-bold hover:text-blue-600">觀點</a>深入了解
         </p>
       </div>
 
@@ -387,7 +387,7 @@ export default function PresentTrack() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-12 items-start relative">
         
         {/* Left Page: System Diagnostics Timeline (Sticky) */}
-        <div className="lg:col-span-4 xl:col-span-3 lg:sticky lg:top-28">
+        <div id="timeline" className="lg:col-span-4 xl:col-span-3 lg:sticky lg:top-28 scroll-mt-24">
            <CourtTimeline />
         </div>
 
@@ -395,9 +395,11 @@ export default function PresentTrack() {
         <div className="lg:col-span-8 xl:col-span-9 flex flex-col lg:pl-4 xl:pl-8 pb-12">
           
           {/* Relocated TL;DR */}
-          <OfficialTLDR item={DISCUSSIONS_DATA.find(item => item.id === 'tldr')} />
+          <div id="tldr" className="scroll-mt-24">
+            <OfficialTLDR item={DISCUSSIONS_DATA.find(item => item.id === 'tldr')} />
+          </div>
           
-          <div className="flex justify-between items-center border-b-2 border-gray-900 pb-3 mb-12">
+          <div id="voices" className="flex justify-between items-center border-b-2 border-gray-900 pb-3 mb-12 scroll-mt-24">
             <h3 className="text-xl font-bold text-gray-900 font-serif">大家怎麼看？</h3>
           </div>
 
