@@ -109,3 +109,16 @@ pr:
 ### Summary
 
 Drafted a production-ready owl placement guide for all requested pages using the three inspected `public/codex/` PNG assets. The strategy keeps the homepage as the primary mascot moment, uses past/future variants only where their time-track semantics fit, and keeps data-heavy/legal-analysis pages subtle so the current editorial document language remains intact.
+
+## Stage Report: review
+
+- DONE: Review verifies every requested page has owl role, source image, size, position, and usage context.
+  Evidence: The placement table covers 首頁, T1 時光機, T2 熱搜榜, T3 未來, 意見懶人包, 爭議時序懶人包, and About with explicit role, asset path, pixel size range, placement, and usage context for each.
+- DONE: Review checks asset division and subtle/high-recognition guidance against the three acceptance criteria.
+  Evidence: Verified `public/codex/owl.png` is 640x640 and the past/future variants are 200x200; guide assigns `owl.png` to brand/comment use, `owl-past.png` to history/timeline contexts, and `owl-future.png` to crisis contexts, with clear high/mid/low exposure rules matching AC-1 through AC-3.
+- DONE: Approval or rejection includes specific, actionable feedback suitable for the gate decision.
+  Evidence: Verdict recommendation is PASSED; implementation feedback is to keep the path strategy consistent between `public/codex/*` and current root `/owl*.png` references, and to centralize future rendering in a shared `OwlMascot` component as noted by the guide.
+
+### Summary
+
+Verdict recommendation: PASSED. I reviewed the guide against the original brief, asset files, and representative site context in `src/app/page.tsx`, `src/app/past/page.tsx`, `src/app/future/page.tsx`, `src/components/SharedPresent.tsx`, `src/app/opinion-lazybag/page.tsx`, `src/app/controversy-timeline/page.tsx`, `src/app/about/page.tsx`, and `src/app/globals.css`; the guide is complete, visually consistent with the existing restrained document/tool language, and gives actionable implementation constraints.
