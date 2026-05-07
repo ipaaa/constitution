@@ -24,6 +24,13 @@ stages:
 
 管理憲庭加好友專案的圖像設計素材與社群媒體視覺內容。涵蓋吉祥物設計、社群貼文圖像、infographic、品牌視覺統一等非程式碼的視覺產出物。
 
+## 寫作規範
+
+本 workflow 遵守 vault 根 `/CLAUDE.md` 的所有規範。
+
+- 禁用句型、語感原則：見 `/style_guide.md`
+- Stage Report 格式：Format B（見 `/CLAUDE.md`）
+
 ## File Naming
 
 Each task is a markdown file named `{id}-{slug}.md` — lowercase, hyphens, no spaces. Example: `001-owl-mascot-homepage.md`.

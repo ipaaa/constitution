@@ -31,6 +31,13 @@ stages:
 
 This workflow tracks features for a constitution literacy website that makes Taiwan's Constitutional Court accessible through three experiential tracks: Past (timeline), Present (trending cases), and Future (bottleneck crisis). Each feature moves from design through implementation and review before merging into the site.
 
+## 寫作規範
+
+本 workflow 遵守 vault 根 `/CLAUDE.md` 的所有規範。
+
+- 禁用句型、語感原則：見 `/style_guide.md`
+- Stage Report 格式：Format B（見 `/CLAUDE.md`）
+
 ## File Naming
 
 Each feature is a markdown file named `{id}-{slug}.md` — lowercase, hyphens, no spaces. Example: `004-t2-search-wiring.md`.
