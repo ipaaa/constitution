@@ -189,9 +189,11 @@ function DecadeSection({ group, expanded, onToggle, registerEntryRef }: DecadeSe
                           {item.category || '憲法起源'}
                         </span>
                       </div>
-                      <h2 className="text-3xl md:text-4xl font-black text-[#1A1A1A] border-b-2 border-[#D3D3D3] pb-4 mb-6">
-                        {item.textbook.chapter}
-                      </h2>
+                      {item.textbook.chapter?.trim() && (
+                        <h2 className="text-3xl md:text-4xl font-black text-[#1A1A1A] border-b-2 border-[#D3D3D3] pb-4 mb-6">
+                          {item.textbook.chapter}
+                        </h2>
+                      )}
                       <p
                         className="text-xl leading-[1.8] text-[#3A3A3A] mb-5"
                         dangerouslySetInnerHTML={{ __html: item.textbook.content as string }}
