@@ -1,6 +1,6 @@
 # 憲庭加好友 — 內容產線待辦清單
 
-體檢日期：2026-08-31　　最後更新：2026-08-31
+體檢日期：2026-08-31　　最後更新：2026-09-01
 
 本清單依**危險程度**排序，不是依工作量。每一項都附證據與驗證指令，可自行重跑確認。
 
@@ -75,21 +75,48 @@ curl -s https://constitution-nine.vercel.app/past -o p.html
 # 內容為 client-render，資料在 JS bundle 而非 HTML，需抓 /_next/static/*.js 比對
 ```
 
-### 2. 回填 SSOT 的 10 格 　🔴 **唯一剩下的封鎖**
+### ~~2. 回填 SSOT 的 10 格~~ 🟡 **大部分已完成（2026-09-01 查核）**
 
 → [`../content-rescue/ssot-backfill.md`](../content-rescue/ssot-backfill.md)
 
-**只有你能做**（Drive connector 無寫入儲存格能力）。這是解除「不能跑 sync」封鎖的前提。
+直接讀 `SSOT_收集區` 查核，非依回報：
 
-現在的狀態是 **repo 與線上一致，但 SSOT 仍是壞的**：
+- ✅ **6 格已完成**：d7/d8/d9 的 abstract 與 owl comment，與清單逐字相符
+- ✅ d7 vibe 已更新為 `📣 懶人入門`
+- ⚠️ **d8/d9 vibe 待確認**：目前皆為 `📣 懶人入門`，清單原訂 `💬 正反交鋒` / `🔥 公民必讀`。是刻意統一還是漏改？**編輯台判斷，不自行更動**
+- 🔄 tldr 那格**已被結構變更取代** —— 見下方 P1-5
+
+### 3. P1-5　`site_tldr` 通不到網站 　🔴 **現在唯一的封鎖**
+
+**這是新發現的，不在原體檢清單裡。**
+
+你把 tldr 從 `Track 2_discussion` 刪除、改放進新的 `site_tldr` 分頁，並改成一列一重點。
+**內容保全了，結構也更好** —— 但產線不知道這個分頁存在：
 
 ```
-① SSOT   ❌ ──✂── ② repo ✅ ──✅── ③ 線上 ✅
+site_tldr 分頁 ──✂──✂── sync 只讀 TRACK_1 / TRACK_2 兩個 CSV
+```
+
+- `scripts/sync-content.mjs` 只有 `TRACK_1_CSV_URL`、`TRACK_2_CSV_URL` 兩個來源，無 `site_tldr`
+- 網站以 `DISCUSSIONS_DATA.find(item => item.id === 'tldr')` 取用（`src/app/present/page.tsx:392`）
+- `OfficialTLDR` 第一行是 `if (!item) return null`（同檔 L75）
+
+**後果**：產線一接通，`discussions.json` 不會再有 `tldr` 這筆，`/present` 的整個 TL;DR 區塊**無聲消失** —— 不報錯、不擋 build、CI 全綠。
+
+這正是本次體檢要防的失效模式再現一次，只是這回是「漏掉」而不是「覆蓋」。
+
+**附帶問題**：`site_tldr` 有**兩個都叫 `status` 的欄位**（D 欄與 F 欄）。`parseCSV` 以標題字串為 key，後者會覆蓋前者。目前兩欄值相同故無症狀，但日後只改其中一欄會靜默失效。建議留一個、另一個改名或刪除。
+
+**解法**：sync 增讀 `site_tldr`，組回 `id: 'tldr'` 那筆 ——
+`abstract` = 各列 `**{label}**：{text}` 以換行接起（元件正是以 `\n` 切點），`title`/`link` 取 `order 0` 那列。
+
+現在的狀態：
+
+```
+① SSOT   🟡 ──✂── ② repo ✅ ──✅── ③ 線上 ✅
          ↑
-    唯一還斷著的地方
+   內容已補齊，但 tldr 這條路徑還沒接上
 ```
-
-不回填則產線接通後將被**第三次**覆蓋。
 
 ---
 
@@ -285,6 +312,25 @@ curl -s https://constitution-nine.vercel.app/past -o p.html
 - **後果**：這就是 P0-1 那 15 筆壞資料能上線的原因
 - **修法**：Track 1 加 `status` 欄，並把過濾條件改為嚴格模式
 
+**2026-09-01 更新 —— 半套已完成，但危險反而提高了：**
+
+- ✅ `SSOT_收集區` 的 Track 1 **已有 `status` 欄**，h1–h46 多數標為 `Approved`
+- ❌ 但 `sync-content.mjs` 的過濾條件**沒改**，仍是寬鬆模式：
+
+  ```js
+  .filter(row => !row.status || row.status.toLowerCase() === 'approved')
+  //              ^^^^^^^^^^^ 空白 = 放行
+  ```
+
+- 🚨 **h2 的 `status` 目前是空白** —— 就是那筆待法學確認的釋字272（P0-2）
+
+  若空白是刻意用來「先擋著、等確認」，**這個意圖不會生效**：寬鬆過濾會照樣放行。
+  有了 `status` 欄卻配寬鬆過濾，比完全沒有欄位更危險 —— 人會以為擋住了。
+
+  （附帶：`收集區` 的 h2 內容**已是改正後的訴訟權版本**，所以真放行反而會修好 h2。但「擋不住」這個機制缺陷與內容對錯無關，仍須修。）
+
+- **修法不變，且更急**：過濾改為 `row.status && row.status.toLowerCase() === 'approved'`，與 Track 2 一致
+
 ### P2-2　兩張 SSOT 落差巨大
 
 | | 收集區 | Editor |
@@ -474,12 +520,19 @@ git log -1 --format='%ad %s' --date=short -- src/data/discussions.json
 ~~4. **P0-1** 修 15 筆欄位錯位~~ ✅ 完成（`8d3f8f9`）
 ~~5. **P3-4** 拍板產線方案~~ ✅ 完成（[design.md](../content-pipeline/design.md)）
 
-剩餘：
+~~1. **P1-1** 把 A 類 3 筆貼回試算表~~ ✅ 6/10 格完成（2026-09-01 查核）
+~~2. **P0-3 / P0-4** 清掉 test 字串與佔位摘要~~ ✅ 完成（`fe04178`、`8890d8d`）
 
-1. **P1-1** 把 A 類 3 筆貼回試算表 —— 解除「不能跑 sync」的限制。**只有人工能做，且是後續所有步驟的前提**
-2. **P0-3 / P0-4** 清掉 test 字串與佔位摘要 —— 對外可見，成本低。產線斷開後可直接改 json
-3. **P0-2** 找法學協作者確認 h2 —— 卡在別人身上，越早問越好
-4. **design.md 施工項目 2–10** —— 依序執行，重建產線
+剩餘（2026-09-01 重排）：
+
+1. **P1-5** sync 增讀 `site_tldr`　🔴 **現在唯一的封鎖**
+   —— 不做則產線接通後 TL;DR 區塊無聲消失。這是工程項目，不必等人工
+2. **P2-1** Track 1 過濾改嚴格模式 —— 一行的改動，且 h2 的空白 status 已讓這個缺陷有了實際受害者
+3. **d8/d9 vibe 確認** —— 編輯台一句話的事，卡著 SSOT 收尾
+4. **P0-2** 找法學協作者確認 h2 —— 卡在別人身上，越早問越好
+5. **design.md 施工項目 2–10** —— 依序執行，重建產線
+
+> 1 與 2 都是動 `sync-content.mjs`，建議同一個 PR 一起改、一起看 diff。
 
 ---
 
@@ -498,4 +551,6 @@ git log -1 --format='%ad %s' --date=short -- src/data/discussions.json
 | 2026-08-31 | 加入 noindex、受眾與緊急度修正 | `3cdb4a0` |
 | 2026-08-31 | merge 進 main（fast-forward，8 commits） | — |
 | 2026-08-31 | 自 `75df766` 還原被 sync 覆蓋的摘要與 tldr | `fe04178` |
-| 2026-08-31 | SSOT 回填清單、session debrief | 本次 |
+| 2026-08-31 | SSOT 回填清單、session debrief | `5e6048d` |
+| 2026-09-01 | push 完成、線上驗證 | `060882d` |
+| 2026-09-01 | 查核 SSOT 回填進度（6/10 完成）、發現 P1-5 `site_tldr` 斷點、P2-1 有實際受害者 | 本次 |
