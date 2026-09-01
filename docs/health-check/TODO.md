@@ -83,39 +83,34 @@ curl -s https://constitution-nine.vercel.app/past -o p.html
 
 - ✅ **6 格已完成**：d7/d8/d9 的 abstract 與 owl comment，與清單逐字相符
 - ✅ d7 vibe 已更新為 `📣 懶人入門`
-- ⚠️ **d8/d9 vibe 待確認**：目前皆為 `📣 懶人入門`，清單原訂 `💬 正反交鋒` / `🔥 公民必讀`。是刻意統一還是漏改？**編輯台判斷，不自行更動**
+- ✅ **d8/d9 vibe 已確認**：三支 Reels **刻意統一**為 `📣 懶人入門`（2026-09-01 captain 裁示）。回填清單原訂的 `💬 正反交鋒` / `🔥 公民必讀` 作廢
 - 🔄 tldr 那格**已被結構變更取代** —— 見下方 P1-5
 
-### 3. P1-5　`site_tldr` 通不到網站 　🔴 **現在唯一的封鎖**
+**回填工作到此結束，SSOT 內容面已無待辦。**
 
-**這是新發現的，不在原體檢清單裡。**
+### 3. ~~P1-5　`site_tldr` 通不到網站~~ ✅ **已納入設計（2026-09-01）**
 
-你把 tldr 從 `Track 2_discussion` 刪除、改放進新的 `site_tldr` 分頁，並改成一列一重點。
-**內容保全了，結構也更好** —— 但產線不知道這個分頁存在：
+你把 tldr 從 `Track 2_discussion` 移出、改放進 `site_tldr` 分頁並改成一列一重點 —— **這個判斷是對的**，它修掉了 design.md 原本的一個矛盾：
 
-```
-site_tldr 分頁 ──✂──✂── sync 只讀 TRACK_1 / TRACK_2 兩個 CSV
-```
+- 原設計把 tldr 當 Track 2 的一列（第四節驗證範例即以它為例）
+- 但原設計要求 Track 2 的 `year`／`vibe` 必填，而 tldr 兩者皆空
+- 加上「驗證失敗即中止、全有全無」→ **照原設計施工完，第一次跑 sync 就會被自己擋下來**
 
-- `scripts/sync-content.mjs` 只有 `TRACK_1_CSV_URL`、`TRACK_2_CSV_URL` 兩個來源，無 `site_tldr`
-- 網站以 `DISCUSSIONS_DATA.find(item => item.id === 'tldr')` 取用（`src/app/present/page.tsx:392`）
-- `OfficialTLDR` 第一行是 `if (!item) return null`（同檔 L75）
+**已於 [design.md](../content-pipeline/design.md) 補齊**：分頁定義、欄位規則、sync 還原方式、驗證規則、施工項目 4／6b／7。詳見該文件文末修訂紀錄。
 
-**後果**：產線一接通，`discussions.json` 不會再有 `tldr` 這筆，`/present` 的整個 TL;DR 區塊**無聲消失** —— 不報錯、不擋 build、CI 全綠。
+仍須留意的兩個靜默失敗點（已寫入設計，施工時對照）：
 
-這正是本次體檢要防的失效模式再現一次，只是這回是「漏掉」而不是「覆蓋」。
+- `id: 'tldr'` 不可更動 —— `OfficialTLDR` 的 `if (!item) return null`（`src/app/present/page.tsx:75`）會讓取不到時整塊消失，不報錯、不擋 build
+- `order 0`（標題與連結）那列的 `status` **目前是空白** —— 只收 `Approved` 的話標題與連結會被濾掉。已列為施工項目 6b
 
-**附帶問題**：`site_tldr` 有**兩個都叫 `status` 的欄位**（D 欄與 F 欄）。`parseCSV` 以標題字串為 key，後者會覆蓋前者。目前兩欄值相同故無症狀，但日後只改其中一欄會靜默失效。建議留一個、另一個改名或刪除。
-
-**解法**：sync 增讀 `site_tldr`，組回 `id: 'tldr'` 那筆 ——
-`abstract` = 各列 `**{label}**：{text}` 以換行接起（元件正是以 `\n` 切點），`title`/`link` 取 `order 0` 那列。
+**附帶問題已解決**：`site_tldr` 曾有兩個同名 `status` 欄，2026-09-01 已由人工移除，僅留一欄。現行欄位為 `order | label | text | status | link`（已直接讀 SSOT 確認）。該情境已寫成 design.md 的共通驗證規則。
 
 現在的狀態：
 
 ```
-① SSOT   🟡 ──✂── ② repo ✅ ──✅── ③ 線上 ✅
+① SSOT   ✅ ──✂── ② repo ✅ ──✅── ③ 線上 ✅
          ↑
-   內容已補齊，但 tldr 這條路徑還沒接上
+   內容與結構都就緒，剩「把線接回去」的工程施工
 ```
 
 ---
@@ -523,16 +518,17 @@ git log -1 --format='%ad %s' --date=short -- src/data/discussions.json
 ~~1. **P1-1** 把 A 類 3 筆貼回試算表~~ ✅ 6/10 格完成（2026-09-01 查核）
 ~~2. **P0-3 / P0-4** 清掉 test 字串與佔位摘要~~ ✅ 完成（`fe04178`、`8890d8d`）
 
+~~3. **d8/d9 vibe 確認**~~ ✅ 完成（刻意統一為 `📣 懶人入門`）
+~~4. **P1-5** `site_tldr` 斷點~~ ✅ 已納入 design.md，不再是獨立待辦
+
 剩餘（2026-09-01 重排）：
 
-1. **P1-5** sync 增讀 `site_tldr`　🔴 **現在唯一的封鎖**
-   —— 不做則產線接通後 TL;DR 區塊無聲消失。這是工程項目，不必等人工
-2. **P2-1** Track 1 過濾改嚴格模式 —— 一行的改動，且 h2 的空白 status 已讓這個缺陷有了實際受害者
-3. **d8/d9 vibe 確認** —— 編輯台一句話的事，卡著 SSOT 收尾
-4. **P0-2** 找法學協作者確認 h2 —— 卡在別人身上，越早問越好
-5. **design.md 施工項目 2–10** —— 依序執行，重建產線
+1. **design.md 施工項目 2、3、4、5、6、6b** —— 全是人工，全在試算表上做，**只有你能做**，且是工程施工的前置
+2. **design.md 施工項目 7、8、9、10** —— 工程，前置到齊才動。P2-1 的過濾條件改嚴格模式已含在項目 7 內，不另外開票
+3. **P0-2** 找法學協作者確認 h2 —— 卡在別人身上，越早問越好。與產線施工無相依，可平行進行
 
-> 1 與 2 都是動 `sync-content.mjs`，建議同一個 PR 一起改、一起看 diff。
+> **不要在項目 2 之前先動 `sync-content.mjs`。** 欄位標題仍帶註解（`id (給系統看的編號)`），
+> sync 以標題字串精確取值，現在寫的對應邏輯到項目 2 完成後全要重寫。
 
 ---
 
@@ -553,4 +549,5 @@ git log -1 --format='%ad %s' --date=short -- src/data/discussions.json
 | 2026-08-31 | 自 `75df766` 還原被 sync 覆蓋的摘要與 tldr | `fe04178` |
 | 2026-08-31 | SSOT 回填清單、session debrief | `5e6048d` |
 | 2026-09-01 | push 完成、線上驗證 | `060882d` |
-| 2026-09-01 | 查核 SSOT 回填進度（6/10 完成）、發現 P1-5 `site_tldr` 斷點、P2-1 有實際受害者 | 本次 |
+| 2026-09-01 | 查核 SSOT 回填進度（6/10 完成）、發現 P1-5 `site_tldr` 斷點、P2-1 有實際受害者 | `bdd0060` |
+| 2026-09-01 | 回填結案（vibe 統一裁示）；`site_tldr` 納入 design.md，修掉原設計中 tldr 必填欄位的矛盾 | 本次 |

@@ -1,6 +1,6 @@
 # 內容產線設計
 
-**定案日期**：2026-08-31
+**定案日期**：2026-08-31　**最後修訂**：2026-09-01（新增 `site_tldr` 分頁，見文末修訂紀錄）
 **狀態**：已定案，尚未施工
 **背景診斷**：[`../health-check/2026-08-31-content-pipeline.md`](../health-check/2026-08-31-content-pipeline.md)
 **施工項目**：[`../health-check/TODO.md`](../health-check/TODO.md)
@@ -45,6 +45,7 @@
 | `Track 1_history` | 歷史軌內容 |
 | `Track 2_discussion` | 討論軌內容 |
 | `Track 2_opposing` | **新增**，正反交鋒觀點 |
+| `site_tldr` | **新增**，網站置頂的 TL;DR 版面元件（非討論內容） |
 
 ### 欄位標題規則
 
@@ -107,6 +108,33 @@
 
 此變更同時解決一個既有問題：`opposing_views` 目前只存在於 `discussions.json`，**編輯台完全看不到它**，其中的佔位出處（`某學者` / `某大學法律系`）正在對外顯示而無人能察覺。攤平後它與其他內容受同一套把關。
 
+### site_tldr（新增）
+
+`tldr` 原本是 `Track 2_discussion` 的一列，但**它不是一篇討論** —— 沒有作者、沒有年份、沒有 `vibe`。它是 `/present` 頁面上的一個版面元件。
+
+**把它留在 Track 2 會讓第四節的驗證器中止整份 sync。** Track 2 的 `year` 與 `vibe` 為必填（見上表），而 tldr 這筆兩者皆空；第四節的行為是「驗證失敗即中止，不寫入任何檔案」且「全有全無」。這不是假設 —— 是照本設計做完施工項目 7 之後，第一次跑 sync 就會發生的事。
+
+**解法：獨立分頁，一列一重點。** 與 `Track 2_opposing` 同一路數 —— 網站上是多段結構的東西，在試算表裡攤平成列。
+
+| 欄位 | 必填 | 說明 |
+|---|---|---|
+| `order` | ✓ | 排序鍵，取代 `id`。`0` 為標題列，`1` 起為內容重點 |
+| `label` | ✓ | 重點小標，如「權限界線」；`order 0` 時為 `標題與連結` |
+| `text` | ✓ | 重點內文；`order 0` 時為網站顯示的標題 |
+| `status` | ✓ | 僅編輯台（保護範圍） |
+| `link` | | 僅 `order 0` 使用，TL;DR 的出處連結 |
+
+**sync 還原方式**（施工項目 7）：
+
+- 取 `status = Approved` 的列，依 `order` 排序
+- `order 0` → 該筆的 `title` 與 `link`
+- `order ≥ 1` → 各列組成 `**{label}**：{text}`，以換行接起成為 `abstract`
+- 產出一筆 `id: 'tldr'`、`category: 'Official TL;DR'`、`author: '憲庭加好友'` 併入 `discussions.json`
+
+⚠️ **`order 0` 那列的 `status` 也必須是 `Approved`。** 目前是空白 —— 若照把關機制只收 `Approved`，標題與連結會被靜默濾掉，TL;DR 會變成一個沒有抬頭、點不出去的區塊。這是本分頁最容易犯的錯，故列為驗證規則（見第四節）。
+
+⚠️ **`id: 'tldr'` 這個值不可更動。** 網站以 `DISCUSSIONS_DATA.find(item => item.id === 'tldr')` 取用（`src/app/present/page.tsx:392`），而 `OfficialTLDR` 的第一行是 `if (!item) return null`（同檔 L75）—— 取不到不報錯、不擋 build，整個區塊直接消失。這是不變式 #3 所防的靜默失敗在**渲染層**的同型風險，故在此明文標註。
+
 ---
 
 ## 三、把關機制
@@ -147,9 +175,10 @@ sync  ：只收 status = Approved 的列
 ### 規則
 
 **共通**
-- `id` 不得為空、不得重複
+- `id` 不得為空、不得重複（`site_tldr` 以 `order` 為鍵，適用同一規則）
 - 標記必填的欄位不得為空
 - `status` 必須是 `Approved` / `Rejected` / 空白之一
+- **欄位標題不得重複** —— `parseCSV` 以標題字串為 key，重複時後者會覆蓋前者。兩欄同名而值不同時，前者的內容會無聲消失
 
 **Track 1**
 - `year` 必須為 4 位數字
@@ -165,6 +194,13 @@ sync  ：只收 status = Approved 的列
 **Track 2_opposing**
 - `discussion_id` 必須對應到 Track 2 中實際存在的 `id`
 
+**site_tldr**
+- `order` 必須為非負整數，且不得重複
+- 必須存在 `order 0` 的列，**且其 `status` 為 `Approved`** —— 否則標題與連結會被濾掉
+- `order 0` 的 `link` 必須是合法網址
+- `order ≥ 1` 至少須有一列通過核可（全被擋下等同 TL;DR 消失）
+- `text` 不得含 `test test`、`lorem ipsum` 等測試字樣
+
 ### 行為
 
 **驗證失敗即中止，不寫入任何檔案。**
@@ -176,8 +212,8 @@ sync  ：只收 status = Approved 的列
   Track 1
     h15  year 應為 4 位數字，實際為「憲法第十四條規定人民有集會之自由…」
     h15  ruling_id 不可為空
-  Track 2
-    tldr abstract 含有測試字串「test test test」
+  site_tldr
+    order 1  text 含有測試字串「test test test」
 
 共 3 項錯誤。請修正 SSOT 後重試。
 ```
@@ -245,15 +281,18 @@ sync  ：只收 status = Approved 的列
 | 1 | 搶救內容貼回 SSOT | **僅限人工** | — |
 | 2 | 清理欄位標題註解 | 人工 | 1 |
 | 3 | Track 1 新增 `status` 欄 | 人工 | 2 |
-| 4 | `status` 設保護範圍 | 人工 | 3 |
+| 4 | `status` 設保護範圍（含 `site_tldr`） | 人工 | 3 |
 | 5 | `vibe` 改下拉選單（清單由編輯台決定） | 人工 | — |
 | 6 | 新增 `Track 2_opposing` 分頁並填入現有資料 | 人工 | — |
-| 7 | 改寫 sync：來源改指 SSOT、加入驗證、失敗中止、支援 opposing 分組 | 工程 | 2,3,6 |
+| 6b | `site_tldr` 的 `order 0` 補上 `status = Approved` | 人工 | — |
+| 7 | 改寫 sync：來源改指 SSOT、加入驗證、失敗中止、支援 opposing 分組與 `site_tldr` 還原 | 工程 | 2,3,6,6b |
 | 8 | 移除 `build` 中的 sync | 工程 | 7 |
 | 9 | 執行完整 sync → 開 PR → 對 diff → 合併 | 工程＋編輯台 | 7,8 |
 | 10 | 封存 `SSOT_Editor` | 人工 | 9 |
 
-**第 1 步是所有事情的前提。** 目前 Vercel 的 `TRACK_1_CSV_URL` / `TRACK_2_CSV_URL` 已停用（改名加 `_disabled`），產線處於**刻意斷開**的狀態 —— 這是安全的，但表示試算表的任何更新都不會反映到網站，不應長期維持。
+**第 1 步是所有事情的前提** —— ✅ **已於 2026-09-01 完成**（見 [`../content-rescue/ssot-backfill.md`](../content-rescue/ssot-backfill.md)）。下一個可動的是第 2 步，全為人工，且 2→3→4 有嚴格順序。
+
+目前 Vercel 的 `TRACK_1_CSV_URL` / `TRACK_2_CSV_URL` 已停用（改名加 `_disabled`），產線處於**刻意斷開**的狀態 —— 這是安全的，但表示試算表的任何更新都不會反映到網站，不應長期維持。
 
 ---
 
@@ -267,3 +306,26 @@ sync  ：只收 status = Approved 的列
 | `收集區` h30–h46 共 17 筆從未上線 | 需確認是尚未核可，或是遺漏 |
 | Drive 資料夾未分享給任何協作者 | 兩張 SSOT 目前僅 owner 可存取 |
 | 三處資料重複（照片、聊聊紀錄、黑客松提案、讀物清單） | 見 TODO P3-3 |
+
+---
+
+## 修訂紀錄
+
+### 2026-09-01 — 新增 `site_tldr` 分頁
+
+**起因**：`tldr` 已於 SSOT 中自 `Track 2_discussion` 移出，改置於新分頁 `site_tldr`，並由「單格三行（Alt+Enter）」改為一列一重點。
+
+**這個改動修掉了本設計原有的一個矛盾**，不是偏離設計：
+
+- 原設計把 `tldr` 當成 Track 2 的一列（第四節的驗證失敗範例即以它為例）
+- 但原設計同時要求 Track 2 的 `year` 與 `vibe` 必填，而 `tldr` 這筆兩者皆空
+- 加上「驗證失敗即中止、全有全無」，**照原設計施工完成後第一次跑 sync 就會被自己擋下來**
+
+**本次修訂**：
+
+1. 第二節分頁表新增 `site_tldr`，並補上其欄位定義與 sync 還原方式
+2. 第四節新增 `site_tldr` 驗證規則；共通規則新增「欄位標題不得重複」
+3. 第四節的驗證失敗範例改以 `site_tldr` 呈現 `tldr`，修正原本的歸屬錯誤
+4. 第七節施工項目 4、7 納入 `site_tldr`；新增項目 6b（`order 0` 補 `status`）
+
+**未一併處理**：`site_tldr` 曾短暫存在兩個同名 `status` 欄，已於 2026-09-01 由人工移除，僅留一欄。該情境已寫成共通驗證規則，避免再犯。

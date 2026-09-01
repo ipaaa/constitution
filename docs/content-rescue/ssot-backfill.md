@@ -1,6 +1,6 @@
 # SSOT 回填清單 — Track 2
 
-**產生日期**：2026-08-31　**最後查核**：2026-09-01　**狀態**：**6/10 已完成，剩 2 格待確認 + 1 項已被結構變更取代**
+**產生日期**：2026-08-31　**最後查核**：2026-09-01　**狀態**：✅ **已結案** —— 內容回填全部完成，tldr 改由 `site_tldr` 分頁承接並已納入設計
 
 這些內容目前**只存在於 repo**，從未進入任何一張試算表。
 產線接通前若未回填，將被**第三次**覆蓋（前兩次見下方沿革）。
@@ -14,11 +14,15 @@
 | G8 / G9 / G10 | d7・d8・d9 abstract | ✅ **已完成**，與本清單逐字相符 |
 | J8 / J9 / J10 | d7・d8・d9 owl comment | ✅ **已完成**，與本清單逐字相符（含「」引號） |
 | K8 | d7 vibe | ✅ `📣 懶人入門` |
-| K9 | d8 vibe | ⚠️ 目前為 `📣 懶人入門`，本清單原訂 `💬 正反交鋒` |
-| K10 | d9 vibe | ⚠️ 目前為 `📣 懶人入門`，本清單原訂 `🔥 公民必讀` |
+| K9 | d8 vibe | ✅ `📣 懶人入門` —— 見下方裁示 |
+| K10 | d9 vibe | ✅ `📣 懶人入門` —— 見下方裁示 |
 | G11 | tldr 三重點 | 🔄 **已不適用** —— 該列已自 `Track 2_discussion` 刪除，內容改置於新的 `site_tldr` 分頁（見下） |
 
-**K9 / K10 待確認**：三則 Reels 是否刻意統一為 `懶人入門`（合理的編輯決定），或貼上時未逐格更換。此為編輯台判斷，不自行更動。
+**K9 / K10 裁示（2026-09-01）**：三則 Reels **刻意統一**為 `📣 懶人入門`。
+本清單原訂的 `💬 正反交鋒`（d8）與 `🔥 公民必讀`（d9）**作廢，不要照舊改回去**。
+理由：d7–d9 是同一系列的動畫短片，統一標記符合讀者預期。
+
+> ✅ **本清單的內容回填工作已全部結束。** 剩下的是工程施工，見 [design.md](../content-pipeline/design.md) 第七節。
 
 **檔案**：[SSOT_收集區](https://docs.google.com/spreadsheets/d/1BKQEuC9GmeMuoZ1Lwwe3IRvmkDqmQCIzAyvywGy3Wyc/edit)
 **分頁**：`Track 2_discussion`
@@ -107,17 +111,23 @@
 | 2 | 權力分立 | 大法官這次是拿回原本就屬於自己的裁判空間…… | Approved | |
 | 3 | 下一步 | 判決只是第一步，後續憲訴法怎麼補…… | Approved | |
 
-**內容本身已保全，這個結構也比原本好**（與 design.md 對 `opposing_views` 的攤平決定同一路數）。
+現行欄位（2026-09-01 直接讀 SSOT 確認）：`order | label | text | status | link`
 
-⛔ **但目前這批內容通不到網站**，原因見 TODO 的 **P1-5**：
-`scripts/sync-content.mjs` 只讀 `TRACK_1_CSV_URL` 與 `TRACK_2_CSV_URL` 兩個分頁，**完全不知道 `site_tldr` 存在**。
-網站在 `src/app/present/page.tsx:392` 以 `DISCUSSIONS_DATA.find(item => item.id === 'tldr')` 取用該筆，而 `OfficialTLDR` 的第一行是 `if (!item) return null`
-—— 產線一接通，整個 TL;DR 區塊會**無聲消失**，不報錯、不擋 build。
+**內容已保全，結構也比原本好** —— 而且這個改動修掉了 design.md 原有的一個矛盾：
+原設計把 tldr 當 Track 2 的一列，卻又要求 Track 2 的 `year`／`vibe` 必填，而 tldr 兩者皆空。
+配上「驗證失敗即中止、全有全無」，照原設計施工完，第一次跑 sync 就會被自己擋下來。
 
-**解除條件**：sync 增讀 `site_tldr` 並組回 `id: 'tldr'` 那筆（對應施工項目，見 TODO P1-5）。
+**已納入設計**（2026-09-01）：分頁定義、欄位規則、sync 還原方式、驗證規則、施工項目 4／6b／7
+均已寫入 [design.md](../content-pipeline/design.md)，詳見該文件文末修訂紀錄。
+
+施工時要對照的兩個靜默失敗點：
+
+- `id: 'tldr'` 不可更動 —— `OfficialTLDR` 的 `if (!item) return null`（`src/app/present/page.tsx:75`）會讓取不到時整塊消失，不報錯、不擋 build
+- `order 0`（標題與連結）那列的 `status` 目前是空白 —— 只收 `Approved` 會把標題與連結濾掉（施工項目 6b）
 
 - [x] 內容已保全於 `site_tldr`
-- [ ] sync 已能讀取 `site_tldr`　←　**真正的未完成項**
+- [x] 已納入 design.md，施工項目已開
+- [ ] sync 實作（design.md 施工項目 7，前置未到齊）
 
 ---
 
