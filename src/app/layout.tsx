@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  // ⚠️ 正式對外發布前必須移除這一段，否則網站永遠不會出現在搜尋結果。
+  // 現階段受眾為工作夥伴（有連結才看得到），故阻擋搜尋引擎收錄。
+  // 追蹤項目：docs/health-check/TODO.md P3-8
+  robots: { index: false, follow: false },
   title: "Add C0urt 憲庭加好友",
   description: "憲政科技平台 - 別讓你的權利已讀不回。將「過去課本裡的民主成就」轉化為「被卡住的現實危機」，降低公民理解憲法法庭價值的門檻。",
   openGraph: {
