@@ -55,30 +55,41 @@ npm run build 完整跑過，16 個頁面全部產生成功
 
 ---
 
-## 🔔 明天第一件事
+## 🔔 現在的下一件事
 
-**1. 決定要不要 `git push origin main`**
+### ~~1. `git push origin main`~~ ✅ 已完成（2026-09-01）
 
-本機 `main` 領先遠端 **10 個 commit**，今天所有修復都還沒推上去 —— **線上網站目前仍是舊的**。
+`5cdb0d4..5e6048d`，10 個 commit 已推送並部署。**線上實測驗證通過**（自 605KB bundle 直接比對，非僅看部署狀態）：
 
+| 應該消失 | 結果 | 應該出現 | 結果 |
+|---|:---:|---|:---:|
+| h15 錯位的整段條文 | ✅ | d7 真實摘要 | ✅ |
+| tldr 的 `test test test` | ✅ | d8 真實摘要 | ✅ |
+| 佔位摘要 | ✅ | tldr 三重點 | ✅ |
+| | | d7 owl 短評 | ✅ |
+| | | noindex | ✅ |
+
+驗證指令：
 ```bash
-git push origin main
+curl -s https://constitution-nine.vercel.app/past -o p.html
+# 內容為 client-render，資料在 JS bundle 而非 HTML，需抓 /_next/static/*.js 比對
 ```
 
-push 會觸發 Vercel 部署。該次部署已預先驗證過：
+### 2. 回填 SSOT 的 10 格 　🔴 **唯一剩下的封鎖**
 
-| 動作 | 結果 |
-|---|---|
-| `npm run build`（含 sync） | ✅ 會 skip，環境變數已停用 |
-| 15 筆修復生效 | ✅ |
-| noindex 生效 | ✅ 預期中 |
-| 懶人包卡片內容更新 | ✅ test 字串換成真實三重點 |
+→ [`../content-rescue/ssot-backfill.md`](../content-rescue/ssot-backfill.md)
 
-⚠️ 工作夥伴會看到網站變了，你可能想先跟他們說一聲。
+**只有你能做**（Drive connector 無寫入儲存格能力）。這是解除「不能跑 sync」封鎖的前提。
 
-**2. 回填 SSOT 的 10 格** → [`../content-rescue/ssot-backfill.md`](../content-rescue/ssot-backfill.md)
+現在的狀態是 **repo 與線上一致，但 SSOT 仍是壞的**：
 
-這是解除「不能跑 sync」封鎖的前提。
+```
+① SSOT   ❌ ──✂── ② repo ✅ ──✅── ③ 線上 ✅
+         ↑
+    唯一還斷著的地方
+```
+
+不回填則產線接通後將被**第三次**覆蓋。
 
 ---
 
