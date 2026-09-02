@@ -163,10 +163,15 @@ robots: { index: false, follow: false },
 | 還有什麼要做 | `docs/health-check/TODO.md` |
 | 新產線要長怎樣 | `docs/content-pipeline/design.md` |
 | 搶救出來的內容 | `docs/content-rescue/` |
-| 全部文件的索引 | `docs/INDEX.md` |
+| 專案定位、架構、技術、協作 | `docs/project/` |
+| 全部文件的索引 | `docs/INDEX.md` ← **不確定去哪找就看這份** |
 
-⚠️ `Documents/` 資料夾（大寫 D）內多份文件描述的是**舊的產線**，已於 2026-09-01 判定過時。
-在完成整併前，不要依照該資料夾內的指示操作。
+⚠️ `docs/_archive/` 內是已過時的文件，保留供追溯。**不要照做。**
+每份檔頭已註明它被誰取代。
+
+⚠️ 這兩份各有一部分過時，檔頭有警告標明範圍：
+`docs/project/tech-stack.md`（資料流章節）、
+`docs/content-pipeline/data-collection-guide.md`（T1／T2 章節）。
 
 ---
 
