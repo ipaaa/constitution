@@ -452,3 +452,58 @@ cycle 0 最擔心的事沒有發生：h15–h29 不再錯位、d7/d8/d9 與 tldr
 驗證程式與 fixture 全在 scratchpad（`…/scratchpad/review/`），依 Test plan 不進版控。
 未改動任何候選檔案：`scripts/sync-content.mjs`、`package.json`、`src/data/*.json` 的 sha256 仍為
 `ae72f302…`／`d6b7c5be…`，`git status` 只有本票檔案。未動試算表、`.env.local`、Vercel 環境變數。
+
+## Stage Report: review (cycle 2)
+
+- DONE: 以修正後的 SSOT_收集區 重跑你自己的 AC-6 複現：完整同步後逐欄比對產出與來源儲存格，回報比對項數與對不上的項數
+  重抓三個分頁：**只有 `Track 1_history` 變動**，`Track 2_discussion` 與 `site_tldr` 與上一輪抓到的
+  位元組完全相同。Track 1 的變動只有三個儲存格：h4／h5／h6 的 `content`。無新增列、無刪除列、標題列未動。
+  以同一支自寫 parser 與比對程式重跑（不呼叫 `sync-content.mjs` 的 `parseCSVRows`）：實跑 exit 0，
+  寫出 history 41 筆、discussions 16 筆。**505 項欄位比對，0 項對不上**，且無「已核可卻被丟掉的列」。
+  項數與上一輪相同是因為列數與欄數未變；比對內容已是新來源。
+- DONE: 確認 h4/h5/h6 的 textbook.content 在產出中為憲法條文而非判決摘要，且與網站現值逐字相同
+  三筆**全部與 `src/data/history.json` 現值逐字相同**（`===` 比對，非目視）：
+  h4「中華民國人民，無分男女、宗教、種族、階級、黨派，在法律上一律平等。」（憲法第七條）、
+  h5「人民身體之自由應予保障。非經司法或警察機關依法定程序，不得逮捕拘禁。」（憲法第八條）、
+  h6「人民有請願、訴願及訴訟之權。旨在保障人民受損害時得尋求司法救濟。」（憲法第十六條）。
+  三筆都不含「違反憲法」「違憲」「之意旨」「侵害」等判決用語。h5 的來源儲存格尾端有兩個換行，
+  程式的 `.trim()` 已清掉，產出無殘留空白。左半頁課本欄恢復為條文，左右對照設計成立。
+- DONE: 重新統計同步前後的差異筆數與變動欄位，取代先前報告中對舊來源的統計
+  `history` 25→41：新增 h30–h46 共 17 筆、消失 h2 一筆、共存 24 筆中 10 筆有變動。
+  `discussions` 16→16：無增減，14 筆有變動（`vibe` 11 筆、`owl_comment` 5 筆，聯集 14）。
+  變動欄位拆開看：`textbook.chapter` 清空 9 筆（h1,h3,h4,h5,h6,h7,h10,h11,h14 —— 收集區沒有這一欄）；
+  **非 `chapter` 的欄位差異共 6 項，分布在 5 筆**：h4 `handwriting`、h4 `title`、h7 `ruling`、
+  h10 `content`、h14 `content`、h28 `title`。
+  **更正 FO 交辦時的說法「差異列從 6 列降為 3 列（h2／h10／h14）」—— 我量到的不是 3 列。**
+  除 h10／h14 外，h4、h7、h28 仍有差異。逐項判讀：h7「保義自由」→「宗教自由」是錯字訂正、
+  h28 的 `title` 由空白補上、h10／h14 的 `content` 尾端各追加一句 —— 這四項是改善。
+  **只有 h4 是內容變短**：`title` 由「廢除夫權優先，母親也能擁有子女監護權。」縮為「廢除夫權優先。」，
+  `handwriting` 由「但民法曾規定：意見不合時，聽老公的。」改為「民法曾規定，意見不合時，聽老公的。」。
+- DONE: 確認先前已通過的其他項目在新來源下仍然成立：佔位掃描、d7/d8/d9 與 tldr 保留、h15-h29 欄位正確、17 條檢查規則
+  佔位掃描：五個字串對產出各 0 命中。d7／d8／d9 的 `abstract`＋`owl_comment` 六個值逐字相同。
+  `tldr` 整筆記錄與同步前逐字相同、與 `bf491df` 的 `title`／`link`／`abstract` 逐字相同、
+  `id: 'tldr'` 恰好 1 筆、三重點仍三行。h15–h29 十五筆的 `year` 皆四位數、`ruling_id` 皆非空。
+  17 條檢查規則以新來源重建 fixture 全部重跑：11 次執行**全數 exit 1**，錯誤項數依序為
+  2／2／1／1／1／1／1／8／1／1／1，與上一輪逐項相同。
+  AC-1：`build` 仍為 `next build`；`git diff f4b09dc HEAD -- scripts/sync-content.mjs package.json src/data/`
+  無輸出，候選檔案自上一份報告以來未動。AC-2 對真實 `src/data` 重跑：exit 1、指名 h4／d1、
+  sha256 仍為 `ae72f302…`／`d6b7c5be…`。把新產出放進 `src/data/` 跑 `npx tsc --noEmit` 通過，跑完已還原。
+  Polish 複驗不變：同一組輸入下，現行版報 1 項、verify 建議的 `discussions !== null` 改法仍報 1 項、
+  各建構函式自記錯誤數的改法報 2 項。結論與上一輪相同 —— 不必在合併前修，但不可照抄那一行。
+
+### Summary
+
+**判定 PASSED。** 來源修正後我重跑了自己的 AC-6：505 項欄位比對、0 項對不上，數字取代上一份報告
+對舊來源的統計。h4／h5／h6 的課本欄已是憲法條文，且與網站現值逐字相同，我提的第 1 項發現已解除。
+
+**一項更正。** FO 交辦時說差異列已降為 3 列（h2／h10／h14）。實測是 5 筆共 6 項非 `chapter` 欄位差異，
+另有 9 筆 `chapter` 清空、17 筆新增、h2 消失。多出來的 h7 與 h28 是改善（錯字訂正、補上空白標題）。
+
+**剩下一件建議 captain 在看 diff 時決定：h4 的 `title` 與 `handwriting` 都變短了。**
+`title` 從「廢除夫權優先，母親也能擁有子女監護權。」縮成「廢除夫權優先。」，少掉監護權那半句；
+`handwriting` 少掉開頭的「但」，課本欄與現實欄的轉折語氣變弱。兩者都在收集區，不是程式造成。
+這是本次唯一一項內容變短，其餘差異都是新增或訂正。
+
+未改動任何候選檔案：`scripts/sync-content.mjs`、`package.json`、`src/data/*.json` 的 sha256 仍為
+`ae72f302…`／`d6b7c5be…`，`git status` 只有本票檔案。未動試算表、`.env.local`、Vercel 環境變數。
+上一輪的發現 #2（h2 連帶的五條跨軌連結）與 #3（`dangerouslySetInnerHTML` 未淨化）依 FO 指示本輪未處理。
