@@ -22,6 +22,17 @@ gates:
                 id: briefing:037:verify:attempt-1:revision-1
                 digest: sha256:2f30cd66b396ed4137952c4abf7924dca16ee2f5a1fae3187ff812631673cd1d
                 room-ref: '@review/verify/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:037:verify:1
+                briefing: briefing:037:verify:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-02T18:11:11.538243Z"
+                decision: approve
+                reason: 六條 AC 全部有實測證據，含以正確來源 SSOT_收集區 執行的完整同步比對（41 筆差異全數對應到儲存格，0 項對不上）。captain 已於試算表修正 h4 的「侵權/父權」誤植（FO 重抓 CSV 確認：侵權已移除、父權在位），並裁示 h2 維持 status 空白、不上線。規模超出宣告 274% 由 captain 接受。核可進入 review。
+              application:
+                target-stage: review
+                state: pending
 ---
 
 改寫 `scripts/sync-content.mjs`，並把同步從 `npm run build` 中移除。這是內容產線改造的核心工程，對應 `../content-pipeline/design.md` 第五節的施工項目 7 與 8。
