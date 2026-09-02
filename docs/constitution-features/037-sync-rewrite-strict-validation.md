@@ -1,7 +1,7 @@
 ---
 id: 037
 title: 改寫內容同步程式：嚴格把關、失敗中止、支援 site_tldr
-status: implement
+status: verify
 source: design.md 第五節施工項目 7-8
 started: 2026-09-02T17:05:11Z
 completed:
