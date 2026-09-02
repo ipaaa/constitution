@@ -9,7 +9,7 @@ verdict:
 score: 1.0
 worktree: .worktrees/spacedock-ensign-037-sync-rewrite-strict-validation
 issue:
-pr:
+pr: pr-merge:32
 mod-block:
 gates:
     version: 1
