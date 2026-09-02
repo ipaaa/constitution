@@ -50,6 +50,16 @@ workflow 的 verify／review 審查」。** 本票內無任何 Stage Report。
 
 commit 記錄顯示本 PR 由兩個 commit 組成：`feat: add owl mascot placements across all pages per design guide 005`，以及後續 `fix: prevent owl image from overlapping text on controversy timeline intro`（對應上述 controversy-timeline 頁的 flex 排版修正）。
 
+### 完成清單
+
+- DONE: 首頁（`src/app/page.tsx`）hero 貓頭鷹圖片來源改為 `/codex/owl.png`
+- DONE: past 頁面（`src/app/past/page.tsx`）加入 `owl-past.png`
+- DONE: future 頁面（`src/app/future/page.tsx`）加入 `owl-future.png`
+- DONE: opinion-lazybag 頁面（`src/app/opinion-lazybag/page.tsx`）加入 `owl.png`
+- DONE: controversy-timeline 頁面（`src/app/controversy-timeline/page.tsx`）加入 `owl-past.png`
+- DONE: about 頁面（`src/app/about/page.tsx`）加入 `owl.png`
+- DONE: 修正 controversy-timeline 頁面圖片與文字重疊問題
+
 ### 變更規模
 
 +59／−9 行，跨 6 個檔案。

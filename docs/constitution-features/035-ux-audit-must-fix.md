@@ -62,6 +62,16 @@ workflow 的 verify／review 審查」。** 本票內無任何 Stage Report。
 
 commit 記錄額外顯示一筆 `fix(B): align TrackCards public mode detection with LaunchGate`，內容與上述 B 項的 public mode 判斷邏輯有關，已併入 B 項變更說明。
 
+### 完成清單
+
+- DONE: A. 首頁主 CTA 改導向 `/future`
+- DONE: B. 新增 `TrackCards.tsx`，三軌卡片依 `LAUNCHED_PAGES` 顯示「即將開放」
+- DONE: E. 統一首頁懶人包 CTA 文案
+- DONE: K. 首頁三軌區加閱讀順序提示
+- SKIPPED: D. T2 頁首「3 分鐘導讀」。commit 記錄顯示先實作、後在同一 PR 內撤銷，最終未進入合併結果
+- SKIPPED: C. About 頁面移除 placeholder 文字。本 PR diff 未觸及
+- SKIPPED: F. 第一波社群主視覺 infographic。本 PR diff 未觸及
+
 ### 變更規模
 
 +196／−98 行，跨 4 個檔案（其中 `src/components/home/TrackCards.tsx` 為新增檔案）。
