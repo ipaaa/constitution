@@ -146,3 +146,55 @@ Verified by: 同步前後對 `history.json` 與 `discussions.json` 做逐筆比�
 **沒做、且是刻意的**：`AGENTS.md` 的「不要執行 build」禁令未解除。它的解除條件寫的是施工
 項目 7 與 8，但真正安全的時點是項目 9（跑完整同步、captain 對過 diff、合併）之後 ——
 在那之前 `main` 上的 `build` 仍會跑 sync。建議合併時一併改。
+
+## Stage Report: verify
+
+- FAILED: 以真實試算表執行完整同步，逐筆比對同步前後的 history.json 與 discussions.json，確認 d7/d8/d9 的摘要與 owl 短評、tldr 三重點、h15-h29 欄位值均未遺失或倒退（本票 AC-6）
+  依 Test plan 以真實試算表實跑 `npm run sync-content`：exit 1、10 項錯誤、未寫入任何檔案
+  （兩個 json 的 sha256 仍為 `ae72f302…`／`d6b7c5be…`，`git status` 乾淨）。中止是對的 ——
+  逐欄比對顯示來源會使內容大幅倒退：h15–h29 共 15 筆、每筆 7 個欄位全部錯位（h15 的 `year`
+  是一整段條文、`ruling_id` 空白）；d7/d8/d9 的 `abstract` 會變成佔位句、owl 短評會變成同一句
+  罐頭、`vibe` 會全變 `💡 腦袋升級`。**但 AC-6 要求的「同步後檔案」不存在，AC-6 無法查核。**
+- FAILED: 確認 h2 的 status 在試算表中為空白，且同步後的 history.json 不含 h2（本票 AC-3）
+  `TRACK_1_CSV_URL` 指到的分頁沒有 `status` 欄（標題列為 id,category,chapter,content,
+  handwriting,year,title,ruling,ruling_id,image_url），同步報「缺少必要欄位「status」」而中止。
+  AC-3 的前提不成立。機制另以 fixture 實測通過：`status` 空白的 h2 被排除，history 只剩 h1,h3；
+  把過濾放寬回 `!row.status || approved` 會使這一項失敗。
+- DONE: 對產出的資料執行佔位資料掃描：不得含有 某學者、某大學法律系、test test、lorem ipsum、快速了解最新判決的5個重點
+  同步無產出，改掃兩處。現行 `src/data/*.json`：5 個字串全部 0 命中。來源分頁：7 命中 ——
+  d2/d4/d6/d7/d8/d9 的 `abstract` 是「快速了解最新判決的5個重點」，Track 2 的 `tldr` 列含
+  「test test」。程式全數擋下，見上述 10 項錯誤。
+- DONE: 逐項判讀 implement 階段報告中列出的五項判斷，指出哪些會影響真實試算表的同步結果，以及是否需要 captain 裁示
+  判斷 1（必填值只查已核可列）會影響：實跑中 d3（整列空白）未產生任何必填錯誤，判斷正確。
+  判斷 2（vibe 允許清單）會影響：實跑中 16 筆已核可列全部通過，**不需改常數**。
+  判斷 4（佔位檢查擴及 title/author/owl_comment）會影響，但本次 7 個命中全在 `abstract`，
+  結果不變；擴大是保護性的。判斷 3、5 不影響：真實 site_tldr 的 `order 0` label 非空，
+  三個分頁 10／12／5 欄全部具名，無空白標題。**五項都不需 captain 裁示。**
+
+### Summary
+
+同步程式的把關與「全有全無」在真實資料上成立：實跑 exit 1、10 項錯誤指名到列與欄、一個檔案都沒寫。
+但驗證另外發現三項問題，其中兩項是本票檔案內的缺陷。**判定 REJECTED。**
+
+**F1（需 captain 裁示）—— 來源網址指向錯誤的試算表。** `TRACK_1_CSV_URL`／`TRACK_2_CSV_URL`
+的值與 `main` 的 `.env.local` 逐字相同、2026-03-15 後未動過，且與 `SITE_TLDR_CSV_URL` 屬於
+**不同的試算表文件**（發布金鑰不同）。抓到的 Track 1 有 25 列、無 `status` 欄、h15–h29 共 15 列
+錯位；Track 2 有 17 列 —— 正是 `design.md` 第一節列的 `SSOT_Editor`（25／17／錯位 15 筆），
+而非 `SSOT_收集區`（42／44／無錯位）。h2 的 `ruling_id` 仍是 `釋字第 272 號`，也符合該表所記
+「Editor 仍是錯的」。施工項目 3、1 標為已完成，但那些人工修正不在這個網址上。這不是程式缺陷，
+是 `.env.local` 與分頁發布狀態的問題，本票無法自行決定改指哪一份，需 captain 處理。
+
+**F2（本票可修）—— `discussions.json` 會出現兩筆 `id: 'tldr'`。** Track 2 分頁仍留著 `tldr` 那一列。
+編輯台若把它的測試字串改掉（而不是刪掉整列），同步就會通過，並在 Track 2 的 tldr 之後再接上
+site_tldr 組出的 tldr。sandbox 實跑：exit 0、`discussions.json` 含 2 筆 `id: 'tldr'`，
+`present/page.tsx:392` 的 `find(item => item.id === 'tldr')` 取到 Track 2 那筆舊版，
+site_tldr 分頁的內容被靜默忽略。這直接違反 AC-4 與 design.md 不變式 #4。
+
+**F3（本票可修）—— 核可筆數為 0 時靜默清空。** Track 1 補上 `status` 欄但尚未核可任何列時
+（施工項目 4 的保護範圍還是 ⏸，這是很可能的中間狀態），sandbox 實跑得到
+「✅ 檢查通過，已寫入 src/data/history.json（0 筆）」、exit 0、檔案內容為 `[]`。
+兩軌同時空白時 25 筆歷史與 16 筆討論全數消失，而程式回報成功。design.md 第四節替 site_tldr
+寫了「order ≥ 1 至少要有一列通過核可」，Track 1／Track 2 沒有對應的防線。
+
+未改動任何候選檔案；`scripts/sync-content.mjs` 與 `package.json` 維持 `197436e` 的內容。
+驗證用的 fixture 與比對程式放在 scratchpad，依 Test plan 不進版控。
