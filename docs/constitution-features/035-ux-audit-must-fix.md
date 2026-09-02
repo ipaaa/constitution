@@ -48,12 +48,19 @@ workflow 的 verify／review 審查」。** 本票內無任何 Stage Report。
 > 依據為該 PR 的實際 diff。當時未留下任何 Stage Report。
 
 - DONE: A. 首頁主 CTA 改導向 `/future`
+  檔案 `src/app/page.tsx`，commit `8bf8354`。
 - DONE: B. 新增 `TrackCards.tsx`，三軌卡片依 `LAUNCHED_PAGES` 顯示「即將開放」
+  新檔 `src/components/home/TrackCards.tsx`，commit `8bf8354`，判斷邏輯經 commit `d408e57` 修正。
 - DONE: E. 統一首頁懶人包 CTA 文案
+  檔案 `src/components/home/LazybagCtaSection.tsx`，commit `8bf8354`，文案再經 commit `30e28bb` 更新。
 - DONE: K. 首頁三軌區加閱讀順序提示
+  檔案 `src/app/page.tsx`，commit `8bf8354`。
 - SKIPPED: D. T2 頁首「3 分鐘導讀」。commit 記錄顯示先實作、後在同一 PR 內撤銷，最終未進入合併結果
+  commit `485735a` 實作，commit `27c7326` 撤銷。
 - SKIPPED: C. About 頁面移除 placeholder 文字。本 PR diff 未觸及
+  PR #31 diff 不含 `src/app/about/page.tsx` 的任何改動。
 - SKIPPED: F. 第一波社群主視覺 infographic。本 PR diff 未觸及
+  PR #31 diff 不含任何新增圖片素材。
 
 ### 實際變更
 

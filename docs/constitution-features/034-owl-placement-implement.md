@@ -38,12 +38,19 @@ workflow 的 verify／review 審查」。** 本票內無任何 Stage Report。
 > 依據為該 PR 的實際 diff。當時未留下任何 Stage Report。
 
 - DONE: 首頁（`src/app/page.tsx`）hero 貓頭鷹圖片來源改為 `/codex/owl.png`
+  檔案 `src/app/page.tsx`，commit `2135bb8`。
 - DONE: past 頁面（`src/app/past/page.tsx`）加入 `owl-past.png`
+  檔案 `src/app/past/page.tsx`，commit `2135bb8`。
 - DONE: future 頁面（`src/app/future/page.tsx`）加入 `owl-future.png`
+  檔案 `src/app/future/page.tsx`，commit `2135bb8`。
 - DONE: opinion-lazybag 頁面（`src/app/opinion-lazybag/page.tsx`）加入 `owl.png`
+  檔案 `src/app/opinion-lazybag/page.tsx`，commit `2135bb8`。
 - DONE: controversy-timeline 頁面（`src/app/controversy-timeline/page.tsx`）加入 `owl-past.png`
+  檔案 `src/app/controversy-timeline/page.tsx`，commit `2135bb8`。
 - DONE: about 頁面（`src/app/about/page.tsx`）加入 `owl.png`
+  檔案 `src/app/about/page.tsx`，commit `2135bb8`。
 - DONE: 修正 controversy-timeline 頁面圖片與文字重疊問題
+  檔案 `src/app/controversy-timeline/page.tsx`，commit `e9f53e1`。
 
 ### 實際變更
 
