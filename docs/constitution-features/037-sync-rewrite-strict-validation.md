@@ -33,6 +33,14 @@ gates:
               application:
                 target-stage: review
                 state: consumed
+        - id: gate:037:review
+          stage: review
+          attempts:
+            - id: gate-attempt:037-review-1
+              briefing:
+                id: briefing:037:review:attempt-1:revision-1
+                digest: sha256:953d731b43e2114292a967bf8db87e3c589f3e0e552ee2f7bf81c9a8484a3f96
+                room-ref: '@review/review/briefing-1'
 ---
 
 改寫 `scripts/sync-content.mjs`，並把同步從 `npm run build` 中移除。這是內容產線改造的核心工程，對應 `../content-pipeline/design.md` 第五節的施工項目 7 與 8。
