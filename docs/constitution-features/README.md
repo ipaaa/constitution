@@ -7,7 +7,11 @@ id-style: sequential
 stages:
   defaults:
     worktree: false
-    concurrency: 2
+    # 2026-09-02 暫時由 2 調為 3。原因：034/035 兩張票的工作已於 2026-05-03
+    # 隨 PR #30/#31 合併上線，但 workflow 狀態未推進，四個月來持續佔用兩個
+    # 併行名額，導致全部 design 階段的票都派不出去。
+    # 待 034/035 補上 implement 階段的回顧式 Stage Report 並正常收尾後，改回 2。
+    concurrency: 3
   states:
     - name: design
       initial: true
