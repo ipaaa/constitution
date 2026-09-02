@@ -1,11 +1,11 @@
 ---
 id: 037
 title: 改寫內容同步程式：嚴格把關、失敗中止、支援 site_tldr
-status: review
+status: complete
 source: design.md 第五節施工項目 7-8
 started: 2026-09-02T17:05:11Z
-completed:
-verdict:
+completed: 2026-09-02T19:53:42Z
+verdict: PASSED
 score: 1.0
 worktree: .worktrees/spacedock-ensign-037-sync-rewrite-strict-validation
 issue:
@@ -60,7 +60,8 @@ gates:
                 reason: review 以自寫 parser 獨立複現六條 AC（505 項欄位比對 0 項對不上），並以新來源重建 fixture 重跑 design.md 第四節全部 17 條檢查規則，11 次執行全數 exit 1。captain 依 review 的發現修正 SSOT_收集區：h4/h5/h6 的 content 由判決摘要改回憲法條文、h4 的 handwriting 補回。FO 以七個欄位重新比對確認（不再只看 content）：h4 handwriting 已逐字相同，title 僅餘一個標點差異（句號 vs 逗號），內容無缺漏；其餘差異 h7/h10/h14/h28 皆為收集區優於網站的改善，h2 依 captain 裁示維持 status 空白不上線。核可完成，進入交付：跑完整同步、提交資料、開 PR 由 captain 對 diff。
               application:
                 target-stage: complete
-                state: pending
+                state: consumed
+archived: 2026-09-02T19:53:42Z
 ---
 
 改寫 `scripts/sync-content.mjs`，並把同步從 `npm run build` 中移除。這是內容產線改造的核心工程，對應 `../content-pipeline/design.md` 第五節的施工項目 7 與 8。
