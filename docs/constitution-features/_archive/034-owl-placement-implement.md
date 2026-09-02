@@ -1,16 +1,17 @@
 ---
 id: "034"
 title: 貓頭鷹法官全站視覺融入實作
-status: implement
+status: complete
 source: design-assets/005
 started: 2026-05-03T02:06:10Z
-completed:
-verdict:
+completed: 2026-09-02T17:15:23Z
+verdict: PASSED
 score: 0.8
 worktree: .worktrees/spacedock-ensign-034-owl-placement
 issue:
 pr: pr-merge:30 #30
 mod-block:
+archived: 2026-09-02T17:15:23Z
 ---
 
 根據 design-assets/005 的 placement guide，將集中於 public/owl-avatars/ 的貓頭鷹圖片整合到全站各頁面。使用既有圖片素材：owl.png、owl-past.png、owl-future.png。
