@@ -41,6 +41,10 @@ gates:
                 id: briefing:037:review:attempt-1:revision-1
                 digest: sha256:953d731b43e2114292a967bf8db87e3c589f3e0e552ee2f7bf81c9a8484a3f96
                 room-ref: '@review/review/briefing-1'
+              withdrawal:
+                by: agent:first-officer
+                at: "2026-09-02T18:58:38.996354Z"
+                reason: 來源資料於 gate 開啟後變更：captain 依 gate 上的第 1 項發現，修正 SSOT_收集區 h4/h5/h6 的 content 欄（由判決摘要改回憲法條文）。FO 重抓 CSV 確認三格已與網站現值逐字相同，全表差異由 6 筆降為 3 筆。review 報告中的 505 項欄位比對是對舊來源做的，已不能代表合併時的內容，故撤回本 briefing 並在重驗後重開。
 ---
 
 改寫 `scripts/sync-content.mjs`，並把同步從 `npm run build` 中移除。這是內容產線改造的核心工程，對應 `../content-pipeline/design.md` 第五節的施工項目 7 與 8。
