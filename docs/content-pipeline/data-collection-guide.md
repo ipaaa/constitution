@@ -4,7 +4,7 @@
 > **不要這樣做。** 那兩個檔是產物，手改的內容會在下次同步時消失。
 >
 > 內容要改，改 Google 試算表，並由編輯台把 `status` 設為 `Approved`。
-> 正確流程見 [`content-pipeline/design.md`](./content-pipeline/design.md)。
+> 正確流程見 [`content-pipeline/design.md`](./design.md)。
 >
 > **T3（`future.ts`）章節不受影響，仍然有效。**
 

@@ -5,9 +5,9 @@
 >
 > 本文也未說明：產線目前處於**刻意斷開**狀態，Vercel 的試算表網址已停用。
 >
-> 正確流程見 [`../docs/content-pipeline/design.md`](../docs/content-pipeline/design.md) 第五節。
-> 禁止事項見 [`../AGENTS.md`](../AGENTS.md)。
-> 本文將於產線改造完成後重寫，見 [`../docs/INDEX.md`](../docs/INDEX.md) 第 2 階段。
+> 正確流程見 [`../content-pipeline/design.md`](../content-pipeline/design.md) 第五節。
+> 禁止事項見 [`../../AGENTS.md`](../../AGENTS.md)。
+> 本文將於產線改造完成後重寫，見 [`../INDEX.md`](../INDEX.md) 第 2 階段。
 
 ---
 

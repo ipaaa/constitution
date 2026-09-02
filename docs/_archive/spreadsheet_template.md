@@ -7,8 +7,8 @@
 > 2. Track 1 範本沒有 `status` 欄。照此建表等於沒有把關，
 >    這正是 15 筆資料錯位能上線的原因。
 >
-> 正確的欄位結構見 [`../docs/content-pipeline/design.md`](../docs/content-pipeline/design.md) 第二節。
-> 本文預定封存，見 [`../docs/INDEX.md`](../docs/INDEX.md)。
+> 正確的欄位結構見 [`../content-pipeline/design.md`](../content-pipeline/design.md) 第二節。
+> 本文預定封存，見 [`../INDEX.md`](../INDEX.md)。
 
 ---
 
