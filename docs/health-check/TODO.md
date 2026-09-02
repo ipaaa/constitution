@@ -14,7 +14,7 @@
 |---|---|
 | **出了什麼事、為什麼會上線** | [`2026-08-31-content-pipeline.md`](./2026-08-31-content-pipeline.md)　←　**先看這份**。「三個破洞 → 四道防線」的因果總表在文件上方的「第二次補述」 |
 | **還有什麼要做、誰做** | 本檔案 |
-| **新的產線要長怎樣** | [`../content-pipeline/design.md`](../content-pipeline/design.md)。第七節是施工順序 |
+| **產線的一切**（目標、現況、進度、規格、施工順序） | [`../content-pipeline/design.md`](../content-pipeline/design.md) ← 產線只有這一份 |
 | **被搶救出來的內容** | [`../content-rescue/`](../content-rescue/) —— 回填清單、短評網站版備份 |
 
 > ⚠️ 體檢報告的「三、根因」寫於 2026-08-31，**不完整** —— 它解釋了資料為什麼會壞，但沒解釋為什麼會上線。缺的那塊（每次部署都自動重跑同步）在同一份文件的第二次補述裡。
@@ -24,15 +24,23 @@
 ## ⛔ 動工前必讀
 
 ```
-在 P1-1 完成之前，不要執行：
+不要執行：
   node scripts/sync-content.mjs
   npm run sync-content
   npm run build          ← build 也會跑 sync
 ```
 
-`src/data/discussions.json` 已被人工編輯，內含試算表裡不存在的內容。現在跑 sync 會用試算表的舊值／佔位值覆蓋掉線上較好的版本，並抹除 `opposing_views`。
+**這條禁令尚未解除。** 2026-09-01 更新：搶救內容已回填試算表（原本的解除條件），
+但**同步程式還沒改寫**，所以現在跑它仍會出問題：
 
-備份已存於 `docs/content-rescue/`（commit `94c6356`），但**備份不等於解除風險** —— 只有把內容搬回試算表才算。
+- 它不認識 `site_tldr` 分頁 → 網站的摘要區塊會消失
+- Track 1 的把關仍是壞的 → `status` 空白也放行
+- 檢查機制還沒有 → 有問題只印警告，繼續寫入
+
+**真正的解除條件**：完成 [`../content-pipeline/design.md`](../content-pipeline/design.md)
+第五節的施工項目 7 與 8。
+
+要驗證改動，用 `npx tsc --noEmit` 與 `npm run dev`（`dev` 不含同步）。
 
 **目前的保護狀態**：Vercel 的 `TRACK_1_CSV_URL` / `TRACK_2_CSV_URL` 已改名加 `_disabled`（2026-08-31），sync 會自動跳過。已實測驗證：
 
@@ -51,22 +59,10 @@ npm run build 完整跑過，16 個頁面全部產生成功
 
 ## 產線現況
 
-```
-寫作者（法學者・編輯）
-      ↓ 編輯
-  SSOT_收集區 (Drive)      42 列・已被專家改正・欄位標題含註解
-      ↓ ✋ 人工複製（無人負責・會貼歪・不回流）
-  SSOT_Editor (Drive)      25 列・15 筆錯位・含法律錯誤・含 test 資料
-      ↓ node scripts/sync-content.mjs（依欄位標題名稱對應）
-  src/data/history.json    ← 最後 commit 2026-05-02
-  src/data/discussions.json   ← 已被人工編輯，與上游脫鉤
-      ↓
-  線上網站
-```
+產線的目標、現況、進度、施工順序**全部集中在一份文件**：
+[`../content-pipeline/design.md`](../content-pipeline/design.md)
 
-**核心問題：**中間那個人工複製動作，同時扮演「編輯台把關」與「資料搬運」兩個角色，而它把搬運做壞了。
-
----
+本清單只列產線以外、或卡在人的項目。產線本身的施工進度不在這裡重複記錄。
 
 ## 🔔 現在的下一件事
 

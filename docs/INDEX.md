@@ -53,8 +53,7 @@ docs/
 
 | 路徑 | 用途 | 狀態 | 負責人 | 最後查核 |
 |---|---|---|---|---|
-| `docs/content-pipeline/current-vs-target.md` | 產線的目標、現況、差距對照。**先看這份** | evergreen | captain | 2026-09-01 |
-| `docs/content-pipeline/design.md` | 新產線的完整規格與施工順序 | plan | captain | 2026-09-01 |
+| `docs/content-pipeline/design.md` | 產線的**唯一**規格文件：目標、現況、進度、規格、施工順序 | plan | captain | 2026-09-01 |
 | `docs/content-pipeline/data-collection-guide.md` | ⚠️ T3 章節有效，**T1／T2 章節已過時**，檔頭有警告 | plan | captain | 2026-09-01 |
 
 ### 體檢與待辦

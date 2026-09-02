@@ -8,7 +8,7 @@
 > 本文描述的 Python 爬蟲腳本不存在於 repo 中。
 >
 > 技術選型章節（Next.js / Tailwind / TypeScript）仍然正確。
-> 資料流章節見 [`../content-pipeline/current-vs-target.md`](../content-pipeline/current-vs-target.md)。
+> 正確的資料流見 [`../content-pipeline/design.md`](../content-pipeline/design.md)。
 
 ---
 
