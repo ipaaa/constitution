@@ -1,0 +1,31 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:037:review:attempt-1:revision-1",
+  "question": "037 通過 review。獨立審查者以自寫 parser 複現六條 AC、逐條實跑 design.md 第四節的 17 條檢查規則，未發現會造成內容遺失或靜默失敗的缺陷。是否核可完成？核可後進入交付：跑完整同步、開 PR、由你對 diff。另有三項來源資料／既有設計問題需你在看 diff 時決定，其中 h4/h5/h6 的 content 語意改變會使網站左右對照設計失效。",
+  "artifacts": [
+    {
+      "id": "artifact:037:review:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/f93aa55ab40a08539dbcb74a116b1510baff4a46/docs/constitution-features/037-sync-rewrite-strict-validation.md",
+      "rev": "sha256:f092f30626a43bd4284e5730997944ca3fa9a55e79f1683a4249f0aa8783858b",
+      "mediaType": "text/markdown",
+      "summary": "review 以自寫 CSV parser 與比對程式獨立複現六條 AC，不採信前幾輪自述：505 項欄位比對 0 項對不上；第四節 17 條規則各以 fixture 觸發全數會中止並指名。更正 verify 兩處自述誤差。判定 verify 建議的 Polish 改法無效並提出正確改法，但判定不必在合併前修。新增三項需 captain 決定：h4/h5/h6 的 content 由憲法條文換成判決摘要、h2 消失會連帶讓五條跨軌連結不顯示、textbook.content 走 dangerouslySetInnerHTML 且同步不做淨化。"
+    }
+  ],
+  "context": [
+    {
+      "type": "Reference",
+      "id": "reference:037:review:attempt-1:revision-1:item-2",
+      "uri": "git-root://main/f93aa55ab40a08539dbcb74a116b1510baff4a46/docs/content-pipeline/design.md",
+      "mediaType": "text/markdown",
+      "rev": "sha256:68b3acd8000510d350cbe80da36ed868f097100dfefdfad4de5a76feef42ab42"
+    },
+    {
+      "type": "Reference",
+      "id": "reference:037:review:attempt-1:revision-1:item-3",
+      "uri": "git-root://main/f93aa55ab40a08539dbcb74a116b1510baff4a46/docs/health-check/TODO.md",
+      "mediaType": "text/markdown",
+      "rev": "sha256:089a823631d06965f00a484d2538cb67bdbbc71a15162a43e61cd1d74214eb1a"
+    }
+  ]
+}
