@@ -234,6 +234,8 @@ curl -s https://constitution-nine.vercel.app/past -o p.html
   grep -c "test test test" src/data/discussions.json   # 應為 0
   ```
 
+</details>
+
 ---
 
 ### ~~P0-4　6 筆佔位摘要~~ ✅ 已完成
@@ -246,9 +248,15 @@ curl -s https://constitution-nine.vercel.app/past -o p.html
 
 ---
 
-### P0-5　`d1` 的反方意見掛著**虛構出處**，正在線上顯示　🔺 與 P0-2 同級
+### ~~P0-5　`d1` 的反方意見掛著虛構出處~~ ✅ 已刪除（2026-09-01）
 
-- **狀態**：待編輯台決定（2026-09-01 發現）
+- **狀態**：**已移除**。從 `discussions.json` 的 `d1` 刪掉整個 `opposing_views` 欄位（37 行），剛好對應當初加進來的行數
+- **為什麼刪資料就夠**：渲染那行是 `{item.opposing_views && item.opposing_views.length > 0 && (...)}`，沒資料就不渲染，「立場觀點」整個區塊自動消失。元件與型別保留未動，因為 `019` 那張票還開著
+- **驗證**：假出處出現次數 `0`；資料仍為 16 筆；`npx tsc --noEmit` 通過
+
+<details>
+<summary>原始問題記錄（含來歷追查）</summary>
+
 - **線上位置**：`https://constitution-nine.vercel.app/present/d1` 的「**立場觀點**」區塊，兩張卡片的出處行
 - **程式位置**：`src/components/opposing-views/OpposingViewCard.tsx` L17–23，把 `author`／`affiliation`／`year` 以「，」串成一行直接顯示
 - **資料位置**：`src/data/discussions.json` → `d1` → `opposing_views`（**全站只有這一筆有**）
@@ -275,6 +283,8 @@ curl -s https://constitution-nine.vercel.app/past -o p.html
   ```
 - **關聯**：此項與「反方意見要不要進 SSOT」是兩件事，見 P1-3
 
+</details>
+
 ---
 
 ## P1 — 資料有遺失風險
@@ -288,17 +298,30 @@ curl -s https://constitution-nine.vercel.app/past -o p.html
 - **這是解除「不能跑 sync」限制的前提**
 - **不做的後果**：產線接通後這批內容將被**第三次**覆蓋（前兩次沿革見清單檔）
 
-### P1-2　5 筆短評有兩個版本，需編輯台裁決
+### ~~P1-2　5 筆短評有兩個版本，需編輯台裁決~~ ✅ 已決定（2026-09-01）
 
-- **狀態**：待決策
+- **決定**：**採用試算表版。**
 - **受影響**：`d1` `d2` `d4` `d5` `d6`
-- **狀況**：兩邊都是真短評，不是佔位。json 版口語有風格，試算表版偏說明性
+- **不需要動手** —— 同步程式一接通，就會自動用試算表版覆蓋網站版
+- **網站版已完整備份**：[`../content-rescue/owl-comments-website-version.md`](../content-rescue/owl-comments-website-version.md)
 - **例**（d1）：
-  - json：「憲法法庭沒死，只是被鎖在抽屜裡——這篇說的是誰把鑰匙拿回來了。」
-  - 收集區：「長期關心司法議題的張娟芬老師寫給非法律人的你瞭解！」
-- **要決定的事**：貓頭鷹短評採哪一套聲音（這會定調整個網站的語氣）
-- **誰能做**：編輯台
-- **對照表**：`docs/content-rescue/track2-rescue.md` B 類
+  - 網站版（將被覆蓋）：「憲法法庭沒死，只是被鎖在抽屜裡——這篇說的是誰把鑰匙拿回來了。」
+  - 試算表版（採用）：長期關心司法議題的張娟芬老師寫給非法律人的你瞭解！
+
+⚠️ **副作用，之後看 PR 時會遇到**：`d7`／`d8`／`d9` 的引號口語版已於 8/31 回填進試算表，所以覆蓋後全站會變成「`d7`–`d9` 是口語、其餘是說明性」。要不要統一另外再說，備份檔裡有完整說明。
+
+### P1-6　確認網站版短評是不是 AI 生成的　🔍 你要查的
+
+- **狀態**：待你確認
+- **要查什麼**：`d1` `d2` `d4` `d5` `d6`（以及同風格的 `d7` `d8` `d9`）那批「」引號版短評，是人寫的還是 AI 生成的
+- **為什麼要查**：若是 AI 生成而未經審閱，那就跟 `h2` 的法律錯誤、`d1` 的虛構出處是同一類問題 —— 以專業口吻寫出來、但沒有人背書的內容
+- **全文在哪**：[`../content-rescue/owl-comments-website-version.md`](../content-rescue/owl-comments-website-version.md)
+- **已查到的線索**：
+  - 進入 repo 的時間點是 `75df766`（2026-04-16），commit 訊息寫「replace shared owl_comment/vibe/abstract **placeholders** with unique per-article copy」
+  - **該 commit 沒有 `Co-Authored-By` 標記** —— 相對地，已確認為 agent 所寫的 `58c433e`（反方意見）就有明確的 `Co-Authored-By: Claude Opus 4.6`
+  - 所以**從 git 紀錄判斷不出來**，需要你回想或另外查
+- **可參考的特徵**：這五則句構高度一致（白話重述＋破折號＋一句收尾，整句用「」包起來）。可能是同一人一次寫完，也可能是生成的
+- **若確認是 AI 生成**：因為已決定改用試算表版，這批內容本來就會被覆蓋掉，屆時問題自然消失。但仍值得知道 —— 因為要確認**同一批作業裡還有沒有別的東西**是這樣進來的
 
 ### P1-3　`opposing_views` 無處可存
 
@@ -499,7 +522,8 @@ captain 指出那些中文是寫給學者老師看的，刪掉編輯端就失去
 
 ### P3-8　🚨 發布前必須移除 noindex
 
-- **狀態**：已加入（2026-08-31），**發布時必須移除**
+- **狀態**：**現在刻意保持著，不要動**（2026-09-01 確認）—— 目前就是不要讓 Google 搜尋得到。**等真的要對外發布時才移除**
+- **原狀態**：已加入（2026-08-31），**發布時必須移除**
 - **位置**：`src/app/layout.tsx` 的 `metadata.robots`
 
   ```ts
@@ -581,8 +605,8 @@ git log -1 --format='%ad %s' --date=short -- src/data/discussions.json
 
 剩餘（2026-09-01 再次重排）：
 
-1. **P0-5：處理 `d1` 的虛構出處** —— 對外可見，且與產線施工無相依，可立即做
-   ~~`Track 2_opposing` 分頁~~ 已決定不建（2026-09-01），design.md 已移除
+~~1. **P0-5：`d1` 的虛構出處**~~ ✅ 已刪除（2026-09-01）
+~~2. **P1-2：短評採哪一套聲音**~~ ✅ 已決定用試算表版（2026-09-01）
 2. **改寫 sync**（design.md 項目 7–10）—— 工程。P2-1 的嚴格過濾、P2-3 的標題解析都含在項目 7 內，不另外開票
 3. **P0-2** 找法學協作者確認 h2 —— 卡在別人身上，越早問越好，與產線施工無相依，可平行進行
 
