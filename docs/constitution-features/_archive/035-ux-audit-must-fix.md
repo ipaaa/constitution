@@ -1,16 +1,17 @@
 ---
 id: "035"
 title: UX 審計上線前必修項
-status: implement
+status: complete
 source: design-assets/007
 started: 2026-05-03T03:23:28Z
-completed:
-verdict:
+completed: 2026-09-02T17:15:23Z
+verdict: PASSED
 score: 0.9
 worktree: .worktrees/spacedock-ensign-035-ux-audit
 issue:
 pr: pr-merge:31 #31
 mod-block:
+archived: 2026-09-02T17:15:23Z
 ---
 
 根據 design-assets/007 UX 顧問報告，修正上線前必須解決的問題。
