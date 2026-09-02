@@ -198,3 +198,42 @@ site_tldr 分頁的內容被靜默忽略。這直接違反 AC-4 與 design.md �
 
 未改動任何候選檔案；`scripts/sync-content.mjs` 與 `package.json` 維持 `197436e` 的內容。
 驗證用的 fixture 與比對程式放在 scratchpad，依 Test plan 不進版控。
+
+## Stage Report: implement (cycle 1)
+
+- DONE: F2 修正：同步產出的 discussions.json 不得出現重複 id；Track 2 來源列與 site_tldr 組出的記錄發生 id 衝突時中止並指名兩個來源分頁，不得靜默取其一
+  新增 `checkMergedDiscussionIds`，在兩軌都通過、寫檔之前比對合併後的 id。
+  Fixture：Track 2 放一列 id 為 `tldr` 且**其餘欄位完全合法**的列（year／vibe 都有值，
+  才隔離出 id 衝突本身；真實試算表的舊列 year／vibe 是空的，會先被必填檢查擋下）。
+  結果：退出碼 1，訊息為
+  `tldr  id 在兩個分頁各出現一次：Track 2_discussion 有一列 id 為「tldr」，site_tldr 也組出同一個 id。…請刪掉 Track 2_discussion 裡 id 為「tldr」的那一列`，
+  兩個 json 的 sha256 皆未變。
+  改成「後者覆蓋前者」或「先到先贏」會使這項證明失效 —— 退出碼會變回 0。
+- DONE: F3 修正：某一軌來源有資料列但核可後為 0 筆時中止並指名該軌，不得寫出空檔案
+  新增 `checkNotEmptyAfterApproval`，Track 1 與 Track 2 各呼叫一次。
+  Fixture：Track 1 只放一列 `status` 空白的資料（就是 status 欄剛建好、尚未核可的狀態）。
+  結果：退出碼 1，訊息為 `Track 1  內容  有 1 列資料，但沒有任何一列的 status 是 Approved。…`，
+  `history.json` 的 sha256 未變、內容不是 `[]`，且 stdout 不含「已寫入」。Track 2 同樣測過。
+  把這道檢查拿掉會使證明失效 —— 會變回 exit 0 且寫出 `[]`。
+
+### 修正前的反向驗證
+
+把 harness 指向修正前的 commit `197436e` 重跑，上述 14 個測項全數 FAIL，
+且重現 verify 的觀察逐字相同：F2 得到 `exit 0`、`discussions.json（3 筆，含 tldr）`；
+F3 得到 `exit 0`、`✅ 檢查通過，已寫入 src/data/history.json（0 筆）`。
+測項不是套套邏輯 —— 它們在缺陷存在時真的會失敗。
+
+### ⚠️ 需要 captain 在 gate 上裁示：F3 把一條規則一致化了
+
+「來源有資料列但核可後為 0 筆就中止」這條規則，`design.md` 第四節**只寫給 `site_tldr`**
+（「`order ≥ 1` 至少要有一列通過核可」），**沒有寫給 Track 1 與 Track 2**。
+本次依 FO 指派把同一條防線套到兩軌。這是設計文件目前沒有的規則。
+請 captain 確認是否同意把它寫進 `design.md` 第四節。
+
+### Summary
+
+依 FO 授權處置修正 F2 與 F3，兩項皆為 Material。F1 未動（FO 授權 route for decision，
+不在本輪範圍）。改動只在 `scripts/sync-content.mjs`，`+51` 行，未動其他檔案。
+`npx tsc --noEmit` 通過。Harness 全數 50 + 14 = 64 項測項通過，路徑同前一份報告。
+本輪未執行 `npm run build`，未碰真實試算表，未動 `src/data/*.json`。
+重驗由 verify 執行，本報告不主張 gate 結果。commit `c3249e0`。
