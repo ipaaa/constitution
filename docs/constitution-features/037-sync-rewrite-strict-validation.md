@@ -94,3 +94,55 @@ Verified by: 同步前後對 `history.json` 與 `discussions.json` 做逐筆比�
 - 施工項目 10（封存 `SSOT_Editor`）—— 人工，合併後才做
 - 試算表的 `status` 保護範圍設定 —— 需先有協作者，見 `../health-check/TODO.md` 的 P3-1
 - `approved_by`／`approved_at`／`reject_reason` 三個欄位尚未在試算表建立，本票不處理
+
+## Stage Report: implement
+
+- DONE: 同步程式在資料違反檢查規則時整份中止，不寫入任何檔案，且錯誤訊息指名到具體欄位
+  植入 `year` 非四位數 + `abstract` 含 `test test` 的 CSV：退出碼 1，輸出逐字為 design.md
+  第四節的範例格式（`h4 year 應為 4 位數字，實際為「憲法第十四條…」`／`d7 abstract 含有測試
+  字串「test test」`），兩個 json 的 sha256 與執行前相同。把中止改回「印警告後繼續」或
+  「跳過壞的列」，sha256 比對這一項就會失敗。commit `197436e`。
+- DONE: npm run build 不再執行同步；執行前後 src/data/*.json 的 sha256 相同
+  `build` 改為 `next build`。實跑 `npm run build`（exit 0，16 頁全數產出），前後
+  sha256 皆為 `ae72f302…`／`d6b7c5be…`，`diff` 無輸出。把 `sync-content.mjs` 加回 build
+  會使這一項失敗。
+- DONE: site_tldr 分頁讀取並還原為 id 'tldr' 的記錄
+  以 `bf491df` 的 tldr 反推 CSV 再跑一次同步，產出的記錄與 `bf491df` **整筆** JSON 逐字
+  相同（含 `title`／`link`／`abstract`）。改動 `id` 值或換行組裝規則會使它失敗。
+  另測 `order 0` 的 `status` 空白時中止並指名 —— design.md 第二節警告的失效路徑。
+- DONE: 現有內容（d7/d8/d9 摘要與短評、tldr 三重點、h15-h29 欄位）未倒退
+  僅完成可在本階段驗證的部分：`owl comment (允鍾…)` 正確解析為 `owl_comment`（值逐字相同，
+  若最長前綴比對壞掉會變成空字串）；`tldr` 三重點如上。**與真實試算表的逐筆比對是 AC-6，
+  依本票 Test plan 於 verify 階段執行。本階段沒有 `.env.local`，跑不到真實資料。**
+
+### Summary
+
+改寫 `scripts/sync-content.mjs`（180 → 679 行）並把同步移出 `build`。四個缺陷全部處理：
+部署不再自動同步、兩軌統一只收 `Approved`、加入第四節的檢查規則且失敗即整份中止、
+支援 `site_tldr`。`parseCSV` 的掃描迴圈維持原樣，只把「組成物件」那段拆出來 —— design.md
+第二節的實測是用這個迴圈跑的。驗證程式在
+`/private/tmp/claude-501/-Users-ipa-Documents-ipa-Document-00-Claude-spacedock-folder/dfe33f00-9190-4f9d-8044-b332a2106079/scratchpad/sync-harness.mjs`
+（依 Test plan 不進版控），50 項檢查全數通過。`npx tsc --noEmit` 通過；`npm run lint` 的
+4 error 6 warning 全在 `src/components/`，改動前即存在，`scripts/` 不在 lint 範圍。
+
+**超出宣告範圍，需要裁量。** 估計 +200 淨行、tolerance ±40%（上限 +280），實際 +498
+（`596 insertions / 98 deletions`，仍是宣告的 2 個檔案）。組成：欄位定義表 44 行、
+註解 134 行、其餘為第四節的 15 條檢查規則與標題解析器。要壓回 280 行，只能砍檢查或砍註解。
+
+**五項判斷，寫在這裡讓 gate 看得到。** 前三項會影響 verify 跑真實試算表的結果：
+1. 必填欄位的**值**檢查只對 `status = Approved` 的列執行。試算表是寫作者的工作區，
+   對草稿列套必填檢查等於任何人存檔到一半就擋住整份發布。`status` 的**值**檢查則對所有列
+   執行（`Approve` 這類錯字會讓一列被靜默丟掉，那正是要擋的東西）。
+2. `vibe` 允許清單取自現有 `discussions.json` 的 9 個值。design.md 第七節記載最終清單
+   未定。試算表若出現第 10 個值，同步會中止並指名 —— 刻意的，但 verify 可能因此需要改一行常數。
+3. `site_tldr` 的 `label` 只對 `order ≥ 1` 要求非空。`order 0` 的 `label` 不會被讀取，
+   第四節的檢查清單也未列它。第二節的欄位表標為必填，此處從第四節。
+4. 佔位字串檢查從第四節的 `abstract` 擴及 `title`／`author`／`owl_comment`
+   （`某學者，某大學法律系` 當初就是掛在作者位置上線的）。不收單獨的 `test`：
+   latest、protest 都含有它。
+5. 標題空白且**整欄無資料**的欄位忽略不報錯（試算表末端常留空欄，它沒承載內容）；
+   標題空白但欄內有資料則中止。
+
+**沒做、且是刻意的**：`AGENTS.md` 的「不要執行 build」禁令未解除。它的解除條件寫的是施工
+項目 7 與 8，但真正安全的時點是項目 9（跑完整同步、captain 對過 diff、合併）之後 ——
+在那之前 `main` 上的 `build` 仍會跑 sync。建議合併時一併改。
