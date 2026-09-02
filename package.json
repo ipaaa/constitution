@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/sync-content.mjs && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "sync-content": "node --env-file=.env.local scripts/sync-content.mjs"
