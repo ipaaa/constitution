@@ -28,7 +28,7 @@ npx tsc --noEmit         ← 型別檢查
 npm run dev              ← 本機預覽，不含 sync
 ```
 
-解除條件：完成 `docs/content-pipeline/design.md` 第七節的第 8 項（把 sync 移出 build）。
+解除條件：完成 `docs/content-pipeline/design.md` 第五節的施工項目 7 與 8。
 
 ### 2. 不要手改 `src/data/*.json`
 
@@ -145,13 +145,11 @@ robots: { index: false, follow: false },
 
 現有兩個 workflow，目前皆休眠：
 
-- `docs/constitution-features/` — 網站功能
-- `docs/design-assets/` — 視覺素材
+- `docs/constitution-features/` — 網站功能。**已於 2026-09-02 refit 至 0.28，可使用**
+- `docs/design-assets/` — 視覺素材。仍為 0.9.5，要用之前需先 refit
 
-兩者都是 spacedock 0.9.5 commissioned，現行版本為 0.28，需要 refit 才能使用。
-
-内容產線的施工不走上述 workflow。它有自己的施工順序，見
-`docs/content-pipeline/design.md` 第七節。
+內容產線的施工不走上述 workflow。它有自己的施工順序，見
+`docs/content-pipeline/design.md` 第五節。
 
 ---
 

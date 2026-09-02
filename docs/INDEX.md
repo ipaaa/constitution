@@ -90,12 +90,16 @@ docs/
 
 | 路徑 | 用途 | 狀態 | 負責人 | 最後查核 |
 |---|---|---|---|---|
-| `docs/constitution-features/` | 網站功能 workflow。30 個封存 entity、7 個開著 | record | — | 2026-09-01 |
+| `docs/constitution-features/README.md` | 網站功能 workflow 的規格。**已 refit 至 0.28** | evergreen | captain | 2026-09-02 |
+| `docs/constitution-features/` | 30 個封存 entity、7 個開著、4 份 debrief | record | — | 2026-09-02 |
 | `docs/design-assets/` | 視覺素材 workflow。5 個封存、4 個開著 | record | — | 2026-09-01 |
 
-兩者皆 `commissioned-by: spacedock@0.9.5`，現行為 0.28。要恢復需先 refit。
-其 README 的查詢指令路徑已不存在，schema 缺 `mod-block`、`archived` 欄位。
-`_archive/`、`_debriefs/` 為 record，不改寫。
+`constitution-features` 已於 2026-09-02 refit：修好失效的查詢指令、補上 `mod-block`
+欄位、寫作規範改指向 `AGENTS.md`（原指向兩個不存在的檔案）、`pr-merge` 模組更新至
+0.27.0，並採用樣板新增的證據紀律與 entity 範本。階段設計與 `sequential` 編號保留未動。
+
+`design-assets` 仍為 `spacedock@0.9.5`，要用之前需先 refit。
+各 workflow 的 `_archive/`、`_debriefs/` 為 record，不改寫。
 
 ---
 
