@@ -239,3 +239,52 @@ F3 得到 `exit 0`、`✅ 檢查通過，已寫入 src/data/history.json（0 筆
 `npx tsc --noEmit` 通過。Harness 全數 50 + 14 = 64 項測項通過，路徑同前一份報告。
 本輪未執行 `npm run build`，未碰真實試算表，未動 `src/data/*.json`。
 重驗由 verify 執行，本報告不主張 gate 結果。commit `c3249e0`。
+
+## Stage Report: verify (cycle 2)
+
+- DONE: 複驗 F2：確認 Track 2 來源列與 site_tldr 組出的記錄發生 id 衝突時中止並指名兩個來源分頁，且不寫出任何檔案
+  以真實 Track 2（只把佔位字串換成正常文字、保留 `tldr` 那一列）＋真實 site_tldr 實跑：exit 1、
+  1 項錯誤，訊息同時指名 `Track 2_discussion` 與 `site_tldr`，並指出該刪哪一列；兩個 json 的
+  sha256 未變。把 `checkMergedDiscussionIds` 拿掉會使這一項失敗（cycle 1 前實跑為 exit 0、
+  產出 2 筆 `id: 'tldr'`）。
+- DONE: 複驗 F3：確認某一軌來源有資料列但核可後為 0 筆時中止並指名該軌，不寫出空檔案
+  兩軌各測一次。Track 1 全部 status 空白：exit 1、「Track 1 有 3 列資料，但沒有任何一列的 status
+  是 Approved」。Track 2 全部空白：exit 1、「Track 2 有 16 列資料…」。兩次檔案皆未變。
+  cycle 1 前同樣輸入是 exit 0、寫出 `[]` 並回報「✅ 已寫入（0 筆）」。
+- DONE: 確認 cycle 1 的修正未破壞先前已通過的行為：把關、全有全無、site_tldr 還原、標題解析仍如前一輪報告所述
+  正常路徑實跑 exit 0：`history.json` 為 h1,h3（AC-3 —— status 空白的 h2 被排除）；
+  `discussions.json` 只有 1 筆 `id: 'tldr'`，且與現行檔案裡的 tldr 整筆 JSON 逐字相同（AC-4）；
+  `owl comment (允鍾…)` 仍正確解析為 `owl_comment`（AC-5 正向）；產出 0 個佔位字串命中。
+  AC-2 實跑（`year` 非四位數 ＋ `abstract` 含 `test test`）exit 1、指名 h4／d1、檔案未變。
+  AC-5 反向實跑（標題打成 `ruling_di`）exit 1、指名第 9 欄。AC-1：`build` 仍為 `next build`。
+  真實試算表複跑：exit 1、**與 cycle 1 前完全相同的 10 項錯誤**、檔案未變 —— 新增的兩道檢查
+  沒有在真實資料上產生偽陽性。`npx tsc --noEmit` 通過，`git status` 乾淨。
+- DONE: 判定本輪 verdict，並說明 F1 未解除的情況下 AC-6 仍無法查核這件事對 gate 的意義
+  見下方 Summary。判定 **PASSED（附條件）**，F1 與 AC-6 送交 captain 裁示。
+
+### Summary
+
+cycle 1 的兩項修正都成立，且都以「改前會失敗、改後會通過」的方式實測過，不是只讀程式碼確認。
+先前已通過的行為全部保持，真實試算表的錯誤清單一字未變，代表新增的檢查沒有誤傷正常資料。
+本票檔案內我找得到的缺陷已經沒有了。
+
+**F1 未解除，AC-6 仍無法查核。** `TRACK_1_CSV_URL`／`TRACK_2_CSV_URL` 仍指向 `SSOT_Editor`
+（25 列／17 列／h15–h29 錯位 15 筆），不是 `SSOT_收集區`（42 列／44 列／無錯位）。
+同步因此在「缺少必要欄位 status」中止，產不出可比對的檔案，AC-6 的「同步前後逐筆比對」
+無從執行。這不是程式缺陷 —— 改 `.env.local` 與發布 `SSOT_收集區` 的三個分頁是人工動作，
+本票無法自行決定改指哪一份。
+
+**這對 gate 的意義：再退回 implement 不會有進展。** implement 能做的都做完了，F1 只有 captain
+能解。依 review-finding disposition，超出本票範圍的 Material 應維持原狀並列為 Needs decision，
+而且只有 captain 能更動驗收標準。因此我建議 gate 以 PASSED 通過程式碼，同時把兩件事寫進
+決議：(1) AC-6 尚未查核，狀態是「未驗證」，不是「通過」；(2) AC-6 的查核要等 captain 把來源
+改指 `SSOT_收集區` 之後，在施工項目 9（跑完整同步、開 PR、對 diff）當場做 —— 本票的
+Out of scope 已經把項目 9 定為交付動作。在那次比對通過前，不要恢復 Vercel 的環境變數。
+
+**一項 Polish，不影響本輪判定。** `checkMergedDiscussionIds` 由 `if (errors.length === 0)`
+守著，所以有別的錯誤時 id 衝突不會一起報出來。實測：`year` 錯誤 ＋ id 衝突同時存在時，
+只報 year 那一項。編輯要改兩輪才看得到第二個問題，與程式自己寫的「一次蒐集所有錯誤再一起
+回報」不一致。改法是改成 `if (discussions !== null && tldr !== null)`。內容不會因此遺失，
+衝突仍然擋在寫入之前，故不列為退回理由。
+
+本輪未改動任何候選檔案；`scripts/sync-content.mjs` 維持 `c3249e0` 的內容。
