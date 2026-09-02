@@ -402,6 +402,27 @@ function checkUniqueKeys(records, keyField, group, errors) {
   }
 }
 
+/**
+ * 來源有資料列，但核可過濾後一筆都不剩時中止。
+ *
+ * 沒有這道防線，Track 1 的 status 欄剛建好、還沒核可任何列時，同步會寫出
+ * `[]` 並回報「✅ 已寫入（0 筆）」—— 25 筆歷史與 16 筆討論全數消失，程式說成功。
+ * 全數清空是最大幅度的內容倒退，它必須出聲。
+ *
+ * design.md 第四節只為 site_tldr 寫了這條（「order ≥ 1 至少要有一列通過核可」）。
+ * 這裡把同一條規則套到 Track 1 與 Track 2。
+ */
+function checkNotEmptyAfterApproval(records, approved, group, errors) {
+  if (records.length > 0 && approved.length === 0) {
+    addError(
+      errors,
+      group,
+      '內容',
+      `有 ${records.length} 列資料，但沒有任何一列的 status 是 Approved。同步會寫出空檔案，網站上這一軌的內容會全數消失。確認是否忘了核可。`,
+    );
+  }
+}
+
 function checkPlaceholders(record, fields, group, errors, keyField = 'id') {
   for (const field of fields) {
     const value = record[field];
@@ -455,6 +476,7 @@ function buildTrack1(csv, errors) {
   checkStatusValues(records, TRACK_1, errors);
 
   const approved = records.filter(isApproved);
+  checkNotEmptyAfterApproval(records, approved, TRACK_1, errors);
   checkRequiredValues(approved, TRACK_1_COLUMNS, fieldToIndex, TRACK_1, errors);
   checkUniqueKeys(approved, 'id', TRACK_1, errors);
 
@@ -508,6 +530,7 @@ function buildTrack2(csv, errors) {
   checkStatusValues(records, TRACK_2, errors);
 
   const approved = records.filter(isApproved);
+  checkNotEmptyAfterApproval(records, approved, TRACK_2, errors);
   checkRequiredValues(approved, TRACK_2_COLUMNS, fieldToIndex, TRACK_2, errors);
   checkUniqueKeys(approved, 'id', TRACK_2, errors);
 
@@ -628,6 +651,33 @@ function buildSiteTldr(csv, errors) {
 }
 
 // ---------------------------------------------------------------------------
+// 跨分頁檢查
+// ---------------------------------------------------------------------------
+
+/**
+ * discussions.json 由兩個來源合併而成：Track 2 的列，加上 site_tldr 組出的那一筆。
+ * 兩邊撞到同一個 id 時中止。
+ *
+ * 這是 tldr 從 Track 2 搬到 site_tldr 留下的過渡狀態：舊的那一列還在 Track 2。
+ * 不擋的話兩筆同 id 都會寫進去，而網站的
+ * DISCUSSIONS_DATA.find(item => item.id === 'tldr') 只會拿到排在前面的 Track 2 舊版，
+ * site_tldr 分頁的內容被靜默忽略 —— 看起來一切正常，內容卻是舊的。
+ *
+ * 不用「後者覆蓋前者」或「先到先贏」解決。那只是換一種靜默行為。
+ */
+function checkMergedDiscussionIds(fromTrack2, tldr, errors) {
+  const track2Ids = new Set(fromTrack2.map(record => record.id));
+  if (track2Ids.has(tldr.id)) {
+    addError(
+      errors,
+      SITE_TLDR,
+      tldr.id,
+      `id 在兩個分頁各出現一次：Track 2_discussion 有一列 id 為「${tldr.id}」，site_tldr 也組出同一個 id。網站只會讀到其中一筆。請刪掉 Track 2_discussion 裡 id 為「${tldr.id}」的那一列 —— 它的內容已經搬到 site_tldr 分頁。`,
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
 // 主流程
 // ---------------------------------------------------------------------------
 
@@ -656,6 +706,7 @@ async function main() {
   const history = buildTrack1(csv1, errors);
   const discussions = buildTrack2(csv2, errors);
   const tldr = buildSiteTldr(csv3, errors);
+  if (errors.length === 0) checkMergedDiscussionIds(discussions, tldr, errors);
   if (errors.length > 0) return abort(errors);
 
   // 全部通過才寫。序列化完成後才動硬碟，避免寫到一半失敗留下半份檔案。
