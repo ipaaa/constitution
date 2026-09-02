@@ -11,6 +11,17 @@ worktree: .worktrees/spacedock-ensign-037-sync-rewrite-strict-validation
 issue:
 pr:
 mod-block:
+gates:
+    version: 1
+    records:
+        - id: gate:037:verify
+          stage: verify
+          attempts:
+            - id: gate-attempt:037-verify-1
+              briefing:
+                id: briefing:037:verify:attempt-1:revision-1
+                digest: sha256:2f30cd66b396ed4137952c4abf7924dca16ee2f5a1fae3187ff812631673cd1d
+                room-ref: '@review/verify/briefing-1'
 ---
 
 改寫 `scripts/sync-content.mjs`，並把同步從 `npm run build` 中移除。這是內容產線改造的核心工程，對應 `../content-pipeline/design.md` 第五節的施工項目 7 與 8。
