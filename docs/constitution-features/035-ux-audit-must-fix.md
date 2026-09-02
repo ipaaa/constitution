@@ -91,3 +91,7 @@ commit 記錄額外顯示一筆 `fix(B): align TrackCards public mode detection 
 
 PR #31 於 2026-05-03T04:13:51Z 合併。合併 commit `cd14620999e0e07f4a2bf344291a05eea3e884cf` 為 `main` 的祖先。
 
+### Summary
+
+本票 checklist 共 7 項，4 項完成（A、B、E、K），3 項未完成（C、D、F）。D 項（3 分鐘導讀）曾在同一 PR 內先實作後撤銷，最終未進入合併結果；C、F 兩項自始未被本 PR 的 diff 觸及。變更規模為 +196／−98 行，跨 4 個檔案，其中 `TrackCards.tsx`（172 行）為新增檔案。
+
