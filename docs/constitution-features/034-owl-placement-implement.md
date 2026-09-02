@@ -37,6 +37,14 @@ workflow 的 verify／review 審查」。** 本票內無任何 Stage Report。
 > 本節為 2026-09-02 依已合併的 PR #30 逐檔重建的回顧記錄，非當時即時撰寫。
 > 依據為該 PR 的實際 diff。當時未留下任何 Stage Report。
 
+- DONE: 首頁（`src/app/page.tsx`）hero 貓頭鷹圖片來源改為 `/codex/owl.png`
+- DONE: past 頁面（`src/app/past/page.tsx`）加入 `owl-past.png`
+- DONE: future 頁面（`src/app/future/page.tsx`）加入 `owl-future.png`
+- DONE: opinion-lazybag 頁面（`src/app/opinion-lazybag/page.tsx`）加入 `owl.png`
+- DONE: controversy-timeline 頁面（`src/app/controversy-timeline/page.tsx`）加入 `owl-past.png`
+- DONE: about 頁面（`src/app/about/page.tsx`）加入 `owl.png`
+- DONE: 修正 controversy-timeline 頁面圖片與文字重疊問題
+
 ### 實際變更
 
 - `src/app/page.tsx`：首頁 hero 貓頭鷹圖片來源從 `/owl.png` 改為 `/codex/owl.png`。
@@ -49,16 +57,6 @@ workflow 的 verify／review 審查」。** 本票內無任何 Stage Report。
 六個頁面的圖片均設定 `width`／`height` 與 `className` 控制顯示寬度。除首頁與 about 頁的圖片保留有意義的 `alt` 文字外，其餘標記 `aria-hidden="true"` 或空 `alt=""`。
 
 commit 記錄顯示本 PR 由兩個 commit 組成：`feat: add owl mascot placements across all pages per design guide 005`，以及後續 `fix: prevent owl image from overlapping text on controversy timeline intro`（對應上述 controversy-timeline 頁的 flex 排版修正）。
-
-### 完成清單
-
-- DONE: 首頁（`src/app/page.tsx`）hero 貓頭鷹圖片來源改為 `/codex/owl.png`
-- DONE: past 頁面（`src/app/past/page.tsx`）加入 `owl-past.png`
-- DONE: future 頁面（`src/app/future/page.tsx`）加入 `owl-future.png`
-- DONE: opinion-lazybag 頁面（`src/app/opinion-lazybag/page.tsx`）加入 `owl.png`
-- DONE: controversy-timeline 頁面（`src/app/controversy-timeline/page.tsx`）加入 `owl-past.png`
-- DONE: about 頁面（`src/app/about/page.tsx`）加入 `owl.png`
-- DONE: 修正 controversy-timeline 頁面圖片與文字重疊問題
 
 ### 變更規模
 

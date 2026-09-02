@@ -10,7 +10,7 @@ score: 0.9
 worktree: .worktrees/spacedock-ensign-035-ux-audit
 issue:
 pr: pr-merge:31 #31
-mod-block: merge:pr-merge
+mod-block:
 ---
 
 根據 design-assets/007 UX 顧問報告，修正上線前必須解決的問題。
@@ -47,6 +47,14 @@ workflow 的 verify／review 審查」。** 本票內無任何 Stage Report。
 > 本節為 2026-09-02 依已合併的 PR #31 逐檔重建的回顧記錄，非當時即時撰寫。
 > 依據為該 PR 的實際 diff。當時未留下任何 Stage Report。
 
+- DONE: A. 首頁主 CTA 改導向 `/future`
+- DONE: B. 新增 `TrackCards.tsx`，三軌卡片依 `LAUNCHED_PAGES` 顯示「即將開放」
+- DONE: E. 統一首頁懶人包 CTA 文案
+- DONE: K. 首頁三軌區加閱讀順序提示
+- SKIPPED: D. T2 頁首「3 分鐘導讀」。commit 記錄顯示先實作、後在同一 PR 內撤銷，最終未進入合併結果
+- SKIPPED: C. About 頁面移除 placeholder 文字。本 PR diff 未觸及
+- SKIPPED: F. 第一波社群主視覺 infographic。本 PR diff 未觸及
+
 ### 實際變更
 
 對照本票 Checklist 逐項核對 diff：
@@ -61,16 +69,6 @@ workflow 的 verify／review 審查」。** 本票內無任何 Stage Report。
 `src/app/page.tsx` 另有結構性精簡：移除 `Clock`、`Search`、`Workflow` 圖示與 `CRISIS_STATS` 的直接 import（改由 `TrackCards.tsx` 內部引用），新增 `TrackCards` 與 `Suspense` 的 import，三軌卡片渲染包在 `<Suspense fallback={null}>` 內。
 
 commit 記錄額外顯示一筆 `fix(B): align TrackCards public mode detection with LaunchGate`，內容與上述 B 項的 public mode 判斷邏輯有關，已併入 B 項變更說明。
-
-### 完成清單
-
-- DONE: A. 首頁主 CTA 改導向 `/future`
-- DONE: B. 新增 `TrackCards.tsx`，三軌卡片依 `LAUNCHED_PAGES` 顯示「即將開放」
-- DONE: E. 統一首頁懶人包 CTA 文案
-- DONE: K. 首頁三軌區加閱讀順序提示
-- SKIPPED: D. T2 頁首「3 分鐘導讀」。commit 記錄顯示先實作、後在同一 PR 內撤銷，最終未進入合併結果
-- SKIPPED: C. About 頁面移除 placeholder 文字。本 PR diff 未觸及
-- SKIPPED: F. 第一波社群主視覺 infographic。本 PR diff 未觸及
 
 ### 變更規模
 
