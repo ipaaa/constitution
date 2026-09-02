@@ -1,3 +1,17 @@
+> # ⛔ 這份範本已過時，不要照建（2026-09-01）
+>
+> **本文有兩處會重現已修好的事故：**
+>
+> 1. 教人把 `tldr` 當成 Track 2 的一列新增。新的驗證機制會因此擋下整份同步。
+>    `tldr` 現在有獨立分頁 `site_tldr`。
+> 2. Track 1 範本沒有 `status` 欄。照此建表等於沒有把關，
+>    這正是 15 筆資料錯位能上線的原因。
+>
+> 正確的欄位結構見 [`../docs/content-pipeline/design.md`](../docs/content-pipeline/design.md) 第二節。
+> 本文預定封存，見 [`../docs/INDEX.md`](../docs/INDEX.md)。
+
+---
+
 # 📊 Google Spreadsheet 範本資料 (Spreadsheet Template Data)
 
 您可以直接根據下方的資料格式建立您的 Google Spreadsheet，或將下方的 CSV 內容儲存為 `.csv` 檔案後匯入。

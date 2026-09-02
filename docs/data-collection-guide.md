@@ -1,3 +1,15 @@
+> # ⚠️ T1／T2 章節已過時（2026-09-01）
+>
+> **本文教「在 `src/data/history.json` 新增條目」「在 `src/data/discussions.json` 新增條目」。**
+> **不要這樣做。** 那兩個檔是產物，手改的內容會在下次同步時消失。
+>
+> 內容要改，改 Google 試算表，並由編輯台把 `status` 設為 `Approved`。
+> 正確流程見 [`content-pipeline/design.md`](./content-pipeline/design.md)。
+>
+> **T3（`future.ts`）章節不受影響，仍然有效。**
+
+---
+
 # 資料收集流程說明文件
 
 本文件記錄「憲庭加好友」三個軌道（T1 過去、T2 現在、T3 未來）的資料收集、更新與驗證流程。

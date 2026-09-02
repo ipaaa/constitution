@@ -1,3 +1,17 @@
+> # ⚠️ 資料流章節已過時（2026-09-01）
+>
+> **本文稱 JSON 檔 commit 進 repo 即為 SSOT。這是錯的。**
+>
+> 真實情況：Google 試算表是唯一真相，`scripts/sync-content.mjs` 產生 JSON，
+> **`src/data/*.json` 是產物，不得手改**。
+>
+> 本文描述的 Python 爬蟲腳本不存在於 repo 中。
+>
+> 技術選型章節（Next.js / Tailwind / TypeScript）仍然正確。
+> 資料流章節見 [`../docs/content-pipeline/current-vs-target.md`](../docs/content-pipeline/current-vs-target.md)。
+
+---
+
 # 4. 技術架構與資料流 (Tech Stack & Data Flow)
 
 為了讓 `Add C0urt 憲庭加好友` 能在低維護成本下長期營運，並乘載可能因為時事引發的瞬間高流量，我們採取 **「無伺服器架構 (Serverless)」** 與 **「資料驅動靜態網站 (Data-driven SSG)」** 的策略。

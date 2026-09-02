@@ -1,3 +1,16 @@
+> # ⛔ 這份文件已過時，不要照做（2026-09-01）
+>
+> **本文教的 `npm run sync-content` 與後續 `git push`，是目前明令禁止的動作。**
+> 執行會覆蓋 `src/data/` 內的資料。
+>
+> 本文也未說明：產線目前處於**刻意斷開**狀態，Vercel 的試算表網址已停用。
+>
+> 正確流程見 [`../docs/content-pipeline/design.md`](../docs/content-pipeline/design.md) 第五節。
+> 禁止事項見 [`../AGENTS.md`](../AGENTS.md)。
+> 本文將於產線改造完成後重寫，見 [`../docs/INDEX.md`](../docs/INDEX.md) 第 2 階段。
+
+---
+
 # 📋 SSOT → Vercel / Local 部署備忘
 
 > 更新內容到網站的流程速查卡。給未來的自己 / 新夥伴用。
