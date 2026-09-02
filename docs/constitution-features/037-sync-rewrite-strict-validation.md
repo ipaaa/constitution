@@ -88,6 +88,8 @@ Verified by: 同步前後對 `history.json` 與 `discussions.json` 做逐筆比�
 
 ### Feedback Cycles
 
+- Cycle 1: REJECTED — verify；surface 2 檔／+549 淨行 vs estimate +200 ±40%（274%，超出上限 269 行）；AC unchanged。F1 route for decision（captain，來源網址指向 SSOT_Editor 而非 SSOT_收集區，AC-6 因此無法查核）；F2 fix（id 跨分頁重複，違反 AC-4 與不變式 #4）；F3 fix（核可 0 筆時靜默清空，違反 AC-6）。F2／F3 已修並經反向驗證；F3 將一條僅寫給 site_tldr 的規則一致化至兩軌，待 captain 於 gate 確認是否寫入 design.md。
+
 ## Out of scope
 
 - 施工項目 9（跑完整同步、開 PR 對 diff、合併）—— 那是本票的交付動作，不是另一項工程
