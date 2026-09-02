@@ -148,8 +148,9 @@ robots: { index: false, follow: false },
 - `docs/constitution-features/` — 網站功能。**已於 2026-09-02 refit 至 0.28，可使用**
 - `docs/design-assets/` — 視覺素材。仍為 0.9.5，要用之前需先 refit
 
-內容產線的施工不走上述 workflow。它有自己的施工順序，見
-`docs/content-pipeline/design.md` 第五節。
+**內容產線的施工走 `constitution-features` workflow**（2026-09-02 captain 決定，
+推翻 8/31「暫不進 workflow」的舊決定 —— 該決定的前提是 workflow 版本過舊，已於
+2026-09-02 refit 解除）。施工規格見 `docs/content-pipeline/design.md` 第五節。
 
 ---
 
