@@ -1,7 +1,7 @@
 ---
 id: 037
 title: 改寫內容同步程式：嚴格把關、失敗中止、支援 site_tldr
-status: verify
+status: review
 source: design.md 第五節施工項目 7-8
 started: 2026-09-02T17:05:11Z
 completed:
@@ -32,7 +32,7 @@ gates:
                 reason: 六條 AC 全部有實測證據，含以正確來源 SSOT_收集區 執行的完整同步比對（41 筆差異全數對應到儲存格，0 項對不上）。captain 已於試算表修正 h4 的「侵權/父權」誤植（FO 重抓 CSV 確認：侵權已移除、父權在位），並裁示 h2 維持 status 空白、不上線。規模超出宣告 274% 由 captain 接受。核可進入 review。
               application:
                 target-stage: review
-                state: pending
+                state: consumed
 ---
 
 改寫 `scripts/sync-content.mjs`，並把同步從 `npm run build` 中移除。這是內容產線改造的核心工程，對應 `../content-pipeline/design.md` 第五節的施工項目 7 與 8。
@@ -367,3 +367,76 @@ cycle 0 最擔心的事沒有發生：h15–h29 不再錯位、d7/d8/d9 與 tldr
 把內容提交上分支、開 PR 是施工項目 9，應在 captain 看過上述四項之後才做；重跑一次
 `npm run sync-content` 即可重現同一份產出（同步產物另存於 scratchpad）。
 上一輪的 Polish（`checkMergedDiscussionIds` 的 `if (errors.length === 0)`）依 FO 指示未改。
+
+## Stage Report: review
+
+- DONE: 獨立複現六條 AC 各自的 Verified by 子句，不採信前幾輪報告的自述；逐條記錄複現方式與結果
+  六條全部自行複現。方法與前幾輪不同：另寫 CSV parser 與比對程式（不呼叫 `sync-content.mjs` 的
+  `parseCSVRows`），並以本機 HTTP 伺服器餵 fixture，逐項實跑真實程式。
+  AC-1：`build` 為 `next build`，不含 `sync-content`；實跑 `npm run build` exit 0，前後 sha256 皆為
+  `ae72f302…`／`d6b7c5be…`。把 sync 加回 build，這兩個 sha 就會變。
+  AC-2：植入 h4 `year` 非四位數 ＋ d1 `abstract` 含 `test test` → exit 1、指名 `h4 year` 與
+  `d1 abstract`、sha256 未變。改成「跳過壞列只寫好列」會使 sha 改變。
+  AC-3：收集區 h2 的 `status` 儲存格是空字串；同步後 `history.json` 無 h2（同步前有）。
+  放寬回 `!row.status || approved` 會讓 h2 回來。
+  AC-4：產出的 `tldr` 記錄，`title`／`link`／`abstract` 與 `bf491df` 逐字相同；`id: 'tldr'` 恰好 1 筆。
+  改 `id` 值或換行組裝規則會使逐字比對失敗。
+  AC-5 正向：`id`／`content`／`title` 41/41 非空、`owl_comment` 15/15、`vibe` 15/15（標題解析壞掉會是 0）。
+  反向：`ruling_id` 打成 `ruling_di (判解字號)` → exit 1，指名「第 4 欄」與「缺少必要欄位 ruling_id」。
+  AC-6：實跑 exit 0，寫出 history 41 筆、discussions 16 筆。以自寫 parser 把產出的**每一個欄位值**
+  回頭對照來源儲存格：**505 項欄位比對，0 項對不上**，且無「已核可卻被丟掉的列」。
+  差異：`history` 25→41（新增 h30–h46 共 17、消失 h2、共存 24 筆中 10 筆有變動）；
+  `discussions` 16→16（無增減，14 筆有變動：`vibe` 11、`owl_comment` 5）。
+  指名項目全部保住：d7／d8／d9 的 `abstract`＋`owl_comment` 六個值逐字相同；`tldr` 整筆逐字相同、
+  三重點仍三行；h15–h29 十五筆的 `year` 皆四位數、`ruling_id` 皆非空。產出佔位字串掃描 5 項各 0 命中。
+  把新資料放進 `src/data/` 跑 `npx tsc --noEmit` 通過，跑完已 `git checkout` 還原。
+- DONE: 審查 scripts/sync-content.mjs 的程式碼品質：檢查規則是否與 design.md 第四節逐條相符、有無多做或漏做、錯誤訊息是否足以讓編輯台自行修正
+  第四節共 17 條規則，**逐條各以一個 fixture 實跑觸發，17 條全部會中止並指名，無漏做**。
+  證據（每項皆 exit 1、檔案未變）：重複標題 → 「欄位 title 有兩欄：第 8 欄…與第 11 欄…」；
+  `status` 打成 `Approve` → 指名 h1；重複 id → 「id 與第 2 列重複」；缺 `status` 欄 → 「缺少必要欄位」；
+  `ruling_id` 空白、`image_url`／`link` 非網址、`sticky` 非 TRUE/FALSE、`vibe` 不在清單（訊息附上九個允許值）、
+  `order` 非整數、`order` 重複、`order 0` 的 link 非網址、`text` 含 `lorem ipsum` → 一次跑出 8 項錯誤，
+  三個分頁的錯誤同時列出。`order 0` 的 status 空白、`order ≥ 1` 全未核可 → 各自指名。
+  **多做的四項，都有註解說明理由，我判斷全部合理**：兩軌的「核可 0 筆即中止」（已列 gate 待裁示）、
+  佔位檢查擴及 `title`／`author`／`owl_comment`、`views` 須為非負整數、必填**值**只查已核可列。
+  錯誤訊息夠編輯台自行修正：每項都給「哪一列（id 或列號）＋哪一欄＋實際值＋怎麼改」。
+  兩處小瑕疵，不影響使用：錯誤群組名寫 `Track 1`／`Track 2`，但分頁實名是 `Track 1_history`／
+  `Track 2_discussion`（同一支程式的跨分頁訊息卻用了實名）；`padEnd` 以 `.length` 對齊，中文鍵值會歪。
+- DONE: 判斷 verify 提出的 Polish（checkMergedDiscussionIds 被 if errors.length === 0 守著）是否應在合併前修，並說明理由
+  **結論：不必在合併前修，但 verify 提出的那一行改法是錯的，不可照抄。**
+  實測：`buildTrack1`／`buildTrack2`／`buildSiteTldr` 各自結尾的 `if (errors.length > 0) return null`
+  讀的是**共用**的 errors 陣列。只要 Track 1 有任何錯誤，`buildTrack2` 就回傳 `null`，即使 Track 2 自己乾淨。
+  我把 verify 建議的 `if (discussions !== null && tldr !== null)` 套進副本重跑「Track 1 year 錯誤 ＋ tldr id 衝突」：
+  **仍然只報 year 一項，與未修改前逐字相同**。這行改法治不了它要治的症狀。
+  真正有效的改法是讓三個 build 函式各自記錄進入時的錯誤數（`errors.length > errorsAtEntry`）。
+  我套上去重跑同一組輸入：兩項錯誤都報出來了；再以真實試算表重跑，產出與現行版本 **byte 相同**。
+  不列為退回理由的理由：全有全無沒有破口（衝突時仍 exit 1、不寫檔），六條 AC 沒有一條要求錯誤一次報完，
+  且收集區的 Track 2 目前**沒有任何一列 id 是 `tldr`**，觸發條件現在不存在。依 disposition 分類屬 Polish。
+
+### Summary
+
+**判定 PASSED。** 六條 AC 我全部自行複現，沒有一條靠前幾輪報告的自述；第四節 17 條檢查規則
+逐條實跑觸發，沒有漏做。程式本身我找不到會造成內容遺失或靜默失敗的缺陷。
+
+**兩處與 verify cycle 3 自述不符，更正如下。** 一、cycle 3 說 Track 1 有「六個換行標題」；實際只有
+`status（權限保護）` 一欄含換行，其餘五欄是全形括號、沒有換行（Track 2 的 `owl comment` 那欄確實含換行）。
+結論不變（全部解析正確），但機制敘述誇大了。二、cycle 3 把 `discussions` 的變動記為 10 筆；
+我量到 14 筆（`vibe` 11、`owl_comment` 5，聯集 14）。history 的 10 筆與 cycle 3 相符。
+
+**h4 的「侵權」誤植已從來源消失**（現值「宣告民法父權優先條款違憲」），captain 的試算表修正確實生效。
+
+**三件事建議在 captain 看 diff（第 ④ 步）時一併決定，全屬來源資料，不是程式缺陷：**
+1. **h4／h5／h6 的 `content` 換成了判決摘要，不再是憲法條文。** 網站左半頁是「課本」版面
+   （`past/page.tsx:199`），`textbook.content` 原本放憲法條文，右半頁才放判決。這三筆換掉後，
+   課本欄會變成判決摘要，左右對照的設計失效。cycle 3 把它併入「上游訂正」，我判斷不是訂正、是欄位語意改變。
+   h10／h14 的 `content` 是尾端追加一句，那兩筆確實是訂正。
+2. **h2 消失會連帶讓五條跨軌連結靜默消失。** `src/data/cross-track-links.ts` 有六處硬寫 `h2`
+   （第 21、36、40、93、95、97 行）。查詢函式都有 `if (h)` 防護，不會壞、不會擋建置，連結直接不顯示。
+   新增的 h30–h46 也沒有任何跨軌連結資料。
+3. **`textbook.content` 走 `dangerouslySetInnerHTML`（同檔第 199 行），同步不做任何淨化。**
+   收集區現在是唯一真相，且已有 28 列待核可的投稿資料，能編輯試算表的人就能對網站注入 HTML。
+   這是既有行為、不是本票造成，網站也還沒對外，故不列為退回理由。列此供 captain 知悉。
+
+驗證程式與 fixture 全在 scratchpad（`…/scratchpad/review/`），依 Test plan 不進版控。
+未改動任何候選檔案：`scripts/sync-content.mjs`、`package.json`、`src/data/*.json` 的 sha256 仍為
+`ae72f302…`／`d6b7c5be…`，`git status` 只有本票檔案。未動試算表、`.env.local`、Vercel 環境變數。
