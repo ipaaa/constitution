@@ -9,26 +9,21 @@
 
 ## ⛔ 絕對不要做的事
 
-### 1. 不要執行 build 或 sync
+### 1. 不要自己執行內容同步
 
 ```
-npm run build            ← 會跑 sync
-npm run sync-content
+npm run sync-content            ← 會覆寫 src/data/*.json
 node scripts/sync-content.mjs
 ```
 
-原因：`package.json` 的 build 指令是 `node scripts/sync-content.mjs && next build`。
-本機的 `.env.local` 內有試算表網址。執行 build 會抓試算表資料，覆蓋 `src/data/` 的檔案。
-那些檔案內有搶救回來的內容。覆蓋等於再次遺失。
+**`npm run build` 已經安全**（2026-09-02 解除禁令）。PR #32 把同步移出了 build，
+現在 `build` 就是 `next build`。已於 main 上實測：`npm run build` 執行前後，
+`src/data/*.json` 的 sha256 完全相同。
 
-**要驗證改動，用這兩個指令：**
+同步仍然只在有人明確要發布內容時才執行，而且**跑完必須開 PR 讓 captain 對 diff**，
+不可直接提交。流程見 `docs/content-pipeline/design.md` 第五節。
 
-```
-npx tsc --noEmit         ← 型別檢查
-npm run dev              ← 本機預覽，不含 sync
-```
-
-解除條件：完成 `docs/content-pipeline/design.md` 第五節的施工項目 7 與 8。
+驗證改動可用 `npx tsc --noEmit`、`npm run dev`、`npm run build`。
 
 ### 2. 不要手改 `src/data/*.json`
 
