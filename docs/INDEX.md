@@ -54,7 +54,7 @@ docs/
 | 路徑 | 用途 | 狀態 | 負責人 | 最後查核 |
 |---|---|---|---|---|
 | `docs/content-pipeline/design.md` | 產線的**唯一**規格文件：目標、現況、進度、規格、施工順序 | plan | captain | 2026-09-01 |
-| `docs/content-pipeline/data-collection-guide.md` | ⚠️ T3 章節有效，**T1／T2 章節已過時**，檔頭有警告 | plan | captain | 2026-09-01 |
+| `docs/content-pipeline/data-collection-guide.md` | T3（未來軌）的資料收集流程。T1／T2 已移除，改指向 `design.md` | evergreen | captain | 2026-09-02 |
 
 ### 體檢與待辦
 
@@ -139,7 +139,7 @@ docs/
 | 檔案 | 要改成 |
 |---|---|
 | `docs/project/tech-stack.md` | 資料流章節改為：試算表 → sync → JSON（產物，不得手改） |
-| `docs/content-pipeline/data-collection-guide.md` | T1／T2 章節改為 SSOT ＋ `status` 把關流程 |
+| ~~`docs/content-pipeline/data-collection-guide.md`~~ | ✅ 2026-09-02 完成 —— T1／T2 章節已刪除並改指向 `design.md`，未重寫 |
 | `docs/project/contributing.md` | 任務認領改為 spacedock workflow 說明 |
 | `docs/content-pipeline/operations.md`（新增） | 取代已封存的 `ssot_deploy_cheatsheet.md`，依 `design.md` 第五節撰寫 |
 
