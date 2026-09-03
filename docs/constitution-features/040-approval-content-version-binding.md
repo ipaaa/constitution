@@ -1,12 +1,12 @@
 ---
 title: 核可綁定內容版本並在修改後退回重審
-status: design
+status: implement
 source: captain 2026-09-03
 started: 2026-09-03T19:46:08Z
 completed:
 verdict:
 score: 0.95
-worktree:
+worktree: .worktrees/spacedock-ensign-040-approval-content-version-binding
 issue:
 pr:
 mod-block:
