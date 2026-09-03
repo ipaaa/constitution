@@ -191,18 +191,27 @@ Verified by: repo 外部 review checklist 比對 `docs/content-pipeline/design.m
 ### 現在更新
 
 - `docs/constitution-features/approval-content-version-binding.md`：記錄已定方向、`UNPROVEN` 風險與驗證目標。這是設計，尚未實作。
+- `docs/content-pipeline/design.md`：記錄公式衍生 `status` 與同步端指紋的已定方向。明記行為尚未實作。
+- `docs/health-check/TODO.md`：記錄施工與隔離 probe 待辦。明記正式 SSOT 尚未套用新行為。
+- `docs/INDEX.md`：索引本 feature 的已定方向與計畫狀態。不得寫成已上線。
 
 ### 實作後更新
 
-- `docs/content-pipeline/design.md`：把本規格改為現行產線規格。不得提前宣稱已上線。
 - `docs/content-pipeline/operations.md`：記錄核可、拒絕、重審、同步錯誤與復原步驟。
 - `docs/content-pipeline/approval-permission-probe.md`：新增隔離表端到端證據。狀態為 `record`。
-- `docs/INDEX.md`：新增兩份文件並更新查核日。
+- `docs/project/tech-stack.md`：移除過時資料流警告，改寫為已實作的試算表、指紋、同步與 JSON 流程。
+- `docs/project/contributing.md`：更新內容協作與重新核可流程。
+- `AGENTS.md`：更新 agent 可用的產線驗證指令、禁止事項與正式 SSOT 邊界。
+- `docs/INDEX.md`：新增實作後文件，更新用途、狀態與最後查核日。
 
 ### 不更新
 
-- `docs/project/architecture.md`、`docs/project/design-system.md`：網站資訊架構與視覺不變。
-- `docs/health-check/2026-08-31-content-pipeline.md` 與 `docs/_archive/`：都是歷史記錄，不改寫。
+- `docs/content-pipeline/data-collection-guide.md`：只規範 T3 資料收集，不負責 T1／T2 核可產線。
+- `docs/project/architecture.md`：網站資訊架構不變。
+- `docs/project/design-system.md`：網站視覺與元件語言不變。
+- `docs/health-check/2026-08-31-content-pipeline.md`：是歷史體檢記錄，不改寫。
+- `docs/_archive/`：是封存記錄，不套用現行規格。
+- `docs/constitution-features/README.md`：workflow 規格不因單一 feature 改變。
 
 ### Feedback Cycles
 
@@ -218,7 +227,7 @@ Verified by: repo 外部 review checklist 比對 `docs/content-pipeline/design.m
 - DONE: 把內容指紋正規化、發布欄位範圍、核可與 Needs review 狀態轉換、同步拒絕條件寫成可由不同實作者完成的具體規格。
   規格固定 `fingerprint-v1` 編碼、三分頁欄位投影、審核欄位、狀態表、模組責任及失敗關閉條件。
 - DONE: 補齊 Documentation impact 三類文件，並讓每項驗收標準都有可失敗且位於 feature 外部的驗證方式。
-  六項 AC 指向 `tests/` 或 `docs/content-pipeline/`；本機 SHA-256 prototype 證明格式等價、發布變更與審核欄位排除三種行為。
+  三類完整列出現在須記方向、實作後須更新及不更新的文件與理由；六項 AC 指向 `tests/` 或 `docs/content-pipeline/` 的外部驗證。
 
 ### Summary
 
