@@ -78,3 +78,35 @@ Verified by: `grep -rn "CASE_TO_HISTORY\|HISTORY_TO_DISCUSSIONS\|DISCUSSION_TO_C
 
 - **之後是否重做跨軌道連結** —— 需 captain 與內容端討論。若要重做，需先決定：由誰策展、依據什麼、如何驗證連結有效而非僅存在
 - `docs/health-check/TODO.md` 的 P1-7 描述較窄（僅記「鍵值對不上」），待本票定案後一併更新
+
+## Stage Report: implement
+
+- DONE: 移除 cross-track-links.ts 內四張對應表與 CrossTrackLinks 元件，以及在 past/page.tsx、present/[id]/page.tsx、future/CaseCard.tsx 的引用，不保留註解掉的殘骸
+  commit `29da8ec`，−352 行跨 5 個檔案。兩個檔整份刪除，三處消費端連同 `CrossTrackSection`、`CaseHistoryLinks` 與失效的 `Link` import 一併移除。AC-3 的 grep 無結果；另以 `CrossTrackLinks\|cross-track-links\|getLinksFor` 補搜 `src/`，同樣無結果。
+- DONE: 以 react-dom/server 配真實資料渲染三頁，確認跨軌道區塊數為 0 且無例外拋出
+  `node scripts/render-check.cjs . out.json --assert-no-cross-track` 對本分支 exit 0（commit `5114eb0`）。渲染 `/past`、`/future`、`/present` 與全部 16 篇 `/present/[id]`，`errors: 0`。
+- DONE: 以元素計數比對移除前後，確認除跨軌道區塊外其餘內容數量完全相同
+  移除前後各跑一次同一腳本再逐欄比對：跨軌道欄位 21 筆全部歸零，非跨軌道欄位零差異。
+
+### 證據與可證偽性
+
+- **跨軌道計數歸零**：`/past` 的「Related — 跨軌道連結」4 → 0、T2 徽章 6 → 0；`/present/[id]` 的 d1、d2、d4、d5、d6、d7、d8、d9 各自 1 → 0。會使其失敗的改動：保留任一消費端而未移除其資料來源。
+- **其餘內容未變**：`textbook-item` 25、`reality-item` 25、`vh-trigger` 25、待審案件 39、`id="tldr"` 1、`/present` 文章連結 15、每篇詳頁的 `貓頭鷹深度解析` 與 relatedArticles —— 移除前後完全相同。會使其失敗的改動：誤刪共用元件或條件式。
+- **檢查腳本本身可證偽**：同一腳本對 main（連結尚在）exit 1，列出 `./past.crossTrackHeading = 4` 等 21 筆殘留；對本分支 exit 0。若腳本只是空轉，這兩次結果會相同。
+- `npx tsc --noEmit` exit 0。`npm run lint` 為 4 errors / 6 warnings，與 main 的 `src/` 逐數字相同 —— 本次移除未新增任何 lint 問題，新腳本亦為 0。
+
+### 需要 FO 裁示：施工面積超出 tolerance
+
+票上估 −350 行、5 個檔、±30%。**移除本身正好落在估計內**：`29da8ec` 是 −352 行、5 個檔。
+
+但我另外提交了 `scripts/render-check.cjs`（`5114eb0`，+256 行，第 6 個檔），使分支淨額變成 −96 行、6 個檔，**超出 tolerance 區間（−245 ～ −455）**。
+
+加它的原因：AC-1 與 AC-2 指定用 `react-dom/server` 驗收，但專案沒有這個工具，037 也沒留下可沿用的腳本（037 分支目前停在 main，無 diff）。我原本試著用 `npm run dev` + curl 取代，實測不可行 —— dev server 回傳的 HTML 只含 layout，頁面內容在 Suspense 邊界後面串流，`textbook-item` 這類本來就該存在的標記也抓不到 0 筆。若不把腳本入庫，verify 階段無法重跑 AC-1／AC-2。
+
+兩個處置擇一，我建議前者：
+1. **保留**（建議）—— AC-1／AC-2 從此可重跑。腳本已標明僅供驗證、不參與 build，斷言刻意不檢查內容數量，避免試算表同步後假警報。
+2. **回退 `5114eb0`** —— 分支回到 −352／5 檔，正好符合估計，但驗收證據只剩本報告的數字，無法重跑。
+
+### Summary
+
+移除了四張跨軌道對應表、三個查詢函式、`CrossTrackLinks` 元件與三處消費端，整份刪除不留註解殘骸。以 `react-dom/server` 渲染比對證實：跨軌道區塊 21 筆計數全部歸零，其餘元素計數逐項相同，渲染無例外，`tsc` 與 lint 無新增問題。`/future` 移除前即為 0 次渲染，實測印證了票上證據一 —— `CASE_TO_HISTORY` 的鍵 `c02`–`c31` 指向已被真實案件取代的虛構案件。唯一需要裁示的是驗收腳本入庫造成的施工面積超標，見上一節。
