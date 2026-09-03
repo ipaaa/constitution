@@ -1,16 +1,16 @@
 ---
 id: 038
 title: 移除 AI 生成的跨軌道連結（之後是否重做需討論）
-status: review
+status: complete
 source: captain 2026-09-02 決定
 started: 2026-09-03T17:04:14Z
-completed:
-verdict:
+completed: 2026-09-03T19:19:12Z
+verdict: PASSED
 score: 0.6
 worktree: .worktrees/spacedock-ensign-038-remove-ai-generated-cross-track-links
 issue:
 pr: pr-merge:34
-mod-block: merge:pr-merge
+mod-block:
 gates:
     version: 1
     records:
@@ -51,7 +51,8 @@ gates:
                 reason: 三條 AC 由三種互不重疊的方法各自複現：implement 用 react-dom/server + swc、verify 用 jsdom + react-dom/client 真實掛載並跑 effect、review 用 Next 正式建置產物的中文字串集合差集（1098→1092，只少 6 條全為跨軌道文字，新增 0 條，其餘 1092 條逐條相同）。三者皆以「對 main 回報殘留、對本分支回報 0」證明檢查可證偽。cycle 1 因 data-collection-guide.md 仍把兩個已刪檔案列為 evergreen 現況而 REJECTED，修正保留移除痕跡而非刪列。F-2（INDEX.md 日期慢一天）屬 Polish，FO 併入合併後的文件批次處理。
               application:
                 target-stage: complete
-                state: pending
+                state: consumed
+archived: 2026-09-03T19:19:12Z
 ---
 
 **⚠️ 需要討論** —— 移除的部分已定案，但「之後要不要重做、由誰做」尚未決定。
