@@ -457,12 +457,11 @@ captain 提出：「**我從來不想收集反方意見**」。查證後這不�
 
 | 檔案 | 段數 |
 |---|---|
-| `src/components/opinion-lazybag/DecisionFlowchart.tsx` | 75 |
-| `src/components/opinion-lazybag/StanceSpectrum.tsx` | 47 |
-| `src/app/future/page.tsx` | 44 |
-| `src/app/present/page.tsx` | 33 |
-| `src/app/past/page.tsx` | 28 |
-| `src/app/controversy-timeline/page.tsx` | 26 |
+| `src/components/opinion-lazybag/DecisionFlowchart.tsx` | 35 |
+| `src/app/future/page.tsx` | 30 |
+| `src/components/opinion-lazybag/StanceSpectrum.tsx` | 23 |
+| `src/app/preview/page.tsx` | 17 |
+| `src/app/present/page.tsx` | 17 |
 
 前兩個特別值得看 —— `opinion-lazybag` 是**解釋大法官意見立場**的視覺化元件，
 內容是法律判斷。它來自 `docs/constitution-features/_archive/014` 與 `027`，
@@ -492,8 +491,8 @@ captain 提出：「**我從來不想收集反方意見**」。查證後這不�
 ls -1 src/data/
 
 # 程式碼內寫死的中文段落計數
-for f in $(grep -rl "[一-鿿]" src/app src/components --include="*.tsx"); do
-  echo "$(grep -o "[一-鿿]\\{6,\\}" "$f" | wc -l) $f"
+for f in $(grep -rl '[一-鿿]' src/app src/components --include='*.tsx'); do
+  echo "$(grep -coE '[一-鿿]{6,}' "$f") $f"
 done | sort -rn | head -12
 ```
 
