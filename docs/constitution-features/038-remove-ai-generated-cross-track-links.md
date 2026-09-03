@@ -311,3 +311,47 @@ exit 1、無輸出。輔以 `ls src/data/cross-track-links.ts src/components/Cro
 ### Summary
 
 本輪只處理 review cycle 1 的 F-1：一份 evergreen 文件仍把兩個已刪檔案列為現況。改法是標示移除而非刪列，保留痕跡並指向 038。另把分支併入 main 的 `4f2b705`，消除 `039-render-check-tool.md` 被刪的假象。移除工作本身未動，依指派未自行重驗，重驗由 review 執行。
+
+## Stage Report: review (cycle 2)
+
+- DONE: 複驗 F-1：確認 data-collection-guide.md 不再把跨軌道列為現況，且補述帶齊移除事實、日期與 038 的指向
+  第 174 行現為 `| ~~跨軌道~~ | 已於 2026-09-03 移除 | 已於 2026-09-03 移除 |`，兩欄皆不再列路徑。補述四項齊全：已移除、日期 2026-09-03、指向 `docs/constitution-features/038-remove-ai-generated-cross-track-links.md`、「之後是否重做尚未決定」。檔頭最後查核 2026-09-02 → 2026-09-03。
+- DONE: 確認本輪修正未波及其他內容，且先前已通過的 AC-1 至 AC-3 在合併 main 後仍然成立
+  合併後重跑正式建置，中文字串集合與 cycle 1 的分支產物**逐行相同**（1092 條，`diff` 無輸出），對 main 的差集仍是「少 6 條全為跨軌道文字、新增 0 條」。`src/` 本輪零改動，AC-3 兩組 grep 仍 exit 1。
+- DONE: 判定本輪 verdict
+  **PASSED。** 見下方〈判定〉。
+
+### 證據與可證偽性
+
+- **F-1 的檢查點用 FO 指定的判準**（「表格列是否仍列為現況」，不是「檔內是否出現字串」）：`grep -nE '^\|.*(cross-track-links|CrossTrackLinks)' docs/content-pipeline/data-collection-guide.md` → exit 1。**同一條指令對修正前的 `dd65456~1` 命中第 174 行、exit 0** —— 兩次結果相異，證明檢查不是空轉。補述中出現的兩個路徑字串不落在 `^\|` 上，正確地不被誤判。
+- **表格所述與磁碟一致**：`ls src/data/cross-track-links.ts src/components/CrossTrackLinks.tsx` 兩者皆 `No such file or directory`。
+- **合併只帶進文件**：`git show --stat 4f2b705` 為單一檔案 `039-render-check-tool.md` +92 行，未觸及 `src/`。因此 AC-1～AC-3 的結論在合併後結構上不受影響。
+- **不只靠推論，實測重跑**：合併後 `npx next build` exit 0（15 條路由、16 頁靜態產生）、`npx tsc --noEmit` exit 0。從新產物重抽中文字串literal，**與 cycle 1 的分支結果逐行相同**；對 main 的差集仍恰為 `跨軌道連結`、`跨軌道探索`、`歷史脈絡`、`未來影響`、`相關釋憲判例`、`件相關待審案件` 六條，新增 0 條。會使其失敗的改動：本輪若誤動任一 `src/` 檔案，這 1092 條會出現差異。
+- **本輪改動面積**：`git diff --name-only 829e261..HEAD` 只有三個檔 —— 本票實體、`data-collection-guide.md`、以及合併帶進來的 `039-render-check-tool.md`。`git diff --name-only 829e261..HEAD -- src/` 為空。
+
+### 覆核：implement cycle 1 的自述
+
+- 「檢查點是表格列而非字串」的提醒成立，我已依此判準複驗，並補做了反向對照。
+- 採 merge 而非 rebase 的選擇正確。`git rev-list --left-right --count main...HEAD` 為 `0 13`，main 已無領先；`git diff --name-only main...HEAD` 不含 `039-render-check-tool.md`，cycle 1 指出的假 diff 已消失。verify 與 review 的報告 commit 保持原樣未被改寫。
+- 該報告寫「12 個 commit 領先」，現為 13 —— 差額是它自己的報告 commit `761fd2e`。撰寫當下正確，無須更正。
+- 第 138 行「跨軌道共通事項」未動的判斷成立。該節是 T1／T2 與 T3 收集方式的比較表，與已移除的功能無關。
+
+### 發現 F-2：`docs/INDEX.md` 的最後查核日期未跟著改（Polish，不擋交付）
+
+`docs/INDEX.md:57` 仍記 `2026-09-02`，而 `data-collection-guide.md` 檔頭已改為 `2026-09-03`。
+
+- **可觀察的損害**：極小。INDEX 的日期比實際**舊**一天，讀者只會多查一次，不會誤信過時內容 —— 與 F-1（宣稱兩個不存在的檔案是現況）性質不同。
+- **不是既有慣例**：全庫只有三份文件帶 `**最後查核**` 檔頭，本檔是唯一不一致的一筆。`CLAUDE.md` 對 INDEX 的硬性要求是「新增或刪除文件時同步更新」，本輪未增刪文件。
+- 建議處置：`decline` 或併入票上 `Out of scope` 已排定的 `docs/health-check/TODO.md` P1-7 文件更新批次一起改。不需為此再開一輪。
+
+**另一項與本票無關、僅避免被誤記到這張票上**：`docs/INDEX.md` 有四列指向 `docs/meetup-chats/`，該目錄在 main 與本分支皆不存在。本分支未碰 INDEX，屬既有問題。
+
+### 判定
+
+**PASSED。**
+
+F-1 已修正且修法比原指派更好 —— 保留痕跡而非刪列，下一個讀者能看出跨軌道曾經存在、何時移除、為何移除、以及重做與否尚未決定。合併 main 後 AC-1、AC-2、AC-3 三項仍全部 MET，且以重跑的產物字串集合逐行比對確認本輪零波及。唯一新發現 F-2 是一個日期差，屬 Polish，不擋交付。可以交付。
+
+### Summary
+
+本輪範圍窄，複驗三件事。F-1：表格列已不再把兩個已刪檔案列為現況，補述帶齊移除事實、日期、038 指向與「重做未定」，並以「同一條 grep 對修正前 revision 命中、對現況不命中」證明檢查可證偽。合併 main 只帶進一份文件（039 seed），未觸及 `src/`；合併後重建的產物中文字串集合與 cycle 1 逐行相同，對 main 的差集仍恰為六條跨軌道文字、新增 0 條，`next build` 與 `tsc` 皆 exit 0。新發現只有 F-2（`docs/INDEX.md` 日期慢一天，Polish）。判定 PASSED。
