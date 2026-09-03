@@ -10,7 +10,7 @@ score: 0.6
 worktree: .worktrees/spacedock-ensign-038-remove-ai-generated-cross-track-links
 issue:
 pr:
-mod-block:
+mod-block: merge:pr-merge
 gates:
     version: 1
     records:
