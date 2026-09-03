@@ -11,6 +11,17 @@ worktree: .worktrees/spacedock-ensign-038-remove-ai-generated-cross-track-links
 issue:
 pr:
 mod-block:
+gates:
+    version: 1
+    records:
+        - id: gate:038:verify
+          stage: verify
+          attempts:
+            - id: gate-attempt:038-verify-1
+              briefing:
+                id: briefing:038:verify:attempt-1:revision-1
+                digest: sha256:20f368d6f1274f45b84e1e63adcad16fb63998edeade77e3a5d2e6763fde9af0
+                room-ref: '@review/verify/briefing-1'
 ---
 
 **⚠️ 需要討論** —— 移除的部分已定案，但「之後要不要重做、由誰做」尚未決定。
