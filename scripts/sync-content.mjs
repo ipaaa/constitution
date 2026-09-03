@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { fingerprintPublishedRow, SHEET_KEYS } from './content-fingerprint.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -26,7 +27,7 @@ const CONFIG = {
   TRACK_1_CSV: process.env.TRACK_1_CSV_URL || '',
   TRACK_2_CSV: process.env.TRACK_2_CSV_URL || '',
   SITE_TLDR_CSV: process.env.SITE_TLDR_CSV_URL || '',
-  OUTPUT_DIR: path.join(__dirname, '../src/data'),
+  OUTPUT_DIR: process.env.CONTENT_OUTPUT_DIR || path.join(__dirname, '../src/data'),
 };
 
 /**
@@ -78,10 +79,19 @@ const PLACEHOLDER_PATTERNS = [
  *   column: required —— 試算表必須有這一欄，沒有就中止
  *   value:  required —— 已核可的列，這一欄不可空白
  *
- * `status` 的欄位必須存在，但值可以空白（空白代表尚未核可）。
- * `approved_by`／`approved_at`／`reject_reason` 目前試算表還沒建立。
- * 先列為選填，日後建立時同步不會因為多出欄位而中止。
+ * 審核欄位都必須存在。少一欄就無法證明核可綁定目前內容，必須 fail closed。
  */
+const APPROVAL_COLUMNS = [
+  { field: 'status', aliases: ['status'], column: 'required', value: 'optional' },
+  { field: 'review_decision', aliases: ['review_decision', 'review decision'], column: 'required', value: 'optional' },
+  { field: 'review_fingerprint', aliases: ['review_fingerprint', 'review fingerprint'], column: 'required', value: 'optional' },
+  { field: 'approved_by', aliases: ['approved_by', 'approved by'], column: 'required', value: 'optional' },
+  { field: 'approved_at', aliases: ['approved_at', 'approved at'], column: 'required', value: 'optional' },
+  { field: 'approved_fingerprint', aliases: ['approved_fingerprint', 'approved fingerprint'], column: 'required', value: 'optional' },
+  { field: 'current_fingerprint', aliases: ['current_fingerprint', 'current fingerprint'], column: 'required', value: 'optional' },
+  { field: 'reject_reason', aliases: ['reject_reason', 'reject reason'], column: 'required', value: 'optional' },
+];
+
 const TRACK_1_COLUMNS = [
   { field: 'id', aliases: ['id'], column: 'required', value: 'required' },
   { field: 'category', aliases: ['category'], column: 'required', value: 'required' },
@@ -90,13 +100,10 @@ const TRACK_1_COLUMNS = [
   { field: 'ruling', aliases: ['ruling'], column: 'required', value: 'required' },
   { field: 'content', aliases: ['content'], column: 'required', value: 'required' },
   { field: 'title', aliases: ['title'], column: 'required', value: 'required' },
-  { field: 'status', aliases: ['status'], column: 'required', value: 'optional' },
   { field: 'chapter', aliases: ['chapter'], column: 'optional', value: 'optional' },
   { field: 'handwriting', aliases: ['handwriting'], column: 'optional', value: 'optional' },
   { field: 'image_url', aliases: ['image_url', 'image url'], column: 'optional', value: 'optional' },
-  { field: 'approved_by', aliases: ['approved_by', 'approved by'], column: 'optional', value: 'optional' },
-  { field: 'approved_at', aliases: ['approved_at', 'approved at'], column: 'optional', value: 'optional' },
-  { field: 'reject_reason', aliases: ['reject_reason', 'reject reason'], column: 'optional', value: 'optional' },
+  ...APPROVAL_COLUMNS,
 ];
 
 const TRACK_2_COLUMNS = [
@@ -108,25 +115,22 @@ const TRACK_2_COLUMNS = [
   { field: 'link', aliases: ['link'], column: 'required', value: 'required' },
   { field: 'abstract', aliases: ['abstract'], column: 'required', value: 'required' },
   { field: 'vibe', aliases: ['vibe'], column: 'required', value: 'required' },
-  { field: 'status', aliases: ['status'], column: 'required', value: 'optional' },
   { field: 'owl_comment', aliases: ['owl comment', 'owl_comment'], column: 'optional', value: 'optional' },
   { field: 'owl_depth_comment', aliases: ['owl depth comment', 'owl_depth_comment'], column: 'optional', value: 'optional' },
   { field: 'views', aliases: ['views'], column: 'optional', value: 'optional' },
   { field: 'sticky', aliases: ['sticky'], column: 'optional', value: 'optional' },
   { field: 'full_content', aliases: ['full content', 'full_content'], column: 'optional', value: 'optional' },
-  { field: 'approved_by', aliases: ['approved_by', 'approved by'], column: 'optional', value: 'optional' },
-  { field: 'approved_at', aliases: ['approved_at', 'approved at'], column: 'optional', value: 'optional' },
-  { field: 'reject_reason', aliases: ['reject_reason', 'reject reason'], column: 'optional', value: 'optional' },
+  ...APPROVAL_COLUMNS,
 ];
 
 const SITE_TLDR_COLUMNS = [
   { field: 'order', aliases: ['order'], column: 'required', value: 'required' },
   { field: 'text', aliases: ['text'], column: 'required', value: 'required' },
-  { field: 'status', aliases: ['status'], column: 'required', value: 'optional' },
   // label 只有 order ≥ 1 用得到。order 0 的 label 沒有意義，另行檢查。
   { field: 'label', aliases: ['label'], column: 'required', value: 'optional' },
   // link 只有 order 0 用得到。order 0 的 link 必須是合法網址，另行檢查。
   { field: 'link', aliases: ['link'], column: 'required', value: 'optional' },
+  ...APPROVAL_COLUMNS,
 ];
 
 const TRACK_1 = 'Track 1';
@@ -363,10 +367,50 @@ function isApproved(record) {
 function checkStatusValues(records, group, errors, keyField = 'id') {
   for (const record of records) {
     const status = (record.status || '').trim().toLowerCase();
-    if (status !== '' && status !== 'approved' && status !== 'rejected') {
-      addError(errors, group, rowKey(record, keyField), `status 必須是 Approved、Rejected 或空白，實際為「${trunc(record.status)}」。`);
+    if (status !== '' && status !== 'approved' && status !== 'rejected' && status !== 'needs review') {
+      addError(errors, group, rowKey(record, keyField), `status 必須是 Approved、Rejected、Needs review 或空白，實際為「${trunc(record.status)}」。`);
     }
   }
+}
+
+const SHA256_PATTERN = /^[a-f0-9]{64}$/;
+
+function isIsoUtc(value) {
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(value)) return false;
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return false;
+  return parsed.toISOString() === (value.includes('.') ? value : value.replace('Z', '.000Z'));
+}
+
+/** 已核可列必須帶有完整紀錄，且三份指紋都等於 Node 依目前內容重算的值。 */
+function validateApprovalBinding(records, sheetKey, group, errors, keyField = 'id') {
+  records.forEach((record, index) => {
+    if (!isApproved(record)) return;
+    const key = rowKey(record, keyField);
+    const required = ['review_decision', 'review_fingerprint', 'approved_by', 'approved_at', 'approved_fingerprint', 'current_fingerprint'];
+    for (const field of required) {
+      if ((record[field] || '').trim() === '') addError(errors, group, key, `核可紀錄缺少 ${field}。`);
+    }
+    if ((record.review_decision || '').trim() !== 'Approved') {
+      addError(errors, group, key, `review_decision 必須是 Approved，實際為「${trunc(record.review_decision) || '空白'}」。`);
+    }
+    if (record.approved_at && !isIsoUtc(record.approved_at.trim())) {
+      addError(errors, group, key, `approved_at 必須是 ISO 8601 UTC，實際為「${trunc(record.approved_at)}」。`);
+    }
+    let expected;
+    try {
+      expected = fingerprintPublishedRow(sheetKey, record, sheetKey === SHEET_KEYS.TRACK_2 ? index + 1 : undefined);
+    } catch (error) {
+      addError(errors, group, key, `無法計算內容指紋：${error.message}`);
+      return;
+    }
+    for (const field of ['review_fingerprint', 'approved_fingerprint', 'current_fingerprint']) {
+      const actual = (record[field] || '').trim();
+      if (actual !== '' && (!SHA256_PATTERN.test(actual) || actual !== expected)) {
+        addError(errors, group, key, `${field} 與目前發布內容不符。需要重新核可。`);
+      }
+    }
+  });
 }
 
 /**
@@ -474,6 +518,7 @@ function buildTrack1(csv, errors) {
 
   const records = toRecords(rows, fieldToIndex);
   checkStatusValues(records, TRACK_1, errors);
+  validateApprovalBinding(records, SHEET_KEYS.TRACK_1, TRACK_1, errors);
 
   const approved = records.filter(isApproved);
   checkNotEmptyAfterApproval(records, approved, TRACK_1, errors);
@@ -528,6 +573,7 @@ function buildTrack2(csv, errors) {
 
   const records = toRecords(rows, fieldToIndex);
   checkStatusValues(records, TRACK_2, errors);
+  validateApprovalBinding(records, SHEET_KEYS.TRACK_2, TRACK_2, errors);
 
   const approved = records.filter(isApproved);
   checkNotEmptyAfterApproval(records, approved, TRACK_2, errors);
@@ -597,6 +643,7 @@ function buildSiteTldr(csv, errors) {
 
   const records = toRecords(rows, fieldToIndex);
   checkStatusValues(records, SITE_TLDR, errors, 'order');
+  validateApprovalBinding(records, SHEET_KEYS.SITE_TLDR, SITE_TLDR, errors, 'order');
 
   const approved = records.filter(isApproved);
   checkRequiredValues(approved, SITE_TLDR_COLUMNS, fieldToIndex, SITE_TLDR, errors, 'order');
@@ -713,8 +760,10 @@ async function main() {
   const historyJSON = JSON.stringify(history, null, 2);
   const discussionsJSON = JSON.stringify([...discussions, tldr], null, 2);
 
-  fs.writeFileSync(path.join(CONFIG.OUTPUT_DIR, 'history.json'), historyJSON);
-  fs.writeFileSync(path.join(CONFIG.OUTPUT_DIR, 'discussions.json'), discussionsJSON);
+  writeOutputsAtomically(CONFIG.OUTPUT_DIR, {
+    'history.json': historyJSON,
+    'discussions.json': discussionsJSON,
+  });
 
   console.log(`✅ 檢查通過，已寫入 src/data/history.json（${history.length} 筆）`);
   console.log(`✅ 檢查通過，已寫入 src/data/discussions.json（${discussions.length + 1} 筆，含 tldr）`);
@@ -726,4 +775,33 @@ function abort(errors) {
   process.exitCode = 1;
 }
 
-main();
+function writeOutputsAtomically(outputDir, files, io = fs) {
+  io.mkdirSync(outputDir, { recursive: true });
+  const parent = path.dirname(outputDir);
+  const staging = io.mkdtempSync(path.join(parent, '.content-sync-'));
+  const replaced = [];
+  try {
+    for (const [name, content] of Object.entries(files)) {
+      io.writeFileSync(path.join(staging, `${name}.new`), content);
+    }
+    for (const name of Object.keys(files)) {
+      const target = path.join(outputDir, name);
+      const backup = path.join(staging, `${name}.old`);
+      if (io.existsSync(target)) io.renameSync(target, backup);
+      replaced.push({ target, backup, hadOriginal: io.existsSync(backup) });
+      io.renameSync(path.join(staging, `${name}.new`), target);
+    }
+  } catch (error) {
+    for (const { target, backup, hadOriginal } of replaced.reverse()) {
+      if (io.existsSync(target)) io.rmSync(target, { recursive: true, force: true });
+      if (hadOriginal && io.existsSync(backup)) io.renameSync(backup, target);
+    }
+    throw error;
+  } finally {
+    io.rmSync(staging, { recursive: true, force: true });
+  }
+}
+
+export { buildTrack1, buildTrack2, buildSiteTldr, validateApprovalBinding, writeOutputsAtomically };
+
+if (process.argv[1] && path.resolve(process.argv[1]) === __filename) main();

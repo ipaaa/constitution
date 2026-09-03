@@ -23,7 +23,11 @@ node scripts/sync-content.mjs
 同步仍然只在有人明確要發布內容時才執行，而且**跑完必須開 PR 讓 captain 對 diff**，
 不可直接提交。流程見 `docs/content-pipeline/design.md` 第五節。
 
-驗證改動可用 `npx tsc --noEmit`、`npm run dev`、`npm run build`。
+驗證改動可用 `node --test tests/approval-content-version-binding.test.mjs`、
+`npx tsc --noEmit`、`npm run dev`、`npm run build`。
+
+正式 SSOT 尚未套用核可版本綁定。兩帳號隔離 probe 完成前，不得部署
+`scripts/apps-script/` 到正式 SSOT。不得補造 probe 證據。
 
 ### 2. 不要手改 `src/data/*.json`
 

@@ -2,7 +2,7 @@
 
 **狀態**：plan（施工完成後改為 evergreen 或封存）
 **定案日期**：2026-08-31
-**最後修訂**：2026-09-03（新增 feature 040 未實作修訂，見文末修訂紀錄）
+**最後修訂**：2026-09-03（feature 040 已完成 repo 實作；正式 SSOT 尚未部署）
 **施工前置**：已全部完成或取消。**工程可開工。**
 
 **出了什麼事**：[`../health-check/2026-08-31-content-pipeline.md`](../health-check/2026-08-31-content-pipeline.md)
@@ -518,3 +518,24 @@ feature 040 實作後才會取代該模型。保留原文，避免把預定行�
 
 **驗證目標**：逐一改動三個分頁的發布欄位時，公式顯示 `Needs review`，同步以非零退出碼中止，
 且不改寫任何 `src/data/*.json`。完整欄位、正規化與驗收規格見 feature 040。
+
+### 2026-09-03 — feature 040 repo 實作完成
+
+**這則修訂取代本文第二至第五節的直接 `status` 核可模型。** 舊文保留供追溯。
+
+repo 現在包含下列唯一現行機制：
+
+- `scripts/content-fingerprint.mjs` 固定三個分頁的發布欄位與 `fingerprint-v1` 正規化。
+- `scripts/apps-script/approval-workflow.gs` 產生目前指紋與衍生狀態，並提供核可及拒絕操作。
+- `scripts/sync-content.mjs` 要求八個審核欄位，並獨立重算及比對三份指紋。
+- Track 2 指紋包含非空資料列序號。移動列後必須重新核可。
+- 同步先完成全部驗證，再以可復原的兩檔寫入程序更新 JSON。
+
+`status` 不再由人直接輸入。它只由公式產生 `Approved`、`Rejected`、`Needs review` 或空白。
+同步不再只憑 `status = Approved` 放行。
+
+網站 JSON shape、手動同步與 PR 預覽流程不變。自動同步仍停用。
+
+**部署狀態**：正式 SSOT 尚未套用新欄位、公式或 Apps Script。
+兩帳號隔離 probe 尚未執行。受保護欄位的 trigger 寫入能力仍為 `UNPROVEN`。
+現行正確性不依賴 trigger。部署與復原步驟見 [`operations.md`](operations.md)。
