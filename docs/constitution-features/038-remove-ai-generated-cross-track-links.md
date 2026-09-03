@@ -41,6 +41,17 @@ gates:
                 id: briefing:038:review:attempt-1:revision-1
                 digest: sha256:c34f424a0ad230a7e204673dfe4e719185f8515e61f5d99a367498620f57dedd
                 room-ref: '@review/review/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:038:review:1
+                briefing: briefing:038:review:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-03T18:08:54.17022Z"
+                decision: approve
+                reason: 三條 AC 由三種互不重疊的方法各自複現：implement 用 react-dom/server + swc、verify 用 jsdom + react-dom/client 真實掛載並跑 effect、review 用 Next 正式建置產物的中文字串集合差集（1098→1092，只少 6 條全為跨軌道文字，新增 0 條，其餘 1092 條逐條相同）。三者皆以「對 main 回報殘留、對本分支回報 0」證明檢查可證偽。cycle 1 因 data-collection-guide.md 仍把兩個已刪檔案列為 evergreen 現況而 REJECTED，修正保留移除痕跡而非刪列。F-2（INDEX.md 日期慢一天）屬 Polish，FO 併入合併後的文件批次處理。
+              application:
+                target-stage: complete
+                state: pending
 ---
 
 **⚠️ 需要討論** —— 移除的部分已定案，但「之後要不要重做、由誰做」尚未決定。
