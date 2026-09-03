@@ -1,13 +1,13 @@
 ---
 id: 038
 title: 移除 AI 生成的跨軌道連結（之後是否重做需討論）
-status: design
+status: implement
 source: captain 2026-09-02 決定
-started:
+started: 2026-09-03T17:04:14Z
 completed:
 verdict:
 score: 0.6
-worktree:
+worktree: .worktrees/spacedock-ensign-038-remove-ai-generated-cross-track-links
 issue:
 pr:
 mod-block:
