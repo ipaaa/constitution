@@ -110,3 +110,34 @@ Verified by: `grep -rn "CASE_TO_HISTORY\|HISTORY_TO_DISCUSSIONS\|DISCUSSION_TO_C
 ### Summary
 
 移除了四張跨軌道對應表、三個查詢函式、`CrossTrackLinks` 元件與三處消費端，整份刪除不留註解殘骸。以 `react-dom/server` 渲染比對證實：跨軌道區塊 21 筆計數全部歸零，其餘元素計數逐項相同，渲染無例外，`tsc` 與 lint 無新增問題。`/future` 移除前即為 0 次渲染，實測印證了票上證據一 —— `CASE_TO_HISTORY` 的鍵 `c02`–`c31` 指向已被真實案件取代的虛構案件。唯一需要裁示的是驗收腳本入庫造成的施工面積超標，見上一節。
+
+### 施工面積裁示結果與檢查腳本去向（FO 2026-09-03）
+
+FO 裁示回退檢查腳本，理由：新增常設檢查是最後手段，需 captain 明確核可，且應獨立成一張票。captain 核准的是移除跨軌道連結，本票沒有新增檢查工具的授權。已執行 `fd57bd8`（revert `5114eb0`）。**分支現為 −352 行 / 5 個檔，落在票上估計的 −350 ±30% 內。**
+
+我原先「不入庫則 verify 無法重跑」的前提不成立。037 的前例是 verify 自寫 parser、review 再另寫一套，兩者都不沿用實作者的腳本，且 review 因此抓到 verify 建議的修法無效。獨立重寫不會繼承同一組盲點，強度高於重跑同一支腳本。verify 應自行寫一份，以下僅供對照。
+
+**腳本位置（未入版控）：**
+`/private/tmp/claude-501/-Users-ipa-Documents-ipa-Document-00-Claude-spacedock-folder/dfe33f00-9190-4f9d-8044-b332a2106079/scratchpad/render-check.cjs`（256 行）
+
+**用法：**
+
+```
+node render-check.cjs <repo-root> <out.json>                          # 輸出元素計數
+node render-check.cjs <repo-root> <out.json> --assert-no-cross-track  # 斷言歸零，不符 exit 1
+```
+
+`<repo-root>` 需有 `node_modules`（本 worktree 以 symlink 指向主 checkout；`npm install` 亦可）。腳本用 Next 內建的 swc 轉譯 `src/` 下的 `.ts`／`.tsx`，替換 `next/link`、`next/image`、`lucide-react`，再以 `react-dom/server` 渲染 `/past`、`/future`、`/present` 與全部 16 篇 `/present/[id]`。斷言刻意不檢查內容數量 —— 歷史條目數、待審案件數會隨試算表同步變動，寫死會造成假警報。
+
+**已取得的兩組結果（revert 後於 scratchpad 重跑，結果不變）：**
+
+| 對象 | 結果 |
+|---|---|
+| 本分支（連結已移除） | `errors: 0`，PASS，exit 0 |
+| main（連結尚在） | `errors: 0`，FAIL，exit 1，列出 21 筆殘留 |
+
+main 的 21 筆為：`./past.crossTrackHeading = 4`、`./past.crossTrackBadgeT2 = 6`，以及 d1、d2、d4、d5、d6、d7、d8、d9 的 `crossTrackSection`／`crossTrackHistoryHeading`／`crossTrackFutureHeading` 各 1。兩次結果相異，證明檢查不是空轉。
+
+**為什麼不能用 `npm run dev` + curl 取代：** 實測 `next dev` 回傳的 HTML 只含 layout，頁面內容在 Suspense 邊界後面串流，curl 抓不到。連 `textbook-item` 這種本來就該存在的標記都是 0 筆。改用 curl 計數會對空頁面回報「通過」。verify 若要自寫檢查，需避開這個陷阱。
+
+**後續：** FO 將把此腳本當成獨立提案交 captain 決定。`docs/health-check/TODO.md` 的 P2-11（長標題版面無人能驗證）成因即為缺少渲染檢查工具，此腳本是該缺口的候選答案。
