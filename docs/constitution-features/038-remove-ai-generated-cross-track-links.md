@@ -96,6 +96,8 @@ Verified by: `grep -rn "CASE_TO_HISTORY\|HISTORY_TO_DISCUSSIONS\|DISCUSSION_TO_C
 
 ### Feedback Cycles
 
+- Cycle 1: REJECTED — review；surface 5 檔／−352 行 vs estimate −350 ±30%（101%，在容差內）；AC unchanged，AC-1／AC-2／AC-3 三項皆 MET。單一發現 F-1（Material）：evergreen 文件 `docs/content-pipeline/data-collection-guide.md:174` 仍指向兩個已刪檔案，FO 授權 fix。另處理分支落後 main 一個 commit（seed 039）造成的假 diff。
+
 ## Out of scope
 
 - **之後是否重做跨軌道連結** —— 需 captain 與內容端討論。若要重做，需先決定：由誰策展、依據什麼、如何驗證連結有效而非僅存在
