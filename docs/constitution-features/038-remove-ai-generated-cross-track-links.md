@@ -1,7 +1,7 @@
 ---
 id: 038
 title: 移除 AI 生成的跨軌道連結（之後是否重做需討論）
-status: implement
+status: verify
 source: captain 2026-09-02 決定
 started: 2026-09-03T17:04:14Z
 completed:
@@ -141,3 +141,44 @@ main 的 21 筆為：`./past.crossTrackHeading = 4`、`./past.crossTrackBadgeT2 
 **為什麼不能用 `npm run dev` + curl 取代：** 實測 `next dev` 回傳的 HTML 只含 layout，頁面內容在 Suspense 邊界後面串流，curl 抓不到。連 `textbook-item` 這種本來就該存在的標記都是 0 筆。改用 curl 計數會對空頁面回報「通過」。verify 若要自寫檢查，需避開這個陷阱。
 
 **後續：** FO 將把此腳本當成獨立提案交 captain 決定。`docs/health-check/TODO.md` 的 P2-11（長標題版面無人能驗證）成因即為缺少渲染檢查工具，此腳本是該缺口的候選答案。
+
+## Stage Report: verify
+
+- DONE: 自行建立渲染檢查（不要沿用 implement 的腳本，只可拿它對照結果），確認三頁與全部詳頁的跨軌道區塊計數為 0 且渲染無例外
+  自寫 `verify-hydrate-check.cjs`，三處與 implement 不同：用 TypeScript 官方 transpiler（非 swc）、用 `react-dom/client` 真的掛載並跑 effect（非 `react-dom/server`）、用 DOM API 計數（非字串比對）。19 條路由（`/past`、`/present`、`/future` 與全部 16 篇 `/present/[id]`）跨軌道計數 0、`errors: 0`。渲染例外由 `createRoot` 的 `onUncaughtError`／`onCaughtError`／`onRecoverableError` 三個 callback 收集，全數為空。
+- DONE: 確認移除未波及其他內容：以元素計數比對移除前後，非跨軌道欄位零差異
+  以 `git archive main` 開乾淨 baseline，同一支腳本跑兩邊比對：`textbookItem` 25、`realityItem` 25、`vhTrigger` 25、`tldrAnchor` 1、`caseFilingTime` 39、`headings`、`images`、`owlDepthComment`、`relatedArticlesHeading` 全部零差異。三個資料檔 sha256 兩邊相同，所以差異只可能來自本次移除。
+- DONE: 確認 src/ 內無跨軌道殘骸，且無註解掉的對應表
+  四張表名、`CrossTrackLinks`／`getLinksFor*`／`CrossTrackLink`／`CrossTrackSection`／`CaseHistoryLinks`、以及「跨軌道」「歷史脈絡」在 `src/` 皆無結果；另專掃註解行（`^\s*(//|/\*|\*)`）亦無。兩個檔案確認已刪除。`git diff --numstat main..HEAD -- src/` 為新增 0 行、刪除 352 行，是純刪除。
+
+### 證據與可證偽性
+
+- **檢查不是空轉**：同一支腳本對 main 回報跨軌道殘留 54 處、`--assert-no-cross-track` exit 1；對本分支 0 處、exit 0。若腳本空轉，兩次結果會相同。
+- **與 implement 的腳本對照，結論一致**：`/past` 4 個 heading、6 個 T2 徽章；有跨軌道區塊的詳頁同為 d1、d2、d4、d5、d6、d7、d8、d9；`/future` 兩邊都是 0。兩套獨立方法數字吻合，也再次印證票上證據一（`CASE_TO_HISTORY` 的鍵解析不到任何真實案件）。
+- **連結逐條比對，不只比數量**：抓出兩邊所有 `a[href]` 做多重集合差集。移除的 20 條全部是跨軌道連結（`/past` → `/present/dN` 6 條；詳頁 → `/past`／`/future` 14 條）；新增 0 條，標題文字增刪皆 0。會使其失敗的改動：誤刪任一非跨軌道連結或標題。
+- **`allElements` 減少 199**，且只出現在 `/past` 與 d1～d9；`/present`、`/future`、`tldr`、d11～d17 為 Δ0。
+- `npx next build` 與 `npx tsc --noEmit` 皆 exit 0，路由表與 main 相同。
+
+### 佔位資料掃描（stage 指定項目）
+
+`某學者`、`某大學法律系`、`lorem ipsum`、`快速了解最新判決的5個重點`、獨立值 `"test"` 在 `src/` 全部 0 命中。`placeholder` 3 處為搜尋框的 HTML 屬性與一則註解、`TODO` 1 處為 `layout.tsx` 指向 `docs/health-check/TODO.md` 的註解，四處在 main 上均已存在，非本次引入。本票未改動任何資料檔（`discussions.json`、`history.json`、`future.ts` 的 sha256 與 main 相同），唯一被刪的 `src/data/cross-track-links.ts` 即移除標的。
+
+### 事實查核
+
+本票只刪不增，未產生任何對外顯示的事實敘述，故無人名、日期、事件、數據可查。票上三項證據我獨立重現了證據一（`/future` 跨軌道渲染數在移除前即為 0）。證據二涉及釋字第 272 號的法律內容，屬 `docs/health-check/TODO.md` 的 P0-2，需法學背景者判斷，不在本階段能力範圍。
+
+### 需要 FO 知悉：機器相依與限制
+
+1. **原訂的 headless Chrome 方案失敗**。我先做真實 `next build` + `next start` + headless Chrome 取 hydration 後 DOM，兩支 Chrome 二進位檔在本環境都 segfault（signal 11）。改用 jsdom + `react-dom/client`。
+2. **`jsdom` 未裝進專案**。裝在 scratchpad 的獨立 prefix，專案 `node_modules` 未被更動。重建方式：`npm install jsdom --prefix <暫存目錄>`，再用 `JSDOM_PATH` 指過去。
+3. **腳本未入版控**，位置 `/private/tmp/claude-501/-Users-ipa-Documents-ipa-Document-00-Claude-spacedock-folder/dfe33f00-9190-4f9d-8044-b332a2106079/scratchpad/verify-hydrate-check.cjs`。理由同 FO 對 implement 的裁示：新增常設檢查需 captain 核可並獨立成票。**這代表 AC-1／AC-2 目前無法由後續階段重跑**，與 implement 階段的情況相同。
+4. **`相關待審案件` 這個標記不是跨軌道專屬**：`src/app/future/page.tsx:114` 在有篩選標籤時也會顯示同一字串。該檔兩邊 sha256 相同、未被本次改動碰到，且預設狀態下不觸發（兩邊都是 0），故不影響判定。
+5. **驗證一個易踩的陷阱**：實測 `curl` 抓 `next start` 的 HTML，`/past` 在 main 與本分支都是 0 命中 —— 因為 `LaunchGate` 在 hydration 前回傳 `null`。任何只看 SSR HTML 的檢查都會對「連結還在」的 main 回報通過。後續若要重做檢查，必須跑 effect。
+
+### 判定
+
+**PASSED。** 三項 checklist 全數通過，兩套獨立方法結論一致，移除範圍與票上 `Proposed approach` 相符，未波及其他內容。
+
+### Summary
+
+以自寫的 jsdom + `react-dom/client` 掛載檢查（與 implement 的 swc + `react-dom/server` 路徑完全不同）驗證 19 條路由：跨軌道區塊計數 0、渲染無例外。對 main 的乾淨 baseline 做同一檢查得 54 處殘留、exit 1，證明檢查可證偽；兩套方法在 `/past` 的 4／6 與八篇詳頁清單上數字吻合。連結逐條差集顯示移除的 20 條全為跨軌道連結，新增 0 條，非跨軌道欄位零差異。`src/` 無殘骸、無註解掉的對應表、無佔位資料，`next build` 與 `tsc` 皆通過。需 FO 知悉的是：檢查腳本依 FO 既有裁示未入版控，AC-1／AC-2 後續仍無法重跑。
