@@ -247,3 +247,21 @@ Verified by: repo 外部 review checklist 比對 `docs/content-pipeline/design.m
 
 三份 pre-implementation 文件已同步 feature 040 的已定方向與未實作狀態。此次只更新文件，沒有改程式或正式 SSOT。
 TODO 現在把版本綁定列為多人編輯與下次正式同步的前置。INDEX 也反映 workflow 的實際活躍狀態與數量。
+
+## Stage Report: implement
+
+- DONE: 實作 fingerprint-v1 的 Node 與 Apps Script 對應機制、三分頁發布欄位投影及核可操作；不得改網站資料 shape，也不得依賴未證明的受保護欄位 trigger 寫入。
+  commit `b75c98c` 新增 Node／Apps Script 同規格指紋、公式狀態及鎖定式核可／拒絕操作；有效 fixture 斷言既有 JSON keys 與 Track 2 順序不變。
+- DONE: 讓同步對狀態、決定、核可人、時間及指紋採 fail-closed 驗證；fixture 測試必須覆蓋每個發布欄位、偽造或缺漏紀錄、正規化、Track 2 順序與全有全無寫入。
+  `node --test tests/approval-content-version-binding.test.mjs` 通過 44 項；漏投影欄位、放寬核可紀錄、移除序號或移除 rollback 都會使對應測試失敗。
+- DONE: 更新實作後才成立的操作與架構文件，但不得碰正式 SSOT、不得恢復自動同步，也不得偽造尚未執行的兩帳號 probe 證據。
+  commit `b75c98c` 更新操作、架構、協作、索引與待辦；文件明載正式 SSOT 未部署且兩帳號 probe 尚未執行。
+- SKIPPED: 執行隔離試算表兩帳號 probe。
+  本 stage 沒有測試表或兩個 Google 帳號；維持 `UNPROVEN`，未新增 `approval-permission-probe.md` 或偽造 execution ID。
+- SKIPPED: 執行 `npm run build`。
+  implement stage definition 明確禁止；改以 `npx tsc --noEmit` 驗證，結果通過。
+
+### Summary
+
+repo 已完成內容版本綁定、fail-closed 同步與可復原的兩檔寫入。網站資料 shape、自動同步狀態與正式 SSOT 都未變更。
+Apps Script 與 Node parity、全部發布欄位及核可偽造 fixture 共 44 項通過。正式部署仍等待隔離表兩帳號 probe 與 captain 確認。
