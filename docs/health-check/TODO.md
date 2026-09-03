@@ -420,6 +420,83 @@ captain 提出：「**我從來不想收集反方意見**」。查證後這不�
 **captain 於 2026-09-02 裁示：移除現有的 AI 生成跨軌道連結，之後是否重做需討論。**
 已開票 `docs/constitution-features/038`（標注 ⚠️ 需要討論）。本項待該票完成後結案。
 
+
+### P1-8　盤點全站沒有 SSOT 來源的內容　🔴 防止 AI 幻覺內容上線
+
+- **狀態**：已完成初步盤點（2026-09-02），**待決定每一項怎麼辦**
+- **captain 裁示**：全面防止 AI 生成的幻覺內容上線
+
+**為什麼需要這一項**：目前只有 `history.json` 與 `discussions.json` 有 SSOT 來源，
+會經過同步的 17 條檢查與 PR diff 審閱。**其餘所有內容都沒有這道關卡** ——
+沒有人核可、沒有佔位掃描、改了也不會出現在任何 diff 審查流程裡。
+
+已經發生三次同型事故，全部出自無 SSOT 來源的內容：
+
+| 事故 | 內容來自 |
+|---|---|
+| `某學者，某大學法律系` 上線四個月 | `015` 設計文件的 Sample data → 直接寫進 `discussions.json` |
+| 跨軌道連結 15 筆指向虛構案件 | `006` 產生的 `cross-track-links.ts`，自述「人工策展」但無證據 |
+| `h2` 被當成言論自由案 | 依據網站上未回流修正的錯誤資料所做的判斷 |
+
+#### 初步盤點：`src/data/` 的八個檔
+
+| 檔案 | 行數 | 來源 | 內容性質 |
+|---|---|---|---|
+| `history.json` | 401 | ✅ SSOT_收集區 | 有把關 |
+| `discussions.json` | 192 | ✅ SSOT_收集區 | 有把關 |
+| `future.ts` | 432 | ⚠️ 無 | 待審案件、大法官名單、危機統計 |
+| `opinions.ts` | 248 | ⚠️ 無 | 意見光譜資料 |
+| `controversy-timeline.ts` | 231 | ⚠️ 無 | 爭議事件時間軸 |
+| `cross-track-links.ts` | 193 | ⚠️ 無 | **已裁示移除，見 `docs/constitution-features/038`** |
+| `contributors.ts` | 40 | ⚠️ 無 | 貢獻者名單 |
+| `launch-status.ts` | 10 | ⚠️ 無 | 上線狀態旗標（非內容） |
+
+#### 初步盤點：寫死在程式碼裡的中文
+
+以「連續 6 字以上的中文」計數，前段如下：
+
+| 檔案 | 段數 |
+|---|---|
+| `src/components/opinion-lazybag/DecisionFlowchart.tsx` | 75 |
+| `src/components/opinion-lazybag/StanceSpectrum.tsx` | 47 |
+| `src/app/future/page.tsx` | 44 |
+| `src/app/present/page.tsx` | 33 |
+| `src/app/past/page.tsx` | 28 |
+| `src/app/controversy-timeline/page.tsx` | 26 |
+
+前兩個特別值得看 —— `opinion-lazybag` 是**解釋大法官意見立場**的視覺化元件，
+內容是法律判斷。它來自 `docs/constitution-features/_archive/014` 與 `027`，
+**與 `015`（`某學者` 事故）是同一批作業**。
+
+#### 要決定的事
+
+盤點只是起點。每一項都要回答同一個問題：
+
+> **這段內容是誰寫的？依據什麼？有沒有人用外部來源查證過？**
+
+三種可能的處置，需逐項判斷：
+
+1. **搬進 SSOT** —— 適用於會持續更新、且屬編輯台職責的內容（例如 `future.ts` 的待審案件）
+2. **標注來源並凍結** —— 適用於一次性、有明確依據的內容（例如爭議時間軸）
+3. **移除** —— 適用於查無依據者（`cross-track-links.ts` 已循此路，見 `038`）
+
+**不要一次全做。** 建議先處理 `opinion-lazybag` 那兩個檔 ——
+內容是法律判斷、段數最多、且與已知事故同一批作業。
+
+#### 驗證
+
+盤點指令可重跑：
+
+```bash
+# src/data/ 各檔的來源
+ls -1 src/data/
+
+# 程式碼內寫死的中文段落計數
+for f in $(grep -rl "[一-鿿]" src/app src/components --include="*.tsx"); do
+  echo "$(grep -o "[一-鿿]\{6,\}" "$f" | wc -l) $f"
+done | sort -rn | head -12
+```
+
 ---
 
 ## P2 — 結構性問題（不修就會再發生一次）
@@ -711,9 +788,11 @@ git log -1 --format='%ad %s' --date=short -- src/data/discussions.json
 
 ### 之後
 
-6. **P1-7** 修 `/future` 的歷史脈絡區塊（既有 bug，全部 39 件案件都不顯示）
-7. **P2-10** `dangerouslySetInnerHTML` 淨化 —— **必須在 P3-1 分享試算表之前處理**
-8. **P3-8** 發布前移除 `noindex`
+6. **P1-8** 盤點全站無 SSOT 來源的內容 —— 建議先處理 `opinion-lazybag` 那兩個檔
+7. **`docs/constitution-features/038`** 移除 AI 生成的跨軌道連結（已開票，標注需討論）
+8. **P1-7** 修 `/future` 的歷史脈絡區塊 —— 待 038 定案後可能一併結案
+9. **P2-10** `dangerouslySetInnerHTML` 淨化 —— **必須在 P3-1 分享試算表之前處理**
+10. **P3-8** 發布前移除 `noindex`
 
 不擋任何事：P3-9 的內容品質雜項、`status` 保護範圍（等有協作者）、`vibe` 下拉選單、
 文件整併第 2／4 階段、`design-assets` refit、`019` 票。
