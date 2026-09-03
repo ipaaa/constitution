@@ -1,6 +1,6 @@
 # 憲庭加好友 — 內容產線待辦清單
 
-體檢日期：2026-08-31　　最後更新：2026-09-01
+體檢日期：2026-08-31　　最後更新：2026-09-03
 
 本清單依**危險程度**排序，不是依工作量。每一項都附證據與驗證指令，可自行重跑確認。
 
@@ -639,6 +639,21 @@ captain 指出那些中文是寫給學者老師看的，刪掉編輯端就失去
   **所以 `curl` 對本站無效** —— 抓到的是 33KB 空殼，一個字的內容都沒有。
   要驗畫面只能用真實瀏覽器，或伺服器端渲染元件
 
+### P2-12　核可沒有綁定內容版本
+
+- **狀態**：設計已定案，尚未實作。正式 SSOT 未套用新欄位或公式
+- **問題**：現行同步只檢查 `status = Approved`。核可後修改同列發布內容時，舊核可仍可通過
+- **設計**：[`040-approval-content-version-binding.md`](../constitution-features/040-approval-content-version-binding.md)
+  採公式衍生 `status`，並由同步端獨立重算 SHA-256 指紋
+- **完成條件**：
+  1. Apps Script 與 Node 使用同一份 `fingerprint-v1` 規格
+  2. 發布欄位變更後顯示 `Needs review`，舊核可無法同步
+  3. 欠缺紀錄、偽造狀態及錯誤指紋都讓同步整份中止，且不改寫 JSON
+  4. 在隔離測試表完成兩帳號 probe，保存不含帳號與正式 SSOT URL 的證據
+  5. captain 確認後才把欄位與公式套到正式 SSOT，並重新核可既有列
+- **前置關係**：P3-1 開放多人編輯前必須完成本項與 P2-10。下次正式同步前也必須完成本項，
+  以免協作者或責任編輯修改內容後沿用舊核可
+
 ---
 
 ## P3 — 協作與資料整理
@@ -677,11 +692,11 @@ captain 指出那些中文是寫給學者老師看的，刪掉編輯端就失去
 - **SSOT**：`SSOT_收集區` 改名為 `SSOT` 升為唯一真相，`SSOT_Editor` 封存
 - **後續**：施工項目見 design.md 第七節，共 10 項，有嚴格相依順序
 
-### P3-5　`docs/constitution-features/` workflow 版本過舊
+### ~~P3-5　`docs/constitution-features/` workflow 版本過舊~~ ✅ 已完成
 
-- `commissioned-by: spacedock@0.9.5`，現行為 0.27
-- 若要用 workflow 推進上述項目，需先 refit
-- **目前決定：暫不進 workflow**
+- **狀態**：已於 2026-09-02 refit 至 `spacedock@0.28`
+- workflow 已恢復使用。feature 040 正在其中推進
+- **證據**：commit `1eff0e2` 與 `docs/constitution-features/README.md`
 
 ### P3-6　`收集區` 有 17 筆從未上線
 
@@ -795,13 +810,13 @@ git log -1 --format='%ad %s' --date=short -- src/data/discussions.json
 
 ### 之後
 
-6. **`docs/constitution-features/040`** 核可綁定內容版本（score 0.95，全 workflow 最高）
+6. **[feature 040](../constitution-features/040-approval-content-version-binding.md)** 核可綁定內容版本（score 0.95，全 workflow 最高）。這是 P3-1 與下次正式同步的前置
 7. **P1-8** 盤點全站無 SSOT 來源的內容 —— 建議先處理 `opinion-lazybag` 那兩個檔
 8. **`docs/constitution-features/039`** 常設渲染檢查工具（機械檢查，非 AI 內容偵測）
 9. **P2-10** `dangerouslySetInnerHTML` 淨化 —— **必須在 P3-1 分享試算表之前處理**
 10. **P3-8** 發布前移除 `noindex`
 
-不擋任何事：P3-9 的內容品質雜項、`status` 保護範圍（等有協作者）、`vibe` 下拉選單、
+不擋任何事：P3-9 的內容品質雜項、`vibe` 下拉選單、
 文件整併第 2／4 階段、`design-assets` refit、`019` 票。
 
 <details>

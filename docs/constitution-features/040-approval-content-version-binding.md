@@ -233,3 +233,17 @@ Verified by: repo 外部 review checklist 比對 `docs/content-pipeline/design.m
 
 選定不依賴受保護欄位 trigger 寫入的安全設計。`status` 由公式顯示，Node 同步以相同 SHA-256 規格獨立把關。
 正式 SSOT 維持不動。兩帳號隔離 probe 通過後，trigger 也只能作為加速提示，不能取代同步閘門。
+
+## Stage Report: design (cycle 2)
+
+- DONE: 更新 docs/content-pipeline/design.md，記錄 feature 040 已定案的公式衍生狀態與同步端指紋方向，明載尚未實作、正式 SSOT 未套用，並用追加修訂保留舊設計脈絡。
+  追加 2026-09-03 修訂，連回 feature 040，並明列目前能力、取代時點與可失敗的驗證目標。
+- DONE: 更新 docs/health-check/TODO.md，新增 approval 未綁定內容版本的結構性問題、連到 feature 040、列出完成條件與對多人編輯及正式同步的前置關係，並修正與 workflow refit 現況直接衝突的舊追蹤狀態。
+  新增 P2-12，修正 P3-5 為 0.28 refit 已完成，並把 P3-1 與下次正式同步標為前置相依。
+- DONE: 更新 docs/INDEX.md，只更新 workflow 活躍狀態、實際數量、相關文件用途與 2026-09-03 查核日期；不得替 feature 040 新增單獨索引列，也不得把未實作行為寫成現況。
+  索引記錄 33 個封存 entity、7 個進行中、6 份 debrief；feature 040 只出現在既有文件用途說明。
+
+### Summary
+
+三份 pre-implementation 文件已同步 feature 040 的已定方向與未實作狀態。此次只更新文件，沒有改程式或正式 SSOT。
+TODO 現在把版本綁定列為多人編輯與下次正式同步的前置。INDEX 也反映 workflow 的實際活躍狀態與數量。

@@ -1,7 +1,7 @@
 # 文件總索引
 
 **狀態**：evergreen
-**最後查核**：2026-09-01
+**最後查核**：2026-09-03
 **規則**：新增或刪除文件時，同步更新本檔。狀態定義見 [`../AGENTS.md`](../AGENTS.md)。
 
 狀態三種：
@@ -24,7 +24,7 @@ docs/
   content-rescue/      搶救出來的內容
   meetup-chats/        會議記錄（本機限定，未進版控）
   _archive/            已過時、保留供追溯的文件
-  constitution-features/   spacedock workflow（休眠）
+  constitution-features/   spacedock workflow（進行中）
   design-assets/           spacedock workflow（休眠）
 ```
 
@@ -37,7 +37,7 @@ docs/
 | 路徑 | 用途 | 狀態 | 負責人 | 最後查核 |
 |---|---|---|---|---|
 | `AGENTS.md` | agent 與協作者的工作規範。禁止事項、溝通方式、寫作與文件規則 | evergreen | captain | 2026-09-01 |
-| `docs/INDEX.md` | 本檔。全部文件的索引 | evergreen | captain | 2026-09-01 |
+| `docs/INDEX.md` | 本檔。全部文件的索引與 workflow 現況 | evergreen | captain | 2026-09-03 |
 
 ### 專案定位
 
@@ -53,7 +53,7 @@ docs/
 
 | 路徑 | 用途 | 狀態 | 負責人 | 最後查核 |
 |---|---|---|---|---|
-| `docs/content-pipeline/design.md` | 產線的**唯一**規格文件：目標、現況、進度、規格、施工順序 | plan | captain | 2026-09-01 |
+| `docs/content-pipeline/design.md` | 產線的**唯一**規格文件；含 feature 040 已定案但尚未實作的核可版本綁定方向 | plan | captain | 2026-09-03 |
 | `docs/content-pipeline/data-collection-guide.md` | T3（未來軌）的資料收集流程。T1／T2 已移除，改指向 `design.md` | evergreen | captain | 2026-09-03 |
 
 ### 體檢與待辦
@@ -61,7 +61,7 @@ docs/
 | 路徑 | 用途 | 狀態 | 負責人 | 最後查核 |
 |---|---|---|---|---|
 | `docs/health-check/2026-08-31-content-pipeline.md` | 體檢報告。出了什麼事、為什麼會上線。**含兩則補述，先看上方** | record | — | 2026-09-01 |
-| `docs/health-check/TODO.md` | 待辦清單，依危險程度排序 | plan | captain | 2026-09-01 |
+| `docs/health-check/TODO.md` | 待辦清單；含 feature 040 與多人編輯、正式同步的前置關係 | plan | captain | 2026-09-03 |
 
 ### 搶救出來的內容
 
@@ -86,15 +86,15 @@ docs/
 > 但該檔只存在於 captain 的本機。硬碟損壞或他人 clone 時，該證據不存在。
 > 若要保留，需另行決定保存方式（不建議直接取消 ignore，內容含與會者姓名與討論細節）。
 
-### Workflow（休眠中）
+### Workflow（`constitution-features` 進行中）
 
 | 路徑 | 用途 | 狀態 | 負責人 | 最後查核 |
 |---|---|---|---|---|
-| `docs/constitution-features/README.md` | 網站功能 workflow 的規格。**已 refit 至 0.28** | evergreen | captain | 2026-09-02 |
-| `docs/constitution-features/` | 30 個封存 entity、7 個開著、4 份 debrief | record | — | 2026-09-02 |
+| `docs/constitution-features/README.md` | 進行中的網站功能 workflow 規格。**已 refit 至 0.28** | evergreen | captain | 2026-09-03 |
+| `docs/constitution-features/` | 33 個封存 entity、7 個進行中、6 份 debrief | record | — | 2026-09-03 |
 | `docs/design-assets/` | 視覺素材 workflow。5 個封存、4 個開著 | record | — | 2026-09-01 |
 
-`constitution-features` 已於 2026-09-02 refit：修好失效的查詢指令、補上 `mod-block`
+`constitution-features` 已於 2026-09-02 refit，現在進行中：修好失效的查詢指令、補上 `mod-block`
 欄位、寫作規範改指向 `AGENTS.md`（原指向兩個不存在的檔案）、`pr-merge` 模組更新至
 0.27.0，並採用樣板新增的證據紀律與 entity 範本。階段設計與 `sequential` 編號保留未動。
 
