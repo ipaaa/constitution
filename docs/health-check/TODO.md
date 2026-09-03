@@ -493,7 +493,7 @@ ls -1 src/data/
 
 # 程式碼內寫死的中文段落計數
 for f in $(grep -rl "[一-鿿]" src/app src/components --include="*.tsx"); do
-  echo "$(grep -o "[一-鿿]\{6,\}" "$f" | wc -l) $f"
+  echo "$(grep -o "[一-鿿]\\{6,\\}" "$f" | wc -l) $f"
 done | sort -rn | head -12
 ```
 
