@@ -61,6 +61,7 @@ docs/
 | 路徑 | 用途 | 狀態 | 負責人 | 最後查核 |
 |---|---|---|---|---|
 | `docs/health-check/2026-08-31-content-pipeline.md` | 體檢報告。出了什麼事、為什麼會上線。**含兩則補述，先看上方** | record | — | 2026-09-01 |
+| `docs/health-check/2026-09-03-editor-onboarding.md` | 學者編輯上稿流程稽核。開放編輯權限後還開著的洞、使用說明改寫對照、會議講稿 | record | — | 2026-09-03 |
 | `docs/health-check/TODO.md` | 待辦清單；含 feature 040 與多人編輯、正式同步的前置關係 | plan | captain | 2026-09-03 |
 
 ### 搶救出來的內容
