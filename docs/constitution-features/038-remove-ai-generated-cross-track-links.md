@@ -33,6 +33,14 @@ gates:
               application:
                 target-stage: review
                 state: consumed
+        - id: gate:038:review
+          stage: review
+          attempts:
+            - id: gate-attempt:038-review-1
+              briefing:
+                id: briefing:038:review:attempt-1:revision-1
+                digest: sha256:c34f424a0ad230a7e204673dfe4e719185f8515e61f5d99a367498620f57dedd
+                room-ref: '@review/review/briefing-1'
 ---
 
 **⚠️ 需要討論** —— 移除的部分已定案，但「之後要不要重做、由誰做」尚未決定。
