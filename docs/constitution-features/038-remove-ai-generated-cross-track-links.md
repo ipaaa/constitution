@@ -270,3 +270,44 @@ AC-1、AC-2、AC-3 三項全部 MET，且以與前兩階段完全不同的方法
 ### Summary
 
 以 Next 正式建置產物做第三條獨立驗證路徑：對 main 乾淨 baseline 與本分支各建置一次，比對兩邊 `.next` 內所有中文字串literal。結果是只少 6 條、全部為跨軌道 UI 文字、新增 0 條，其餘 1092 條相同 —— 這比逐頁計數更強，證明跨軌道文字在任何程式路徑上都無法出現，且其他內容一字未動。路由清單相同，lint error 逐筆相同，`tsc` 通過。移除範圍逐個 hunk 比對後確認與票上一致。判定 REJECTED 的唯一理由是 `docs/content-pipeline/data-collection-guide.md:174` 這行 evergreen 文件仍指向兩個已刪檔案。
+
+## Stage Report: implement (cycle 1)
+
+- DONE: 修正 docs/content-pipeline/data-collection-guide.md 第 174 行：標明跨軌道已於 2026-09-03 移除、指向 038 這張票，並更新該檔的最後查核日期
+  commit `dd65456`。表格列改為 `| ~~跨軌道~~ | 已於 2026-09-03 移除 | 已於 2026-09-03 移除 |`，另加四行補述。檔頭「最後查核」由 2026-09-02 改為 2026-09-03。
+- DONE: 分支對齊 main，確認 git diff --name-only main...HEAD 不含 039-render-check-tool.md
+  commit `ac6e6ef`（merge `4f2b705`）。`git diff --name-only main...HEAD | grep -c 039-render-check-tool` = 0。`git rev-list --left-right --count main...HEAD` = `0	12`，已無落後。
+
+### 改了什麼
+
+第 174 行原文把兩個檔案列為現況：
+
+```
+| 跨軌道 | `src/data/cross-track-links.ts` | `src/components/CrossTrackLinks.tsx` |
+```
+
+改為保留該列並標示已移除，下方加一段補述，帶齊三件事 —— 已移除、日期 2026-09-03、指向 `docs/constitution-features/038-remove-ai-generated-cross-track-links.md`，並補一句「之後是否重做尚未決定」。沒有直接刪列，因為刪掉會讓下一個讀者以為跨軌道從來不存在。
+
+補述中仍會出現那兩個路徑字串，但該處明講「已於 2026-09-03 刪除，兩個檔案都不存在了」。那是刻意留下的痕跡，不是過時指向。
+
+第 138 行的「跨軌道共通事項」未動。該節比較 T1／T2 與 T3 的收集方式，與已移除的跨軌道連結功能無關，僅標題用詞相同。
+
+### 確認指令
+
+檢查點是「表格列是否仍把已刪檔案列為現況」，而非「檔內是否出現過該字串」—— 後者會把補述誤判為問題。
+
+```
+grep -nE '^\|.*(cross-track-links|CrossTrackLinks)' docs/content-pipeline/data-collection-guide.md
+```
+
+exit 1、無輸出。輔以 `ls src/data/cross-track-links.ts src/components/CrossTrackLinks.tsx` → 兩者皆 `No such file or directory`，確認表格所述與磁碟現況一致。
+
+### 分支狀態
+
+採 **merge 而非 rebase**。verify 與 review 已在本分支提交報告（`42979bd`、`829e261`、`7f1b55a` 等），rebase 會改寫他們的 commit。merge 達成同樣的對齊效果且不破壞既有歷史。
+
+分支現為 12 個 commit 領先 main、0 個落後。`git diff --name-only main..HEAD` 已不再出現 `039-render-check-tool.md`。本輪未改動 `src/`（`git diff --name-only dd65456~1 HEAD -- src/` 為空），亦未動試算表、`.env.local`、Vercel 設定，未碰 `docs/health-check/TODO.md`。
+
+### Summary
+
+本輪只處理 review cycle 1 的 F-1：一份 evergreen 文件仍把兩個已刪檔案列為現況。改法是標示移除而非刪列，保留痕跡並指向 038。另把分支併入 main 的 `4f2b705`，消除 `039-render-check-tool.md` 被刪的假象。移除工作本身未動，依指派未自行重驗，重驗由 review 執行。
