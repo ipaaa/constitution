@@ -1,5 +1,5 @@
 **狀態**：evergreen（僅涵蓋 T3）
-**最後查核**：2026-09-02
+**最後查核**：2026-09-03
 
 # 資料收集流程說明文件
 
@@ -171,7 +171,12 @@
 | T1 | `src/data/history.json` | `src/app/past/page.tsx` |
 | T2 | `src/data/discussions.json` | `src/app/present/page.tsx` |
 | T3 | `src/data/future.ts` | `src/app/future/page.tsx` |
-| 跨軌道 | `src/data/cross-track-links.ts` | `src/components/CrossTrackLinks.tsx` |
+| ~~跨軌道~~ | 已於 2026-09-03 移除 | 已於 2026-09-03 移除 |
+
+> **跨軌道連結已移除。** 原本這裡列的 `src/data/cross-track-links.ts` 與
+> `src/components/CrossTrackLinks.tsx` 已於 2026-09-03 刪除，兩個檔案都不存在了。
+> 移除原因與證據見 `docs/constitution-features/038-remove-ai-generated-cross-track-links.md`。
+> 之後是否重做尚未決定。
 
 
 ---

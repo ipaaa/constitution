@@ -1,0 +1,24 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:038:review:attempt-1:revision-1",
+  "question": "038 移除 AI 生成的跨軌道連結，review cycle 2 判定 PASSED。是否核可完成？核可後開 PR，合併後才輪到 PR #33（內容同步）。",
+  "artifacts": [
+    {
+      "id": "artifact:038:review:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/4f2b705eddbcf866e752cf01dc99fb42b1dc5466/docs/constitution-features/038-remove-ai-generated-cross-track-links.md",
+      "rev": "sha256:810433932df5af42e2a4ed17f5feb10a069adb0e86b048bf9e23e7625a1343d4",
+      "mediaType": "text/markdown",
+      "summary": "移除四張跨軌道對應表、CrossTrackLinks 元件與三處消費端，−352 行純刪除。三條 AC 由三種互不重疊的方法各自複現：implement 用 react-dom/server、verify 用 jsdom + react-dom/client 真實掛載、review 用 Next 正式建置產物的中文字串集合差集（1098→1092，只少 6 條全為跨軌道文字，新增 0 條）。cycle 1 因一份 evergreen 文件仍列出已刪檔案而 REJECTED，已修正並保留移除痕跡。新發現 F-2 為 docs/INDEX.md 日期慢一天，屬 Polish 不擋交付。"
+    }
+  ],
+  "context": [
+    {
+      "type": "Reference",
+      "id": "reference:038:review:attempt-1:revision-1:item-2",
+      "uri": "git-root://main/4f2b705eddbcf866e752cf01dc99fb42b1dc5466/docs/health-check/TODO.md",
+      "mediaType": "text/markdown",
+      "rev": "sha256:d64dcbad4e0291f8b612bd9a6fc32cd7f0358e28fe682f8edc5ce02405c4e500"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:038:verify:attempt-1:revision-1",
+  "question": "038 移除 AI 生成的跨軌道連結，verify 判定 PASSED。是否核可進入 review？另有一項需你知悉：驗收腳本依 FO 裁示未入版控，因此 AC-1／AC-2 後續無法重跑 —— 這是我的裁示造成的代價。",
+  "artifacts": [
+    {
+      "id": "artifact:038:verify:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/682008aca0f7241b3543e0fca3c76a3754720b22/docs/constitution-features/038-remove-ai-generated-cross-track-links.md",
+      "rev": "sha256:810433932df5af42e2a4ed17f5feb10a069adb0e86b048bf9e23e7625a1343d4",
+      "mediaType": "text/markdown",
+      "summary": "移除四張跨軌道對應表、三個查詢函式、CrossTrackLinks 元件與三處消費端，−352 行跨 5 個檔，純刪除不留註解殘骸。verify 自寫 jsdom + react-dom/client 掛載檢查（與 implement 的 swc + react-dom/server 完全不同路徑），驗證 19 條路由跨軌道計數 0、渲染無例外；對 main 同一檢查得 54 處殘留 exit 1，證明可證偽。連結逐條差集：移除 20 條全為跨軌道連結、新增 0 條、非跨軌道欄位零差異。src/ 無殘骸、無佔位資料，next build 與 tsc 皆通過。"
+    }
+  ],
+  "context": [
+    {
+      "type": "Reference",
+      "id": "reference:038:verify:attempt-1:revision-1:item-2",
+      "uri": "git-root://main/682008aca0f7241b3543e0fca3c76a3754720b22/docs/health-check/TODO.md",
+      "mediaType": "text/markdown",
+      "rev": "sha256:d64dcbad4e0291f8b612bd9a6fc32cd7f0358e28fe682f8edc5ce02405c4e500"
+    }
+  ]
+}
