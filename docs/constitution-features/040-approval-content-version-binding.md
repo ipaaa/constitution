@@ -190,7 +190,7 @@ Verified by: repo 外部 review checklist 比對 `docs/content-pipeline/design.m
 
 ### 現在更新
 
-- `docs/constitution-features/approval-content-version-binding.md`：記錄已定方向、`UNPROVEN` 風險與驗證目標。這是設計，尚未實作。
+- `docs/constitution-features/040-approval-content-version-binding.md`：記錄已定方向、`UNPROVEN` 風險與驗證目標。這是設計，尚未實作。
 - `docs/content-pipeline/design.md`：記錄公式衍生 `status` 與同步端指紋的已定方向。明記行為尚未實作。
 - `docs/health-check/TODO.md`：記錄施工與隔離 probe 待辦。明記正式 SSOT 尚未套用新行為。
 - `docs/INDEX.md`：索引本 feature 的已定方向與計畫狀態。不得寫成已上線。
