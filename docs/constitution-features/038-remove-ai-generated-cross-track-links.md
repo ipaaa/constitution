@@ -1,7 +1,7 @@
 ---
 id: 038
 title: 移除 AI 生成的跨軌道連結（之後是否重做需討論）
-status: verify
+status: review
 source: captain 2026-09-02 決定
 started: 2026-09-03T17:04:14Z
 completed:
@@ -32,7 +32,7 @@ gates:
                 reason: verify 自寫 jsdom + react-dom/client 掛載檢查（與 implement 的 swc + react-dom/server 完全不同路徑），19 條路由跨軌道計數 0、渲染無例外；對 main 同一檢查得 54 處殘留 exit 1，證明可證偽。連結逐條差集：移除 20 條全為跨軌道連結、新增 0 條、非跨軌道欄位零差異。src/ 無殘骸無佔位資料，next build 與 tsc 皆通過。captain 知悉並接受 FO 裁示的代價：驗收腳本未入版控，AC-1／AC-2 後續無法重跑；已另開 039 將該工具定型。
               application:
                 target-stage: review
-                state: pending
+                state: consumed
 ---
 
 **⚠️ 需要討論** —— 移除的部分已定案，但「之後要不要重做、由誰做」尚未決定。
@@ -204,3 +204,67 @@ main 的 21 筆為：`./past.crossTrackHeading = 4`、`./past.crossTrackBadgeT2 
 ### Summary
 
 以自寫的 jsdom + `react-dom/client` 掛載檢查（與 implement 的 swc + `react-dom/server` 路徑完全不同）驗證 19 條路由：跨軌道區塊計數 0、渲染無例外。對 main 的乾淨 baseline 做同一檢查得 54 處殘留、exit 1，證明檢查可證偽；兩套方法在 `/past` 的 4／6 與八篇詳頁清單上數字吻合。連結逐條差集顯示移除的 20 條全為跨軌道連結，新增 0 條，非跨軌道欄位零差異。`src/` 無殘骸、無註解掉的對應表、無佔位資料，`next build` 與 `tsc` 皆通過。需 FO 知悉的是：檢查腳本依 FO 既有裁示未入版控，AC-1／AC-2 後續仍無法重跑。
+
+## Stage Report: review
+
+- DONE: 獨立複現 AC-1 至 AC-3，不採信前兩階段的自述；至少一項用與前兩者不同的方法
+  第三種方法：不自寫渲染器，改用 Next 自己的正式建置產物比對。對 main 乾淨 baseline 與本分支各跑一次 `npx next build`（皆 exit 0），再從兩邊 `.next` 的伺服器 chunk、客戶端 chunk 與預渲染 HTML 抽出所有中文字串literal 做集合差集。與 implement 的 swc + `react-dom/server`、verify 的 jsdom + `react-dom/client` 三條路徑互不重疊。
+- DONE: 審查移除是否完整且未過度：比對票上 Proposed approach 列出的移除範圍，指出有無多刪或漏刪
+  逐個 hunk 讀過 `git diff main..HEAD -- src/`：刪除範圍與 Proposed approach 逐項對齊，**無多刪、無漏刪**。`git diff --numstat` 為新增 0 行／刪除 352 行，5 個檔，無任何新增或修改行。
+- DONE: 判斷此次移除是否留下任何會誤導後人的痕跡，例如殘存的型別、匯出、或指向已刪功能的註解與文件
+  `src/` 乾淨（型別 `CrossTrackLink`、四張表、三個 getter、元件名皆 0 命中，含註解行）。**但 `docs/content-pipeline/data-collection-guide.md` 第 174 行仍指向兩個已刪檔案**，見下方〈發現〉。
+
+### 證據與可證偽性
+
+- **字串集合差集（本階段的獨立方法）**：main 產物有 1098 條中文字串literal，本分支 1092 條。**只少 6 條，且 6 條全部是跨軌道 UI 文字**：`跨軌道連結`、`跨軌道探索`、`歷史脈絡`、`未來影響`、`相關釋憲判例`、`件相關待審案件`。**新增 0 條。** 其餘 1092 條逐條相同 —— 這同時證明 AC-1（跨軌道文字在任何程式路徑上都不可能出現）與 AC-2（其他使用者可見文字一字未動）。會使其失敗的改動：誤刪任一非跨軌道字串，或漏刪任一跨軌道字串。
+- **檢查不是空轉**：同一支抽取程式對 main 抓到全部 6 條跨軌道字串、對本分支 0 條。若抽取為空轉，兩邊都會是 0 或相同。
+- **路由未變**：`app-path-routes-manifest.json` 兩邊逐字元相同，15 條路由不增不減。
+- **AC-3 原文指令**：`grep -rn "CASE_TO_HISTORY\|HISTORY_TO_DISCUSSIONS\|DISCUSSION_TO_CASE_TAGS\|DISCUSSION_TO_HISTORY" src/` exit 1（無結果）。另以 `cross-track|crosstrack|getLinksFor|跨軌道|歷史脈絡` 不分大小寫複掃 `src/`，同樣 exit 1。
+- **未引入 lint 問題**：對兩邊各跑 `npx eslint src -f json`，error 為同樣 4 筆（`react-hooks/set-state-in-effect`，檔名行號完全相同），warning 皆 6 筆。`npx tsc --noEmit` exit 0。無殘留的未使用 import。
+
+### 覆核：前兩階段的自述有無誇大
+
+- verify 說「`相關待審案件` 不是跨軌道專屬」—— 屬實。本階段字串差集顯示消失的是 `件相關待審案件`（`${n} 件相關待審案件`），獨立的 `相關待審案件` 兩邊都在，來自 `src/app/future/page.tsx` 的篩選標籤。
+- verify 說「只看 SSR HTML 的檢查會誤判通過」—— 屬實且我獨立踩到同一點。正式建置產出的 `past.html` 只有 14070 bytes，`textbook-item` 與 `跨軌道連結` 在 main 上同為 0 命中，成因是 `src/app/layout.tsx` 的 `LaunchGate` 在掛載前回傳 `null`。所以我改用 chunk 產物比對，不用預渲染 HTML 做內容判定。
+- implement／verify 回報的計數（`/past` 4 個 heading、6 個 T2 徽章、八篇詳頁）我未逐頁重數，但字串層級的「6 條全刪、0 條誤刪」是更強的宣稱，且與其結論相容。
+
+### 發現 F-1：evergreen 文件仍指向已刪檔案（Material，本票可修）
+
+`docs/content-pipeline/data-collection-guide.md:174`：
+
+    | 跨軌道 | `src/data/cross-track-links.ts` | `src/components/CrossTrackLinks.tsx` |
+
+四項證據：
+
+1. **使用者與正常流程** —— 後續 agent 或協作者查「檔案位置一覽」以了解各軌資料放哪。該文件 `狀態: evergreen`、`最後查核: 2026-09-02`。
+2. **可觀察的損害** —— 表列的兩個路徑在本分支皆不存在（`ls` 兩者 No such file）。讀者會以為功能仍在。
+3. **受影響的界線** —— 非 AC-1～AC-3 所涵蓋。受影響的是 `CLAUDE.md` 明訂的界線：「過時的 evergreen 文件是危險的」。本階段 checklist 第三項亦明列「指向已刪功能的註解與文件」。
+4. **觸發證據** —— `grep -rn "cross-track" docs --exclude-dir=_archive --exclude-dir=constitution-features` 命中該行。
+
+**注意檔頭的過時警告不涵蓋此處。** 該文件檔頭只標注 T1／T2 章節過時；第 174 行位於「檔案位置一覽」，讀者會當成現況。
+
+建議處置：`fix`，改動為一行（刪除該表列或標注已於 038 移除）。複驗成本是同一條 grep。
+
+**不算缺陷的三處，一併說明避免重複追查：**
+
+- `docs/health-check/TODO.md` 的 P1-7／P1-8（第 401、438、450、480 行）—— 票上 `Out of scope` 已明列「待本票定案後一併更新」，且行文皆為歷史敘述並指向 `038`。本票尚未結案，現在不算過時。**但這是交付前的待辦，不要遺失。**
+- `docs/constitution-features/_archive/` 的五份舊票 —— `CLAUDE.md` 規定 `record` 類文件不改寫。保留正確。
+- `docs/INDEX.md` —— 本分支未新增或刪除任何文件，無須更新。
+
+### 需要 FO 知悉
+
+1. **分支落後 main 一個 commit**：`4f2b705`（seed 039）。`git diff --stat main..HEAD` 因此顯示 `039-render-check-tool.md` 被刪 92 行 —— 那是分支落後造成的假象，不是本票的改動。交付前需 rebase 或 merge。
+2. **機器相依**：我把 main 的 baseline 用 `git archive main` 展開到 scratchpad，`node_modules` 以 `pax -rwl` 硬連結（不可用 symlink —— Turbopack 會 panic：`Symlink … points out of the filesystem root`）。抽取程式 `cjk-extract.mjs` 在 scratchpad，未入版控，理由同 FO 對 implement 的裁示。**這代表本階段的字串差集後續無法重跑。**
+3. 本票只刪不增，未產生任何對外顯示的事實敘述，無人名、日期、數據可查核。票上證據二（釋字第 272 號）屬 `docs/health-check/TODO.md` 的 P0-2，需法學背景者判斷。
+
+### 判定
+
+**REJECTED —— 單點，只差一行文件。**
+
+AC-1、AC-2、AC-3 三項全部 MET，且以與前兩階段完全不同的方法獨立複現。移除範圍與票上 `Proposed approach` 逐項相符，無多刪無漏刪，未引入型別、lint 或路由變化。唯一擋住交付的是 F-1：一份 evergreen 文件仍宣稱兩個已刪檔案存在。
+
+若 FO 認為 F-1 應與 `docs/health-check/TODO.md` 的 P1-7 併入同一批文件更新，那是 FO 的授權範圍；但那樣必須把 `data-collection-guide.md:174` 明確寫進票上的 `Out of scope`，否則它會被漏掉。
+
+### Summary
+
+以 Next 正式建置產物做第三條獨立驗證路徑：對 main 乾淨 baseline 與本分支各建置一次，比對兩邊 `.next` 內所有中文字串literal。結果是只少 6 條、全部為跨軌道 UI 文字、新增 0 條，其餘 1092 條相同 —— 這比逐頁計數更強，證明跨軌道文字在任何程式路徑上都無法出現，且其他內容一字未動。路由清單相同，lint error 逐筆相同，`tsc` 通過。移除範圍逐個 hunk 比對後確認與票上一致。判定 REJECTED 的唯一理由是 `docs/content-pipeline/data-collection-guide.md:174` 這行 evergreen 文件仍指向兩個已刪檔案。
