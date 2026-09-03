@@ -22,6 +22,17 @@ gates:
                 id: briefing:038:verify:attempt-1:revision-1
                 digest: sha256:20f368d6f1274f45b84e1e63adcad16fb63998edeade77e3a5d2e6763fde9af0
                 room-ref: '@review/verify/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:038:verify:1
+                briefing: briefing:038:verify:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-03T17:39:47.866469Z"
+                decision: approve
+                reason: verify 自寫 jsdom + react-dom/client 掛載檢查（與 implement 的 swc + react-dom/server 完全不同路徑），19 條路由跨軌道計數 0、渲染無例外；對 main 同一檢查得 54 處殘留 exit 1，證明可證偽。連結逐條差集：移除 20 條全為跨軌道連結、新增 0 條、非跨軌道欄位零差異。src/ 無殘骸無佔位資料，next build 與 tsc 皆通過。captain 知悉並接受 FO 裁示的代價：驗收腳本未入版控，AC-1／AC-2 後續無法重跑；已另開 039 將該工具定型。
+              application:
+                target-stage: review
+                state: pending
 ---
 
 **⚠️ 需要討論** —— 移除的部分已定案，但「之後要不要重做、由誰做」尚未決定。
