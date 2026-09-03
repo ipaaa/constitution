@@ -101,6 +101,8 @@ The first officer sets this status when a feature enters the workflow. The worke
   - Acceptance criteria as end-state properties, each with a `Verified by:` clause
   - Data requirements specifying shape, source, and any new types needed
   - Mobile/desktop responsive behavior notes
+  - 將文件影響分成 `現在更新`、`實作後更新` 與 `不更新`；每一節都要列出文件或寫 `無`
+  - 每筆 `現在更新` 都要記錄已定方向、尚未實作的狀態與驗證目標；不可把預定行為寫成已上線
 - **Good:** Specific enough that a different developer could implement from the spec alone; references existing project patterns and design system
 - **Bad:** Vague hand-waving ("make it look nice"), ignoring existing code conventions, designing in isolation from the other tracks' visual language
 - **Gate content:** Show the selected approach, risk evidence, expected files and lines with tolerance, semantic changes, and proposed proof for each acceptance criterion.
@@ -147,6 +149,7 @@ An independent reviewer examines the implementation against the design spec. Thi
   - Each acceptance criterion from the design spec verified as met or not met, by reproducing its `Verified by:` clause rather than trusting the implementation's self-report
   - Code quality assessment (types, conventions, reusability)
   - Any regressions or broken functionality identified
+  - 依實際交付行為檢查 `## Documentation impact` 每一筆：必要更新已完成、`record` 文件未被改寫，而且 `docs/INDEX.md` 符合文件新增或刪除結果
   - Clear PASSED or REJECTED verdict with rationale
 - **Good:** Tests each acceptance criterion individually, checks mobile and desktop behavior, verifies data flow end-to-end
 - **Bad:** Rubber-stamping without actually reading the diff, rejecting on style preferences not in the design spec, scope-creeping new requirements into the review
@@ -281,6 +284,28 @@ reproduce and that can fail. Name the concrete change that would make it fail.}
 {What verifies the implementation. Remember: `npx tsc --noEmit` and `npm run dev`,
 never `npm run build`.}
 
+## Documentation impact
+
+分類所有受影響的文件。三個小節都必須保留。該類別沒有文件時寫 `無`。
+
+### 現在更新
+
+| 文件 | 為什麼現在要改 | 更新內容 |
+|---|---|---|
+| `{path}` | {哪一項現行計畫或決定已不完整} | {已定決策、明確的尚未實作狀態、驗證目標} |
+
+### 實作後更新
+
+| 文件 | 完成條件 | 更新內容 |
+|---|---|---|
+| `{path}` | {必須先通過的行為或測試} | {實作後才成立的操作或 evergreen 現況} |
+
+### 不更新
+
+| 文件 | 理由 |
+|---|---|
+| `{path}` | {例如：屬於 record、由其他流程負責、或既有正本仍正確} |
+
 ### Feedback Cycles
 
 {First officer appends one `- Cycle {N}: ...` line per correction round.
@@ -290,6 +315,18 @@ The gate reads reviewer findings from here. Cycle 3 escalates to the captain.}
 
 {What this feature deliberately does not address.}
 ```
+
+## 文件影響規則
+
+本規則適用於 feature `040` 與之後建立的所有 feature。較早建立且仍在進行的 feature
+不追溯適用。若其內容明確新增 `## Documentation impact`，則適用本規則。
+
+- `現在更新` 記錄已改變計畫的決定。取得實作證據前，必須明載該行為尚未實作。
+- `實作後更新` 只能在指定完成條件通過後，記錄操作方式或 evergreen 現況。程式與必要操作文件放在同一個 PR。
+- `不更新` 保護 record 與不相關的正本，避免不必要的修改。
+- design worker 負責找出並分類文件。implement worker 負責更新與實作綁定的文件。
+  verify worker 檢查實際行為。reviewer 遇到缺漏、過早、矛盾或重複的文件時，必須判定失敗。
+- 新增或刪除文件時，更新 `docs/INDEX.md`。若現有文件已負責該主題，不可另建第二份規格正本。
 
 ## Commit Discipline
 
