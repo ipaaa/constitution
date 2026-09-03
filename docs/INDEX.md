@@ -54,7 +54,7 @@ docs/
 | 路徑 | 用途 | 狀態 | 負責人 | 最後查核 |
 |---|---|---|---|---|
 | `docs/content-pipeline/design.md` | 產線的**唯一**規格文件：目標、現況、進度、規格、施工順序 | plan | captain | 2026-09-01 |
-| `docs/content-pipeline/data-collection-guide.md` | T3（未來軌）的資料收集流程。T1／T2 已移除，改指向 `design.md` | evergreen | captain | 2026-09-02 |
+| `docs/content-pipeline/data-collection-guide.md` | T3（未來軌）的資料收集流程。T1／T2 已移除，改指向 `design.md` | evergreen | captain | 2026-09-03 |
 
 ### 體檢與待辦
 

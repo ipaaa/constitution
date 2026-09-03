@@ -395,9 +395,14 @@ captain 提出：「**我從來不想收集反方意見**」。查證後這不�
 - **誰能做**：編輯台決定最終分類表 → 工程師建立選項限制
 
 
-### P1-7　`/future` 的「歷史脈絡」區塊對所有案件都不顯示　🔴 既有功能缺失
+### ~~P1-7　`/future` 的「歷史脈絡」區塊對所有案件都不顯示~~ ✅ 已解決（2026-09-03）
 
-- **狀態**：未修。**與 2026-09-02 的同步無關，是本來就壞的**
+- **狀態**：**整組跨軌道連結已移除**，本項隨之消滅。見 `docs/constitution-features/038-remove-ai-generated-cross-track-links.md`（PR #34，2026-09-03 合併）
+- **不是修好鍵值，是移除整個功能** —— captain 裁示「不要現有的 AI 生成跨軌道連結」，之後是否重做需討論
+
+<details>
+<summary>原始問題記錄</summary>
+
 - **成因**：`src/data/cross-track-links.ts` 的 `CASE_TO_HISTORY` 以 `c02`…`c31` 為鍵，
   但 `src/data/future.ts` 的案件 id 格式是 `114憲立3`、`112憲民489`。**兩邊零個相符**
 - **證據**：對全部 39 件待審案件呼叫 `getLinksForCase`，每一件都回傳 0 筆；
@@ -419,6 +424,8 @@ captain 提出：「**我從來不想收集反方意見**」。查證後這不�
 
 **captain 於 2026-09-02 裁示：移除現有的 AI 生成跨軌道連結，之後是否重做需討論。**
 已開票 `docs/constitution-features/038`（標注 ⚠️ 需要討論）。本項待該票完成後結案。
+
+</details>
 
 
 ### P1-8　盤點全站沒有 SSOT 來源的內容　🔴 防止 AI 幻覺內容上線
@@ -447,7 +454,7 @@ captain 提出：「**我從來不想收集反方意見**」。查證後這不�
 | `future.ts` | 432 | ⚠️ 無 | 待審案件、大法官名單、危機統計 |
 | `opinions.ts` | 248 | ⚠️ 無 | 意見光譜資料 |
 | `controversy-timeline.ts` | 231 | ⚠️ 無 | 爭議事件時間軸 |
-| `cross-track-links.ts` | 193 | ⚠️ 無 | **已裁示移除，見 `docs/constitution-features/038`** |
+| ~~`cross-track-links.ts`~~ | — | — | **已於 2026-09-03 移除**（038／PR #34） |
 | `contributors.ts` | 40 | ⚠️ 無 | 貢獻者名單 |
 | `launch-status.ts` | 10 | ⚠️ 無 | 上線狀態旗標（非內容） |
 
@@ -777,8 +784,9 @@ git log -1 --format='%ad %s' --date=short -- src/data/discussions.json
 ### 現在
 
 1. **P0-6** 補 `h28` 的正確標題 —— 目前以清空 `status` 擋住，該筆不上線
-2. **完成施工項目 9** —— 跑同步、開 PR、captain 對 diff、合併，最後恢復 Vercel 環境變數
-3. **P2-11** 在有瀏覽器的機器上看一眼 `/past` 的長標題版面 —— 唯一沒人驗過的項目
+2. **P2-11** 在有瀏覽器的機器上看一眼 `/past` 的長標題版面 —— **唯一沒人驗過的**，7 筆超過 30 字，最長 59 字
+
+~~完成施工項目 9~~ ✅ 2026-09-03 完成（PR #33／#34 皆已合併，`design.md` 第七節全部結案）項目
 
 ### 卡在人，越早問越好
 
@@ -787,9 +795,9 @@ git log -1 --format='%ad %s' --date=short -- src/data/discussions.json
 
 ### 之後
 
-6. **P1-8** 盤點全站無 SSOT 來源的內容 —— 建議先處理 `opinion-lazybag` 那兩個檔
-7. **`docs/constitution-features/038`** 移除 AI 生成的跨軌道連結（已開票，標注需討論）
-8. **P1-7** 修 `/future` 的歷史脈絡區塊 —— 待 038 定案後可能一併結案
+6. **`docs/constitution-features/040`** 核可綁定內容版本（score 0.95，全 workflow 最高）
+7. **P1-8** 盤點全站無 SSOT 來源的內容 —— 建議先處理 `opinion-lazybag` 那兩個檔
+8. **`docs/constitution-features/039`** 常設渲染檢查工具（機械檢查，非 AI 內容偵測）
 9. **P2-10** `dangerouslySetInnerHTML` 淨化 —— **必須在 P3-1 分享試算表之前處理**
 10. **P3-8** 發布前移除 `noindex`
 
@@ -839,4 +847,8 @@ git log -1 --format='%ad %s' --date=short -- src/data/discussions.json
 | 2026-09-02 | 037 改寫同步程式、移除 build 中的同步 | PR #32 |
 | 2026-09-02 | 解除 `npm run build` 禁令（已於 main 實測）、F3 規則寫入 design.md | `66a1ce5` |
 | 2026-09-02 | 封存 `SSOT_Editor`；`.env.local` 三個網址統一指向 `SSOT_收集區` | `ea06deb` |
-| 2026-09-02 | 首次正式同步 25→41 筆並檢查渲染；新增 P0-6／P1-7／P2-10／P2-11／P3-9 | 本次 |
+| 2026-09-02 | 首次正式同步並檢查渲染；新增 P0-6／P1-7／P2-10／P2-11／P3-9 | — |
+| 2026-09-03 | 新增 P1-8（盤點無 SSOT 來源的內容）；修正 TODO 的表格縮排 | — |
+| 2026-09-03 | 038 移除 AI 生成的跨軌道連結 | PR #34 |
+| 2026-09-03 | 內容同步 25→40 筆正式上線 | PR #33 |
+| 2026-09-03 | `design.md` 第七節施工項目全部結案；P1-7 隨 038 消滅 | 本次 |
