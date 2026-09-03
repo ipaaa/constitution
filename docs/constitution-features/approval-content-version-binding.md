@@ -2,7 +2,7 @@
 title: 核可綁定內容版本並在修改後退回重審
 status: design
 source: captain 2026-09-03
-started:
+started: 2026-09-03T19:46:08Z
 completed:
 verdict:
 score: 0.95
