@@ -265,3 +265,35 @@ TODO 現在把版本綁定列為多人編輯與下次正式同步的前置。IND
 
 repo 已完成內容版本綁定、fail-closed 同步與可復原的兩檔寫入。網站資料 shape、自動同步狀態與正式 SSOT 都未變更。
 Apps Script 與 Node parity、全部發布欄位及核可偽造 fixture 共 44 項通過。正式部署仍等待隔離表兩帳號 probe 與 captain 確認。
+
+## Stage Report: verify
+
+- FAILED: 獨立重跑與檢視 feature 040 的實作證據，確認 fingerprint-v1、三分頁投影、核可紀錄與 fail-closed 原子寫入符合設計，且網站資料 shape、自動同步與正式 SSOT 均未被改變。
+  44 tests、`npx tsc --noEmit`、`npm run build` 通過，`src/data`／`package.json`／`.github` 相對 implement 基線無 diff；但 AC-2、AC-4、AC-6 未成立，總 verdict 為 REJECTED。
+- DONE: 核對 Apps Script 權限與公式行為的事實主張、UNPROVEN 邊界及 placeholder 掃描；不得把未執行的兩帳號 probe 當成通過證據。
+  Google 官方文件支持 `userinfo.email`、`spreadsheets.currentonly`、直接傳入 cell/range 會重算、document lock 與 `flush()`；兩帳號 probe 明列未執行，`src/data/*.json` 對五類 placeholder 均 0 命中。
+- FAILED: 逐項判定六項 acceptance criteria，列出可重現證據與 PASSED 或 REJECTED verdict；文件影響必須符合實際交付狀態。
+  六項已逐項判定；三項 PASSED、三項 REJECTED，且 `approval-permission-probe.md` 正確未建立，但唯一現行規格仍保留互相衝突的操作指示。
+
+- DONE: AC-1 — PASSED。
+  `node --test tests/approval-content-version-binding.test.mjs` 逐一變更 29 個發布投影案例皆 exit 非零且兩個暫存輸出維持原 bytes；刪除任一投影或放寬比對會失敗。
+- FAILED: AC-2 — REJECTED（證據不足，不是行為失敗）。
+  VM 重跑顯示相異 fingerprint 回傳 `Needs review`，但規定的隔離表兩帳號 probe、表 ID hash 與 execution ID 均不存在，因此不得宣告通過。
+- DONE: AC-3 — PASSED。
+  fixture 對缺核可者、缺／錯時間、缺任一指紋、偽造決定及錯誤指紋均拒絕，只有完整相符紀錄通過；放寬任一必要條件會使測試失敗。
+- FAILED: AC-4 — REJECTED（證據不足，不是已觀察到身分豁免）。
+  Node fixture 可拒絕責任編輯修改後的舊 fingerprint，但沒有兩帳號表端證據可證公式對責任編輯本人亦重新計算；維持 UNPROVEN。
+- DONE: AC-5 — PASSED。
+  指紋單元測試逐一改八個審核欄位皆保持 fingerprint 不變；把任一審核欄位放入投影會使測試失敗。
+- FAILED: AC-6 — REJECTED。
+  `design.md:13-16` 指示讀第五節、`:230-231` 與 `:343` 仍教人直接改 `status`／只按 `status` 放行，雖 `:526` 起聲明取代；正常文件讀者仍會遇到互斥現行流程，違反「唯一現行規格」。
+
+- FAILED: Review finding — `APPROVAL_STATUS` 對無效曆日未完全 fail closed（Deferred risk；task-owned；未獲 FO fix 授權，candidate bytes 未改）。
+  VM 以 `2026-02-31T20:00:00.000Z` 重現 `Approved`；正常 Review 選單只寫 `toISOString()` 且 Node 嚴格拒絕，故目前無 supported-workflow 發布傷害；若允許直接編輯審核欄位或 UI 狀態本身成為發布承諾，提升為 Material。
+- DONE: Authoritative sources checked。
+  https://developers.google.com/apps-script/guides/sheets/functions、https://developers.google.com/apps-script/reference/base/session、https://developers.google.com/apps-script/reference/lock、https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet-app、https://developers.google.com/apps-script/reference/spreadsheet/protection。
+
+### Summary
+
+REJECTED。Repo-side fingerprint、三分頁投影、核可紀錄驗證、輸出復原、資料 shape 與 build 均由獨立重跑支持；正式 SSOT、自動同步與 shipped JSON 未改。
+兩帳號 probe 必須保持 UNPROVEN，且 AC-6 的互斥現行文件指示須經 FO 授權後回到 implement 修正；另保存無效曆日公式判斷為 deferred risk。
