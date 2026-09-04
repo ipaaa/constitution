@@ -1,6 +1,6 @@
 ---
 title: 核可綁定內容版本並在修改後退回重審
-status: implement
+status: verify
 source: captain 2026-09-03
 started: 2026-09-03T19:46:08Z
 completed:
@@ -357,3 +357,46 @@ REJECTED。Repo-side fingerprint、三分頁投影、核可紀錄驗證、輸出
 三項指派全部完成。`design.md` 改為純追加補述，讀者從導讀、第二節、第三節、第四節或第五節任一入口都會先看到「公式衍生 status ＋ 同步端指紋」才是現行規格。
 `APPROVAL_STATUS` 的曆日判斷補到與 Node 端同語意，AC-2／AC-4 改寫為 repo 端可重跑的驗證，隔離表兩帳號 probe 明確移交 feature 044。
 `node --test tests/approval-content-version-binding.test.mjs` 50 項通過、`npx tsc --noEmit` 通過；未執行 `npm run build` 或 `npm run sync-content`，`src/data/*.json` 與正式 SSOT 未動。
+
+## Stage Report: verify (cycle 2)
+
+- DONE: 獨立重跑並逐項判定改寫後的六項 acceptance criteria，特別是依 captain 2026-09-04 裁決改寫的 AC-2／AC-4（須是 repo 端可獨立重跑的驗證，不得以兩帳號 probe 為前提）與先前 REJECTED 的 AC-6；每項給可重現證據與 PASSED 或 REJECTED verdict。
+  `node --test tests/approval-content-version-binding.test.mjs` 50 項全通過；六項 AC 逐項判定並各以一次反向改動證明可失敗，改動全部還原（scripts／tests 的 sha256 與改動前相同）。
+- DONE: 查核 `docs/content-pipeline/design.md` 的更正確實是純追加補述、原句一字未改，且讀者從任一入口都會先讀到現行規格；確認 probe 檔未建立、文件未宣稱 probe 已執行。
+  `git diff --numstat 8b3c7ed..HEAD -- docs/content-pipeline/design.md` = `35 0`，diff 內無任何 `-` 開頭內容行；`ls docs/content-pipeline/` 只有三檔，probe 檔不存在；operations.md:79、design.md:575、AGENTS.md:29-30 均寫「尚未執行」「不得補造 probe 證據」。
+- DONE: 執行 placeholder 掃描並確認邊界未被越過。
+  `src/data/*.json` 對 `某學者`／`某大學法律系`／`test`（詞界）／`lorem ipsum`／`快速了解最新判決的5個重點` 各 0 命中；`git diff main..HEAD -- src/data package.json package-lock.json .github next.config.* src/app src/components` 為空；`npm run build` 前後兩個 JSON 的 sha256 相同（`4071978a…`、`4d1992e3…`）；`package.json` 的 `build` 仍只是 `next build`。
+
+- DONE: AC-1 — PASSED。
+  29 個「核可後改單一發布欄位」子測試全部 exit 非零且兩個輸出維持原 bytes；把 `review_decision !== 'Approved'` 條件停用後「偽造 Approved」子測試失敗（50→pass 48／fail 2）。另以人工比對確認 Node 與 `.gs` 的投影欄位與 design「發布欄位範圍」表逐欄相同。
+- DONE: AC-2 — PASSED。
+  `vm` 載入 `.gs` 後逐欄位改動，`CONTENT_FINGERPRINT` 均改變且 `APPROVAL_STATUS` 回 `Needs review`；把 `APPROVAL_STATUS` 的指紋相等比對改成「非空即可」，該測試連同三個 actor 子測試失敗（pass 45／fail 5）。此判定不依賴兩帳號 probe。
+- DONE: AC-3 — PASSED。
+  七類缺漏／偽造紀錄全部拒絕、唯一有效紀錄通過；反向改動證據同 AC-1。
+- DONE: AC-4 — PASSED。
+  只在 `APPROVAL_STATUS` 與 `validateApprovalBinding` 各加一行對 `managing-editor-id` 的豁免，僅 `managing-editor-id` 子測試失敗（pass 48／fail 2），證明測試真的在測身分豁免而非恆真。此判定不依賴兩帳號 probe。
+- DONE: AC-5 — PASSED。
+  八個審核欄位改值後指紋不變；把 `status` 加入 Track 1 投影後「每個發布欄位都會改變指紋，審核欄位不會」失敗（pass 35／fail 16）。
+- DONE: AC-6 — PASSED。
+  design.md 的補述位於導讀（:25）、第二節（:127）、第三節（:239）、第四節（:276）、第五節（:350），各在該節標題後第一段，早於該節所有舊 `status` 敘述；第一、六、七節不含被取代的核可規則。operations.md、tech-stack.md、contributing.md、AGENTS.md、INDEX.md 均已改為「公式衍生 status ＋ 同步端指紋」，無「只靠 `status = Approved` 放行」的敘述。
+
+- FAILED: Review finding F3 — 測試的欄位清單自我指涉，投影縮小時覆蓋率會靜默縮小（Deferred risk；task-owned；未獲 FO fix 授權，candidate bytes 未改，sha256 已驗證還原）。
+  觸發證據：同時把 `scripts/content-fingerprint.mjs` 與 `scripts/apps-script/approval-workflow.gs` 的 Track 1 投影移除 `'handwriting'`，`node --test` 得 `tests 49／pass 49／fail 0`（基準為 50／50／0）——測試以 `PUBLISHED_FIELDS[sheetKey]` 產生案例，欄位一旦離開投影，案例也一併消失。因此 AC-1 與 AC-2 所寫的「漏掉任一欄位（投影）會使測試失敗」只在單邊改動時成立（會被 parity 測試擋下），雙邊一致改動時不成立。
+  受影響 AC／邊界：AC-1、AC-2 的可失敗性敘述。已釋出使用者與正常流程：責任編輯核可後有人改該欄位、由人手動執行 `npm run sync-content` 並開 PR。可觀察傷害：目前為零——本輪已人工比對兩份投影與 design 表逐欄相同，現行行為正確。promote-to-material 條件：任何一次改動發布欄位投影（新增 SSOT 欄、改名、清理）出貨時，被移除欄位的核可後修改會沿用舊核可而無測試示警。
+  建議處置（advisory）：fix —— 在測試內以字面欄位清單斷言三個分頁的投影，把清單釘死在 design 表上。
+- FAILED: Review finding F4 — `docs/content-pipeline/data-collection-guide.md:16-18` 仍寫「經編輯台把 `status` 設為 `Approved` 之後，由同步程式產生…」（Deferred risk；非 040 task-owned）。
+  該檔狀態為 `evergreen`、最後查核 2026-09-03，敘述在 040 之後已不成立（無人能設定 `status`）。同節開頭已寫「流程見 `design.md`。本文件不重複記載。」，循連結進入者會先讀到 design.md 導讀補述，故無發布傷害。040 的 Documentation impact 明列本檔為「不更新」，且 main 上的 feature `041-correct-stale-pipeline-docs` 已承接本檔 `:23-24` 的同類過時敘述。建議處置（advisory）：decline for 040，並把本句追加進 041 的清單。
+- FAILED: Review finding F5 — `docs/health-check/TODO.md:313` 仍教人「把 `status` 改回 `Approved`」（Polish；非 040 task-owned）。
+  正式 SSOT 尚未部署新欄位與公式，因此該指示對「今天的試算表」仍正確；部署後即失效。建議處置（advisory）：hold，於正式 SSOT 部署時一併更正。
+- DONE: 邊界與交接查核。
+  `docs/constitution-features/044-approval-permission-two-account-probe.md` 確實存在於 `main`（commit `dc8ac40`，`status: design`，載明前置條件未到位不可 dispatch）；本分支 base 為 `aec222a`，早於 041–044 建立，故 `git diff main..HEAD` 顯示的四張票與 `2026-09-03-editor-onboarding.md`「刪除」是分支落後，不是本輪改動。
+- DONE: Surface 與 tolerance（陳述事實，非新 finding）。
+  `git diff --numstat 4503319..HEAD`（排除 entity 與 workflow state）= 12 檔／+985 −89／淨 +896，對 estimate `+500 ±40%`（上限 700）為 179%，超出上限 196 行。此數字與 cycle 1 相同，captain 於 2026-09-04 裁決方案 B 時未要求縮減。
+- DONE: 驗證指令與結果。
+  `node --test tests/approval-content-version-binding.test.mjs` → 50/50 pass；`npx tsc --noEmit` → exit 0；`npm run build` → exit 0 且 `src/data/*.json` sha256 不變。未執行 `npm run sync-content`。
+
+### Summary
+
+PASSED。六項 acceptance criteria 全部以 repo 端可獨立重跑的證據判定通過，AC-2 與 AC-4 依 captain 2026-09-04 裁決改寫後不再以兩帳號 probe 為前提，先前 REJECTED 的 AC-6 也已成立：design.md 為純追加 35 行、原句一字未改，五個入口各有一則位置在前的取代補述。
+`src/data`、正式 SSOT、自動同步狀態與網站資料 shape 均未因本輪修正而改變；placeholder 五類 0 命中；probe 檔未建立，文件一致宣告 probe 尚未執行並指向 feature 044（該票確實存在於 main）。
+記名三則 finding 待 FO 授權：F3 是本 task 自有的測試釘樁缺口（Deferred risk，建議 fix），F4／F5 屬 feature 041 與正式 SSOT 部署時的文件更正（建議 decline／hold）。三則皆未觸及 candidate bytes，反向改動後已以 sha256 驗證還原。
