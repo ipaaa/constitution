@@ -11,6 +11,17 @@ issue:
 pr:
 mod-block:
 id: 040
+gates:
+    version: 1
+    records:
+        - id: gate:040:verify
+          stage: verify
+          attempts:
+            - id: gate-attempt:040-verify-1
+              briefing:
+                id: briefing:040:verify:attempt-1:revision-1
+                digest: sha256:1bea6e99d4d347df3b6af0a61e964673b14d2e60c52514f616ed1e29f70f13bb
+                room-ref: '@review/verify/briefing-1'
 ---
 
 讓 SSOT 的核可結果綁定被核可的內容版本。核可後只要發布欄位被修改，該列必須顯示 `Needs review`，而且同步程式必須拒絕沿用舊核可。
