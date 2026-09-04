@@ -488,3 +488,28 @@ F6 的成因就是兩端對這個詞的理解不同，spec 原本沒有寫死它
 四項授權修正全部完成，四項都以「反向改動使測試失敗」證明有效，不是只看通過數。
 Node 與 Apps Script 現在對 Track 2 序號用同一個定義，只填 `reject_reason` 的列不再讓沒人動過的列被誤退回。
 `node --test tests/approval-content-version-binding.test.mjs` 52 項通過、`npx tsc --noEmit` 通過；未執行 `npm run build` 或 `npm run sync-content`，`src/data/*.json`、正式 SSOT 與網站資料 shape 未動。
+
+## Stage Report: review (cycle 2)
+
+- DONE: 重現本輪四項修正的可失敗性，不採信 implement 的自我回報：F6 把 Node 序號改回 `index + 1` 後迴歸測試必須失敗；F7 停用 `validateApprovalBinding` 後 `Track 1.year`／`Track 2.views`／`Track 2.vibe`／`site_tldr.0.order` 四項必須失敗；F3 雙邊一致移除 Track 1 投影的 `handwriting` 後必須有測試失敗。任一項無法重現即為 REJECTED。
+  四項全部重現。基準 52/52。F6 改回 `index + 1` → pass 51／fail 1，失敗的正是「Track 2 序號與 Apps Script 同語意」。F7 在 `validateApprovalBinding` 開頭插 `return;` → pass 9／fail 43，失敗清單逐字含 `Track 1_history.h1.year`、`Track 2_discussion.d1.views`、`Track 2_discussion.d1.vibe`、`site_tldr.0.order`（斷言 diff 顯示 stderr 只剩既有格式檢查訊息，證明新斷言真的在測指紋閘門）。F3 從 `content-fingerprint.mjs` 與 `approval-workflow.gs` 同時移除 `'handwriting'` → pass 47／fail 5。第四項 F8 無測試可掛：改以 `scripts/sync-content.mjs:371` 證實 `status` 值域確實已含 `Needs review`，且逐條核對〈檢查什麼〉其餘規則（year 4 碼、vibe 清單、sticky、order、`order 0` 須 Approved）在上述反向改動的 stderr 中確實仍會觸發，故補述的「其餘仍然成立」成立。
+  四次反向改動全在 `/private/tmp/.../scratchpad/rev3` 的副本上做，改完以 sha256 逐檔比對確認與 worktree 相同；worktree `git status` 全程乾淨。
+- DONE: 重新判定六項 acceptance criteria，特別是 cycle 2 被擋下的 AC-5——請自行構造「只改一個非發布欄位」的情境驗證不再產生無效退回，並確認 `## 發布欄位範圍` 新增的「非空資料列」定義與 Node、Apps Script 兩端實作三者一致。
+  六項全部成立，AC-5 由 REJECTED 轉 PASSED。自構情境 `scratchpad/ac5.mjs` 完全不依賴 `tests/`，六個場景：A 兩列已核可 exit 0；B 前置一列只填 `reject_reason` → exit 0 且 `discussions.json` 與 A 逐字相同；C 同一列夾在兩列中間 → 同上；D 已核可列自己帶 `reject_reason` → exit 0 且輸出相同；E 發布欄位全空卻偽造 `Approved` → exit 1，fail closed；F Track 1 前置同型空列 → exit 0 且輸出相同。同一支腳本在舊 `index + 1` 下 B 與 C 變成 exit 1、輸出不同，證明情境有鑑別力而非恆真。
+  AC-1／AC-3 由 F7 的停用閘門反向改動覆蓋（43 項失敗）。AC-2 把 `APPROVAL_STATUS` 的指紋相等比對改成「非空即可」→ pass 47／fail 5。AC-4 在 `APPROVAL_STATUS` 與 `validateApprovalBinding` 各加一行 `managing-editor-id` 豁免 → pass 50／fail 2，只有該 actor 子測試失敗。AC-6：五則補述位於 `design.md` 的 :25／:127／:239／:276／:354，各在該節所有舊 `status` 敘述之前（:217／:227 屬第二節，由 :127 覆蓋；:297／:324 屬第四節，由 :276 覆蓋；:379 屬第五節，由 :354 覆蓋）；`design.md` 相對 main 為 +61／−1，唯一刪除行是檔頭 `**最後修訂**` metadata。
+  「非空資料列」三者一致，以執行證明而非讀碼：`scratchpad/seq.mjs` 用 `node:vm` 載入 `.gs`，對同一組三列排列（只填 `reject_reason` 的空列、d1、d2）取得 Apps Script 公式端 `PUBLISHED_ROW_SEQUENCE` = 0／1／2、Node `publishedRowSequences` = 0／1／2，且選單端 `fingerprintForSheetRow_` 對 d1／d2 算出的指紋與 Node 逐字相同——重新核可能解開退回，F6 的「重新核可無法解除」已在兩端同時關閉。空列在兩端都擲錯，維持 fail closed。
+- DONE: 確認本輪未越界：`docs/content-pipeline/design.md` 的修改仍為追加補述且未改寫原句、`record` 文件未被改寫、`approval-permission-probe.md` 未建立、`src/data`／正式 SSOT／網站資料 shape 未變動；並複核 F4／F5 確實未被處理（依授權應維持 decline／hold）。
+  本輪 diff（`afa2cde..HEAD`）只動 6 個檔，程式與文件端僅 `design.md`、`sync-content.mjs`、測試三支。`design.md` 本輪改的是自己前一輪加的補述區塊，原文一句未動。`git diff --stat main...HEAD` 對 `2026-08-31-content-pipeline.md`、`docs/_archive/`、`architecture.md`、`design-system.md`、`README.md`、`src/`、`package.json` 全部為空。`ls docs/content-pipeline/` 僅三檔，probe 檔未建立。`npm run build` exit 0 且 `src/data/*.json` sha256 前後相同（`shasum -c` 兩檔 OK）、`npx tsc --noEmit` exit 0、未執行 `npm run sync-content`。
+  F4（`data-collection-guide.md:16-18`）該檔完全未進 diff，decline 維持。F5（`TODO.md:313`）該行原文仍在，`TODO.md` 的 diff 只落在 :639-660 的 P2-12 段，hold 維持。placeholder 五類在本輪 diff 0 命中（grep 命中全為 `test(` 與 `example.test` 網域）。
+
+### Review findings
+
+無新 finding。上一輪的 F6／F7／F3／F8 四項授權 fix 全部關閉，F4（decline for 040，併入 feature 041）與 F5（hold，待正式 SSOT 部署）依授權原樣帶出本 task。
+
+Surface 陳述事實、非 finding：12 檔／+1046 −89／淨 +957，對 estimate +500 ±40%（上限 700）為 191%，超出 257 行。與 cycle 2 判定相同——多出的四個文件檔本來就列在同一份 spec 的 `## Documentation impact` 實作後更新，只是沒進 `## Expected surface` 的檔案清單，屬 estimate 缺陷而非 scope creep，不建議因此退回。範圍調整屬 captain。
+
+### Summary
+
+PASSED。四項授權修正逐一以反向改動重現可失敗性，沒有一項是恆真或自我回報。AC-5 以獨立於 `tests/` 的六個 sync 級場景重新判定成立，且同一支腳本在舊程式下確實會失敗，證明判定有鑑別力。
+「非空資料列」的定義在 spec、Node、Apps Script 公式端與選單端四處一致，並以 `node:vm` 實跑取得同一組序號與同一份指紋，F6 原本「重新核可也解不開」的傷害在兩端同時關閉。
+越界檢查全部乾淨：`record` 文件與 `_archive` 未動、probe 檔未建立、`src/data` sha256 不變、網站資料 shape 未變、F4／F5 依授權未處理。build 與 tsc 皆 exit 0。建議進入交付。
