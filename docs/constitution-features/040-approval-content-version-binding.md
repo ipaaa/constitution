@@ -47,13 +47,13 @@ gates:
                 target-stage: review
                 state: consumed
 review-round:
-    id: round:040:verify:1
-    stage: verify
+    id: round:040:review:1
+    stage: review
     cycle: 1
     briefing:
-        id: briefing:040:verify:round-1
-        digest: sha256:209884edaecec1ecc9f6fafab02933498d161d4ea19b37e99036d7b35f452830
-        room-ref: '@review/verify/round-1'
+        id: briefing:040:review:round-1
+        digest: sha256:36704ba504e93b6ca48676b9653a9ac89c2e1abf2f7547280f5213a26e98c234
+        room-ref: '@review/review/round-1'
 ---
 
 讓 SSOT 的核可結果綁定被核可的內容版本。核可後只要發布欄位被修改，該列必須顯示 `Needs review`，而且同步程式必須拒絕沿用舊核可。
@@ -266,6 +266,7 @@ Verified by: repo 外部 review checklist 比對 `docs/content-pipeline/design.m
 ### Feedback Cycles
 
 - Cycle 1: REJECTED — verify；surface 12 檔／+896 淨行 vs estimate +500 ±40%（179%，超出上限 196 行）；AC changed（captain 2026-09-04 裁決方案 B：AC-2／AC-4 改寫為 repo 端可獨立驗證的範圍，隔離測試表兩帳號 probe 移交 feature 044）。F1 fix（Material：AC-6，design.md:13-16／:230-231／:343 仍教人直接改 status 或只按 status 放行，與 :526 起的取代聲明互斥）；F2 fix（Deferred risk：APPROVAL_STATUS 對無效曆日未 fail closed，VM 以 2026-02-31T20:00:00.000Z 重現 Approved，promote-to-material 條件為允許直接編輯審核欄位或 UI 狀態成為發布承諾）。F1／F2 已修並經反向驗證（改壞即失敗）；design.md 為純追加補述 34 行、原句未改；node --test 50 項通過、npx tsc --noEmit 通過；未執行 npm run build／sync-content，src/data 與正式 SSOT 未動。
+- Cycle 2: REJECTED — review；surface 12 檔／+957 淨行 vs estimate +500 ±40%（191%，超出上限 257 行；review 判定為 estimate 清單漏列文件所致，非 scope creep，不因此退回）；AC unchanged。F6 fix（Material：Track 2 序號在 Node 與 Apps Script 間語意分歧——`toRecords` 只濾「所有儲存格皆空」的列，`PUBLISHED_ROW_SEQUENCE` 只數「任一發布欄位非空」的列；只改 `reject_reason` 一個非發布欄位就讓另一列被無效退回，且重新核可無法解除，違反 AC-5 與 design「序號不使用試算表實體列號」）；F7 fix（Polish：AC-1 有四個子測試恆真，是被既有欄位格式檢查擋下而非指紋閘門）；F3 fix（Deferred risk：測試欄位清單自我指涉，本輪一併處理，feature 045 待封存為 superseded）；F8 fix（Polish：design.md:276 補述做了過寬保證）；F4 decline for 040（併入 feature 041）；F5 hold（待正式 SSOT 部署）。四項已修並各以反向改動證明可失敗（F6 改回 index+1 → fail 1；F7 停用閘門 → 該四項確實失敗；F3 雙邊移除欄位 → fail 5）；spec 補上「非空資料列」定義釘住 F6 根因；node --test 52 項通過、npx tsc --noEmit 通過。
 
 
 ## Out of scope
