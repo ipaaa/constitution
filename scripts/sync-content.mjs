@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { fingerprintPublishedRow, SHEET_KEYS } from './content-fingerprint.mjs';
+import { fingerprintPublishedRow, PUBLISHED_FIELDS, SHEET_KEYS } from './content-fingerprint.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -382,8 +382,25 @@ function isIsoUtc(value) {
   return parsed.toISOString() === (value.includes('.') ? value : value.replace('Z', '.000Z'));
 }
 
+/**
+ * Track 2 的指紋序號。
+ *
+ * 必須和 Apps Script 的 `PUBLISHED_ROW_SEQUENCE` 同語意：只數「任一發布欄位非空」的列。
+ * 不可改用 `toRecords` 的列序號 —— 那份序號連「只填 reject_reason」的列也算進去，
+ * 兩端就會對同一列算出不同序號，讓沒有人動過的列被誤判為需要重新核可。
+ */
+function publishedRowSequences(records, sheetKey) {
+  const fields = PUBLISHED_FIELDS[sheetKey];
+  let published = 0;
+  return records.map(record => {
+    if (fields.some(field => (record[field] || '').trim() !== '')) published++;
+    return published;
+  });
+}
+
 /** 已核可列必須帶有完整紀錄，且三份指紋都等於 Node 依目前內容重算的值。 */
 function validateApprovalBinding(records, sheetKey, group, errors, keyField = 'id') {
+  const sequences = sheetKey === SHEET_KEYS.TRACK_2 ? publishedRowSequences(records, sheetKey) : null;
   records.forEach((record, index) => {
     if (!isApproved(record)) return;
     const key = rowKey(record, keyField);
@@ -399,7 +416,7 @@ function validateApprovalBinding(records, sheetKey, group, errors, keyField = 'i
     }
     let expected;
     try {
-      expected = fingerprintPublishedRow(sheetKey, record, sheetKey === SHEET_KEYS.TRACK_2 ? index + 1 : undefined);
+      expected = fingerprintPublishedRow(sheetKey, record, sequences ? sequences[index] : undefined);
     } catch (error) {
       addError(errors, group, key, `無法計算內容指紋：${error.message}`);
       return;

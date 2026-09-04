@@ -29,6 +29,15 @@ const TRACK_2 = {
   link: 'https://example.test/d1', views: '0012', owl_comment: '短評', owl_depth_comment: '深評',
   vibe: '🔥 公民必讀', sticky: '', full_content: '全文',
 };
+// 逐字抄自 docs/content-pipeline/design.md 的「發布欄位範圍」表。
+// 這份清單是設計的複本，不是從 scripts/ 匯入的衍生值：兩端一致地刪掉某個欄位時，
+// 下面依這份清單逐欄位驗證的測試就會失敗。改動這份清單前，先改 design.md。
+const DESIGN_PROJECTION = Object.freeze({
+  track1: Object.freeze(['id', 'category', 'chapter', 'content', 'handwriting', 'year', 'title', 'ruling', 'ruling_id', 'image_url']),
+  track2: Object.freeze(['id', 'category', 'title', 'author', 'year', 'abstract', 'link', 'views', 'owl_comment', 'owl_depth_comment', 'vibe', 'sticky', 'full_content']),
+  tldrHeading: Object.freeze(['order', 'text', 'link']),
+  tldrPoint: Object.freeze(['order', 'label', 'text']),
+});
 const TLDR_HEADING = { order: '0', label: '', text: '摘要標題', link: 'https://example.test/tldr' };
 const TLDR_POINT = { order: '1', label: '重點', text: '重點內容', link: '' };
 
@@ -107,6 +116,17 @@ async function runSync(fixtures) {
   return { ...result, output, root };
 }
 
+test('三個分頁的指紋投影與 design.md 的發布欄位範圍表逐字相同', () => {
+  assert.deepEqual([...PUBLISHED_FIELDS[SHEET_KEYS.TRACK_1]], [...DESIGN_PROJECTION.track1]);
+  assert.deepEqual([...PUBLISHED_FIELDS[SHEET_KEYS.TRACK_2]], [...DESIGN_PROJECTION.track2]);
+  const projected = (sheetKey, record, sequence) =>
+    JSON.parse(fingerprintPayload(sheetKey, record, sequence))[2].map(([field]) => field);
+  assert.deepEqual(projected(SHEET_KEYS.TRACK_1, TRACK_1), [...DESIGN_PROJECTION.track1]);
+  assert.deepEqual(projected(SHEET_KEYS.TRACK_2, TRACK_2, 1), [...DESIGN_PROJECTION.track2, '__sequence']);
+  assert.deepEqual(projected(SHEET_KEYS.SITE_TLDR, TLDR_HEADING), [...DESIGN_PROJECTION.tldrHeading]);
+  assert.deepEqual(projected(SHEET_KEYS.SITE_TLDR, TLDR_POINT), [...DESIGN_PROJECTION.tldrPoint]);
+});
+
 test('fingerprint-v1 正規化 NFC、換行、trim、sticky、views 與 order', () => {
   const composed = { ...TRACK_2, title: ' café\r\n', sticky: '', views: '0012' };
   const decomposed = { ...TRACK_2, title: 'cafe\u0301\n', sticky: 'FALSE', views: '12' };
@@ -167,12 +187,12 @@ test('APPROVAL_STATUS 只對真實曆日的完整紀錄顯示 Approved', () => {
 });
 
 test('每個發布欄位都會改變指紋，審核欄位不會', () => {
-  for (const [sheetKey, record, sequence] of [
-    [SHEET_KEYS.TRACK_1, TRACK_1, undefined],
-    [SHEET_KEYS.TRACK_2, TRACK_2, 1],
+  for (const [sheetKey, record, sequence, fields] of [
+    [SHEET_KEYS.TRACK_1, TRACK_1, undefined, DESIGN_PROJECTION.track1],
+    [SHEET_KEYS.TRACK_2, TRACK_2, 1, DESIGN_PROJECTION.track2],
   ]) {
     const baseline = fingerprintPublishedRow(sheetKey, record, sequence);
-    for (const field of PUBLISHED_FIELDS[sheetKey]) {
+    for (const field of fields) {
       const changed = {
         ...record,
         [field]: field === 'sticky' ? 'true' : field === 'views' ? '13' : `${record[field] || ''}x`,
@@ -184,7 +204,7 @@ test('每個發布欄位都會改變指紋，審核欄位不會', () => {
     }
   }
   for (const record of [TLDR_HEADING, TLDR_POINT]) {
-    const fields = record.order === '0' ? ['order', 'text', 'link'] : ['order', 'label', 'text'];
+    const fields = record.order === '0' ? DESIGN_PROJECTION.tldrHeading : DESIGN_PROJECTION.tldrPoint;
     const baseline = fingerprintPublishedRow(SHEET_KEYS.SITE_TLDR, record);
     for (const field of fields) {
       const value = field === 'order' ? (record.order === '0' ? '2' : '3') : `${record[field]}x`;
@@ -204,10 +224,10 @@ test('有效核可維持網站 JSON shape，Track 2 保留來源順序', async (
 
 test('核可後逐一修改每個發布欄位都非零退出，且兩個輸出全不寫', async t => {
   const cases = [
-    [SHEET_KEYS.TRACK_1, TRACK_1, PUBLISHED_FIELDS[SHEET_KEYS.TRACK_1]],
-    [SHEET_KEYS.TRACK_2, TRACK_2, PUBLISHED_FIELDS[SHEET_KEYS.TRACK_2]],
-    [SHEET_KEYS.SITE_TLDR, TLDR_HEADING, ['order', 'text', 'link']],
-    [SHEET_KEYS.SITE_TLDR, TLDR_POINT, ['order', 'label', 'text']],
+    [SHEET_KEYS.TRACK_1, TRACK_1, DESIGN_PROJECTION.track1],
+    [SHEET_KEYS.TRACK_2, TRACK_2, DESIGN_PROJECTION.track2],
+    [SHEET_KEYS.SITE_TLDR, TLDR_HEADING, DESIGN_PROJECTION.tldrHeading],
+    [SHEET_KEYS.SITE_TLDR, TLDR_POINT, DESIGN_PROJECTION.tldrPoint],
   ];
   for (const [sheetKey, record, fields] of cases) {
     for (const field of fields) await t.test(`${sheetKey}.${record.order ?? record.id}.${field}`, async () => {
@@ -219,6 +239,8 @@ test('核可後逐一修改每個發布欄位都非零退出，且兩個輸出�
           : { site: record.order === '0' ? [changed, approve(sheetKey, TLDR_POINT)] : [approve(sheetKey, TLDR_HEADING), changed] };
       const result = await runSync(fixtureCsv(overrides));
       assert.notEqual(result.code, 0);
+      // 必須是指紋閘門擋下的，不是既有欄位格式檢查順手擋下的。
+      assert.match(result.stderr, /與目前發布內容不符|無法計算內容指紋/);
       assert.equal(fs.readFileSync(path.join(result.output, 'history.json'), 'utf8'), 'history-before');
       assert.equal(fs.readFileSync(path.join(result.output, 'discussions.json'), 'utf8'), 'discussions-before');
     });
@@ -257,10 +279,10 @@ test('核可後逐一修改每個發布欄位，衍生 status 都變成 Needs re
   const { CONTENT_FINGERPRINT, APPROVAL_STATUS } = loadAppsScript();
   const approvedAt = '2026-09-03T20:00:00.000Z';
   const cases = [
-    [SHEET_KEYS.TRACK_1, TRACK_1, PUBLISHED_FIELDS[SHEET_KEYS.TRACK_1], undefined],
-    [SHEET_KEYS.TRACK_2, TRACK_2, PUBLISHED_FIELDS[SHEET_KEYS.TRACK_2], 1],
-    [SHEET_KEYS.SITE_TLDR, TLDR_HEADING, ['order', 'text', 'link'], undefined],
-    [SHEET_KEYS.SITE_TLDR, TLDR_POINT, ['order', 'label', 'text'], undefined],
+    [SHEET_KEYS.TRACK_1, TRACK_1, DESIGN_PROJECTION.track1, undefined],
+    [SHEET_KEYS.TRACK_2, TRACK_2, DESIGN_PROJECTION.track2, 1],
+    [SHEET_KEYS.SITE_TLDR, TLDR_HEADING, DESIGN_PROJECTION.tldrHeading, undefined],
+    [SHEET_KEYS.SITE_TLDR, TLDR_POINT, DESIGN_PROJECTION.tldrPoint, undefined],
   ];
   for (const [sheetKey, record, fields, sequence] of cases) {
     const snapshot = CONTENT_FINGERPRINT(sheetKey, ...gsArgs(sheetKey, record, sequence));
@@ -294,6 +316,24 @@ test('放行判斷不依操作者身分：三種 approved_by 都擋下核可後�
       assert.match(result.stderr, /fingerprint|指紋/);
     });
   }
+});
+
+test('Track 2 序號與 Apps Script 同語意：只填 reject_reason 的列不佔序號', async () => {
+  const retired = { reject_reason: '內容已下架' };
+  const approved = approve(SHEET_KEYS.TRACK_2, TRACK_2, 1);
+  const { PUBLISHED_ROW_SEQUENCE } = loadAppsScript();
+  // 試算表端：d1 之前那列的發布欄位全空，所以 d1 的序號仍是 1。
+  const columns = DESIGN_PROJECTION.track2.map(field => [retired[field] ?? '', TRACK_2[field]]);
+  assert.equal(PUBLISHED_ROW_SEQUENCE(...columns), 1);
+  // Node 端必須算出同一個序號，否則沒有人動過的 d1 會被誤判為需要重新核可。
+  const baseline = await runSync(fixtureCsv({ track2: [approved] }));
+  assert.equal(baseline.code, 0, baseline.stderr);
+  const withRetiredRow = await runSync(fixtureCsv({ track2: [retired, approved] }));
+  assert.equal(withRetiredRow.code, 0, withRetiredRow.stderr);
+  assert.equal(
+    fs.readFileSync(path.join(withRetiredRow.output, 'discussions.json'), 'utf8'),
+    fs.readFileSync(path.join(baseline.output, 'discussions.json'), 'utf8'),
+  );
 });
 
 test('原子寫入在第二個 rename 失敗時復原第一個檔案', async () => {
