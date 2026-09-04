@@ -323,3 +323,27 @@ Apps Script 與 Node parity、全部發布欄位及核可偽造 fixture 共 44 �
 
 REJECTED。Repo-side fingerprint、三分頁投影、核可紀錄驗證、輸出復原、資料 shape 與 build 均由獨立重跑支持；正式 SSOT、自動同步與 shipped JSON 未改。
 兩帳號 probe 必須保持 UNPROVEN，且 AC-6 的互斥現行文件指示須經 FO 授權後回到 implement 修正；另保存無效曆日公式判斷為 deferred risk。
+
+## Stage Report: implement (cycle 2)
+
+- DONE: `docs/content-pipeline/design.md` 不再有與 040 新規則互斥的現行操作指示：`:13-16` 的導讀指向、`:230-231` 與 `:343` 教人直接改 `status`／只按 `status` 放行的敘述，都必須讓讀者從任一入口進入都只會得到「公式衍生 status ＋ 同步端指紋」這一套現行規格；依 AGENTS.md 與 design.md:437 以追加補述保留原句脈絡，不得悄悄改寫原文。
+  commit `093cd01`：導讀新增「現在怎麼核可」指向與取代警告，第二、三、四、五節各加一則 2026-09-04 補述；`git diff` 顯示 design.md 為純新增 34 行，原句一字未改。
+- DONE: `APPROVAL_STATUS` 對無效曆日 fail closed：`2026-02-31T20:00:00.000Z` 之類不存在的日期不得產生 `Approved`，且新增的測試在放寬該條件時會失敗。
+  新增 `isApprovalIsoUtc_()` 往返比對 `toISOString()`，與 Node 的 `isIsoUtc` 同語意；測試「APPROVAL_STATUS 只對真實曆日的完整紀錄顯示 Approved」斷言 2026-02-31、2026-04-31、2026-13-01、25 時、非 ISO 與空字串皆回 `Needs review`，把往返比對改成 `return true` 後該測試失敗（實測 pass 44／fail 1）。
+- DONE: AC-2 與 AC-4 依 captain 2026-09-04 裁決重寫為 040 在 repo 端可獨立驗證的範圍，並在 Out of scope 指向 feature 044 承接隔離測試表兩帳號 probe；不得宣稱 probe 已執行，`docs/content-pipeline/approval-permission-probe.md` 仍不得建立。
+  AC-2 改以 vm 載入 `.gs` 逐欄位驗證衍生狀態，AC-4 改為「放行判斷不依身分」；Out of scope、Test plan、Documentation impact、operations.md、TODO.md P2-12 均指向 feature 044；`ls docs/content-pipeline/` 確認只有三個檔，probe 檔未建立。
+- SKIPPED: 執行隔離試算表兩帳號 probe。
+  captain 2026-09-04 裁決移出本 feature；trigger 寫入路徑維持 `UNPROVEN`，未偽造 execution ID。
+- SKIPPED: 執行 `npm run build`。
+  修正封包邊界明令禁止；改以 `npx tsc --noEmit` 驗證，通過。
+
+### 新測試的可失敗性
+
+- 「核可後逐一修改每個發布欄位，衍生 status 都變成 Needs review」：把 `APPROVAL_STATUS` 的指紋相等比對改成「非空即可」，該測試失敗。
+- 「放行判斷不依操作者身分」：只在 `validateApprovalBinding` 加一行 `approved_by === 'managing-editor-id'` 就 return，僅該 actor 子測試失敗（實測 pass 48／fail 2），證明它真的在測身分豁免。
+
+### Summary
+
+三項指派全部完成。`design.md` 改為純追加補述，讀者從導讀、第二節、第三節、第四節或第五節任一入口都會先看到「公式衍生 status ＋ 同步端指紋」才是現行規格。
+`APPROVAL_STATUS` 的曆日判斷補到與 Node 端同語意，AC-2／AC-4 改寫為 repo 端可重跑的驗證，隔離表兩帳號 probe 明確移交 feature 044。
+`node --test tests/approval-content-version-binding.test.mjs` 50 項通過、`npx tsc --noEmit` 通過；未執行 `npm run build` 或 `npm run sync-content`，`src/data/*.json` 與正式 SSOT 未動。
