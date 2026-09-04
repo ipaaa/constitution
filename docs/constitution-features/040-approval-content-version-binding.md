@@ -30,6 +30,14 @@ gates:
                 at: "2026-09-04T18:52:46.818197Z"
                 decision: revise
                 reason: AC-6 未成立：design.md:230-231 與 :343 仍教人直接改 status／只按 status 放行，與 :526 起的取代聲明互斥，正常讀者先撞上舊流程，違反『唯一現行規格』。captain 於 2026-09-04 裁決方案 B：AC-2／AC-4 所需的兩帳號隔離表 probe 移出本 feature 另行開票，040 以 repo 端 fail-closed 同步閘門先落地。退回 implement：(1) 清除 design.md 互斥現行指示；(2) 依 FO 授權 fix 修正 APPROVAL_STATUS 無效曆日未 fail closed；(3) 依裁決重寫 AC-2／AC-4 範圍。
+review-round:
+    id: round:040:verify:1
+    stage: verify
+    cycle: 1
+    briefing:
+        id: briefing:040:verify:round-1
+        digest: sha256:209884edaecec1ecc9f6fafab02933498d161d4ea19b37e99036d7b35f452830
+        room-ref: '@review/verify/round-1'
 ---
 
 讓 SSOT 的核可結果綁定被核可的內容版本。核可後只要發布欄位被修改，該列必須顯示 `Needs review`，而且同步程式必須拒絕沿用舊核可。
@@ -238,6 +246,8 @@ Verified by: repo 外部 review checklist 比對 `docs/content-pipeline/design.m
 - `docs/constitution-features/README.md`：workflow 規格不因單一 feature 改變。
 
 ### Feedback Cycles
+
+- Cycle 1: REJECTED — verify；surface 12 檔／+896 淨行 vs estimate +500 ±40%（179%，超出上限 196 行）；AC changed（captain 2026-09-04 裁決方案 B：AC-2／AC-4 改寫為 repo 端可獨立驗證的範圍，隔離測試表兩帳號 probe 移交 feature 044）。F1 fix（Material：AC-6，design.md:13-16／:230-231／:343 仍教人直接改 status 或只按 status 放行，與 :526 起的取代聲明互斥）；F2 fix（Deferred risk：APPROVAL_STATUS 對無效曆日未 fail closed，VM 以 2026-02-31T20:00:00.000Z 重現 Approved，promote-to-material 條件為允許直接編輯審核欄位或 UI 狀態成為發布承諾）。F1／F2 已修並經反向驗證（改壞即失敗）；design.md 為純追加補述 34 行、原句未改；node --test 50 項通過、npx tsc --noEmit 通過；未執行 npm run build／sync-content，src/data 與正式 SSOT 未動。
 
 
 ## Out of scope
