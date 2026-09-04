@@ -1,6 +1,6 @@
 ---
 title: 核可綁定內容版本並在修改後退回重審
-status: verify
+status: implement
 source: captain 2026-09-03
 started: 2026-09-03T19:46:08Z
 completed:
@@ -22,6 +22,14 @@ gates:
                 id: briefing:040:verify:attempt-1:revision-1
                 digest: sha256:1bea6e99d4d347df3b6af0a61e964673b14d2e60c52514f616ed1e29f70f13bb
                 room-ref: '@review/verify/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:040:verify:1
+                briefing: briefing:040:verify:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-04T18:52:46.818197Z"
+                decision: revise
+                reason: AC-6 未成立：design.md:230-231 與 :343 仍教人直接改 status／只按 status 放行，與 :526 起的取代聲明互斥，正常讀者先撞上舊流程，違反『唯一現行規格』。captain 於 2026-09-04 裁決方案 B：AC-2／AC-4 所需的兩帳號隔離表 probe 移出本 feature 另行開票，040 以 repo 端 fail-closed 同步閘門先落地。退回 implement：(1) 清除 design.md 互斥現行指示；(2) 依 FO 授權 fix 修正 APPROVAL_STATUS 無效曆日未 fail closed；(3) 依裁決重寫 AC-2／AC-4 範圍。
 ---
 
 讓 SSOT 的核可結果綁定被核可的內容版本。核可後只要發布欄位被修改，該列必須顯示 `Needs review`，而且同步程式必須拒絕沿用舊核可。
