@@ -1,0 +1,31 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:040:review:attempt-1:revision-1",
+  "question": "review cycle 2 判 PASSED、無新 finding。是否核可 040 進入 complete（terminal）並開始交付？注意：核可即進入合併儀式，而正式 SSOT 的八欄建置為合併硬前置。",
+  "artifacts": [
+    {
+      "id": "artifact:040:review:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/0bc7ff46ffcdc5cf82cddc61b191476f766b941d/docs/constitution-features/040-approval-content-version-binding.md",
+      "rev": "sha256:4a6cf14f4b93ad604416afae7aa18d6d6657c41a89663a14bea9ed33ce131991",
+      "mediaType": "text/markdown",
+      "summary": "四項授權修正逐一以反向改動重現可失敗性；AC-5 由 REJECTED 轉 PASSED，以獨立於 tests/ 的六個 sync 級場景判定，同一腳本在舊程式下確實失敗。「非空資料列」定義在 spec、Node、Apps Script 公式端與選單端四處一致，並以 node:vm 實跑取得同一組序號與指紋。越界檢查全乾淨。Surface 12 檔／+957 淨行為 estimate 的 191%，review 判定為 estimate 清單缺陷而非 scope creep，範圍調整屬 captain。"
+    }
+  ],
+  "context": [
+    {
+      "type": "Reference",
+      "id": "reference:040:review:attempt-1:revision-1:item-2",
+      "uri": "git-root://main/c7e773b72f442c031e4dd7b9c7d887628668ea72/docs/constitution-features/045-pin-published-field-projection-tests.md",
+      "mediaType": "text/markdown",
+      "rev": "sha256:ee115c838da211945ebe57b3494e82045e7d3780c25e2a7670a9b21f7a5d6e12"
+    },
+    {
+      "type": "Reference",
+      "id": "reference:040:review:attempt-1:revision-1:item-3",
+      "uri": "git-root://main/c7e773b72f442c031e4dd7b9c7d887628668ea72/docs/constitution-features/044-approval-permission-two-account-probe.md",
+      "mediaType": "text/markdown",
+      "rev": "sha256:54be6e45010654440ed8447b47e0e7b41d18e4fc304cb38ef159c0e0ffc0b1e1"
+    }
+  ]
+}

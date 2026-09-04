@@ -46,6 +46,14 @@ gates:
               application:
                 target-stage: review
                 state: consumed
+        - id: gate:040:review
+          stage: review
+          attempts:
+            - id: gate-attempt:040-review-1
+              briefing:
+                id: briefing:040:review:attempt-1:revision-1
+                digest: sha256:10b398c70afa8f3fc0d2273bccbf28452e7da80fd4504e9022dd4a423e531549
+                room-ref: '@review/review/briefing-1'
 review-round:
     id: round:040:review:1
     stage: review
