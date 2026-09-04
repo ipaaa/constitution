@@ -463,3 +463,27 @@ PASSED。六項 acceptance criteria 全部以 repo 端可獨立重跑的證據�
 REJECTED。六項 AC 中五項以獨立反向改動證實成立，AC-5 不成立：F6 以 A／B 對照重現「只改 `reject_reason` 一個非發布欄位，就讓另一列被無效退回，且重新核可無法解除」，這正是 AC-5 與 design 序號設計明文要防的失效模式，且既有測試因為只驗指紋函式而看不到它。
 其餘查核全部通過——文件影響九筆到位、`record` 文件未改寫、INDEX 與實際增刪一致、build／tsc 無回歸、`src/data` 與網站資料 shape 未動、probe 檔未建立。
 Surface 179% 判定為 estimate 清單漏列文件所致，非 scope creep，不建議因此退回。F6 建議 fix（Material，數行），F7／F3／F8 建議一併 fix（Polish／Deferred risk），F4／F5 沿用 verify 的 decline／hold。所有 finding 均未觸及 candidate bytes，反向改動全在 repo 外副本進行。
+
+## Stage Report: implement (cycle 3)
+
+- DONE: F6：把 Node 端產生 Track 2 序號的列篩選改為與 `PUBLISHED_ROW_SEQUENCE` 同語意（只數「任一發布欄位非空」的列），並補一項 sync 級迴歸測試，其唯一變因是非發布欄位（例如只填 `reject_reason`）；該測試在兩端序號語意不一致時必須失敗。
+  commit `35b015f` 新增 `publishedRowSequences()`，`validateApprovalBinding` 改用它取代 `index + 1`；測試「Track 2 序號與 Apps Script 同語意」先斷言 `PUBLISHED_ROW_SEQUENCE` 對該排列給 1，再比對「多一列只填 `reject_reason`」前後 `discussions.json` 逐字相同；把 Node 改回 `index + 1` 後該測試失敗（實測 pass 51／fail 1）。
+- DONE: F7：AC-1 的四個恆真子測試（`Track 1.year`、`Track 2.views`、`Track 2.vibe`、`site_tldr.0.order`）改為真的由指紋閘門擋下——加 stderr 比對，或改用不觸發既有欄位格式檢查的變更值；停用指紋閘門後這四項必須失敗。
+  29 個子測試一律加 `assert.match(result.stderr, /與目前發布內容不符|無法計算內容指紋/)`，兩個訊息都只由 `validateApprovalBinding` 產生；把該函式改成立即 return 後，`Track 1_history.h1.year`、`Track 2_discussion.d1.views`、`Track 2_discussion.d1.vibe`、`site_tldr.0.order` 四項確實失敗（實測 pass 9／fail 43）。
+- DONE: F3 與 F8 一併修正：測試內以字面欄位清單斷言三個分頁的投影並釘在 design 表上（雙邊一致移除欄位時必須有測試失敗）；修正 `docs/content-pipeline/design.md:276` 補述的過寬保證，使其不再宣稱同節 `:293` 的 status 值域檢查規則仍然成立。
+  測試新增逐字抄自 design 表的 `DESIGN_PROJECTION`，並以 `fingerprintPayload` 解出實際投影欄名比對；四個逐欄位迴圈改吃這份字面清單。雙邊一致移除 `handwriting` 後 5 項測試失敗（實測 pass 47／fail 5），先前同一改動是 49 全過。design.md 第四節補述改為逐條指名：`status` 值域那條已失效（現行多一個 `Needs review` 且由公式產生），其餘仍成立。
+- SKIPPED: F4（`data-collection-guide.md:16-18`）與 F5（`TODO.md:313`）。
+  修正封包分別標為 decline for 040（併入 feature 041）與 hold（正式 SSOT 部署時處理），本輪不處理。
+- SKIPPED: 執行隔離試算表兩帳號 probe 與 `npm run build`。
+  probe 已由 captain 裁決移交 feature 044；`npm run build` 由 stage definition 禁止，改以 `npx tsc --noEmit` 驗證，通過。
+
+### 一併釘住的設計定義
+
+`## 發布欄位範圍` 補上「非空資料列」的定義：任一發布欄位非空的列，只填審核欄位的列不佔序號。
+F6 的成因就是兩端對這個詞的理解不同，spec 原本沒有寫死它。此段只補定義，未改變已核可的行為或範圍。
+
+### Summary
+
+四項授權修正全部完成，四項都以「反向改動使測試失敗」證明有效，不是只看通過數。
+Node 與 Apps Script 現在對 Track 2 序號用同一個定義，只填 `reject_reason` 的列不再讓沒人動過的列被誤退回。
+`node --test tests/approval-content-version-binding.test.mjs` 52 項通過、`npx tsc --noEmit` 通過；未執行 `npm run build` 或 `npm run sync-content`，`src/data/*.json`、正式 SSOT 與網站資料 shape 未動。
