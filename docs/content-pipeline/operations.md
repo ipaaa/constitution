@@ -74,3 +74,6 @@ npm run build
 
 兩帳號 probe 仍須在隔離表執行。證據要記錄測試表 ID 雜湊、UTC 時間、兩個角色、
 步驟、結果與 Apps Script execution ID。不要記錄 email 或正式 SSOT URL。
+
+**補述（2026-09-04）**：兩帳號 probe 由 feature `044-approval-permission-two-account-probe` 承接，
+不在 feature 040 範圍內。probe 尚未執行。

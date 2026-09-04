@@ -182,14 +182,16 @@ Semantics this may change: SSOT 核可操作、`status` 來源、允許狀態、
 **AC-1 — 核可後的發布內容不可在未重新核可時通過同步。**
 Verified by: `tests/approval-content-version-binding.test.mjs` 先核可 fixture，再逐一修改上表每個發布欄位。每次都要得到非零退出碼，且 `src/data/*.json` 的 sha256 不變。漏掉任一欄位會使測試失敗。
 
-**AC-2 — 核可後修改發布欄位會顯示 `Needs review`。**
-Verified by: 隔離測試表的兩帳號 probe 逐一修改發布欄位。`status` 必須變為 `Needs review`，且 `approved_*` 不變。刪除狀態公式或漏掉欄位會使 probe 失敗。證據寫入 `docs/content-pipeline/approval-permission-probe.md`。
+**AC-2 — 核可後修改發布欄位會使衍生 `status` 變成 `Needs review`。**
+Verified by: `tests/approval-content-version-binding.test.mjs` 以 `node:vm` 載入 `scripts/apps-script/approval-workflow.gs`，逐一修改三個分頁的每個發布欄位。每次都要求 `CONTENT_FINGERPRINT` 改變，且 `APPROVAL_STATUS` 在核可快照三欄不變的情況下回傳 `Needs review`。漏掉任一欄位投影，或讓 `APPROVAL_STATUS` 不比對指紋，測試就會失敗。
+範圍：本 AC 只驗證 repo 內的公式邏輯。實際 Google 試算表上的兩帳號行為由 feature `044-approval-permission-two-account-probe` 承接（captain 2026-09-04 裁決）。
 
 **AC-3 — 只有完整且與目前內容相符的核可紀錄可以發布。**
 Verified by: `tests/approval-content-version-binding.test.mjs` 測試缺少核可者、時間、任一指紋、偽造 `Approved`、錯誤指紋及有效紀錄。前六類被拒絕，只有有效紀錄通過。放寬任一必要條件會使測試失敗。
 
-**AC-4 — 責任編輯自行修改內容也必須重新核可。**
-Verified by: `docs/content-pipeline/approval-permission-probe.md` 記錄責任編輯修改已核可列。公式必須顯示 `Needs review`。同一列匯出的 CSV fixture 必須被 Node 測試拒絕。若依操作者身分豁免，兩項驗證至少一項失敗。
+**AC-4 — 放行判斷不因操作者身分而豁免。**
+Verified by: `tests/approval-content-version-binding.test.mjs` 以三個不同的 `approved_by`（投稿者、責任編輯、與核可者同一人）重跑「核可後修改內容」案例。三者都必須讓 `APPROVAL_STATUS` 回傳 `Needs review`，且同步以非零退出碼中止。若任一段程式依 `approved_by` 放寬條件，對應案例會通過而使測試失敗。
+範圍：本 AC 只驗證 repo 內的判斷邏輯不讀取身分。責任編輯以自己帳號在正式試算表編輯時的端到端行為由 feature `044-approval-permission-two-account-probe` 承接（captain 2026-09-04 裁決）。
 
 **AC-5 — 非發布欄位變動不會造成無效退回。**
 Verified by: `tests/approval-content-version-binding.test.mjs` 分別修改 `review_decision`、`approved_*` 與 `reject_reason`，確認內容指紋不變。把任一審核欄位納入投影會使測試失敗。
@@ -205,6 +207,8 @@ Verified by: repo 外部 review checklist 比對 `docs/content-pipeline/design.m
 
 隔離試算表 probe 覆蓋投稿者、責任編輯、核可、拒絕、內容修改及非發布欄位修改。probe 必須記錄測試表 ID 的雜湊、時間、兩個角色、步驟、結果與 Apps Script execution ID。不得記錄帳號 email 或正式 SSOT URL。
 
+**補述（2026-09-04，captain 裁決）**：上一段的 probe 移出本 feature，由 feature `044-approval-permission-two-account-probe` 承接。本 feature 只交付 repo 端可獨立重跑的驗證。probe 尚未執行，`docs/content-pipeline/approval-permission-probe.md` 仍不得建立。
+
 ## Documentation impact
 
 ### 現在更新
@@ -218,6 +222,7 @@ Verified by: repo 外部 review checklist 比對 `docs/content-pipeline/design.m
 
 - `docs/content-pipeline/operations.md`：記錄核可、拒絕、重審、同步錯誤與復原步驟。
 - `docs/content-pipeline/approval-permission-probe.md`：新增隔離表端到端證據。狀態為 `record`。
+  **補述（2026-09-04）**：本項改由 feature `044-approval-permission-two-account-probe` 負責。本 feature 不建立此檔。
 - `docs/project/tech-stack.md`：移除過時資料流警告，改寫為已實作的試算表、指紋、同步與 JSON 流程。
 - `docs/project/contributing.md`：更新內容協作與重新核可流程。
 - `AGENTS.md`：更新 agent 可用的產線驗證指令、禁止事項與正式 SSOT 邊界。
@@ -238,6 +243,8 @@ Verified by: repo 外部 review checklist 比對 `docs/content-pipeline/design.m
 ## Out of scope
 
 不處理既有內容的法律正確性。不恢復自動部署同步。不取消 PR diff 與預覽核可。不上線正式 SSOT 設定，直到隔離測試表完成驗證並由 captain 確認。
+
+隔離測試表的兩帳號 probe 不在本 feature 範圍。captain 於 2026-09-04 裁決：現有條件（無測試表、無兩個 Google 帳號、禁止觸碰正式 SSOT）下 worker 無法完成該驗證，改由 feature `044-approval-permission-two-account-probe` 承接。受保護欄位的 trigger 寫入路徑維持 `UNPROVEN`。
 
 ## Stage Report: design
 

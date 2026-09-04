@@ -33,6 +33,14 @@ function normalizeApprovalInteger_(value, field) {
   return text.replace(/^0+(?=\d)/, '');
 }
 
+/** ISO 8601 UTC，且必須是真實曆日。Date 會把 2026-02-31 進位成 3-03，往返比對即拒絕。 */
+function isApprovalIsoUtc_(value) {
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(value)) return false;
+  const parsed = new Date(value);
+  if (isNaN(parsed.getTime())) return false;
+  return parsed.toISOString() === (value.indexOf('.') >= 0 ? value : value.replace('Z', '.000Z'));
+}
+
 function normalizeApprovalField_(field, value) {
   if (field === 'sticky') {
     const text = normalizeApprovalText_(value).toLowerCase();
@@ -111,9 +119,7 @@ function APPROVAL_STATUS(currentFingerprint, decision, reviewFingerprint, approv
   const normalizedDecision = normalizeApprovalText_(decision);
   if (normalizedDecision === 'Rejected' && normalizeApprovalText_(reviewFingerprint) === current) return 'Rejected';
   if (normalizedDecision !== 'Approved') return 'Needs review';
-  const approvedTime = normalizeApprovalText_(approvedAt);
-  const complete = normalizeApprovalText_(approvedBy) !== '' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(approvedTime)
-    && !isNaN(Date.parse(approvedTime));
+  const complete = normalizeApprovalText_(approvedBy) !== '' && isApprovalIsoUtc_(normalizeApprovalText_(approvedAt));
   return complete && normalizeApprovalText_(reviewFingerprint) === current && normalizeApprovalText_(approvedFingerprint) === current
     ? 'Approved' : 'Needs review';
 }

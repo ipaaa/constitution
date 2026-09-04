@@ -53,8 +53,8 @@ docs/
 
 | 路徑 | 用途 | 狀態 | 負責人 | 最後查核 |
 |---|---|---|---|---|
-| `docs/content-pipeline/design.md` | 產線的唯一規格；feature 040 repo 實作完成，正式 SSOT 尚未部署 | plan | captain | 2026-09-03 |
-| `docs/content-pipeline/operations.md` | 核可、拒絕、重新核可、同步錯誤與復原步驟 | evergreen | captain | 2026-09-03 |
+| `docs/content-pipeline/design.md` | 產線的唯一規格；現行機制見〈修訂紀錄〉2026-09-03 feature 040 條目，第二至第五節為已取代的舊模型 | plan | captain | 2026-09-04 |
+| `docs/content-pipeline/operations.md` | 核可、拒絕、重新核可、同步錯誤與復原步驟；兩帳號 probe 由 feature 044 承接 | evergreen | captain | 2026-09-04 |
 | `docs/content-pipeline/data-collection-guide.md` | T3（未來軌）的資料收集流程。T1／T2 已移除，改指向 `design.md` | evergreen | captain | 2026-09-03 |
 
 ### 體檢與待辦
@@ -62,7 +62,7 @@ docs/
 | 路徑 | 用途 | 狀態 | 負責人 | 最後查核 |
 |---|---|---|---|---|
 | `docs/health-check/2026-08-31-content-pipeline.md` | 體檢報告。出了什麼事、為什麼會上線。**含兩則補述，先看上方** | record | — | 2026-09-01 |
-| `docs/health-check/TODO.md` | 待辦清單；含 feature 040 與多人編輯、正式同步的前置關係 | plan | captain | 2026-09-03 |
+| `docs/health-check/TODO.md` | 待辦清單；含 feature 040 與多人編輯、正式同步的前置關係 | plan | captain | 2026-09-04 |
 
 ### 搶救出來的內容
 

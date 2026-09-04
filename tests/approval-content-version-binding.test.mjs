@@ -118,8 +118,7 @@ test('fingerprint-v1 正規化 NFC、換行、trim、sticky、views 與 order', 
   assert.match(fingerprintPayload(SHEET_KEYS.TRACK_1, TRACK_1), /^\["approval-content-v1"/);
 });
 
-test('Apps Script 與 Node 對三個分頁產生相同 fingerprint-v1', () => {
-  const source = fs.readFileSync('scripts/apps-script/approval-workflow.gs', 'utf8');
+function loadAppsScript() {
   const context = {
     Utilities: {
       DigestAlgorithm: { SHA_256: 'sha256' },
@@ -130,7 +129,19 @@ test('Apps Script 與 Node 對三個分頁產生相同 fingerprint-v1', () => {
     },
   };
   vm.createContext(context);
-  vm.runInContext(source, context);
+  vm.runInContext(fs.readFileSync('scripts/apps-script/approval-workflow.gs', 'utf8'), context);
+  return context;
+}
+
+/** 依 CONTENT_FINGERPRINT 的固定參數順序組出試算表公式的引數。 */
+function gsArgs(sheetKey, record, sequence) {
+  if (sheetKey === SHEET_KEYS.SITE_TLDR) return [record.order, record.label ?? '', record.text, record.link ?? ''];
+  const values = PUBLISHED_FIELDS[sheetKey].map(field => record[field] ?? '');
+  return sheetKey === SHEET_KEYS.TRACK_2 ? [...values, sequence] : values;
+}
+
+test('Apps Script 與 Node 對三個分頁產生相同 fingerprint-v1', () => {
+  const context = loadAppsScript();
   const cases = [
     [SHEET_KEYS.TRACK_1, TRACK_1, PUBLISHED_FIELDS[SHEET_KEYS.TRACK_1].map(field => TRACK_1[field])],
     [SHEET_KEYS.TRACK_2, TRACK_2, [...PUBLISHED_FIELDS[SHEET_KEYS.TRACK_2].map(field => TRACK_2[field]), 1]],
@@ -141,6 +152,18 @@ test('Apps Script 與 Node 對三個分頁產生相同 fingerprint-v1', () => {
     const sequence = sheetKey === SHEET_KEYS.TRACK_2 ? 1 : undefined;
     assert.equal(context.CONTENT_FINGERPRINT(sheetKey, ...values), fingerprintPublishedRow(sheetKey, record, sequence));
   }
+});
+
+test('APPROVAL_STATUS 只對真實曆日的完整紀錄顯示 Approved', () => {
+  const { APPROVAL_STATUS } = loadAppsScript();
+  const fingerprint = fingerprintPublishedRow(SHEET_KEYS.TRACK_1, TRACK_1);
+  const status = approvedAt => APPROVAL_STATUS(fingerprint, 'Approved', fingerprint, 'editor-id', approvedAt, fingerprint);
+  assert.equal(status('2026-09-03T20:00:00.000Z'), 'Approved');
+  assert.equal(status('2026-09-03T20:00:00Z'), 'Approved');
+  for (const invalid of ['2026-02-31T20:00:00.000Z', '2026-04-31T00:00:00Z', '2026-13-01T00:00:00.000Z', '2026-09-03T25:00:00.000Z', '2026-09-03 20:00:00', '']) {
+    assert.equal(status(invalid), 'Needs review', invalid);
+  }
+  assert.equal(APPROVAL_STATUS(fingerprint, 'Approved', fingerprint, '', '2026-09-03T20:00:00.000Z', fingerprint), 'Needs review');
 });
 
 test('每個發布欄位都會改變指紋，審核欄位不會', () => {
@@ -228,6 +251,49 @@ test('Track 2 移動非空列會使舊核可失效；空白列不參與序號', 
   const result = await runSync(fixtureCsv({ track2: approved.reverse() }));
   assert.notEqual(result.code, 0);
   assert.match(result.stderr, /fingerprint/);
+});
+
+test('核可後逐一修改每個發布欄位，衍生 status 都變成 Needs review', () => {
+  const { CONTENT_FINGERPRINT, APPROVAL_STATUS } = loadAppsScript();
+  const approvedAt = '2026-09-03T20:00:00.000Z';
+  const cases = [
+    [SHEET_KEYS.TRACK_1, TRACK_1, PUBLISHED_FIELDS[SHEET_KEYS.TRACK_1], undefined],
+    [SHEET_KEYS.TRACK_2, TRACK_2, PUBLISHED_FIELDS[SHEET_KEYS.TRACK_2], 1],
+    [SHEET_KEYS.SITE_TLDR, TLDR_HEADING, ['order', 'text', 'link'], undefined],
+    [SHEET_KEYS.SITE_TLDR, TLDR_POINT, ['order', 'label', 'text'], undefined],
+  ];
+  for (const [sheetKey, record, fields, sequence] of cases) {
+    const snapshot = CONTENT_FINGERPRINT(sheetKey, ...gsArgs(sheetKey, record, sequence));
+    assert.match(snapshot, /^[a-f0-9]{64}$/);
+    assert.equal(APPROVAL_STATUS(snapshot, 'Approved', snapshot, 'editor-id', approvedAt, snapshot), 'Approved');
+    for (const field of fields) {
+      const value = field === 'sticky' ? 'true' : field === 'order' ? '9' : `${record[field] || ''}x`;
+      const current = CONTENT_FINGERPRINT(sheetKey, ...gsArgs(sheetKey, { ...record, [field]: value }, sequence));
+      const label = `${sheetKey}.${record.order ?? record.id}.${field}`;
+      assert.notEqual(current, snapshot, label);
+      // 核可快照三欄維持原值，只有目前指紋改變。
+      assert.equal(APPROVAL_STATUS(current, 'Approved', snapshot, 'editor-id', approvedAt, snapshot), 'Needs review', label);
+    }
+  }
+});
+
+test('放行判斷不依操作者身分：三種 approved_by 都擋下核可後被改的內容', async t => {
+  const { CONTENT_FINGERPRINT, APPROVAL_STATUS } = loadAppsScript();
+  const snapshot = CONTENT_FINGERPRINT(SHEET_KEYS.TRACK_1, ...gsArgs(SHEET_KEYS.TRACK_1, TRACK_1));
+  const edited = { ...TRACK_1, content: '核可之後才改的內容' };
+  const current = CONTENT_FINGERPRINT(SHEET_KEYS.TRACK_1, ...gsArgs(SHEET_KEYS.TRACK_1, edited));
+  for (const actor of ['contributor-id', 'managing-editor-id', 'editor-id']) {
+    await t.test(actor, async () => {
+      assert.equal(APPROVAL_STATUS(current, 'Approved', snapshot, actor, '2026-09-03T20:00:00.000Z', snapshot), 'Needs review');
+      const record = {
+        ...approve(SHEET_KEYS.TRACK_1, TRACK_1), ...edited,
+        approved_by: actor, current_fingerprint: current, status: 'Approved',
+      };
+      const result = await runSync(fixtureCsv({ track1: [record] }));
+      assert.notEqual(result.code, 0);
+      assert.match(result.stderr, /fingerprint|指紋/);
+    });
+  }
 });
 
 test('原子寫入在第二個 rename 失敗時復原第一個檔案', async () => {
