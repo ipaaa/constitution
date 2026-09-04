@@ -30,6 +30,11 @@ gates:
                 at: "2026-09-04T18:52:46.818197Z"
                 decision: revise
                 reason: AC-6 未成立：design.md:230-231 與 :343 仍教人直接改 status／只按 status 放行，與 :526 起的取代聲明互斥，正常讀者先撞上舊流程，違反『唯一現行規格』。captain 於 2026-09-04 裁決方案 B：AC-2／AC-4 所需的兩帳號隔離表 probe 移出本 feature 另行開票，040 以 repo 端 fail-closed 同步閘門先落地。退回 implement：(1) 清除 design.md 互斥現行指示；(2) 依 FO 授權 fix 修正 APPROVAL_STATUS 無效曆日未 fail closed；(3) 依裁決重寫 AC-2／AC-4 範圍。
+            - id: gate-attempt:040-verify-2
+              briefing:
+                id: briefing:040:verify:attempt-2:revision-1
+                digest: sha256:f46555c84416d1fb7f847a6f1b8465ee95c5494d867b0b7638ac77bc8fefa66f
+                room-ref: '@review/verify/briefing-2'
 review-round:
     id: round:040:verify:1
     stage: verify
