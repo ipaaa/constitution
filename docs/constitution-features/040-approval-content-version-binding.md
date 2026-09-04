@@ -1,6 +1,6 @@
 ---
 title: 核可綁定內容版本並在修改後退回重審
-status: verify
+status: review
 source: captain 2026-09-03
 started: 2026-09-03T19:46:08Z
 completed:
@@ -35,6 +35,17 @@ gates:
                 id: briefing:040:verify:attempt-2:revision-1
                 digest: sha256:f46555c84416d1fb7f847a6f1b8465ee95c5494d867b0b7638ac77bc8fefa66f
                 room-ref: '@review/verify/briefing-2'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:040:verify:2
+                briefing: briefing:040:verify:attempt-2:revision-1
+                by: person:captain
+                at: "2026-09-04T19:35:37.383414Z"
+                decision: approve
+                reason: verify cycle 2 判 PASSED：六項 AC 全部以 repo 端可獨立重跑的證據通過，每項附反向改動證明且已 sha256 驗證還原；AC-6 的互斥現行指示已消除，五個入口各有位置在前的取代補述；placeholder 五類 0 命中；src/data、正式 SSOT、自動同步與網站資料 shape 均未變動。三則 finding 經 FO 授權處置且皆非 Material：F3 fix 另開 feature 045、F4 decline 併入 041、F5 hold 待正式 SSOT 部署。captain 於 2026-09-04 核可進入 review。
+              application:
+                target-stage: review
+                state: consumed
 review-round:
     id: round:040:verify:1
     stage: verify
@@ -405,3 +416,48 @@ REJECTED。Repo-side fingerprint、三分頁投影、核可紀錄驗證、輸出
 PASSED。六項 acceptance criteria 全部以 repo 端可獨立重跑的證據判定通過，AC-2 與 AC-4 依 captain 2026-09-04 裁決改寫後不再以兩帳號 probe 為前提，先前 REJECTED 的 AC-6 也已成立：design.md 為純追加 35 行、原句一字未改，五個入口各有一則位置在前的取代補述。
 `src/data`、正式 SSOT、自動同步狀態與網站資料 shape 均未因本輪修正而改變；placeholder 五類 0 命中；probe 檔未建立，文件一致宣告 probe 尚未執行並指向 feature 044（該票確實存在於 main）。
 記名三則 finding 待 FO 授權：F3 是本 task 自有的測試釘樁缺口（Deferred risk，建議 fix），F4／F5 屬 feature 041 與正式 SSOT 部署時的文件更正（建議 decline／hold）。三則皆未觸及 candidate bytes，反向改動後已以 sha256 驗證還原。
+
+## Stage Report: review
+
+- FAILED: 逐項重現六項 acceptance criteria 的 `Verified by:` 子句，不採信實作或 verify 的自我回報；特別是依 captain 2026-09-04 裁決改寫的 AC-2／AC-4，以及 cycle 1 曾被擋下的 AC-6。
+  五項成立、AC-5 不成立（見 F6）。基準 `node --test` 50/50、`npx tsc --noEmit` exit 0、`npm run build` exit 0 且 `src/data/*.json` sha256 前後相同。四次反向改動全在 `/private/tmp/.../scratchpad/rev` 的副本上做，worktree candidate bytes 未改（`git status` 僅 FO 寫的 frontmatter）。
+- DONE: AC-1 — PASSED（附但書）。
+  停用整個 `validateApprovalBinding` 後，29 個「核可後改單一發布欄位」子測試有 25 個失敗（50→pass 11／fail 39），證明退出碼確實由指紋閘門產生。但書見 F7。
+- DONE: AC-2 — PASSED。
+  把 `APPROVAL_STATUS` 的指紋相等比對改成「非空即可」→ pass 45／fail 5。判定只用 `vm` 載入 `.gs`，不依賴兩帳號 probe。
+- DONE: AC-3 — PASSED。
+  七類缺漏／偽造紀錄在停用閘門後全部失敗（同 AC-1 反向改動），證明拒絕來自新驗證而非既有欄位檢查。
+- DONE: AC-4 — PASSED。
+  在 `APPROVAL_STATUS` 與 `validateApprovalBinding` 各加一行 `managing-editor-id` 豁免 → pass 48／fail 2，只有該 actor 子測試失敗。判定不依賴兩帳號 probe。
+- FAILED: AC-5 — REJECTED。見 F6：只改 `reject_reason` 一個非發布欄位，就讓另一列產生無效退回。
+  反向改動（把 `status` 放進 Track 1 投影 → pass 35／fail 16）證明既有測試會擋下投影污染，但該測試只呼叫 `fingerprintPublishedRow`，看不到序號這條路徑。
+- DONE: AC-6 — PASSED。
+  五則 2026-09-04 補述位於 :25／:127／:239／:276／:350，各早於該節所有舊 `status` 敘述（:217、:227、:252、:293、:375）；`design.md` 相對 main 為 +57／−1，唯一刪除行是檔頭 `**最後修訂**` metadata，非內文改寫。無任何現行文件宣稱只靠 `status = Approved` 放行。
+- DONE: 依實際交付行為查核 `## Documentation impact` 每一筆。
+  現在更新四筆與實作後更新五筆（operations.md 新增、tech-stack、contributing、AGENTS、INDEX）皆有對應 diff；`approval-permission-probe.md` 正確未建立（`ls docs/content-pipeline/` 僅三檔）；「不更新」六項 `git diff --stat main...HEAD` 為空，`record` 文件未被改寫；`docs/INDEX.md:57` 已收錄 operations.md（evergreen／2026-09-04）。
+- DONE: 審查 implement diff 的程式碼品質、型別與慣例一致性並確認無回歸。
+  無回歸：build／tsc 通過，`src/data`、`package.json`、網站資料 shape 未動，`sync-content.mjs` 唯一呼叫點 `package.json:10` 仍走 `main()`。慣例一致：`APPROVAL_COLUMNS` 沿用既有 aliases／longest-prefix 結構，`.gs` 的 `HEADER_SEPARATORS` 與 `sync-content.mjs:40` 字元集逐字相同。
+- DONE: 判斷 surface 是否超出設計範圍或可收斂。
+  重算 `git diff --numstat 4503319..HEAD`（排除 entity 與 state）= 12 檔／+985 −89／淨 +896，確認 179%。判定為 estimate 缺陷而非 scope creep：多出的四個檔（tech-stack、contributing、AGENTS、TODO）本來就列在同一份 spec 的 `## Documentation impact` 實作後更新，只是沒進「Expected surface」的檔案清單。淨行由 tests 318 與 `.gs` 263 主導，兩者都是 AC 與設計直接要求的產物。唯一可收斂處約 52 行（`installApprovalFormulas_`／`resolveApprovalHeaders_`／`columnA1_` 的公式安裝便利路徑），不建議為此退回。
+
+### Review findings
+
+- FAILED: F6 — Track 2 序號在 Node 與 Apps Script 之間分歧，只改一個非發布欄位就造成別列無效退回（**Material；task-owned；建議 fix；未獲 FO 授權，candidate bytes 未改**）。
+  觸發證據（A／B 對照，唯一差異是 `reject_reason`）：Track 2 第一列發布欄位全空、`reject_reason` 填「內容已下架」時，`PUBLISHED_ROW_SEQUENCE` 給 d1 序號 1，`validateApprovalBinding` 的 `index + 1` 給 2 → sync exit 1，對沒人動過的 d1 報三筆「指紋與目前發布內容不符。需要重新核可。」；同一列改成完全空白 → exit 0。成因：`toRecords`（`scripts/sync-content.mjs:330`）只濾掉「所有儲存格皆空」的列，`PUBLISHED_ROW_SEQUENCE`（`approval-workflow.gs`）只數「任一發布欄位非空」的列。
+  已釋出使用者與正常流程：責任編輯把某則討論的內容清空但保留該列（審核欄位受保護、清不掉），或退回後內容被刪；之後有人手動執行 `npm run sync-content`。可觀察傷害：整份同步中止，錯誤指向錯的列，而且訊息給的解法無效——重新核可時選單同樣用 `PUBLISHED_ROW_SEQUENCE`，算出的仍是舊序號，除非整列刪除否則解不開。
+  受影響 AC／邊界：AC-5「非發布欄位變動不會造成無效退回」，以及 design`## 發布欄位範圍`「序號不使用試算表實體列號，避免插入空白列造成誤退回」。AC-5 的 `Verified by:` 只呼叫 `fingerprintPublishedRow`，看不到序號來源，因此測試通過不等於 AC 成立。
+  建議處置（advisory）：fix —— Node 端改為只數「任一發布欄位非空」的列來產生序號，與 `PUBLISHED_ROW_SEQUENCE` 同語意，並補一項以非發布欄位為唯一變因的 sync 級迴歸測試。
+- FAILED: F7 — AC-1 有四個子測試是恆真的（**Polish；task-owned；建議 fix；candidate bytes 未改**）。
+  停用整個指紋閘門後，`Track 1.year`、`Track 2.views`、`Track 2.vibe`、`site_tldr.0.order` 仍通過——它們是被既有欄位格式檢查擋下，不是被指紋擋下。行為本身正確（這四欄確實在投影內，由指紋單元測試涵蓋），但 AC-1「漏掉任一欄位會使測試失敗」對這四欄不成立。建議在該子測試加 stderr 比對，或改用不觸發既有格式檢查的變更值。
+- FAILED: F3（verify 記名，本輪已獨立重現）— 測試欄位清單自我指涉（**Deferred risk；task-owned；建議 fix**）。
+  雙邊一致地把 Track 1 投影的 `'handwriting'` 從 `content-fingerprint.mjs` 與 `approval-workflow.gs` 移除 → `tests 49／pass 49／fail 0`，零示警。同意 verify 的分類與建議（測試內用字面欄位清單釘住 design 表）。
+- FAILED: F8 — `docs/content-pipeline/design.md:276` 的補述說「本節的檢查規則仍然成立」，但同節 `:293`「`status` 必須是 `Approved`／`Rejected`／空白其中之一」已不成立（`checkStatusValues` 現在也收 `Needs review`）（**Polish；task-owned；建議 fix**）。
+  不構成 AC-6 失敗（該行沒有宣稱只靠 `status = Approved` 放行），但補述對讀者做了過寬的保證。
+- SKIPPED: F4、F5（verify 記名）。
+  同意 verify 的分類與建議：F4 屬 feature 041 的檔案，decline for 040；F5 對尚未部署的正式試算表仍正確，hold。
+
+### Summary
+
+REJECTED。六項 AC 中五項以獨立反向改動證實成立，AC-5 不成立：F6 以 A／B 對照重現「只改 `reject_reason` 一個非發布欄位，就讓另一列被無效退回，且重新核可無法解除」，這正是 AC-5 與 design 序號設計明文要防的失效模式，且既有測試因為只驗指紋函式而看不到它。
+其餘查核全部通過——文件影響九筆到位、`record` 文件未改寫、INDEX 與實際增刪一致、build／tsc 無回歸、`src/data` 與網站資料 shape 未動、probe 檔未建立。
+Surface 179% 判定為 estimate 清單漏列文件所致，非 scope creep，不建議因此退回。F6 建議 fix（Material，數行），F7／F3／F8 建議一併 fix（Polish／Deferred risk），F4／F5 沿用 verify 的 decline／hold。所有 finding 均未觸及 candidate bytes，反向改動全在 repo 外副本進行。
