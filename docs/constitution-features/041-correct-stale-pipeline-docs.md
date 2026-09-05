@@ -137,15 +137,15 @@ Verified by: 更新後三份文件在 `INDEX.md` 的「最後查核」為 2026-0
 
 | # | 位置（更正後行號） | 更正文字所斷言的 | 驗證指令與輸出 |
 |---|---|---|---|
-| 1 | `design.md:45` | 產線已於 2026-09-02 接回 | `git log --oneline -- src/data/history.json` → `77d9cea` |
-| 2 | `design.md:424` | 「同步刻意斷開」已不成立；`build` 不含同步 | 同上，加 build 前後 sha256 相同 |
+| 1 | `design.md:46` | 產線已於 2026-09-02 接回 | `git log --oneline -- src/data/history.json` → `77d9cea` |
+| 2 | `design.md:425` | 「同步刻意斷開」已不成立；`build` 不含同步 | 同上，加 build 前後 sha256 相同 |
 | 3 | `design.md:412` | 施工項目 4 保護範圍已完成 | `2026-09-03-editor-onboarding.md:35/54/117`（captain 回報） |
-| 4 | `design.md:245` | 「status 欄鎖住」已是現況 | 同上 |
-| 5 | `TODO.md:524` | P2-1 已隨 PR #32 解決 | `grep -n "isApproved" scripts/sync-content.mjs` → `:354` 嚴格比對 |
-| 6 | `TODO.md:33` | `build` 禁令已解除 | `npm run build` 前後 sha256 相同，退出碼 0 |
-| 7 | `dcg:24` | 施工項目 7–10 已完成、`build` 禁令已解除 | 同 5、6 |
+| 4 | `design.md:246` | 「status 欄鎖住」已是現況 | 同上 |
+| 5 | `TODO.md:524`、`:565` | P2-1 已隨 PR #32 解決 | `grep -n "isApproved" scripts/sync-content.mjs` → `:354` 嚴格比對 |
+| 6 | `TODO.md:35` | `build` 禁令已解除 | `npm run build` 前後 sha256 相同，退出碼 0 |
+| 7 | `data-collection-guide.md:26` | 施工項目 7–10 已完成、`build` 禁令已解除 | 同 5、6 |
 | 8 | `TODO.md:700` | `憲庭加好友文件/` → `Constitution_docs/` | `GIT-BOUNDARIES.md:54`（2026-09-04 更新） |
-| 9 | `TODO.md:715` | 同上 | 同上 |
+| 9 | `TODO.md:714` | 同上 | 同上 |
 
 ### 需要 captain 裁示的一處偏離
 
