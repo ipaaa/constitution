@@ -1,7 +1,7 @@
 ---
 id: 041
 title: 修正內容產線文件與實際行為不符之處
-status: implement
+status: verify
 source: captain 2026-09-03
 started: 2026-09-05T00:05:49Z
 completed:
