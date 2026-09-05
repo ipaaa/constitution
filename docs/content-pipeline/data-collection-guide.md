@@ -1,5 +1,5 @@
 **狀態**：evergreen（僅涵蓋 T3）
-**最後查核**：2026-09-03
+**最後查核**：2026-09-04（feature 041 逐處查證敘述與實際行為是否相符）
 
 # 資料收集流程說明文件
 
@@ -22,6 +22,16 @@
 
 ⚠️ **產線改造尚未完成。** 目前同步程式仍是舊版，`design.md` 第五節的施工項目
 7–10 尚未執行。在那之前不要執行 `npm run sync-content` 或 `npm run build`。
+
+> ⚠️ **2026-09-04 更正：上面兩行已不成立。**
+> `design.md` 第五節的施工項目 7 至 10 都已於 2026-09-02 完成。
+> 同步程式已改寫（PR #32），`SSOT_Editor` 已封存。
+> `npm run build` 的禁令已於 2026-09-02 解除。`build` 現在只是 `next build`，不含同步。
+> 驗證方式：`npm run build` 前後跑 `shasum -a 256 src/data/*.json`，兩次相同。
+> 2026-09-04 於 feature 041 的 worktree 實測，兩檔指紋前後皆未變。
+> `npm run sync-content` 仍然不要自己執行。它會覆寫 `src/data/*.json`。
+> 只在要發布內容時執行，且跑完必須開 PR 讓 captain 對 diff。
+> 原句保留。詳見 `design.md` 文末修訂紀錄的 2026-09-04 一則。
 
 ---
 ## T3：未來軌道（Future Track）
