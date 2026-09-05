@@ -11,6 +11,17 @@ worktree: .worktrees/spacedock-ensign-041-correct-stale-pipeline-docs
 issue:
 pr:
 mod-block:
+gates:
+    version: 1
+    records:
+        - id: gate:041:verify
+          stage: verify
+          attempts:
+            - id: gate-attempt:041-verify-1
+              briefing:
+                id: briefing:041:verify:attempt-1:revision-1
+                digest: sha256:7af2178c78586a269cfec765051fdd66910afd10b70462a612c7d42390edef7b
+                room-ref: '@review/verify/briefing-1'
 ---
 
 三份現行文件描述的產線狀態與實際行為不符，共七處。試算表編輯權限已開放給協作者，他們會依這些文件判斷什麼可做、什麼不可做。本 feature 讓文件敘述與實際行為一致，並保留原文脈絡。
