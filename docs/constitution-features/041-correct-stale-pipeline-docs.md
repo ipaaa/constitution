@@ -183,3 +183,61 @@ AC-4 字面要求最後查核日為 **2026-09-03**。實際查核發生在 **202
 九處敘述（AC-1 的七處＋scope notes 追加的兩處資料夾更名）已全部以追加 `⚠️` 段落更正，原句一字未改；`design.md` 與 `TODO.md` 的 diff 為純新增。三項 AC-1 證據都實際跑過：`npm run build` 前後兩檔 sha256 完全相同、`isApproved()` 為嚴格比對、`77d9cea` 為 2026-09-02 首次正式同步。淨增 99 行，落在 +90 ±40% 的容差內。
 
 兩項需要 captain 在 gate 上決定：一是最後查核日填 2026-09-04 而非 AC-4 字面的 2026-09-03；二是 scope notes 第二節列出的 14 處額外發現，經查證 12 處確實過時、1 處部分過時（P2-9）、1 處尚未過時（`INDEX.md` 的 `operations.md`，須待 040 合併），全部依規定未動。
+
+## Stage Report: verify
+
+- DONE: 獨立重跑 AC-1 的三項驗證指令，並逐一比對九處更正文字所斷言的內容與實際輸出是否相符
+  三項全數獨立重跑，九處全數相符。逐處對照見下方「AC-1 獨立複驗」。
+- DONE: 確認 AC-2 與 AC-3
+  AC-2：`git diff -U0 main...HEAD` 於四份文件的刪除行共 5 行，全為「最後查核」日期（`INDEX.md` 4 行、`data-collection-guide.md` 1 行）。`design.md`、`TODO.md` 為 `56 0` / `33 0` 純新增。九處原句經 `sed -n` 逐行讀出，一字未改。
+  AC-3：自行以 `grep -n` 定位九處錯誤敘述與九則 `⚠️ **2026-09-04 更正`，未採信 implement 的量測腳本。距離全部 ≤ 9 行，見下方表格。
+- DONE: 邊界與越界查核
+  `git diff --numstat main...HEAD` 只列出 5 個檔，全在 `docs/` 下；`src/`、`scripts/`、`AGENTS.md`、`docs/_archive/**`、兩份 `record` 文件（`2026-08-31-content-pipeline.md`、`2026-09-03-editor-onboarding.md`）皆未出現。未執行 `npm run sync-content`。`npx tsc --noEmit` 退出碼 0。
+- DONE: 複核 14 處額外發現確實一處未改，且「是否過時」判定正確
+  14 處的行號（`design.md:67/69/71/463`、`TODO.md:339/608/621/634`、`dcg:161/171/175`、`AGENTS.md:141`、`INDEX.md:138/145`）全部落在 diff hunk 之外，確認未改。12 處「是」的判定逐處查證屬實。P2-9「部分過時」與 `operations.md`「尚未過時」兩項複核結果見下方。
+
+### AC-1 獨立複驗
+
+| 指令 | 我跑出來的輸出 | 對應更正處 |
+|---|---|---|
+| `shasum -a 256 src/data/*.json`（build 前後） | 前後皆 `4071978a…` / `4d1992e3…`，`npm run build` 退出碼 0 | `dcg:26`、`TODO.md:35`、`design.md:425` |
+| `grep -n "isApproved" scripts/sync-content.mjs` | `:354` 定義 `(record.status \|\| '').trim().toLowerCase() === 'approved'`；`:478/:532/:601` 呼叫 | `TODO.md:524`、`:565` |
+| `git log --oneline -- src/data/history.json` | `77d9cea` 2026-09-02「25 → 40 筆」 | `design.md:46`、`:425` |
+
+額外自行查證：`git show 77d9cea^:src/data/history.json` 為 **25** 筆、現為 **40** 筆，證實「25 增為 40」；`history.json` 內 h30–h46 共 17 筆全在，證實 `design.md:463`「從未上線」已過時。`package.json` 的 `build` 為 `next build`。`2026-09-03-editor-onboarding.md` 第 35、54、58、110、117 行內容與更正文字所引全部逐字相符。`GIT-BOUNDARIES.md:54` 逐字記載 2026-09-04 由 `憲庭加好友文件/` 更名為 `Constitution_docs/`，磁碟上舊名已不存在。
+
+### AC-3 距離（自行量測）
+
+| # | 錯誤敘述行 | 更正段行 | 距離 |
+|---|---|---|---|
+| 1 | `design.md:43` | `:46` | 3 |
+| 2 | `design.md:421` | `:425` | 4 |
+| 3 | `design.md:403` | `:412` | 9 |
+| 4 | `design.md:244` | `:246` | 2 |
+| 5 | `TODO.md:522`／`:563` | `:524`／`:565` | 2／2 |
+| 6 | `TODO.md:26`（⛔ 區塊起） | `:35` | 9 |
+| 7 | `dcg:23` | `:26` | 3 |
+| 8 | `TODO.md:698` | `:700` | 2 |
+| 9 | `TODO.md:708` | `:714` | 6 |
+
+### 兩項判定的複核結果
+
+`TODO.md` P2-9 判為「部分過時」— **同意**。`:636`「已納入設計，待施工」的解法是 PR 的 Vercel 預覽網址，`2026-09-03-editor-onboarding.md:381-382` 顯示 2026-09-03 已實際使用，故「待施工」不成立；同檔 `:453` 逐字記載「這兩個環節完全靠人記得做」，殘留風險屬實。
+
+`INDEX.md:145` 把 `operations.md` 列為「待新增」判為「尚未過時」— **同意**。`git ls-tree main docs/content-pipeline/` 只有 `design.md` 與 `data-collection-guide.md`，`operations.md` 不在 main。040 合併後才會過時。
+
+### 我發現、未修改的一處（Polish）
+
+`TODO.md:700` 的更正寫「路徑請自行代換」。P3-2 表格的路徑是 `憲庭加好友文件/網站書籍策劃/`，直接代換得到 `Constitution_docs/網站書籍策劃/`，該路徑不存在 —— 實際是 `Constitution_docs/1_網站書籍策劃/`。更名時子目錄一併加了編號前綴，`GIT-BOUNDARIES.md:54` 有記載（`0_會議紀錄與待辦/` 至 `5_archive/`），更正段未帶到。四項證據：讀者依 P3-2 找撰稿人選盤點時觸發；`ls "Constitution_padocs/網站書籍策劃"` 不存在；受影響的是本票「敘述與實際一致」的目的，非 AC-1 的七處；`ls "30 Public Writing/Constitution_docs/"` 輸出 `1_網站書籍策劃` 為觸發證據。更正的核心斷言（`憲庭加好友文件/` → `Constitution_docs/`）本身正確，僅導覽指示不完整，一次 `ls` 即可自行復原，故提議 **Polish**，任務歸屬為本票，處置提議為修（加一行說明子目錄已加編號前綴）。**未動任何位元組，等 FO 授權。**
+
+### 需要 captain 決定的兩項（implement 已提出，複核後維持）
+
+一、最後查核日填 2026-09-04 而非 AC-4 字面的 2026-09-03。四處（`INDEX.md:4`、三份文件檔頭）確實一致，AC-4 明定的失敗條件未觸發。查核確實發生在 2026-09-04。依 `## Review-finding disposition` 第 5 條，只有 captain 能改驗收標準。
+
+二、`data-collection-guide.md` 狀態為 `evergreen`，本票把它的最後查核日推進到 2026-09-04，但該檔 `:161`「目前 Vercel 的部署會執行同步」、`:171`「檢查機制尚未實作」、`:175`「該指令現已禁止使用」三句仍然錯誤且依 scope notes 未改。這正是本票 Problem 第 34 行點名的「查核日期新而內容錯」。此為既有狀況（原本就標 2026-09-03 且同樣錯），非本票造成的退步，且超出本票授權範圍，故分類為 **Material／不歸本票所有 → Needs decision**，維持不動，請 captain 裁示是否另開票。
+
+### Summary
+
+verify 判定 **PASSED**。AC-1 的三項指令獨立重跑，九處更正文字所斷言的內容與實際輸出全部相符，無一處對不上；AC-2 的刪除行只有 5 行日期欄位，九處原句一字未改；AC-3 九處距離自行量測全部 ≤ 9 行，未採信 implement 的腳本。邊界未越界，14 處額外發現確實一處未動，P2-9 與 `operations.md` 兩項判定複核後同意。
+
+佔位資料掃描：對本票新增的所有行掃 `某學者`、`某大學法律系`、`test`、`lorem ipsum`、`快速了解最新判決的5個重點`，零命中；`src/data/*.json` 亦零命中，且 build 前後指紋未變，證明本票未觸及資料檔。發現一處 Polish（`TODO.md:700` 的路徑代換不完整），未修改，連同 implement 提出的兩項一併送 gate。
