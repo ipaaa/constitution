@@ -305,3 +305,58 @@ AC-4 字面要求最後查核日為 **2026-09-03**。實際查核發生在 **202
 verify 判定 **PASSED**。AC-1 的三項指令獨立重跑，九處更正文字所斷言的內容與實際輸出全部相符，無一處對不上；AC-2 的刪除行只有 5 行日期欄位，九處原句一字未改；AC-3 九處距離自行量測全部 ≤ 9 行，未採信 implement 的腳本。邊界未越界，14 處額外發現確實一處未動，P2-9 與 `operations.md` 兩項判定複核後同意。
 
 佔位資料掃描：對本票新增的所有行掃 `某學者`、`某大學法律系`、`test`、`lorem ipsum`、`快速了解最新判決的5個重點`，零命中；`src/data/*.json` 亦零命中，且 build 前後指紋未變，證明本票未觸及資料檔。發現一處 Polish（`TODO.md:700` 的路徑代換不完整），未修改，連同 implement 提出的兩項一併送 gate。
+
+## Stage Report: implement (cycle 2)
+
+- DONE: 納入 scope notes 第二節已查證的 14 處：12 處「確實過時」者比照本票既有手法以追加 `⚠️` 補述更正，原句一字不改
+  commit `e3110ed`。12 處分佈：`design.md` 4、`TODO.md` 3、`data-collection-guide.md` 3、`AGENTS.md` 1、`INDEX.md` 1。逐處對照見下方表。`git diff` 本輪 **零刪除行**（`git diff -U0 655f163..e3110ed -- docs/ AGENTS.md | grep -c '^-[^-]'` → 只有 cycle 1 已知的 5 行日期欄位，cycle 2 新增部分為 0）。
+- DONE: `TODO.md` P2-9 依「部分過時」處理，同時寫清楚「待施工」已不成立與殘留風險仍在
+  `TODO.md:661` 的更正段分兩節。「已不成立的部分」引 `2026-09-03-editor-onboarding.md:381-382`（2026-09-03 已實際使用 PR 預覽網址）。「仍然開著的部分」逐字引同檔 `:453`「這兩個環節完全靠人記得做」，並指出它違反 `design.md` 不變式 #6、尚無對應的票。
+- DONE: `INDEX.md` 把 `operations.md` 列為「待新增」判定為尚未過時，維持不動，並在 stage report 記錄解除條件
+  `INDEX.md:145` 一字未動。**解除條件：feature 040 合併進 main。** 查證：`git ls-tree main docs/content-pipeline/` 只有 `design.md` 與 `data-collection-guide.md`；`operations.md` 只存在於 `.worktrees/spacedock-ensign-040-approval-content-version-binding/`。此解除條件也寫進 `INDEX.md:150` 的更正段，讓讀者當場看到為什麼那一列不改。
+- DONE: 更新驗收標準本文 —— AC-1 的「七處」擴充為 23 處並列出清單
+  entity body AC-1 上方新增 captain 裁決段，含 23 處清單表（檔案、敘述、來源為「原七處／擴充／scope notes 第一節」）。原 AC-1 條文保留於下方。
+- DONE: AC-4 的查核日由 2026-09-03 改為 2026-09-04 並記錄理由
+  entity body AC-4 下方新增裁決段。理由：實際查核發生於 09-04，填 09-03 會製造本票要消滅的同一種不符。一致性判定不變。原條文保留。
+- DONE: 修正 `docs/health-check/TODO.md:700` 的路徑代換不完整
+  `TODO.md:735` 追加一行：`憲庭加好友文件/網站書籍策劃/` 現址為 `Constitution_docs/1_網站書籍策劃/`，六個子目錄為 `0_會議紀錄與待辦/` 至 `5_archive/`。查證指令 `ls "…/30 Public Writing/Constitution_docs/"` 輸出六個帶編號前綴的目錄。原更正段的核心斷言未改，只補一行。
+
+### 本輪 12 處逐處對照
+
+| 檔案:行 | 更正的敘述 | 驗證依據 |
+|---|---|---|
+| `design.md:81` | 流程圖「⚠️ 尚未改寫」 | `sync-content.mjs` 已於 PR #32 改寫 |
+| `design.md:81` | 流程圖「Track 1 的 status 空白也放行」 | `sync-content.mjs:354` 嚴格比對，`:478/:532/:601` 呼叫它 |
+| `design.md:81` | 流程圖「不認識 site_tldr 分頁」 | `sync-content.mjs:134/575/658` |
+| `design.md:476` | 「h30–h46 共 17 筆從未上線」 | `history.json` 40 筆，h30–h46 共 17 個 id 全在 |
+| `TODO.md:341` | P1-1「尚未搬回試算表 🔔 明天的第一項工作」 | 同檔 `:87-99`「回填工作到此結束」＋文末「已完成項目」 |
+| `TODO.md:620` | P2-6「sync 已將近 4 個月沒跑」 | 該項自訂指令 `git log -1 -- src/data/discussions.json` → `77d9cea` 2026-09-02 |
+| `TODO.md:646` | P2-8「已暫時緩解，尚未從根本解決」 | `package.json` 的 `build` 現為 `next build`；build 前後 sha256 相同 |
+| `TODO.md:661` | P2-9「已納入設計，待施工」（部分） | `editor-onboarding.md:381-382` 已用；`:453` 殘留風險屬實 |
+| `dcg:164` | 「目前 Vercel 的部署會執行同步」 | 同上 build 證據 |
+| `dcg:183` | 「檢查機制尚未實作」 | `sync-content.mjs:13/17/266/294` |
+| `dcg:183` | 「該指令現已禁止使用」 | 禁令 2026-09-02 解除 |
+| `AGENTS.md:146` | 「現有兩個 workflow，目前皆休眠」 | 040、041 為 `status: implement`，另 15 張 `status: design` |
+| `INDEX.md:150` | 整併第 2 階段「⏸ 待產線改造完成」 | `design.md` 第七節第 7–10 項皆已於 2026-09-02 完成 |
+
+### 驗證輸出
+
+- **AC-3 全數通過。** 23 處逐一量測更正段與原敘述的距離：最遠 15 行（`INDEX.md` 整併表第 2 列），最近 2 行。量測方式：以原敘述字串定位後掃描其後 21 行找 `> ⚠️ **2026-09-04 更正`，23 處全數命中，0 失敗。
+- **AC-2 全數通過。** cycle 2 的 diff 為純新增。五份文件 `git diff --numstat`：`AGENTS.md 6 0`、`INDEX.md 9 0`、`dcg 14 0`、`design.md 15 0`、`TODO.md 32 0`。
+- **AC-1 證據未變。** `npm run build` 退出碼 0，前後 `shasum -a 256 src/data/*.json` 皆為 `4071978a…` / `4d1992e3…`。本輪未動 `src/`、`scripts/`、試算表，未執行 `npm run sync-content`，故該證據仍成立（`git status` 只列 6 份 Markdown）。
+- **`npx tsc --noEmit` 退出碼 0。**
+
+### Surface 據實回報
+
+累計對五份文件淨增 **+175 行**（`git diff --numstat 655f163`：新增 180、刪除 5；刪除的 5 行全為 AC-4 的日期欄位）。原 estimate 為 `+90 ±40%`（54–126）。超出上限 49 行，約為 estimate 的 194%。**未為壓行數而省略任何應更正的處數**，範圍調整已由 captain 於 2026-09-04 授權。
+
+### 需要知道的兩件事
+
+1. **`CLAUDE.md` 是 `AGENTS.md` 的 symlink**（`lrwxr-xr-x CLAUDE.md -> AGENTS.md`）。更正 `AGENTS.md:141` 一併對 `CLAUDE.md` 生效，不需另外處理。依指示只動了 `:141` 那一處。
+2. **與 feature 040 的合併衝突風險擴大。** cycle 1 本已在 `design.md` 文末修訂紀錄追加一則；cycle 2 又動了同一則（四則改為六則），並新增 `INDEX.md` 的更正段。040 的 worktree 已在 `design.md` 追加 61 行、且建立了 `docs/content-pipeline/operations.md`。本票基於 `4503319`。**後合併者需人工對齊 `design.md` 文末修訂紀錄的順序，並在 040 合併後更正 `INDEX.md:145` 的 `operations.md` 那一列。**
+
+### Summary
+
+依 captain 2026-09-04 裁決把驗收範圍由七處擴充為 23 處，補上 scope notes 第二節查證過的 12 處確實過時敘述與 1 處部分過時（P2-9，兩面都寫），並補齊 `TODO.md` 的路徑代換說明。判定尚未過時的 `INDEX.md` `operations.md` 那一列維持不動，解除條件（040 合併）同時寫進 stage report 與該檔的更正段。entity body 的 AC-1 與 AC-4 已依裁決更新，原條文保留。
+
+23 處全部通過 AC-3（最遠 15 行），cycle 2 的 diff 為純新增，`npx tsc --noEmit` 與 `npm run build` 皆通過且 `src/data/*.json` 指紋未變。累計淨增 +175 行，超出原 estimate 上限 49 行，成因是 captain 授權的範圍擴充，已據實回報。
