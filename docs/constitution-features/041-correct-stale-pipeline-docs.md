@@ -309,7 +309,7 @@ verify 判定 **PASSED**。AC-1 的三項指令獨立重跑，九處更正文字
 ## Stage Report: implement (cycle 2)
 
 - DONE: 納入 scope notes 第二節已查證的 14 處：12 處「確實過時」者比照本票既有手法以追加 `⚠️` 補述更正，原句一字不改
-  commit `e3110ed`。12 處分佈：`design.md` 4、`TODO.md` 3、`data-collection-guide.md` 3、`AGENTS.md` 1、`INDEX.md` 1。逐處對照見下方表。`git diff` 本輪 **零刪除行**（`git diff -U0 655f163..e3110ed -- docs/ AGENTS.md | grep -c '^-[^-]'` → 只有 cycle 1 已知的 5 行日期欄位，cycle 2 新增部分為 0）。
+  commit `e3110ed`。12 處分佈：`design.md` 4、`TODO.md` 3、`data-collection-guide.md` 3、`AGENTS.md` 1、`INDEX.md` 1。逐處對照見下方表。**原文一行未刪。** 詳見下方「AC-2 驗證」。
 - DONE: `TODO.md` P2-9 依「部分過時」處理，同時寫清楚「待施工」已不成立與殘留風險仍在
   `TODO.md:661` 的更正段分兩節。「已不成立的部分」引 `2026-09-03-editor-onboarding.md:381-382`（2026-09-03 已實際使用 PR 預覽網址）。「仍然開著的部分」逐字引同檔 `:453`「這兩個環節完全靠人記得做」，並指出它違反 `design.md` 不變式 #6、尚無對應的票。
 - DONE: `INDEX.md` 把 `operations.md` 列為「待新增」判定為尚未過時，維持不動，並在 stage report 記錄解除條件
@@ -342,13 +342,15 @@ verify 判定 **PASSED**。AC-1 的三項指令獨立重跑，九處更正文字
 ### 驗證輸出
 
 - **AC-3 全數通過。** 23 處逐一量測更正段與原敘述的距離：最遠 15 行（`INDEX.md` 整併表第 2 列），最近 2 行。量測方式：以原敘述字串定位後掃描其後 21 行找 `> ⚠️ **2026-09-04 更正`，23 處全數命中，0 失敗。
-- **AC-2 全數通過。** cycle 2 的 diff 為純新增。五份文件 `git diff --numstat`：`AGENTS.md 6 0`、`INDEX.md 9 0`、`dcg 14 0`、`design.md 15 0`、`TODO.md 32 0`。
+- **AC-2 驗證：原文一行未刪。** 全票累計 `git diff -U0 655f163..HEAD` 對五份文件只有 **5 行刪除**，全部是 AC-4 要求更新的「最後查核」日期欄位（`INDEX.md` 4 行、`data-collection-guide.md` 1 行）。23 處敘述所在行皆不出現於 `-` 側。
+  cycle 2 的增量 diff（`9d52c85..e3110ed`）另有 5 行刪除，但那 5 行**是 cycle 1 自己加的補述**，不是原文：`design.md` 修訂紀錄那則的「四則」改寫為「六則」共 4 行，`TODO.md` 進度紀錄那列「三份文件」改寫為「五份文件」1 行。兩者在累計 diff 中不出現，因為它們在 `655f163` 時尚不存在。
+  cycle 2 增量 `git diff --numstat`：`AGENTS.md 6 0`、`INDEX.md 9 0`、`dcg 14 0`、`design.md 21 4`、`TODO.md 33 1`。
 - **AC-1 證據未變。** `npm run build` 退出碼 0，前後 `shasum -a 256 src/data/*.json` 皆為 `4071978a…` / `4d1992e3…`。本輪未動 `src/`、`scripts/`、試算表，未執行 `npm run sync-content`，故該證據仍成立（`git status` 只列 6 份 Markdown）。
 - **`npx tsc --noEmit` 退出碼 0。**
 
 ### Surface 據實回報
 
-累計對五份文件淨增 **+175 行**（`git diff --numstat 655f163`：新增 180、刪除 5；刪除的 5 行全為 AC-4 的日期欄位）。原 estimate 為 `+90 ±40%`（54–126）。超出上限 49 行，約為 estimate 的 194%。**未為壓行數而省略任何應更正的處數**，範圍調整已由 captain 於 2026-09-04 授權。
+累計對五份文件淨增 **+177 行**（`git diff --numstat 655f163..HEAD`：新增 182、刪除 5；刪除的 5 行全為 AC-4 的日期欄位）。原 estimate 為 `+90 ±40%`（54–126）。超出上限 51 行，約為 estimate 的 197%。**未為壓行數而省略任何應更正的處數**，範圍調整已由 captain 於 2026-09-04 授權。
 
 ### 需要知道的兩件事
 
@@ -359,4 +361,4 @@ verify 判定 **PASSED**。AC-1 的三項指令獨立重跑，九處更正文字
 
 依 captain 2026-09-04 裁決把驗收範圍由七處擴充為 23 處，補上 scope notes 第二節查證過的 12 處確實過時敘述與 1 處部分過時（P2-9，兩面都寫），並補齊 `TODO.md` 的路徑代換說明。判定尚未過時的 `INDEX.md` `operations.md` 那一列維持不動，解除條件（040 合併）同時寫進 stage report 與該檔的更正段。entity body 的 AC-1 與 AC-4 已依裁決更新，原條文保留。
 
-23 處全部通過 AC-3（最遠 15 行），cycle 2 的 diff 為純新增，`npx tsc --noEmit` 與 `npm run build` 皆通過且 `src/data/*.json` 指紋未變。累計淨增 +175 行，超出原 estimate 上限 49 行，成因是 captain 授權的範圍擴充，已據實回報。
+23 處全部通過 AC-3（最遠 15 行），原文一行未刪，`npx tsc --noEmit` 與 `npm run build` 皆通過且 `src/data/*.json` 指紋未變。累計淨增 +177 行，超出原 estimate 上限 51 行，成因是 captain 授權的範圍擴充，已據實回報。
