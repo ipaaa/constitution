@@ -30,6 +30,14 @@ gates:
                 at: "2026-09-05T03:37:26.405535Z"
                 decision: revise
                 reason: 交付本身乾淨（九處全對、原句一字未改、AC-1 三項指令由 verify 獨立重跑全部相符），但範圍不足以達成本票自己宣稱的目的：041 把 data-collection-guide.md 的最後查核日推進到 2026-09-04，卻留下 :161／:171／:175 三句仍然錯誤的敘述，正是本票 Problem 親筆點名的『查核日期新而內容錯，比沒有查核日期更容易誤導』。captain 於 2026-09-04 裁決 revise 並擴充範圍：納入 scope notes 第二節已由 implement 與 verify 兩度查證的 14 處額外過時敘述。另裁示最後查核日採 2026-09-04（實際查核日）而非 AC-4 字面的 2026-09-03。FO 授權 fix：TODO.md:700 的路徑代換不完整（Polish）。
+review-round:
+    id: round:041:verify:1
+    stage: verify
+    cycle: 1
+    briefing:
+        id: briefing:041:verify:round-1
+        digest: sha256:c0ad2fcc2bac28e667bd0d5ecf8d1b6af8aa5d11c1af1b3c465407aaa88f2648
+        room-ref: '@review/verify/round-1'
 ---
 
 三份現行文件描述的產線狀態與實際行為不符，共七處。試算表編輯權限已開放給協作者，他們會依這些文件判斷什麼可做、什麼不可做。本 feature 讓文件敘述與實際行為一致，並保留原文脈絡。
@@ -169,6 +177,8 @@ Verified by: 更新後三份文件在 `INDEX.md` 的「最後查核」為 2026-0
 | `AGENTS.md` / `CLAUDE.md` | 已於 2026-09-02 更新，`build` 禁令解除的敘述正確 |
 
 ### Feedback Cycles
+
+- Cycle 1: REJECTED — verify；surface 5 檔／+177 淨行 vs estimate +90 ±40%（197%，超出上限 51 行；範圍擴充由 captain 授權，非 scope creep）；AC changed（captain 2026-09-04 裁決：AC-1 由七處擴充為 23 處；AC-4 查核日由 2026-09-03 改為 2026-09-04，理由為實際查核日，填 09-03 會製造本票要消滅的同一種不符）。退回主因非交付有錯——verify 判 PASSED、四項 checklist 全 DONE——而是範圍不足：本票把 data-collection-guide.md 的查核日推進到 09-04，卻留下 :161／:171／:175 三句仍錯，正是本票 Problem 親筆點名的「查核日期新而內容錯」。F-A fix（Polish：TODO.md:700 路徑代換不完整，子目錄更名時加了編號前綴，代換後路徑不存在）。擴充後補上 12 處確實過時、1 處部分過時（P2-9 兩面都寫），1 處尚未過時（INDEX.md 的 operations.md）依判定維持不動並記錄解除條件為 040 合併。原句全數保留，diff 刪除行僅 5 行日期欄位。
 
 ## Out of scope
 
