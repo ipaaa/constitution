@@ -31,13 +31,13 @@ gates:
                 decision: revise
                 reason: 交付本身乾淨（九處全對、原句一字未改、AC-1 三項指令由 verify 獨立重跑全部相符），但範圍不足以達成本票自己宣稱的目的：041 把 data-collection-guide.md 的最後查核日推進到 2026-09-04，卻留下 :161／:171／:175 三句仍然錯誤的敘述，正是本票 Problem 親筆點名的『查核日期新而內容錯，比沒有查核日期更容易誤導』。captain 於 2026-09-04 裁決 revise 並擴充範圍：納入 scope notes 第二節已由 implement 與 verify 兩度查證的 14 處額外過時敘述。另裁示最後查核日採 2026-09-04（實際查核日）而非 AC-4 字面的 2026-09-03。FO 授權 fix：TODO.md:700 的路徑代換不完整（Polish）。
 review-round:
-    id: round:041:verify:1
+    id: round:041:verify:2
     stage: verify
-    cycle: 1
+    cycle: 2
     briefing:
-        id: briefing:041:verify:round-1
-        digest: sha256:c0ad2fcc2bac28e667bd0d5ecf8d1b6af8aa5d11c1af1b3c465407aaa88f2648
-        room-ref: '@review/verify/round-1'
+        id: briefing:041:verify:round-2
+        digest: sha256:6e50a0984508ddad75fae97a52b1ff08f6839e5403bb770960c97906432f2de0
+        room-ref: '@review/verify/round-2'
 ---
 
 三份現行文件描述的產線狀態與實際行為不符，共七處。試算表編輯權限已開放給協作者，他們會依這些文件判斷什麼可做、什麼不可做。本 feature 讓文件敘述與實際行為一致，並保留原文脈絡。
@@ -179,6 +179,7 @@ Verified by: 更新後三份文件在 `INDEX.md` 的「最後查核」為 2026-0
 ### Feedback Cycles
 
 - Cycle 1: REJECTED — verify；surface 5 檔／+177 淨行 vs estimate +90 ±40%（197%，超出上限 51 行；範圍擴充由 captain 授權，非 scope creep）；AC changed（captain 2026-09-04 裁決：AC-1 由七處擴充為 23 處；AC-4 查核日由 2026-09-03 改為 2026-09-04，理由為實際查核日，填 09-03 會製造本票要消滅的同一種不符）。退回主因非交付有錯——verify 判 PASSED、四項 checklist 全 DONE——而是範圍不足：本票把 data-collection-guide.md 的查核日推進到 09-04，卻留下 :161／:171／:175 三句仍錯，正是本票 Problem 親筆點名的「查核日期新而內容錯」。F-A fix（Polish：TODO.md:700 路徑代換不完整，子目錄更名時加了編號前綴，代換後路徑不存在）。擴充後補上 12 處確實過時、1 處部分過時（P2-9 兩面都寫），1 處尚未過時（INDEX.md 的 operations.md）依判定維持不動並記錄解除條件為 040 合併。原句全數保留，diff 刪除行僅 5 行日期欄位。
+- Cycle 2: REJECTED — verify；surface 5 檔／淨 +185 行 vs estimate +90 ±40%（範圍擴充由 captain 於 cycle 1 授權，非 scope creep）；AC unchanged。退回原因為單一處：23 處中 22 處實質主張經 reviewer 以指令獨立複驗屬實，F-1（Material）`AGENTS.md:147` 的更正段寫「040 與 041 的 status 為 implement」，但跑它自附的掃描指令輸出為 `041 … verify`——成因是把會隨流程漂移的快照寫進 evergreen 文件，且會隨本票自己推進而繼續惡化，正是本票要消滅的形狀。F-1 fix：改為只陳述不漂移的事實，即時票況交給指令回答，改寫後無任何一句斷言票號或階段。F-2 fix（Polish：INDEX.md 沿用「design.md 第七節第 7–10 項」，施工順序表實際在第五節；錯誤源自 INDEX.md 原句，依體例保留原句以補述指出）；F-3 fix（Polish：design.md 修訂紀錄誤將 :46／:81 歸為第二節）；F-4 fix（Polish：TODO.md 誤指被引句在 :87-99，實際在 :110）。四項皆已修，未重做已通過的 22 處、AC 條文與 operations.md 判定。
 
 ## Out of scope
 
