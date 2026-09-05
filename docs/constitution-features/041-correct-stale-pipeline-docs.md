@@ -80,6 +80,45 @@ Semantics this may change: `none`。不改路由、不改資料形狀、不改�
 
 ## Acceptance criteria
 
+> ⚠️ **2026-09-04 captain 裁決：擴充驗收範圍。** 原文保留於下，實際驗收依本段。
+> AC-1 的「七處」擴充為 **23 處**。AC-4 的查核日由 2026-09-03 改為 **2026-09-04**。
+> 依 `## Review-finding disposition` 第 5 條，只有 captain 能改已核可的驗收範圍。
+> 擴充理由：041 把 `data-collection-guide.md` 的查核日推進到 2026-09-04，卻留下三句仍然錯誤的敘述，
+> 正是本票 Problem 點名的失效模式（「查核日期新而內容錯」）。
+> 查核日理由：實際查核發生在 2026-09-04，填 2026-09-03 會製造本票要消滅的同一種不符。
+>
+> **AC-1 涵蓋的 23 處清單**（括號內為更正後行號）：
+>
+> | # | 檔案 | 敘述 | 來源 |
+> |---|---|---|---|
+> | 1 | `design.md`（`:46`） | 產線現在是刻意斷開的 | 原七處 |
+> | 2 | `design.md`（`:81`） | 流程圖「⚠️ 尚未改寫」 | 擴充 |
+> | 3 | `design.md`（`:81`） | 流程圖「Track 1 的 status 空白也放行」 | 擴充 |
+> | 4 | `design.md`（`:81`） | 流程圖「不認識 site_tldr 分頁」 | 擴充 |
+> | 5 | `design.md`（`:255`） | 「投稿者 status 欄鎖住」寫成設計目標 | 原七處 |
+> | 6 | `design.md`（`:421`） | 施工項目 4 ⏸ 等有協作者再設 | 原七處 |
+> | 7 | `design.md`（`:434`） | 「目前狀態」同步刻意斷開 | 原七處 |
+> | 8 | `design.md`（`:476`） | 「h30–h46 共 17 筆從未上線」 | 擴充 |
+> | 9 | `TODO.md`（`:35`） | 動工前必讀：`build` 禁令尚未解除 | 原七處 |
+> | 10 | `TODO.md`（`:341`） | P1-1 搶救內容尚未搬回試算表 | 擴充 |
+> | 11 | `TODO.md`（`:531`） | P2-1 Track 1 完全沒有把關 | 原七處 |
+> | 12 | `TODO.md`（`:572`） | P2-1「修法不變，且更急」 | 原七處（同節第二則） |
+> | 13 | `TODO.md`（`:620`） | P2-6 sync 已將近 4 個月沒跑 | 擴充 |
+> | 14 | `TODO.md`（`:646`） | P2-8 已暫時緩解，尚未從根本解決 | 擴充 |
+> | 15 | `TODO.md`（`:661`） | P2-9 已納入設計，待施工（部分過時） | 擴充 |
+> | 16 | `TODO.md`（`:731`） | P3-2 表的 `憲庭加好友文件/` 路徑 | scope notes 第一節 |
+> | 17 | `TODO.md`（`:746`） | P3-3 表的 `憲庭加好友文件/` 路徑 | scope notes 第一節 |
+> | 18 | `data-collection-guide.md`（`:26`） | 產線改造尚未完成 | 原七處 |
+> | 19 | `data-collection-guide.md`（`:164`） | 目前 Vercel 的部署會執行同步 | 擴充 |
+> | 20 | `data-collection-guide.md`（`:183`） | 檢查機制尚未實作 | 擴充 |
+> | 21 | `data-collection-guide.md`（`:183`） | 「該指令現已禁止使用」 | 擴充 |
+> | 22 | `AGENTS.md`（`:146`） | 現有兩個 workflow，目前皆休眠 | 擴充 |
+> | 23 | `INDEX.md`（`:150`） | 整併第 2 階段 ⏸ 待產線改造完成 | 擴充 |
+>
+> **判定為尚未過時、維持不動**：`INDEX.md` 把 `docs/content-pipeline/operations.md` 列為「待新增」。
+> `git ls-tree main docs/content-pipeline/` 只有兩檔，`operations.md` 只存在於 feature 040 的 worktree。
+> **解除條件：feature 040 合併進 main。** 屆時該列才需要更正。
+
 **AC-1 — 七處敘述都不再與實際行為衝突。**
 Verified by: 逐處以指令取得實際行為，把指令與輸出貼進 stage report，再對照更正後的文字。`npm run build` 前後 `sha256sum src/data/*.json` 相同，證明部署不執行同步；`grep -n "isApproved" scripts/sync-content.mjs` 顯示 `(record.status || '').trim().toLowerCase() === 'approved'`，證明空白不放行；`git log --oneline -- src/data/history.json` 顯示 2026-09-02 之後有同步 commit，證明產線已接回。任一處的更正文字與其指令輸出不符，即為失敗。
 
@@ -91,6 +130,12 @@ Verified by: 對三份文件各取一處，從該段落起算 20 行內必須出
 
 **AC-4 — `docs/INDEX.md` 的最後查核日與實際一致。**
 Verified by: 更新後三份文件在 `INDEX.md` 的「最後查核」為 2026-09-03，且各文件檔頭的「最後查核」與之相同。兩處不一致即為失敗。
+
+> ⚠️ **2026-09-04 captain 裁決：日期改為 2026-09-04。** 原句保留於上。
+> 理由：實際查核發生在 2026-09-04，本票的補述也全部標 2026-09-04。
+> 填 2026-09-03 會讓查核日與內容不符，正是本票 Problem 點名要消滅的形狀
+> （「查核日期新而內容錯，比沒有查核日期更容易誤導」）。
+> 一致性的判定不變：`INDEX.md` 的三列與三份文件檔頭必須相同，不同即為失敗。
 
 ## Test plan
 

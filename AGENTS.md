@@ -143,6 +143,12 @@ robots: { index: false, follow: false },
 - `docs/constitution-features/` — 網站功能。**已於 2026-09-02 refit 至 0.28，可使用**
 - `docs/design-assets/` — 視覺素材。仍為 0.9.5，要用之前需先 refit
 
+> ⚠️ **2026-09-04 更正：「目前皆休眠」已不成立。`constitution-features` 正在運轉。**
+> 該 workflow 現有 040 與 041 兩張票的 `status` 為 `implement`，另有 15 張票的 `status` 為 `design`。
+> 驗證指令：`for f in docs/constitution-features/0*.md; do grep -m1 '^status:' "$f"; done`。
+> `docs/design-assets/` 仍為休眠，仍是 0.9.5，要用之前需先 refit。
+> 原句保留。
+
 **內容產線的施工走 `constitution-features` workflow**（2026-09-02 captain 決定，
 推翻 8/31「暫不進 workflow」的舊決定 —— 該決定的前提是 workflow 版本過舊，已於
 2026-09-02 refit 解除）。施工規格見 `docs/content-pipeline/design.md` 第五節。

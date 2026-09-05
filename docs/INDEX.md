@@ -147,6 +147,15 @@ docs/
 ⚠️ **必須等 `design.md` 第七節第 7–10 項完成後才做。**
 現在寫的是還沒實現的流程，寫完馬上又會過時。
 
+> ⚠️ **2026-09-04 更正：第 2 階段的等待條件已解除。**
+> 上面寫的解除條件是 `design.md` 第七節第 7–10 項。四項都已於 2026-09-02 完成。
+> 第 7 項改寫同步程式、第 8 項把同步移出 `build`（皆 PR #32），第 9 項首次正式同步（PR #33），
+> 第 10 項封存 `SSOT_Editor`。第 2 階段現在可以開工，不再是「⏸ 待產線改造完成」。
+> **一個例外**：上表的 `docs/content-pipeline/operations.md`（新增）維持「待新增」。
+> `git ls-tree main docs/content-pipeline/` 只有 `design.md` 與 `data-collection-guide.md` 兩檔。
+> `operations.md` 只存在於 feature 040 的 worktree，尚未合併。040 合併後才需要改這一列。
+> 原表格與原句保留。
+
 ### 第 4 階段 — 防漂移檢查（captain 已核准）
 
 現行規則「記得更新最後查核日期」是人為約定，機器無法驗證，違反 `design.md` 不變式 #6。
