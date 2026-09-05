@@ -30,6 +30,11 @@ gates:
                 at: "2026-09-05T03:37:26.405535Z"
                 decision: revise
                 reason: 交付本身乾淨（九處全對、原句一字未改、AC-1 三項指令由 verify 獨立重跑全部相符），但範圍不足以達成本票自己宣稱的目的：041 把 data-collection-guide.md 的最後查核日推進到 2026-09-04，卻留下 :161／:171／:175 三句仍然錯誤的敘述，正是本票 Problem 親筆點名的『查核日期新而內容錯，比沒有查核日期更容易誤導』。captain 於 2026-09-04 裁決 revise 並擴充範圍：納入 scope notes 第二節已由 implement 與 verify 兩度查證的 14 處額外過時敘述。另裁示最後查核日採 2026-09-04（實際查核日）而非 AC-4 字面的 2026-09-03。FO 授權 fix：TODO.md:700 的路徑代換不完整（Polish）。
+            - id: gate-attempt:041-verify-2
+              briefing:
+                id: briefing:041:verify:attempt-2:revision-1
+                digest: sha256:9dc5bbdf02e6b472891753cf87cafada35f616686c0152b722d406ba19144ec4
+                room-ref: '@review/verify/briefing-2'
 review-round:
     id: round:041:verify:2
     stage: verify
