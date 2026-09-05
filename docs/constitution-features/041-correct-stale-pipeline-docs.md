@@ -1,7 +1,7 @@
 ---
 id: 041
 title: 修正內容產線文件與實際行為不符之處
-status: verify
+status: review
 source: captain 2026-09-03
 started: 2026-09-05T00:05:49Z
 completed:
@@ -35,6 +35,17 @@ gates:
                 id: briefing:041:verify:attempt-2:revision-1
                 digest: sha256:9dc5bbdf02e6b472891753cf87cafada35f616686c0152b722d406ba19144ec4
                 room-ref: '@review/verify/briefing-2'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:041:verify:2
+                briefing: briefing:041:verify:attempt-2:revision-1
+                by: person:captain
+                at: "2026-09-05T04:10:04.637315Z"
+                decision: approve
+                reason: verify cycle 3 判 PASSED：F-1 至 F-4 全部修正並經獨立複驗。F-1 的修法以「未來也不會漂移」為標準驗證——更正段九句無一斷言票號、階段或數量，三道精確掃描零命中；段內實質主張逐一以指令查證屬實。三處導覽指引的六個被引行號全部實讀複驗，F-2 原句一字未改僅以補述指出。既有成果未破壞：刪除行仍只有 5 行日期欄位，24 處更正距離全驗 ≤20，src／scripts／兩份 record／_archive 皆未動，placeholder 零命中，資料檔指紋三個 cycle 相同。一項 Deferred risk 經 FO 授權 decline for 041 並記錄 promote 條件。captain 於 2026-09-04 核可進入 review。
+              application:
+                target-stage: review
+                state: consumed
 review-round:
     id: round:041:verify:2
     stage: verify
@@ -523,3 +534,33 @@ verify 判定 **PASSED**。F-1 的修法成立：`AGENTS.md` 更正段九句無�
 F-2、F-3、F-4 三處導覽指引已指向正確位置，六個被引行號（`design.md:349`／`:403`／`:465`、`TODO.md:105-108`／`:110`）全部實讀複驗；F-3 另四則節次我一併複查也正確。F-2 的原句 `INDEX.md:147` 確實一字未改，錯誤僅以 `**節次更正**` 補述指出，符合本票體例。
 
 既有成果未破壞：累計刪除行仍只有 5 行「最後查核」日期欄位，`design.md`／`TODO.md`／`AGENTS.md` 三檔零刪除；24 處更正距離全驗 ≤20（最遠 14 行）；`src/`、`scripts/`、兩份 record、`docs/_archive/**` 皆未出現於 `git diff --name-only`；`AGENTS.md` 為單一 hunk 9/0。`npx tsc --noEmit` 退出碼 0。另有一項 Deferred risk 只回報未修改，已記錄 promote 條件。
+
+## Stage Report: review
+
+- DONE: 逐項重現四項 acceptance criteria 的 `Verified by:` 子句，不採信 implement 或 verify 的自我回報：AC-1 的 23 處（含 captain 2026-09-04 擴充的部分）敘述是否都不再與實際行為衝突、AC-2 原句是否全數保留、AC-3 每處更正是否都在 20 行內可見、AC-4 的最後查核日是否四處一致
+  AC-1 **成立**。23 處的更正段全部落在 AC 清單指名的行號（`design.md:46/81×3/255/421/434/476`、`TODO.md:35/341/531/572/620/646/661/731/746`、`dcg:26/164/183×2`、`AGENTS.md:146`、`INDEX.md:150`），共 20 則 `⚠️` 段落。三項指名證據我自行重跑：`npm run build` 退出碼 0，前後 `shasum -a 256 src/data/*.json` 逐字相同（`4071978a…`／`4d1992e3…`），證明部署不執行同步；`grep -n isApproved scripts/sync-content.mjs` 得嚴格比對，空白不放行；`git log --oneline -- src/data/history.json` 得 `77d9cea`（2026-09-02，25→40 筆）。另自行查證：`package.json` 的 `build` 為 `next build`；`history.json` 40 筆且 h30–h46 十七筆全在；`sync-content.mjs:134/575/658` 支援 `site_tldr`、`:13/:17/:266/:294` 為檢查機制；`git ls-tree main docs/content-pipeline/` 只有兩檔；`editor-onboarding.md:35/54/58/110/117/381-382/453` 逐行實讀相符；`design.md:349/403/465` 節次相符；`TODO.md:105-108/:110` 相符且文末「已完成項目」列有 P1-1 與 P2-1；`design-assets/README.md:2` 為 `spacedock@0.9.5`、`constitution-features/README.md:2` 為 `0.28.0-pre2`、refit commit `1eff0e2` 存在。F-1 的修法我以其自附掃描指令實跑複驗：輸出 17 行、`041` 現為 `review`（已從 cycle 3 的 `verify` 漂移），而更正段對票號／階段／數量三道正規表達式掃描零命中，故輸出漂移不與該段衝突——這是 F-1 修法有效的正面證據。
+  AC-2 **成立**（結構性，非抽驗）。`git diff --numstat main...HEAD`：`design.md 74/0`、`TODO.md 65/0`、`AGENTS.md 9/0` 三檔零刪除；`INDEX.md 17/4`、`dcg 25/1` 的 5 行刪除逐行讀出全為「最後查核」日期欄位，`+`／`-` 兩側只差 `2026-09-03`→`2026-09-04`。23 處原句無一在 `-` 側。
+  AC-3 **成立**。自行以 `grep -n` 定位每處原敘述行與其後第一個 `⚠️ 2026-09-04 更正` 行相減：最遠 14 行（`design.md:67` 流程圖「尚未改寫」→`:81`），次遠 12 行（`TODO.md:634`→`:646`）、9 行（`design.md:412`→`:421`），其餘 ≤6 行。無一超過 20。
+  AC-4 **成立**。`INDEX.md:4`（檔頭）、`design.md:6`、`TODO.md:5`、`dcg:2` 四處皆為 `2026-09-04`；`INDEX.md:56/57/65` 三列亦為 `2026-09-04`，與各檔頭相同。
+- DONE: 依實際交付行為查核 `## Documentation impact` 每一筆：必要更新已完成、狀態為 `record` 的文件未被改寫、`docs/INDEX.md` 與實際文件增刪一致。特別確認 `INDEX.md` 把 `operations.md` 列為「待新增」那一列維持不動且解除條件已記錄
+  「現在更新」四筆全數完成：`design.md` 六則加註＋文末修訂紀錄 `:572`；`TODO.md` 九則加註＋文末「進度紀錄」追加 2026-09-04 一列；`dcg` 三則加註；`INDEX.md` 三列查核日更新。「實作後更新」為「無」，無事可查。「不更新」逐筆以 `git diff --name-only main...HEAD` 驗證：兩份 `record`（`2026-08-31-content-pipeline.md`、`2026-09-03-editor-onboarding.md`）、`docs/_archive/**`、040 的 entity 皆零命中，未被改寫。`src/`、`scripts/` 亦零命中，`npx tsc --noEmit` 退出碼 0，本票新增行的佔位字樣掃描零命中。本票未新增或刪除任何文件，`INDEX.md` 的檔案清單本就不需增列——三列日期以外未動，與實際一致。`operations.md`「待新增」那一列**維持不動**：`git ls-tree main docs/content-pipeline/` 只有 `design.md` 與 `data-collection-guide.md`，該列尚未過時；解除條件已寫進 `INDEX.md:157-159`（040 合併後才需改）。一筆不一致見下方 F-7。
+- DONE: 評估這份 diff 的品質與風險：本票只改五份 Markdown、淨增約 185 行（estimate 為 +90 ±40%，範圍擴充由 captain 授權）。請判斷是否有超出授權範圍的改動，以及三輪修正後是否留下任何互相矛盾的補述。另請注意本票與 feature 040 都改了 `docs/content-pipeline/design.md`，040 的 worktree 已追加 61 行尚未合併——請在報告中記錄本票所基於的 main 版本，供合併時對齊
+  **無超出授權範圍的改動。** `git diff --numstat main...HEAD` 只有五份 Markdown（`AGENTS.md 9/0`、`INDEX.md 17/4`、`dcg 25/1`、`design.md 74/0`、`TODO.md 65/0`；淨 +185）＋ entity ＋ 五個 gate artifact JSON。五份文件與 23 處全部落在 captain 2026-09-04 裁決明列的範圍內。`AGENTS.md` 為單一 hunk（`@@ -145,0 +146,9 @@`）；`CLAUDE.md` 是 `AGENTS.md` 的 symlink，更正自動同步，未另行改動。
+  **互相矛盾的補述：查無。** 20 則更正段我逐則讀過，彼此無衝突；`design.md:434` 對施工表第 9 項「🟢 下一步」的更正與 `INDEX.md:154-156` 對第 7–10 項的更正說法一致；`TODO.md:661` 的 P2-9「兩面都要看」與 `editor-onboarding.md:453` 的原文一致，未把殘留風險說成已解決。找到三項非矛盾的缺失，見下方 F-5 至 F-7。
+  **合併對齊基準**：041 的 `design.md` 基於 main 現行版本——`git rev-parse main:docs/content-pipeline/design.md` 與 merge-base `655f163` 同為 blob `7e4d4a3`，最後改動 commit 為 `4503319`；main HEAD `6e77dad` 未再動過該檔，故 041 不需 rebase。040 分支 `a51b5d9` 對同檔為 `61/1`。以舊行座標比對，兩票的 hunk **有兩處相撞**：一是檔頭（040 `@@ -2,7`，改寫「最後修訂」並新增「補述日期」；041 `@@ -3,6`，新增「最後查核」），二是文末修訂紀錄（兩票皆 `@@ -518,3`，各自追加一節）。其餘 hunk 在舊座標上不重疊。**後合併者需人工對齊這兩處**；implement 報告只點出文末那一處，檔頭這一處是本次新增的發現。
+
+### 三項只回報、未修改的 finding（未動任何位元組，等 FO 授權）
+
+- **F-5（Polish，任務歸屬：本票）** `design.md:82` 寫「`scripts/sync-content.mjs:354` 為 `return (record.status || '').trim().toLowerCase() === 'approved';`」，但 `grep -n` 輸出的 `:354` 是 `function isApproved(record) {`，該 `return` 在 `:355`。四項證據：(1) 讀者依 `design.md` 流程圖更正段跳到 `sync-content.mjs:354`；(2) 可觀察的損害——落在函式簽名行，要看的 `return` 就在下一行，不會導出錯誤結論；(3) 受影響的 AC——AC-1 只要求更正文字與指令輸出相符，實質主張「空白不放行」屬實，僅導覽行號差一行；(4) 觸發證據——`grep -n isApproved scripts/sync-content.mjs` 得 `354:function isApproved(record) {`，`sed -n '355p'` 得該 `return`。與 cycle 2 的 F-3／F-4（同為行號誤植，皆判 Polish）同一形狀。處置提議：修（`:354`→`:355`，或改為 `TODO.md:534` 的「`:354` 的函式是」寫法，該處措辭無誤）。
+- **F-6（Material／不歸本票所有 → Needs decision）** `dcg:216`「驗證方式建議執行 `npm run build`。該指令會執行同步並覆蓋資料檔，現已禁止。」與 `dcg:132`「該指令會執行同步並覆蓋資料檔，已於 2026-09-02 改掉。」兩句仍以現在式斷言 `build` 會跑同步／仍被禁止，皆已不成立。四項證據：(1) 讀者讀 `dcg`「驗證方式」一節或文末「變更說明」；(2) 可觀察的損害——誤以為 `build` 仍被禁；(3) 受影響的值——本檔為 `evergreen` 且本票把查核日推進到 2026-09-04，正是 Problem 點名的「查核日期新而內容錯」；(4) 觸發證據——`:216` 之前最近的更正段在 `:183`，相距 33 行且未提及該句，AC-3 的 20 行規則對它不成立。**但這兩句不在 captain 2026-09-04 裁決明列的 23 處內**，依 `## Review-finding disposition` 第 5 條只有 captain 能擴充範圍，故維持不動，請 captain 裁示併入本票或另開票。形狀與 cycle 1 verify 送出、captain 後來吸收的 `dcg:161/171/175` 完全相同。
+- **F-7（Polish，任務歸屬：本票）** `## Documentation impact` 的 `### 不更新` 表仍把 `AGENTS.md` / `CLAUDE.md` 列為不改，但交付依 captain 擴充後的 AC-1 第 22 項改了 `AGENTS.md`（9/0）。兩處互相矛盾。無事實衝突——該列的理由限於「`build` 禁令解除的敘述正確」，本票改的是「目前皆休眠」那一句，兩者不同——但表未隨裁決更新。處置提議：把 `AGENTS.md` 自「不更新」移到「現在更新」，或依本票體例在該表下追加一則說明。
+
+### Verdict
+
+**PASSED。** 四項 AC 全數以指令獨立重現成立，未採信 implement 或 verify 的自我回報。三項 finding 皆非 Material-且-歸本票所有：F-5、F-7 為 Polish，F-6 超出 captain 核可範圍屬 Needs decision。依 stage def「不得把新需求塞進 review」與 small-change fast path，且本票已在 cycle 3（再退回即觸發 captain 升級），三項一併送 gate 由 FO／captain 裁示，不作為退回理由。
+
+### Summary
+
+以指令逐項重現四項 `Verified by:` 子句：`npm run build` 退出碼 0 且前後資料檔指紋逐字相同、`isApproved()` 為嚴格比對、`77d9cea` 為 2026-09-02 首次正式同步；23 處更正段全部落在 AC 清單指名的行號，AC-2 由三檔零刪除構成結構性證明，AC-3 自行量測最遠 14 行，AC-4 四處查核日一致。`## Documentation impact` 三類逐筆查核，兩份 `record` 與 `_archive` 零命中，`operations.md`「待新增」那一列維持不動且解除條件已記錄。
+
+交付無超出授權範圍的改動，20 則更正段之間查無矛盾。找到三項缺失並依 disposition 只回報未修改：F-5 行號差一行（Polish）、F-6 `dcg:216`／`:132` 兩句殘留過時敘述但超出 captain 核可的 23 處（Needs decision）、F-7 `不更新` 表與已擴充的 AC-1 第 22 項互相矛盾（Polish）。合併對齊：041 的 `design.md` 基於 main 現行 blob `7e4d4a3`（commit `4503319`），不需 rebase；與 040 在檔頭與文末修訂紀錄**兩處**相撞，後合併者需人工對齊。
