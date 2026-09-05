@@ -436,3 +436,38 @@ verify 判定 **REJECTED**，單一原因是 F-1：`AGENTS.md:147` 主張 041 �
 另有三項 Polish（F-2 節次、F-3 節次、F-4 行號區間），皆為導覽指引指錯而非結論有誤，可與 F-1 一併在同一輪修掉。
 
 佔位資料掃描：對本票新增的所有行掃 `某學者`、`某大學法律系`、`test`、`lorem ipsum`、`快速了解最新判決的5個重點`，零命中；`src/data/*.json` 亦零命中，且 `npm run build` 前後兩檔 sha256 未變，證明本票未觸及資料檔。`npx tsc --noEmit` 退出碼 0。
+
+## Stage Report: implement (cycle 3)
+
+- DONE: F-1 —— 把 `AGENTS.md` 的更正段改寫為不會漂移的敘述，移除票號狀態快照
+  commit `e49f561`。刪掉「040 與 041 兩張票的 `status` 為 `implement`」與「另有 15 張票的 `status` 為 `design`」。改為三句不隨流程改變的事實：`docs/constitution-features/` 已於 2026-09-02 refit 至 0.28 並開始使用；原句上方第一個項目符號自己就寫了「已於 2026-09-02 refit 至 0.28，可使用」，與「皆休眠」互相矛盾；`docs/design-assets/README.md:2` 為 `commissioned-by: spacedock@0.9.5`，仍需 refit。並明文寫出**本文刻意不記錄票號與票況**及其理由。
+- DONE: 改完後跑一次那條掃描指令，確認更正段的每一句在當下與未來都不會與輸出衝突
+  指令改為 `for f in docs/constitution-features/0*.md; do printf '%s ' "$(basename "$f")"; grep -m1 '^status:' "$f"; done`（加了檔名輸出，原版只印 `status:` 行，看不出是哪張票）。實跑輸出 17 行，涵蓋 012–050。更正段現在**沒有任何一句斷言票號或階段**，因此輸出無論怎麼變都不會與它衝突。這是 F-1 成因的正面修法：evergreen 文件寫不變的事實，即時狀態交給指令。
+- DONE: F-2 —— `INDEX.md` 沿用「`design.md` 第七節第 7–10 項」的節次錯誤
+  更正段新增「**節次更正**」小節：編號的施工項目在第五節（`design.md:349`「五、更新流程與施工順序」，表格在 `:403`「施工順序」），第七節（`:465`「七、本設計未處理的事項」）是一張沒有編號的表。**原句 `INDEX.md:147` 一字未改**，節次錯誤以補述指出，符合本票體例。三個行號已用 assert 複驗。
+- DONE: F-3 —— `design.md` 修訂紀錄把 `:46` 與 `:81` 說成第二節
+  改為「『目前走到哪』一節開頭、同節流程圖後」，並加一句說明該節在第一節之前、沒有編號、不是第二節。複驗：`## 目前走到哪` 在 `:41`，`## 二、試算表要長怎樣` 在 `:135`，`:46` 與 `:81` 都落在前者之下。其餘四則節次原本就正確，未動。
+- DONE: F-4 —— `TODO.md` 把被引的句子說成 `:87-99`
+  改為「本檔 `:105-108` 逐項記錄查核結果，`:110` 寫明『回填工作到此結束，SSOT 內容面已無待辦』」。複驗：`:105-108` 為四個查核項目符號，`:110` 為該句。取 `:105-108` 而非 finding 寫的 `:104-108`，因為 `:104` 是空行。
+- DONE: 確認本輪未破壞既有成果 —— 23 處原句仍一字未改、每處更正距離仍 ≤20 行
+  AC-3 重跑 23 處：0 失敗，最遠 15 行。AC-2 重跑累計 `git diff -U0 655f163..HEAD`：五份文件只有 **5 行刪除**，仍是 AC-4 的日期欄位（`INDEX.md` 4 行、`data-collection-guide.md` 1 行），23 處原句皆不在 `-` 側。
+- DONE: `src/`／`scripts/`／`record` 文件／`_archive` 仍未動
+  本輪 `git status` 只列 4 份 Markdown（`AGENTS.md`、`INDEX.md`、`design.md`、`TODO.md`）。`npx tsc --noEmit` 退出碼 0。`shasum -a 256 src/data/*.json` 仍為 `4071978a…` / `4d1992e3…`。未執行 `npm run sync-content`。
+
+### 本輪 diff 的刪除行說明
+
+cycle 3 增量 diff 有 **9 行刪除**，全部是**我在 cycle 1／2 自己加的補述**，不是原文：`AGENTS.md` 更正段 4 行、`INDEX.md` 更正段 2 行、`design.md` 修訂紀錄 2 行、`TODO.md` 更正段 1 行。累計 diff 不受影響，仍只有 5 行日期欄位。
+
+cycle 3 增量 `git diff --numstat`：`AGENTS.md 7 4`、`INDEX.md 6 2`、`design.md 3 2`、`TODO.md 1 1`。
+
+### Surface 據實回報
+
+累計對五份文件淨增 **+185 行**（`git diff --numstat 655f163..HEAD`：新增 190、刪除 5）。原 estimate `+90 ±40%`（54–126），超出上限 59 行，約為 estimate 的 206%。本輪自身只淨增 8 行；累計超標的成因仍是 captain 2026-09-04 授權的範圍擴充。未為壓行數而省略任何一項應修的 finding。
+
+### Summary
+
+只處理 verify cycle 2 退回的四項 finding，未重做已通過的 22 處實質主張、AC-2／AC-3／AC-4 條文與 `operations.md` 的判定。
+
+F-1 的成因是把會隨流程漂移的快照寫進 evergreen 文件，`AGENTS.md` 的更正段已改為只陳述不漂移的事實，並把即時票況交給該段自附的掃描指令；改寫後該段沒有任何一句斷言票號或階段，因此指令輸出怎麼變都不會與它衝突。F-2、F-3、F-4 三處導覽指引已更正，其中 F-2 的錯誤來自 `INDEX.md` 原句，依本票體例原句保留、以補述指出節次有誤。
+
+複驗結果：23 處全數通過 AC-3（最遠 15 行）、累計刪除行仍只有 5 行日期欄位、`npx tsc --noEmit` 退出碼 0、`src/data/*.json` 指紋未變。累計淨增 +185 行，已據實回報。
