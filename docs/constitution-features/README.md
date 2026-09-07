@@ -41,7 +41,7 @@ This workflow tracks features for a constitution literacy website that makes Tai
 
 **本專案的工作規範在 [`../../AGENTS.md`](../../AGENTS.md)。動手前先讀。**
 
-該檔涵蓋：絕對不要做的事（含「不要執行 `npm run build`」）、怎麼跟 captain 溝通、
+該檔涵蓋：絕對不要做的事（含「不要執行 `npm run sync-content`」）、怎麼跟 captain 溝通、
 簡明技術中文寫作規則、文件狀態規範。
 
 > 舊版 README 曾指向 vault 根目錄的 `/CLAUDE.md` 與 `/style_guide.md`。
@@ -121,7 +121,7 @@ A worker builds the feature in a worktree branch based on the design spec. This 
 - **Bad:** Inline styles mixed with Tailwind, `any` types, copy-pasting large blocks from other tracks without adapting, breaking existing navigation or layout
 - When a finding arrives, follow `## Review-finding disposition`: investigate read-only, preserve its evidence, propose materiality/ownership/disposition, and obtain distinct FO authorization before any candidate edit, commit, or reviewer rerun.
 
-> ⚠️ **Never run `npm run build` or `npm run sync-content`.** The build script runs the content sync, which overwrites `src/data/*.json` from the spreadsheet. Verify with `npx tsc --noEmit` and `npm run dev`. See `../../AGENTS.md`.
+> ⚠️ **Never run `npm run sync-content`.** It overwrites `src/data/*.json` from the spreadsheet. `npm run build` is safe since 2026-09-02 — PR #32 moved the sync out of build — but prefer `npx tsc --noEmit` and `npm run dev` for routine verification. See `../../AGENTS.md`.
 
 ### `verify`
 
@@ -281,8 +281,8 @@ reproduce and that can fail. Name the concrete change that would make it fail.}
 
 ## Test plan
 
-{What verifies the implementation. Remember: `npx tsc --noEmit` and `npm run dev`,
-never `npm run build`.}
+{What verifies the implementation. Remember: `npx tsc --noEmit` and `npm run dev`;
+never `npm run sync-content`.}
 
 ## Documentation impact
 
@@ -333,3 +333,7 @@ The gate reads reviewer findings from here. Cycle 3 escalates to the captain.}
 - Commit status changes at dispatch and merge boundaries
 - Commit feature body updates when substantive
 - Implementation commits land on the worktree branch; merge to main happens via the `pr-merge` mod after PR review
+
+## 修訂紀錄
+
+- **2026-09-07（FO）** —— 三處移除已失效的 `npm run build` 禁令。PR #32 已於 2026-09-02 把內容同步移出 build，`AGENTS.md:19` 記載解禁。原敘述的理由（「build 會執行同步」）在該日之後不成立，且 `implement` stage 定義會由 `dispatch show-stage-def` 原封不動發給每一個 worker —— feature 040 的 implement 報告即以此為由 SKIP 了 `npm run build`，而同票的 verify 與 review 都實際執行了它。禁令因此改為只涵蓋 `npm run sync-content`。本檔為 FO 操作的流程文件，依寫入契約由 FO 直接修訂。
