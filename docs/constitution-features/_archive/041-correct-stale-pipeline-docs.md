@@ -1,16 +1,16 @@
 ---
 id: 041
 title: 修正內容產線文件與實際行為不符之處
-status: review
+status: complete
 source: captain 2026-09-03
 started: 2026-09-05T00:05:49Z
-completed:
-verdict:
+completed: 2026-09-07T23:08:43Z
+verdict: PASSED
 score:
 worktree: .worktrees/spacedock-ensign-041-correct-stale-pipeline-docs
 issue:
 pr: pr-merge:35
-mod-block: merge:pr-merge
+mod-block:
 gates:
     version: 1
     records:
@@ -64,7 +64,7 @@ gates:
                 reason: review 判 PASSED：四項 AC 全數以指令獨立重現成立，未採信 implement 或 verify 的自我回報。AC-2 為結構性證明——AGENTS.md 9/0、design.md 74/0、TODO.md 65/0 三檔零刪除，五行刪除全為日期欄位，原句不可能被改寫。Documentation impact 三類逐筆查核，兩份 record 與 _archive 零命中，operations.md「待新增」那列維持不動且解除條件已記錄。captain 於 2026-09-07 核可，並確認 041 本質為一次性還債、機制交由 feature 054：F-5／F-6／F-7 三項 finding 不吸收進本票，改以後續票追蹤。另 constitution-features/README.md 的同類過時處由 FO 依流程文件寫入權限直接修正。
               application:
                 target-stage: complete
-                state: pending
+                state: consumed
 review-round:
     id: round:041:verify:2
     stage: verify
@@ -73,6 +73,7 @@ review-round:
         id: briefing:041:verify:round-2
         digest: sha256:6e50a0984508ddad75fae97a52b1ff08f6839e5403bb770960c97906432f2de0
         room-ref: '@review/verify/round-2'
+archived: 2026-09-07T23:08:43Z
 ---
 
 三份現行文件描述的產線狀態與實際行為不符，共七處。試算表編輯權限已開放給協作者，他們會依這些文件判斷什麼可做、什麼不可做。本 feature 讓文件敘述與實際行為一致，並保留原文脈絡。
