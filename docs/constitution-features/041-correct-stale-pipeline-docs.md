@@ -9,7 +9,7 @@ verdict:
 score:
 worktree: .worktrees/spacedock-ensign-041-correct-stale-pipeline-docs
 issue:
-pr:
+pr: pr-merge:35
 mod-block:
 gates:
     version: 1
