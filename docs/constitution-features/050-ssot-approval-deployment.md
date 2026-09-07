@@ -6,7 +6,7 @@ source: captain 2026-09-04（把關機制體檢最高風險項：無票、無人
 started:
 completed:
 verdict:
-score:
+score: 0.95
 worktree:
 issue:
 pr:
