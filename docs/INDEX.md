@@ -1,7 +1,7 @@
 # 文件總索引
 
 **狀態**：evergreen
-**最後查核**：2026-09-03
+**最後查核**：2026-09-04
 **規則**：新增或刪除文件時，同步更新本檔。狀態定義見 [`../AGENTS.md`](../AGENTS.md)。
 
 狀態三種：
@@ -53,8 +53,8 @@ docs/
 
 | 路徑 | 用途 | 狀態 | 負責人 | 最後查核 |
 |---|---|---|---|---|
-| `docs/content-pipeline/design.md` | 產線的**唯一**規格文件；含 feature 040 已定案但尚未實作的核可版本綁定方向 | plan | captain | 2026-09-03 |
-| `docs/content-pipeline/data-collection-guide.md` | T3（未來軌）的資料收集流程。T1／T2 已移除，改指向 `design.md` | evergreen | captain | 2026-09-03 |
+| `docs/content-pipeline/design.md` | 產線的**唯一**規格文件；含 feature 040 已定案但尚未實作的核可版本綁定方向 | plan | captain | 2026-09-04 |
+| `docs/content-pipeline/data-collection-guide.md` | T3（未來軌）的資料收集流程。T1／T2 已移除，改指向 `design.md` | evergreen | captain | 2026-09-04 |
 
 ### 體檢與待辦
 
@@ -62,7 +62,7 @@ docs/
 |---|---|---|---|---|
 | `docs/health-check/2026-08-31-content-pipeline.md` | 體檢報告。出了什麼事、為什麼會上線。**含兩則補述，先看上方** | record | — | 2026-09-01 |
 | `docs/health-check/2026-09-03-editor-onboarding.md` | 學者編輯上稿流程稽核。開放編輯權限後還開著的洞、使用說明改寫對照、會議講稿 | record | — | 2026-09-03 |
-| `docs/health-check/TODO.md` | 待辦清單；含 feature 040 與多人編輯、正式同步的前置關係 | plan | captain | 2026-09-03 |
+| `docs/health-check/TODO.md` | 待辦清單；含 feature 040 與多人編輯、正式同步的前置關係 | plan | captain | 2026-09-04 |
 
 ### 搶救出來的內容
 
@@ -146,6 +146,19 @@ docs/
 
 ⚠️ **必須等 `design.md` 第七節第 7–10 項完成後才做。**
 現在寫的是還沒實現的流程，寫完馬上又會過時。
+
+> ⚠️ **2026-09-04 更正：第 2 階段的等待條件已解除。原句的節次也指錯了。**
+> **節次更正**：上面寫「`design.md` 第七節第 7–10 項」。編號的施工項目在**第五節**
+> （`design.md:349`「五、更新流程與施工順序」，表格在 `:403`「施工順序」）。
+> 第七節（`design.md:465`「七、本設計未處理的事項」）是一張沒有編號的表，沒有第 7–10 項。
+> 依本檔體例，原句保留不改，節次以本段更正。
+> **等待條件已解除**：第五節施工順序表的第 7–10 項都已於 2026-09-02 完成。
+> 第 7 項改寫同步程式、第 8 項把同步移出 `build`（皆 PR #32），第 9 項首次正式同步（PR #33），
+> 第 10 項封存 `SSOT_Editor`。第 2 階段現在可以開工，不再是「⏸ 待產線改造完成」。
+> **一個例外**：上表的 `docs/content-pipeline/operations.md`（新增）維持「待新增」。
+> `git ls-tree main docs/content-pipeline/` 只有 `design.md` 與 `data-collection-guide.md` 兩檔。
+> `operations.md` 只存在於 feature 040 的 worktree，尚未合併。040 合併後才需要改這一列。
+> 原表格與原句保留。
 
 ### 第 4 階段 — 防漂移檢查（captain 已核准）
 

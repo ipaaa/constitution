@@ -143,6 +143,15 @@ robots: { index: false, follow: false },
 - `docs/constitution-features/` — 網站功能。**已於 2026-09-02 refit 至 0.28，可使用**
 - `docs/design-assets/` — 視覺素材。仍為 0.9.5，要用之前需先 refit
 
+> ⚠️ **2026-09-04 更正：上面「目前皆休眠」寫於 refit 之前，已不成立。**
+> `docs/constitution-features/` 已於 2026-09-02 refit 至 0.28 並開始使用。
+> 上面第一個項目符號自己就寫了「已於 2026-09-02 refit 至 0.28，可使用」，與「皆休眠」互相矛盾。
+> **本文刻意不寫票號與票況。** 那是會隨流程漂移的快照，寫進 evergreen 文件就會過時。
+> 要知道當下有哪些票、各自在哪一階段，跑這條指令：
+> `for f in docs/constitution-features/0*.md; do printf '%s ' "$(basename "$f")"; grep -m1 '^status:' "$f"; done`
+> `docs/design-assets/` 的休眠敘述仍然正確。`docs/design-assets/README.md:2` 為 `commissioned-by: spacedock@0.9.5`，要用之前需先 refit。
+> 原句保留。
+
 **內容產線的施工走 `constitution-features` workflow**（2026-09-02 captain 決定，
 推翻 8/31「暫不進 workflow」的舊決定 —— 該決定的前提是 workflow 版本過舊，已於
 2026-09-02 refit 解除）。施工規格見 `docs/content-pipeline/design.md` 第五節。
