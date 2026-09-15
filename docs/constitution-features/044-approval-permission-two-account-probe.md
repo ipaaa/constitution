@@ -949,6 +949,8 @@ implement stage 要跑的檢查：
 
 ### Feedback Cycles
 
+- Cycle 1: REJECTED — verify；AC changed: no。安全查核與程序回寫兩項通過，退回原因為單一 Material finding：證據文件與 AC-2 判定列宣稱 P1／P3 的三個 `approved_*` 欄經實測不變，而原始記錄 P1 僅觀察兩欄、P3 完全未觀察。**成因在 FO**——probe 執行時 FO 只向 captain 詢問兩欄，撰寫時把 AC 的要求誤當成已觀察的事實。FO 授權 fix，方向為「如實縮小宣稱並揭露缺口」而非補做觀察（probe 已收尾）。修正後不僅改正該處，另主動揭露共五項記錄缺口並於檔頭加總覽，明載「記錄缺口，不是行為失敗；行為結論不受影響，但證據強度低於 AC 原文要求」。七命題的行為結論全數維持。
+
 
 ## Out of scope
 
