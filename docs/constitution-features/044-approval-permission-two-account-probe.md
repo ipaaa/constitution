@@ -11,6 +11,17 @@ worktree: .worktrees/spacedock-ensign-044-approval-permission-two-account-probe
 issue:
 pr:
 mod-block:
+gates:
+    version: 1
+    records:
+        - id: gate:044:verify
+          stage: verify
+          attempts:
+            - id: gate-attempt:044-verify-1
+              briefing:
+                id: briefing:044:verify:attempt-1:revision-1
+                digest: sha256:7a0c11f8a920831eaea47e0963d2b71ca74713b19f065192a999ad22d12dbb6b
+                room-ref: '@review/verify/briefing-1'
 ---
 
 在隔離測試表上以兩個 Google 帳號實跑，證明核可欄位的權限邊界與 `status` 公式對「他人修改內容」與「責任編輯自行修改內容」都會重新計算。
