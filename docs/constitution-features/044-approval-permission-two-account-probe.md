@@ -731,6 +731,10 @@ probe 已執行完畢。完整記錄在 `docs/content-pipeline/approval-permissi
 
 **feature 040 在 verify cycle 1 被判 REJECTED 的 AC-2 與 AC-4，所需的試算表端證據已齊備。**
 
+**但有一項限制，040 的 gate 必須知道**：齊備的是 `status` 重算的行為證據。
+`approved_*` 三欄「逐字不變」的證據**不齊**——P1 只查核 `approved_by` 與 `approved_at` 兩欄，
+P3 完全未查核。040 的 gate 若要求該項，需另行補測。
+
 ### 結論一：保護範圍必須以非擁有者帳號逐格實測驗收，不得以設定畫面為準
 
 本次即因為只看設定畫面而漏設。清查時 `Track 1_history`
@@ -863,10 +867,10 @@ feature 050 步驟 6 的 A/B 兩類保護分法維持未驗證狀態。
 | AC | 判定 | 依據與落差 |
 |---|---|---|
 | AC-1 | **通過（粒度不足）** | 七格 `current_fingerprint` 全部相符。但比對的是開頭 8 碼與結尾 8 碼，不是 AC 原文要求的完整 64 字元逐字比對 |
-| AC-2 | **通過（記錄缺口）** | P1 與 P3 的 `status` 都由 `Approved` 轉為 `Needs review`，`approved_*` 三欄不變。缺口：P1 改動後的 `current_fingerprint` 實際值未記錄，未與 `bab4a7d2…6843` 逐字比對 |
+| AC-2 | **部分達成** | 行為結論成立：P1 與 P3 的 `status` 都由 `Approved` 轉為 `Needs review`，退回與操作者身分無關。**三項記錄缺口**：(a) P1 只查核 `approved_by` 與 `approved_at` 兩欄，**`approved_fingerprint` 未查核**；(b) **P3 完全未查核三個 `approved_*` 欄**；(c) P1 改動後的 `current_fingerprint` 實際值未記錄，未與 `bab4a7d2…6843` 逐字比對。AC 原文要求 P1 與 P3 兩次都確認三欄逐字不變，該證據不存在 |
 | AC-3 | **部分達成** | 行為結論成立（投稿者改不動審核欄、公式欄與標題列，改得動內容欄），但**只逐格記錄五格**（A1、K2、L2、N2、D2），未達 AC 原文的「八欄＋三次繞道＝十一項」。「整列複製貼上」與「刪除整欄」兩項繞道未測。**依 AC 原文，記錄粒度不成立，是否補測由 captain 決定** |
 | AC-4 | **通過（間接證明）** | A 填入 `probe-note` 後 `status` 維持 `Approved`。`APPROVAL_STATUS` 只在三份指紋相符時顯示 `Approved`，故指紋確未改變。缺口：指紋值未逐字記錄 |
-| AC-5 | **通過** | `status` 為 `Rejected`、`approved_by` 與 `approved_at` 保留；改內容後轉為 `Needs review` |
+| AC-5 | **通過（記錄缺口）** | `status` 為 `Rejected`、`approved_by` 與 `approved_at` 保留；改內容後轉為 `Needs review`。缺口：`review_decision`、`reject_reason`、`approved_fingerprint` 三欄的實際值未查核。`probe-reject` 是輸入值，不是觀察到的欄位值 |
 | AC-6 | **SKIPPED** | P6（步驟 12）由 captain 於 2026-09-15 決定跳過。trigger 寫入路徑**維持 `UNPROVEN`**。AC 要求的結論句仍寫進證據文件：trigger 只能當加速提示，不取代 `scripts/sync-content.mjs` 的指紋閘門。`design.md` 與 `operations.md` 未因本票放寬同步端檢查。**補做路徑見步驟 12 的追加補述** |
 | AC-7 | **部分達成** | 證據文件已建立，狀態 `record`，含測試表 ID 雜湊、兩個角色、步驟與結果。三項缺口：(a) **execution ID 不存在於現行介面**，以指紋對照替代，見步驟 3 的追加補述二；(b) 逐步 UTC 時間未記錄；(c) 洩漏檢查指令一無輸出，指令二有一行輸出，即 Apps Script commit sha（40 字元）。該值是本票 checklist 明文要求記錄的公開 commit，不是洩漏。指令二若改為先挖掉 40 位十六進位字串再比對即無輸出 |
 | AC-8 | **通過** | `git grep` 無輸出（exit 1）。`probe-trigger.gs` 與其觸發條件**從未建立**（P6 跳過），故無須刪除。B 已移出乙類保護範圍的允許名單。測試表由 captain 決定保留，供補做 P6 |
@@ -1043,3 +1047,47 @@ design stage 沒有 Google 帳號、沒有試算表，所以全部證據改用�
 安全查核與程序回寫兩項全數通過：本輪新增內容無 email、無測試表 ID 原值、無 Google 網址，四則程序補述皆為追加且原句保留，交給 feature 050 的兩項結論明確記載。事實查核發現一處美化：證據文件與 AC-2 判定列宣稱 P1／P3 的三個 `approved_*` 欄不變，而原始記錄 P1 只有兩欄、P3 一欄未記。依本階段檢核標準「任一處與原始記錄不符或被美化即為 REJECTED」。
 
 **判定：REJECTED。** 修正範圍極小（兩處句子改為與原始記錄一致並補記缺口），不影響任何命題的行為結論。
+
+## Stage Report: implement (cycle 2)
+
+- DONE: 把證據文件與 044 票中關於 `approved_*` 的宣稱改為與原始記錄一致：`approval-permission-probe.md` 的 P1 一節只陳述 `approved_by` 與 `approved_at` 兩欄仍有值，不得宣稱三欄；AC-2 判定列同樣修正。P3 一節與 AC-2 判定列各補記一句明確的記錄缺口：`approved_*` 於 P3 未查核。缺口要寫成可見的陳述，不是刪掉不提。
+  P1 實際欄改為「`approved_by` 與 `approved_at` 仍有值」，並新增「記錄缺口一：**`approved_fingerprint` 未查核**」。P3 新增「記錄缺口：**P3 完全未查核三個 `approved_*` 欄**」。AC-2 判定由「通過（記錄缺口）」改為**部分達成**，三項缺口逐條列出。文件開頭的缺口清單由三項擴為五項，第 4 項即此事。
+- DONE: 確認修正後全文再無任何超出原始記錄 `/tmp/sd044-probe-log.md` 的觀察宣稱。請逐節比對七個命題，把比對結果寫進 stage report——特別注意其他可能同型的問題。
+  逐節比對表見下。**另找到三處同型問題，全部已修**。
+- DONE: 維持既有成果不變：P2 假通過的全程記載、P6 跳過與補做路徑、四則程序補述、交給 feature 050 的兩項結論，均不得改動。安全邊界不變。
+  `git diff` 的刪除行只有 10 行，全部是本輪要修的宣稱（見 commit）。四則補述、P2 全程、P6 補做路徑、兩項結論的關鍵字逐一 grep 仍在。洩漏指令一無輸出；指令二仍只輸出第 8 行的 commit sha。
+
+### 逐節比對結果（對照 `/tmp/sd044-probe-log.md`）
+
+| 節 | 比對結果 |
+|---|---|
+| 環境建立、指紋核對 | 相符。另修一處：測試表描述刪去原始記錄沒有的「也不是正式表的複本」 |
+| P1 | **不符，已修**。原始記錄第 91 行只有 `approved_by`、`approved_at`；文件曾寫三欄 |
+| P2 | 相符。五格表、假通過全程、重驗五格逐項對得上 |
+| P3 | **不符，已修**。原始記錄只觀察 `status`，文件未宣稱三欄但也未揭露缺口，現已補記 |
+| P4 | 相符。前置修正與 `status` 維持 `Approved` 皆有據 |
+| P5 | **同型問題，已修**。`review_decision`、`reject_reason`、`approved_fingerprint` 的實際值原始記錄未載。`probe-reject` 是輸入值，不是觀察值。AC-5 判定改為「通過（記錄缺口）」 |
+| P6 | 相符。未執行，跳過理由與補做路徑逐項對得上 |
+| P7 | 相符。a／b／c 三項與 `無法取得核可者身分。` 未出現皆有據 |
+
+**另外兩處同型問題（非命題節）：**
+
+1. **「Apps Script 執行紀錄」表杜撰函式名。** 文件曾寫核可動作的函式為 `approveSelectedRows`。原始記錄未載任何核可執行紀錄，而 `approval-workflow.gs:201` 的實際函式名是 `approveActiveRows`——**杜撰的名字連程式都對不上**。已改為「未記錄」。
+2. **「執行期間」宣稱 probe 自 2026-09-08 起跑。** 原始記錄只對 2026-09-15 的事件標日期，2026-09-08 是本票 implement 的起算日，不是 probe 的起跑日。已改為分開陳述。
+
+**一處宣稱已加限制**：「040 的 AC-2 與 AC-4 所需的試算表端證據已齊備」在兩個檔各加一段限制——齊備的是 `status` 重算的行為證據，`approved_*` 逐字不變的證據不齊。這正是 reviewer 指出的可觀察傷害。
+
+**一處依據已標明**：「過程發現一」的同步程式反應表加註「依據是閱讀 `validateApprovalBinding` 的程式碼，不是實跑同步」。本 probe 全程不執行 `npm run sync-content`。
+
+### 可失敗的證據
+
+- `grep -n 'approved_' docs/content-pipeline/approval-permission-probe.md` 已無「三個 `approved_*` 欄保留原值」。P1 節現有「記錄缺口一」，P3 節現有「記錄缺口」。**任何一處改回三欄宣稱，grep 就會再出現該句。**
+- `grep -n 'approveSelectedRows'` 無輸出（exit 1）。該函式名在 `approval-workflow.gs` 中不存在，實際為 `approveActiveRows`（`:201`）。
+- `git diff` 對本輪只有 10 行刪除，全部是被修正的宣稱本身。**若誤刪 P2 全程或四則補述，刪除行數會遠高於此。**
+- 洩漏指令一無輸出（exit 1）；指令二輸出仍只有 commit sha 一行。
+
+### Summary
+
+reviewer 指對了。錯誤不是臆測，是把 AC 的要求當成已觀察的事實寫進 `record` 文件——同一節裡其他落差都揭露了，唯獨這一處沒有。
+逐節重比七個命題後另找到三處同型問題，其中最嚴重的是「Apps Script 執行紀錄」表杜撰了函式名 `approveSelectedRows`，而程式裡實際叫 `approveActiveRows`。那張表原本就是「未記錄」的一欄，不該有任何函式名出現在核可那一列。
+修正方向一律是縮小宣稱並把缺口寫成可見的句子，沒有刪除任何既有成果。文件開頭的缺口清單因此由三項增為五項，讓讀者在讀任何一節之前先知道證據強度的上限。

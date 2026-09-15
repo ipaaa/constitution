@@ -1,19 +1,24 @@
 # 隔離測試表兩帳號 probe 記錄
 
 **狀態**：record
-**執行期間**：2026-09-08（feature 044 進入 implement）至 2026-09-15（結案）
+**執行期間**：工作記錄只對 2026-09-15 的事件標日期（P2 重驗、P7、收尾）。
+其餘步驟的執行日期未記錄。feature 044 的 implement stage 於 2026-09-08 起算。
 **測試表 ID 雜湊（SHA-256）**：`a186d380c903dc493dbbd7c863deab2fa23d39142de97b49ffab0f96f1660a99`
 **Apps Script 版本**：`scripts/apps-script/approval-workflow.gs`，commit
 `093cd013515d64522dc47662202fd5ad3ce73b84`
 
 本檔是 `record`。不改寫原文。要修正就追加一節補述。
 
-> **本檔的記錄粒度有三個已知缺口，先講清楚：**
+> **本檔的記錄粒度有五個已知缺口，先講清楚：**
 > 1. 各步驟的 UTC 時間沒有逐步記錄。工作記錄只對 2026-09-15 的事件標日期。
 > 2. Apps Script execution ID 沒有記錄。現行介面不提供該欄位，見「Apps Script 執行紀錄」一節。
 > 3. P2 的記錄是五格，不是 feature 044 的票所要求的十一項。見「P2」一節。
+> 4. **`approved_*` 三欄的查核不完整。** P1 只查核 `approved_by` 與 `approved_at` 兩欄；
+>    P3 完全未查核這三欄。票內 AC-2 要求兩次都確認三欄逐字不變。見 P1 與 P3 兩節。
+> 5. 各命題的 `current_fingerprint` 實際值都沒有逐字記錄，改以 `status` 的行為間接證明。
 >
-> 這三項都是記錄缺口，不是行為失敗。各命題的行為結論不受影響。
+> 這五項都是記錄缺口，不是行為失敗。各命題的行為結論不受影響，但**證據強度低於 AC 原文要求**。
+> **本檔只記錄真正觀察到的事。沒有觀察到的，寫成缺口，不寫成事實。**
 
 ---
 
@@ -32,7 +37,7 @@
 
 ### 測試表
 
-全新獨立試算表，不是正式 SSOT 的分頁，也不是正式表的複本。三個分頁的名稱逐字建立。
+全新獨立試算表，不是正式 SSOT 的分頁。三個分頁的名稱逐字建立。
 
 ### 三個分頁的匯入結果
 
@@ -120,13 +125,17 @@ feature 050 的步驟 3 不需要改寫標題規則。
 
 - 操作：A 修改 `Track 1_history` 列 2 的內容欄。
 - 預期：`status` 轉為 `Needs review`，`approved_by`、`approved_at`、`approved_fingerprint` 不變。
-- 實際：`status` 轉為 `Needs review`。三個 `approved_*` 欄保留原值。
+- 實際：`status` 轉為 `Needs review`。`approved_by` 與 `approved_at` 仍有值。
 - 判定：通過。
 
 **意義**：這是 feature 040 的 AC-4 在 verify cycle 1 被判 REJECTED 時所缺的表端證據。
 公式不依操作者身分放行。責任編輯自己改內容，核可一樣失效。
 
-**記錄缺口**：修改後 `current_fingerprint` 的實際值沒有記錄。
+**記錄缺口一**：**`approved_fingerprint` 未查核。**
+原始記錄只觀察到 `approved_by` 與 `approved_at` 兩欄仍有值。
+票內 AC-2 要求三欄逐字不變。第三欄的證據不存在，本節不宣稱它未變。
+
+**記錄缺口二**：修改後 `current_fingerprint` 的實際值沒有記錄。
 票內 AC-2 要求它逐字等於 `bab4a7d2c9e29c3044b1afda0d252e44ca3624a019f7700d520874a8e6806843`。
 本次只記錄了 `status` 的轉換。
 
@@ -207,7 +216,13 @@ feature 044 的票的 AC-3 要求逐項記錄八個審核欄位的編輯嘗試�
 **意義**：這是 feature 040 的 AC-2。配合 P1 可得結論：**退回與操作者身分無關。**
 公式只比對指紋。
 
-**附帶證據**：B 改得動內容欄、改不動審核欄。保護範圍的分界正確，未過度保護。
+**記錄缺口**：**P3 完全未查核 `approved_by`、`approved_at`、`approved_fingerprint` 三欄。**
+原始記錄這一節只觀察 `status`。票內 AC-2 要求 P1 與 P3 兩次都確認三欄逐字不變，
+P3 這一半的證據不存在。本節不宣稱這三欄未變。
+
+**附帶證據（有時序保留）**：原始記錄此處寫「B 改得動內容欄、改不動審核欄」。
+這句寫於發現 P2 假通過之前，當時 `Track 1_history` 的保護範圍尚未補齊。
+**保護分界的有效證據是 P2 的重驗，不是這一句。**
 
 ### P4　只改審核欄位不會退回　通過
 
@@ -237,6 +252,10 @@ feature 044 的票的 AC-3 要求逐項記錄八個審核欄位的編輯嘗試�
 | `approved_at` | 仍有值 |
 
 後半：A 在拒絕狀態下修改列 3 的 `content`，`status` 由 `Rejected` 轉為 `Needs review`。
+
+**記錄缺口**：`review_decision` 與 `reject_reason` 兩欄的實際值未查核。
+`probe-reject` 是輸入值，不是觀察到的欄位值。票內 AC-5 要求 `reject_reason` 為 `probe-reject`，
+本次未記錄該欄的實際內容。`approved_fingerprint` 同樣未查核。
 
 **意義**：拒絕不抹除稽核紀錄。上一次核可的操作者與時間仍可追溯。
 `Rejected` 也不是終點狀態。稿件一經修改就回到待審，編輯不需要人工清除拒絕標記。
@@ -304,6 +323,9 @@ A 可以手動編輯 `status` 欄。Google 試算表的保護範圍無法排除�
 | 手打 `status = Approved`，未真正核可 | 擋下：`核可紀錄缺少 review_decision。` |
 | 手打 `status` 且偽造 `review_decision` | 擋下：`review_fingerprint 與目前發布內容不符。` |
 
+**這張表的依據是閱讀 `validateApprovalBinding` 的程式碼，不是實跑同步。**
+本 probe 全程不執行 `npm run sync-content`，不設定測試表的 CSV URL。
+
 **操作風險**：手動編輯 `status` 會覆蓋該格公式。該列狀態自此不再自動更新，
 必須重跑「安裝／更新公式」還原。
 **feature 050 的操作手冊要明訂：不要手動編輯 `status` 欄。**
@@ -338,7 +360,7 @@ B 當時不在該範圍的允許名單內，寫入被拒。
 | 安裝公式 `Track 1_history` | `installApprovalFormulas` | 未記錄 | 成功 |
 | 安裝公式 `Track 2_discussion` | `installApprovalFormulas` | 未記錄 | 成功 |
 | 安裝公式 `site_tldr` | `installApprovalFormulas` | 未記錄 | 成功 |
-| 核可七列（三次） | `approveSelectedRows` 等選單動作 | 未記錄 | 成功 |
+| 核可七列（三次） | 未記錄 | 未記錄 | 成功 |
 
 **替代證據**：「指紋核對」一節的七格比對。
 它證明測試表上執行的程式就是 repo 的 `approval-workflow.gs`。
@@ -377,6 +399,10 @@ B 當時不在該範圍的允許名單內，寫入被拒。
 
 **feature 040 在 verify cycle 1 被判 REJECTED 的 AC-2 與 AC-4，
 所需的試算表端證據已經齊備。**
+
+**但有一項限制，040 的 gate 必須知道**：齊備的是 `status` 重算的行為證據。
+`approved_*` 三欄「逐字不變」的證據**不齊**——P1 只查核 `approved_by` 與 `approved_at` 兩欄，
+P3 完全未查核。040 的 gate 若要求該項，需另行補測。
 
 ### 要交給 feature 050 的兩項結論
 
