@@ -1,13 +1,13 @@
 ---
 id: 044
 title: 隔離測試表兩帳號 probe：驗證核可欄位權限與公式重算
-status: design
+status: implement
 source: captain 2026-09-04（feature 040 verify gate 裁決方案 B 拆出）
 started: 2026-09-08T02:35:20Z
 completed:
 verdict:
 score: 0.96
-worktree:
+worktree: .worktrees/spacedock-ensign-044-approval-permission-two-account-probe
 issue:
 pr:
 mod-block:
