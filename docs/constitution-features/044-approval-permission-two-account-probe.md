@@ -1006,3 +1006,40 @@ design stage 沒有 Google 帳號、沒有試算表，所以全部證據改用�
 證據文件如實記錄 P2 的假通過與重驗全程，因為那是本 probe 最有價值的發現：保護範圍設定看起來正確卻未生效，而它是阻止投稿者偽造自洽核可的唯一防線——同步端指紋閘門擋不住這條路。
 判定時沒有把記錄缺口寫成通過。AC-3 只實測五格、未達原文要求的十一項，判為**部分達成**並列出未測項目，是否補測交 captain 決定；AC-1 的指紋比對只做頭尾各 8 碼、AC-2 與 AC-4 的指紋值未逐字記錄，三項都在判定表中寫明落差。
 一項要 captain 注意的衝突：本票 checklist 要求證據文件記錄 Apps Script commit sha，但該值為 40 個十六進位字元，會被 AC-7 第二條洩漏檢查指令命中。指令實測輸出該行。這不是洩漏（公開 repo 的 commit），但依 AC 原文即為有輸出。AC 原文未改，落差記在判定表中。
+
+## Stage Report: verify
+
+- FAILED: 逐項查核證據文件 `docs/content-pipeline/approval-permission-probe.md` 的事實正確性：七個命題的判定是否與 `/tmp/sd044-probe-log.md` 的原始記錄一致、P2 首次假通過的過程是否如實保留而非只寫最終結果、P6 跳過與其補做路徑是否記載完整。任一處與原始記錄不符或被美化即為 REJECTED。
+  七命題判定、P2 假通過全程（首測→清查五格→推翻→補設三範圍→重驗）、P6 跳過理由與五項補做路徑均與原始記錄逐項相符；但 `approved_*` 有兩處宣稱超出原始記錄，見 Finding 1。
+- DONE: 安全查核（最高優先）：證據文件與本輪所有新增內容不得出現帳號 email、測試表 ID 原值、正式 SSOT 網址。
+  四道掃描全部乾淨，指令與輸出見下方「安全掃描實跑」。測試表僅以 `a186d380…0a99` 呈現；`src/data/*.json` 與 main 的 sha256 相同，probe 佔位值未進入。
+- DONE: 查核四項程序缺漏是否確實回寫進 044 票的對應步驟、且為追加補述而非改寫原句；並確認交給 feature 050 的兩項結論已明確記載。
+  四則補述在第 315（步驟 2 匯入）、344（步驟 3 `onOpen` 誤認）、349（步驟 3／5／11／12 execution ID 不存在）、431（步驟 6 十格逐欄檢查表＋行為驗收）行，皆標「原句保留」；`git diff 0631698..HEAD -U0` 的刪除行僅 `-status: design` 與 `-worktree:` 兩行狀態欄位。兩項結論在第 734、745 行。
+
+### 安全掃描實跑
+
+    # 本輪新增行（實作 commit 36af185）掃 email／Google 網址 → 無輸出
+    git show HEAD~1 -U0 | grep '^+' | grep -vE '^\+\+\+' \
+      | grep -nE '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|docs\.google\.com|/spreadsheets/d/|script\.google\.com'   # exit=1
+    # 本輪新增行掃裸識別碼（先挖掉 64／40／8 位十六進位）→ 僅命中檔名與路徑，無 ID
+    git show HEAD~1 -U0 | grep '^+' | sed -E 's/[a-f0-9]{64}//g; s/[a-f0-9]{40}//g; s/[a-f0-9]{7,8}//g' | grep -nE '[A-Za-z0-9_-]{25,}'
+    # AC-7 指令一（證據文件）→ 無輸出（exit=1）
+    grep -nE '@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|docs\.google\.com|/spreadsheets/d/' docs/content-pipeline/approval-permission-probe.md
+    # AC-7 指令二 → 唯一輸出為第 7 行 Apps Script commit sha 093cd01…（票內明文要求記錄的公開值，非洩漏）；再挖掉 40 位十六進位後無輸出
+    # AC-8 → git grep -nE 'probe-h1|probe-d1|probe content A|probe tldr title|probeTriggerWrite' -- src scripts   # exit=1
+    # src/data 佔位值 → grep -nE 'probe-h1|probe content|probe-note|probe-reject' src/data/*.json   # exit=1
+
+### Finding 1（Material）：`approved_*` 的宣稱超出原始記錄
+
+- 釋出使用者與正常流程：captain 與 feature 050／040 讀本票的 AC-2 判定列，判斷「040 被 REJECTED 的表端證據已齊備」。
+- 可觀察的損害：讀者會相信 P1 的 `approved_fingerprint` 與 P3 的三個 `approved_*` 欄都經實測確認未變，實際未觀察。
+- 受影響的 AC／邊界：本票 AC-2 原文要求 P1 與 P3「`approved_by`／`approved_at`／`approved_fingerprint` 三欄逐字不變」；`record` 文件不得美化。
+- 觸發證據：`/tmp/sd044-probe-log.md:91` 的 P1 只記 `approved_by`、`approved_at` 兩欄；同檔 P3 一節完全未記 `approved_*`。但 `docs/content-pipeline/approval-permission-probe.md:123` 寫「三個 `approved_*` 欄保留原值」，本票第 866 行的 AC-2 判定列寫「P1 與 P3 的 …`approved_*` 三欄不變」。同節其他落差（指紋值未記錄）都已明白揭露，唯獨此處未揭露。
+
+建議分類：Material、任務範圍內、建議 `fix`（改為只陳述原始記錄有的兩欄，並在 P3 與 AC-2 判定列補記「`approved_*` 未查核」的記錄缺口）。**本階段未改動任何候選位元組**，等待 FO 授權。
+
+### Summary
+
+安全查核與程序回寫兩項全數通過：本輪新增內容無 email、無測試表 ID 原值、無 Google 網址，四則程序補述皆為追加且原句保留，交給 feature 050 的兩項結論明確記載。事實查核發現一處美化：證據文件與 AC-2 判定列宣稱 P1／P3 的三個 `approved_*` 欄不變，而原始記錄 P1 只有兩欄、P3 一欄未記。依本階段檢核標準「任一處與原始記錄不符或被美化即為 REJECTED」。
+
+**判定：REJECTED。** 修正範圍極小（兩處句子改為與原始記錄一致並補記缺口），不影響任何命題的行為結論。
