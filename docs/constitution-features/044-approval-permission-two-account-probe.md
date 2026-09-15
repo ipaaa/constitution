@@ -1093,3 +1093,70 @@ design stage 沒有 Google 帳號、沒有試算表，所以全部證據改用�
 reviewer 指對了。錯誤不是臆測，是把 AC 的要求當成已觀察的事實寫進 `record` 文件——同一節裡其他落差都揭露了，唯獨這一處沒有。
 逐節重比七個命題後另找到三處同型問題，其中最嚴重的是「Apps Script 執行紀錄」表杜撰了函式名 `approveSelectedRows`，而程式裡實際叫 `approveActiveRows`。那張表原本就是「未記錄」的一欄，不該有任何函式名出現在核可那一列。
 修正方向一律是縮小宣稱並把缺口寫成可見的句子，沒有刪除任何既有成果。文件開頭的缺口清單因此由三項增為五項，讓讀者在讀任何一節之前先知道證據強度的上限。
+
+## Stage Report: verify (cycle 2)
+
+- DONE: 逐節比對修正後的證據文件與原始記錄 `/tmp/sd044-probe-log.md`，確認**再無任何超出原始記錄的觀察宣稱**。七個命題逐一查核，把比對結果寫進報告。特別注意 implement 自行揭露的五項記錄缺口是否確實對應真實缺口、有無遺漏同型問題（宣稱觀察了某欄但原始記錄未載）。
+  七命題逐節比對表見下。**cycle 1 的 Finding 1 已消除**，全文再無「宣稱觀察了某欄而原始記錄未載」的句子。五項揭露的缺口逐一回查原始記錄，**五項全部對應真實缺口，無虛構缺口**。另查出三處精確度問題，皆為 Polish／Deferred risk，非同型問題，見 Finding 2-4。
+- DONE: 確認記錄缺口是以**可見的陳述**呈現，而非用刪除或模糊措辭掩蓋：P1 的 `approved_fingerprint` 未查核、P3 的三欄未查核，兩處都必須讀得到。並確認檔頭的缺口總覽與各節內文一致。
+  兩處都讀得到：`approval-permission-probe.md:134`「**記錄缺口一**：**`approved_fingerprint` 未查核。**」、`:219`「**記錄缺口**：**P3 完全未查核 `approved_by`、`approved_at`、`approved_fingerprint` 三欄。**」皆為粗體正面陳述，非刪除或模糊化。票內 AC-2 判定列（`:870`）同步改為**部分達成**並逐條列出三項缺口。檔頭缺口總覽**有一處不一致**，見 Finding 2。
+- DONE: 重跑安全掃描並把指令與輸出貼進報告：本輪新增內容不得出現帳號 email、測試表 ID 原值、正式 SSOT 網址；`src/data/*.json` 的 sha256 須與 main 相同。同時確認 P2 假通過全程、P6 跳過與補做路徑、四則程序補述、交給 feature 050 的兩項結論均未被本輪改動。
+  九道掃描全部乾淨，指令與輸出見下方。本輪 commit `69a1ca7` 的**刪除行共 10 行，逐行核對全部是被修正的宣稱本身**，P2 全程、P6 補做路徑、四則補述、兩項結論一行未動。
+
+### 安全掃描實跑（本輪 = commit `69a1ca7`）
+
+    # S1 本輪新增行掃 email／Google 網址 → 無輸出
+    git show 69a1ca7 -U0 | grep '^+' | grep -v '^+++' \
+      | grep -nE '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|docs\.google\.com|/spreadsheets/d/|script\.google\.com'   # exit=1
+    # S2 本輪新增行掃裸識別碼（先挖掉 64／40／7-8 位十六進位）→ 2 行，均為檔名 approval-permission-probe.md，非識別碼
+    # S3 AC-7 指令一（證據文件全文）→ 無輸出（exit=1）
+    grep -nE '@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|docs\.google\.com|/spreadsheets/d/' docs/content-pipeline/approval-permission-probe.md
+    # S4 AC-7 指令二（挖掉 64／40 位十六進位後）→ 無輸出（exit=1）
+    # S5／S6 精確 44 字元 Google 試算表 ID 形狀（排除 64 位雜湊）→ 無輸出（exit=1）。測試表僅以 sha256 `a186d380…0a99` 呈現
+    sed -E 's/[a-f0-9]{64}//g' docs/content-pipeline/approval-permission-probe.md docs/constitution-features/044-*.md \
+      | grep -nE '(^|[^A-Za-z0-9_/-])[A-Za-z0-9_-]{44}([^A-Za-z0-9_-]|$)'   # exit=1
+    # S7 src/data sha256：discussions.json 4071978a7ad0b3d0… 與 main 相同；history.json 4d1992e3a5fbb21e… 與 main 相同
+    # S8 git diff --stat main...HEAD -- src/data/ → 空（本分支從未觸碰 src/data）
+    # S9 佔位值 git grep -nE 'probe-h1|probe-d1|probe content|probe-note|probe-reject|probeTriggerWrite' -- src scripts   # exit=1
+    # S10 stage def 指定的佔位掃描 grep -rnE '某學者|某大學法律系|lorem ipsum|快速了解最新判決的5個重點' src/data/ 證據文件   # exit=1
+    # 改動範圍：git diff --name-only main...HEAD 全部在 docs/ 之下，無程式碼檔案
+
+### 逐節比對結果（證據文件 ↔ `/tmp/sd044-probe-log.md`）
+
+| 節 | 比對結果 |
+|---|---|
+| 環境建立、指紋核對 | 相符。`:40` 已刪去原始記錄沒有的「也不是正式表的複本」。`:101-103` 主動揭露 8＋8 碼比對粒度低於 AC-1 |
+| P1 | **已修正，相符**。`:128` 實際欄只列 `approved_by`、`approved_at`；第三欄改以「記錄缺口一」呈現 |
+| P2 | 相符。首測→清查五格→推翻→補設三範圍→重驗五格，全程保留，五格表逐格對得上原始記錄 |
+| P3 | **已修正，相符**。`:219` 補記三欄未查核；`:223-225` 的附帶證據加註時序，指明有效證據是 P2 重驗 |
+| P4 | 相符。前置還原、`probe-note`、`status` 維持 `Approved` 皆有據，指紋值缺口已揭露 |
+| P5 | **已修正，相符**。`:256-258` 新增 `review_decision`／`reject_reason`／`approved_fingerprint` 未查核，並指明 `probe-reject` 是輸入值 |
+| P6 | 相符。未執行、跳過理由、五項補做路徑、不放寬同步端閘門的結論句逐項對得上 |
+| P7 | 相符。a／b／c 三項與「`無法取得核可者身分。` 未出現」皆有據 |
+
+**對程式的獨立查核（不是重讀文件，是比對 commit `093cd01` 的實際內容）**：`approval-workflow.gs` 263 行、sha256 `cd380aee…6f67`、`appsscript.json` sha256 `89fea586…3ad7` 三項與證據文件逐字相符；`oauthScopes` 相符。`approveSelectedRows` **不存在**（`grep` exit 1），`onOpen:20` 的「核可選取列」實際綁 `approveActiveRows:201`，implement 的修正正確。「安裝／更新公式」綁 `installApprovalFormulas:156`，執行紀錄表填的函式名成立。`resolveApprovalHeaders_:127` 存在，`HEADER_SEPARATORS:15` 含全形括號 `（`。`validateApprovalBinding` 的兩則錯誤訊息逐字相符（`核可紀錄缺少 ${field}。`、`${field} 與目前發布內容不符。`）。
+
+### Finding 2（Polish）：檔頭「五個已知缺口」漏列 P5 一節的缺口
+
+- 釋出使用者與正常流程：讀者以檔頭總覽判斷證據強度，再決定要不要細讀各節。
+- 可觀察的損害：檔頭第 4 項把 `approved_fingerprint` 未查核限定在 P1 與 P3；但 `:258` 另記 P5 的 `approved_fingerprint` 同樣未查核，`:256` 另記 `review_decision`、`reject_reason` 未查核。只讀檔頭會漏掉這一處。`:101-103` 的 AC-1 比對粒度缺口同樣不在五項之列。
+- 受影響的 AC／邊界：無。P5 在命題總表對應欄為「—」，不對應 feature 040 或 050 的任何 AC；票內 AC-5 判定列已完整記載該缺口；`:400-405` 交給 040 的限制句只涉及 P1／P3，未受影響。
+- 觸發證據：`approval-permission-probe.md:12`「五個已知缺口」 vs `:101-103`、`:256-258`。
+
+建議分類：**Polish**（無現行使用者可見損失，各節缺口本身都讀得到）、任務範圍內。最小修正是把檔頭數字改為七項並補入 P5 與 AC-1 兩項。**本階段未改動任何候選位元組。**
+
+### Finding 3（Polish）：檔頭「執行期間」的日期歸屬與內文不一致
+
+`:4` 寫「工作記錄只對 2026-09-15 的事件標日期（P2 重驗、P7、收尾）」，但原始記錄與 `:287` 都把 P7 標為 captain 2026-09-07 核准納入，P7 的執行日未標；而原始記錄實際標 2026-09-15 的還有 P6 跳過決定與 P2 假通過的發現，兩者未列入括號。屬記錄歸屬誤植，不涉及任何試算表觀察值。
+
+### Finding 4（Deferred risk）：`validateApprovalBinding` 的引用未標版本
+
+`:317` 引用 `scripts/sync-content.mjs` 的 `validateApprovalBinding`，`:438` 引用 `tests/approval-content-version-binding.test.mjs`。兩者目前**只存在於 feature 040 的 commit `093cd01`，不在本分支 HEAD，也不在 `main`**（`git merge-base --is-ancestor 093cd01 HEAD` → 否；`grep validateApprovalBinding scripts/sync-content.mjs` → 無）。檔頭已為 Apps Script 標明 commit，此兩處未標。**升為 Material 的條件**：feature 040 被放棄、或該函式在合併前更名，屆時 `record` 文件的引用將無法解析。040 合併後此項自動消失。
+
+### Summary
+
+cycle 1 的 Finding 1 已確實修正，且不是靠刪句掩蓋：P1 的 `approved_fingerprint` 與 P3 的三欄都改成粗體的正面缺口陳述，票內 AC-2 判定由「通過」降為「部分達成」。逐節重比七個命題後，全文再無宣稱觀察了原始記錄未載欄位的句子；implement 自行揭露的五項缺口逐一回查，全部對應真實缺口，無虛構。安全掃描九道全乾淨，`src/data/*.json` 與 `main` 的 sha256 相同，本分支改動全在 `docs/` 之下。本輪 10 行刪除逐行核對，P2 假通過全程、P6 補做路徑、四則程序補述、交給 050 的兩項結論一行未動。
+
+另查出三處精確度問題：檔頭缺口總覽漏列 P5 一節的缺口（Finding 2）、檔頭日期歸屬誤植（Finding 3）、`validateApprovalBinding` 引用未標版本（Finding 4）。三者都不宣稱任何未觀察的事實，不影響任何命題的行為結論，也不對應任何 AC 的判定，依四項證據欄逐一檢驗均不成立 Material。
+
+**判定：PASSED。** Finding 2 的修正成本極低（改一個數字、補兩行），若 FO 認為值得可另行授權處理；本階段未改動任何候選位元組。
