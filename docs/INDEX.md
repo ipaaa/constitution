@@ -55,6 +55,7 @@ docs/
 |---|---|---|---|---|
 | `docs/content-pipeline/design.md` | 產線的**唯一**規格文件；含 feature 040 已定案但尚未實作的核可版本綁定方向 | plan | captain | 2026-09-04 |
 | `docs/content-pipeline/data-collection-guide.md` | T3（未來軌）的資料收集流程。T1／T2 已移除，改指向 `design.md` | evergreen | captain | 2026-09-04 |
+| `docs/content-pipeline/approval-permission-probe.md` | 隔離測試表兩帳號 probe 記錄。核可欄位權限邊界與 `status` 公式重算的實測證據 | record | — | 2026-09-15 |
 
 ### 體檢與待辦
 

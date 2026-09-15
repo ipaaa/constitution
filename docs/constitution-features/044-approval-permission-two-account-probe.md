@@ -312,6 +312,14 @@ order,label,text,link,status,review_decision,review_fingerprint,approved_by,appr
 **這是要在真實試算表上證明分隔符規則成立**，不是裝飾。正式表的標題全部帶中文說明，
 這一格若在測試表上失敗，050 的步驟 3 就要改寫。
 
+> ⚠️ **2026-09-15 追加補述（probe 實跑發現）：直接貼上剪貼簿不可行。**
+> 上面寫「點 `A1`，貼上對應的區塊，再執行資料 → 將文字分隔成不同欄」。實跑時換行失效。
+> 三個區塊全部擠成一列，A2 空白。
+> **改用：檔案 → 匯入 → 上傳 → 取代目前工作表 → 分隔符逗號。**
+> 匯入後驗證欄數：`Track 1_history` 18 欄（R1 = `reject_reason`）、
+> `Track 2_discussion` 21 欄（U1 = `reject_reason`）、`site_tldr` 12 欄（L1 = `reject_reason`）。
+> 原句保留。
+
 ### 步驟 3（captain）安裝 Apps Script 並裝公式
 
 1. **擴充功能 → Apps Script**，建立綁定式專案。
@@ -332,6 +340,24 @@ order,label,text,link,status,review_decision,review_fingerprint,approved_by,appr
 | `這個分頁不支援核可公式。` | 分頁名稱打錯 | 回步驟 1 |
 | 沒有 `Review` 選單 | 沒重新載入分頁，或程式沒存檔 | 重新載入 |
 | `無法取得核可者身分。` | Apps Script 未授權 | 重跑一次選單並授權 |
+
+> ⚠️ **2026-09-15 追加補述一（probe 實跑發現）：`onOpen` 會被誤認成安裝紀錄。**
+> 上面第 4 點要求重新載入分頁。重新載入會自動觸發 `onOpen`，
+> 該次執行在「執行項目」顯示為已完成。它不是安裝紀錄。
+> **確認安裝時，要看函式名稱是不是 `installApprovalFormulas`。** 原句保留。
+
+> ⚠️ **2026-09-15 追加補述二（適用步驟 3、5、11、12）：execution ID 不存在。**
+> 上面寫「每次執行都到 Apps Script 編輯器左側『執行項目』抄下 execution ID」。
+> **現行 Apps Script 介面不提供 execution ID。**「執行項目」的欄位只有
+> 部署、函式、類型、開始時間、持續時間、狀態。
+> **改為記錄函式名稱與開始時間（到秒）與狀態，或直接指向步驟 4 的指紋對照。**
+> 指紋對照的證據強度更高：execution ID 只證明「有跑過」，指紋對照證明「跑的是哪一版」。
+> 本次 probe 未取得開始時間，證據文件以指紋對照替代。
+> 步驟 5、11、12 的同一句要求一併以本補述更正。原句保留。
+
+> ⚠️ **2026-09-15 追加補述三（probe 實跑證實）：中文說明標題可以通過。**
+> `Track 2_discussion` 的標題 `owl_comment （允鍾短評）` 在真實試算表上安裝成功。
+> 「欄名＋合法分隔符＋中文說明」的規則成立。feature 050 的步驟 3 不需要改寫。
 
 ### 步驟 4（captain ＋ 工程）核對指紋，確認測試表跑的是 repo 那份程式
 
@@ -379,6 +405,9 @@ order,label,text,link,status,review_decision,review_fingerprint,approved_by,appr
 
 > **證據文件不記錄 `approved_by` 的值。** 那是帳號 email。只記「A」。
 
+> ⚠️ **2026-09-15 追加補述：「三次執行的 execution ID 都要抄下來」無法執行。**
+> 見步驟 3 的追加補述二。改記函式名稱與開始時間，或指向步驟 4 的指紋對照。原句保留。
+
 ### 步驟 6（captain）設定保護範圍，然後才邀請 B
 
 **順序不可顛倒。** 先保護，後邀請。否則 B 會有一段可以動任何欄位的空窗。
@@ -398,6 +427,32 @@ order,label,text,link,status,review_decision,review_fingerprint,approved_by,appr
 
 設完之後，用**共用 → 加入 B → 權限「編輯者」**。
 **不要**勾選「編輯者可以變更權限和共用設定」。
+
+> 🔴 **2026-09-15 追加補述（probe 實跑發現）：保護範圍極易漏設，必須以行為驗收。**
+> 上面的三類保護表只描述「要設哪三類」。實跑時 `Track 1_history`
+> **只有 Q（`current_fingerprint`）與 R（`reject_reason`）兩欄真正受保護**，
+> 其餘設定看起來正確但未生效。P2 因此得到假通過，直到準備步驟 13 時清查才發現。
+>
+> **設定畫面不是驗收標準。行為才是。** 設完保護範圍後，用 B 帳號逐格實測下表：
+>
+> | 格 | 欄位 | 類別 | 預期 |
+> |---|---|---|---|
+> | A1 | 標題列 | 丙 | 擋 |
+> | K2（Track 1） | `status` | 甲 | 擋 |
+> | Q2（Track 1） | `current_fingerprint` | 甲 | 擋 |
+> | L2（Track 1） | `review_decision` | 乙 | 擋 |
+> | M2（Track 1） | `review_fingerprint` | 乙 | 擋 |
+> | N2（Track 1） | `approved_by` | 乙 | 擋 |
+> | O2（Track 1） | `approved_at` | 乙 | 擋 |
+> | P2（Track 1） | `approved_fingerprint` | 乙 | 擋 |
+> | R2（Track 1） | `reject_reason` | 乙 | 擋 |
+> | D2（Track 1） | `content` | 內容 | **可改**（反向對照，確認未過度保護） |
+>
+> 三個分頁各做一次。任何一格與預期不符，回頭補設該範圍，再全部重測。
+>
+> **範圍數量不是九個。** 實際設定 11 個。原因是「乙　審核欄」六欄不連續，
+> `reject_reason` 與其餘五欄被 `current_fingerprint` 隔開，部分分頁要拆成兩段。
+> **判準是行為，不是數量。** 原句保留。
 
 ### 步驟 7（captain，帳號 A）P1 —— 責任編輯自己改內容
 
@@ -499,6 +554,12 @@ approved_at  approved_fingerprint  current_fingerprint  reject_reason
 
 抄下 execution ID。做完後重新核可列 3，把狀態恢復成 `Approved`。
 
+> ⚠️ **2026-09-15 追加補述：「抄下 execution ID」無法執行。**
+> 見步驟 3 的追加補述二。原句保留。
+>
+> **實跑結果補記**：P5 前後半皆通過。另發現以未授權帳號執行 `Review → 拒絕選取列`
+> **完全沒有作用且沒有錯誤訊息**（靜默失敗）。詳見證據文件的「過程發現」第二項。
+
 ### 步驟 12（captain）P6 —— installable edit trigger 能不能寫入受保護欄位（UNPROVEN）
 
 > **這一步必須放在最後。** trigger 會寫入 `reject_reason`，做在前面會污染步驟 10 的 P4。
@@ -534,6 +595,17 @@ function probeTriggerWrite(e) {
 
 抄下 execution ID。**做完後刪除觸發條件，並刪除 `probe-trigger.gs`。**
 
+> ⏭ **2026-09-15 追加補述：本步驟由 captain 決定跳過，未執行。**
+> trigger 寫入路徑維持 `UNPROVEN`。
+> 跳過理由：兩種結果的結論相同——trigger 可被停用、可失敗、授權可過期，
+> 因此不論能否寫入，都不得取代 `scripts/sync-content.mjs` 的同步端指紋閘門。
+> 本 probe 的所有結論都不依賴 trigger 路徑。
+> **補做路徑已保留**：測試表保留不刪，`~/Documents/probe-csv/` 的三份 CSV
+> 與兩個 Apps Script 檔保留。本步驟獨立，只寫入 `reject_reason`，
+> 其唯一會被污染的 P4 已驗畢，可單獨補跑，約十分鐘。
+> 補做結果以追加補述寫進證據文件，不改寫原文。
+> 「抄下 execution ID」一句同樣無法執行，見步驟 3 的追加補述二。原句保留。
+
 ### 步驟 13（captain）P7 —— 非擁有者的責任編輯（🔴 需 captain 確認是否納入）
 
 **這一項超出本票原始的三個命題，是為 feature 050 加做的。**
@@ -552,6 +624,13 @@ feature 050 的步驟 6 把保護分成「只有 captain 可改的公式欄」�
 
 **captain 若決定不做這一項**，把 AC-9 標為 SKIPPED，並在證據文件註明未驗證。
 050 的步驟 6 就要自行承擔這個風險。
+
+> ✅ **2026-09-15 追加補述：captain 於 2026-09-07 核准納入，本步驟已執行且通過。**
+> 三項子測試全部符合預期。`無法取得核可者身分。` 未出現，
+> 因此 feature 050 的步驟 4 不需要補充授權說明。詳見證據文件的 P7 一節。
+>
+> **前置修復記事**：清查時 B 曾可編輯 A1、K2、L2、N2（見步驟 6 的追加補述）。
+> 四格已還原後才執行本步驟。
 
 ### 步驟 14（工程 ＋ captain）產出證據文件
 
@@ -635,6 +714,50 @@ printf '%s' '<SHEET_ID>' | shasum -a 256
 | 同步端會擋住舊核可 | 那由 040 的 `tests/approval-content-version-binding.test.mjs` 證明。probe 不跑同步 |
 | 59 列重新核可不會出錯 | 測試表只有七列。列數帶來的問題（Track 2 序號、逾時、誤選）要在 050 的步驟 7 面對 |
 | trigger 可以取代同步端閘門 | 見步驟 12。不論結果如何，結論都是不可取代 |
+
+## 執行結果與交給 feature 050 的結論（2026-09-15 追加）
+
+probe 已執行完畢。完整記錄在 `docs/content-pipeline/approval-permission-probe.md`（`record`）。
+
+| 命題 | 結果 | 對應 |
+|---|---|---|
+| P1 責任編輯自己改內容也會退回 | 通過 | feature 040 的 AC-4 |
+| P2 投稿者不能編輯審核欄位 | 通過（重驗；**首次為假通過**） | feature 040 的 AC-4 |
+| P3 投稿者改內容也會退回 | 通過 | feature 040 的 AC-2 |
+| P4 只改審核欄位不會退回 | 通過 | feature 040 的 AC-5 |
+| P5 拒絕流程可用且保留稽核紀錄 | 通過 | — |
+| P6 trigger 能否寫入受保護欄位 | **跳過**，維持 `UNPROVEN` | — |
+| P7 非擁有者的責任編輯 | 通過 | feature 050 的步驟 6 |
+
+**feature 040 在 verify cycle 1 被判 REJECTED 的 AC-2 與 AC-4，所需的試算表端證據已齊備。**
+
+### 結論一：保護範圍必須以非擁有者帳號逐格實測驗收，不得以設定畫面為準
+
+本次即因為只看設定畫面而漏設。清查時 `Track 1_history`
+**只有 Q（`current_fingerprint`）與 R（`reject_reason`）兩欄真正受保護**，
+其餘設定看起來正確但未生效。P2 因此首次得到假通過。
+
+漏設發生在七列、三分頁、由 captain 親手設定的測試表上。正式表是 59 列，已開放多位協作者。
+
+**feature 050 的步驟 6 必須改成**：逐格用非擁有者帳號實測、提供逐欄檢查表、
+並把「內容欄可改」列為反向對照。逐欄檢查表見本票步驟 6 的追加補述。
+
+### 結論二：責任編輯首次使用 `Review` 選單不需要額外授權 Apps Script
+
+依據是 P7 的第 c 項。B 以非擁有者身分執行 `Review → 核可選取列` 成功，
+`無法取得核可者身分。` 未出現。
+
+**feature 050 的步驟 4 不需要補充授權說明。**
+
+### 附帶：兩項要寫進 feature 050 操作手冊的規則
+
+1. **不要手動編輯 `status` 欄。** 擁有者改得動（保護範圍排除不了擁有者，是平台限制）。
+   手改會覆蓋該格公式，該列狀態自此不再自動更新，必須重跑「安裝／更新公式」還原。
+   同步端不受影響：`validateApprovalBinding` 的閘門是 `review_decision` 與三份指紋，不是 `status`。
+2. **核可選單「沒反應」時，先確認自己在審核欄保護範圍的允許名單內。**
+   未授權帳號執行核可或拒絕會**靜默失敗**，沒有錯誤訊息。
+
+**本票不編輯 feature 050 的票。** 跨票編輯是污染。上述結論由 050 自己的 stage 採用。
 
 ## 元件與資料需求
 
@@ -732,6 +855,28 @@ Verified by: 證據文件的 P7 一節。B 被加入「乙　審核欄」保護�
 **captain 決定不做時**，本項標為 SKIPPED，證據文件註明未驗證，
 feature 050 步驟 6 的 A/B 兩類保護分法維持未驗證狀態。
 
+### 判定（2026-09-15，probe 執行後追加）
+
+上面九項 AC 的原文一字未改。下表是實際執行後的判定。
+證據全部在 `docs/content-pipeline/approval-permission-probe.md`。
+
+| AC | 判定 | 依據與落差 |
+|---|---|---|
+| AC-1 | **通過（粒度不足）** | 七格 `current_fingerprint` 全部相符。但比對的是開頭 8 碼與結尾 8 碼，不是 AC 原文要求的完整 64 字元逐字比對 |
+| AC-2 | **通過（記錄缺口）** | P1 與 P3 的 `status` 都由 `Approved` 轉為 `Needs review`，`approved_*` 三欄不變。缺口：P1 改動後的 `current_fingerprint` 實際值未記錄，未與 `bab4a7d2…6843` 逐字比對 |
+| AC-3 | **部分達成** | 行為結論成立（投稿者改不動審核欄、公式欄與標題列，改得動內容欄），但**只逐格記錄五格**（A1、K2、L2、N2、D2），未達 AC 原文的「八欄＋三次繞道＝十一項」。「整列複製貼上」與「刪除整欄」兩項繞道未測。**依 AC 原文，記錄粒度不成立，是否補測由 captain 決定** |
+| AC-4 | **通過（間接證明）** | A 填入 `probe-note` 後 `status` 維持 `Approved`。`APPROVAL_STATUS` 只在三份指紋相符時顯示 `Approved`，故指紋確未改變。缺口：指紋值未逐字記錄 |
+| AC-5 | **通過** | `status` 為 `Rejected`、`approved_by` 與 `approved_at` 保留；改內容後轉為 `Needs review` |
+| AC-6 | **SKIPPED** | P6（步驟 12）由 captain 於 2026-09-15 決定跳過。trigger 寫入路徑**維持 `UNPROVEN`**。AC 要求的結論句仍寫進證據文件：trigger 只能當加速提示，不取代 `scripts/sync-content.mjs` 的指紋閘門。`design.md` 與 `operations.md` 未因本票放寬同步端檢查。**補做路徑見步驟 12 的追加補述** |
+| AC-7 | **部分達成** | 證據文件已建立，狀態 `record`，含測試表 ID 雜湊、兩個角色、步驟與結果。三項缺口：(a) **execution ID 不存在於現行介面**，以指紋對照替代，見步驟 3 的追加補述二；(b) 逐步 UTC 時間未記錄；(c) 洩漏檢查指令一無輸出，指令二有一行輸出，即 Apps Script commit sha（40 字元）。該值是本票 checklist 明文要求記錄的公開 commit，不是洩漏。指令二若改為先挖掉 40 位十六進位字串再比對即無輸出 |
+| AC-8 | **通過** | `git grep` 無輸出（exit 1）。`probe-trigger.gs` 與其觸發條件**從未建立**（P6 跳過），故無須刪除。B 已移出乙類保護範圍的允許名單。測試表由 captain 決定保留，供補做 P6 |
+| AC-9 | **通過** | captain 2026-09-07 核准納入。P7 三項子測試全部符合預期：B 填 `reject_reason` 成功、改 `status` 與 `current_fingerprint` 被擋、`Review → 核可選取列` 成功且 `approved_by` 顯示 B |
+
+**AC-7 指令二與本票 checklist 的衝突**：checklist 要求證據文件記錄 Apps Script commit sha，
+該值為 40 個十六進位字元，會被指令二的 `[A-Za-z0-9_-]{40,}` 命中。
+指令二實測輸出一行，即該 commit sha。加上 `s/[a-f0-9]{40}//g` 後無輸出。
+**AC 原文未改，此處只記錄落差。**
+
 ## Test plan
 
 **本票不改任何程式。** repo 端的驗證由 feature 040 的
@@ -786,6 +931,18 @@ implement stage 要跑的檢查：
 | `scripts/` 下任何程式 | 本票是純驗證票 |
 | `docs/constitution-features/README.md` | workflow 規格不因單一 feature 改變 |
 
+### 實際完成狀況（2026-09-15，implement stage 追加）
+
+| 文件 | 狀態 |
+|---|---|
+| `docs/content-pipeline/approval-permission-probe.md` | **已新增**，狀態 `record`。含測試表 ID 雜湊、兩個角色、步驟、結果、收尾。**不含** email 與正式 SSOT URL。execution ID 改以指紋對照替代（現行介面不提供該欄位） |
+| `docs/INDEX.md` | **已新增一列**於「內容產線」表 |
+| `docs/constitution-features/050-ssot-approval-deployment.md` | **未改，且不應由本票改。** 要交給 050 的結論寫在本票的「執行結果與交給 feature 050 的結論」一節與證據文件的「結論與對 feature 050 的影響」一節 |
+| 本票 | AC 判定已追加於 `## Acceptance criteria` 末；probe 實跑發現的四項程序缺漏以追加補述寫入步驟 2、3、6 與步驟 5／11／12（原句全部保留） |
+
+**「不更新」一欄的判斷維持不變。** probe 的結論沒有放寬任何同步端檢查，
+`docs/content-pipeline/design.md` 與 `operations.md` 因此不動。
+
 ### Feedback Cycles
 
 
@@ -825,3 +982,27 @@ design stage 沒有 Google 帳號、沒有試算表，所以全部證據改用�
 過程中另外找到兩件會誤導執行者的事，都已寫進票內：其一，`site_tldr` 的 `order 0` 列不把 `label` 算進指紋（`approvalFieldsFor_`），改那一格 `status` 不會變，容易被誤判成公式失效；其二，分頁名稱打錯時 `resolveApprovalHeaders_` 會退回 `site_tldr` 的欄位清單，報出毫不相干的「缺少欄位「order」。」，而 `reviewActiveRows_` 不像 `installApprovalFormulas` 會先擋分頁名稱。
 留下一項 🔴 需 captain 在 gate 決定：AC-9／步驟 13（非擁有者的責任編輯）超出本票原始三個命題，是為 feature 050 步驟 6 的兩類保護分法加做的，用同一組帳號多花五分鐘就能驗。captain 不納入時標為 SKIPPED，該分法維持未驗證。
 另外回報一件與本票無關的既有問題：`npx tsc --noEmit` 目前失敗，錯誤全部來自 `.next/types/` 下的重複檔（`routes.d 2.ts`、`validator 2.ts`），`src/` 零錯誤。本票未觸碰程式，也未清理該目錄。
+
+## Stage Report: implement
+
+- DONE: 依 `/tmp/sd044-probe-log.md` 產出 `docs/content-pipeline/approval-permission-probe.md`，狀態 `record`，骨架依本票步驟 14 的規定。**必須如實記錄 P2 曾為假通過並經重驗**，不可只寫最終結果——該過程本身是本 probe 最有價值的發現。同時記錄 P6 跳過與其補做路徑。**不得寫入帳號 email、測試表 ID 原值或正式 SSOT URL**；帳號一律以 A／B 代稱，測試表僅記雜湊。Apps Script 來源 commit 為 `093cd01`。
+  新檔 414 行。P2 一節分四段：第一次測試（假通過）→ 發現假通過（五格實測表）→ 為什麼更嚴重（投稿者可偽造自洽核可）→ 重驗真通過。P6 記為跳過並列五點補做路徑。AC-7 洩漏指令一無輸出；指令二輸出一行，即 checklist 要求記錄的 commit sha，落差已記錄。
+- DONE: 把 probe 執行過程中發現的四項程序缺漏回寫進本票（044）的對應步驟，以追加補述方式呈現、不改寫原句。
+  四則補述已加：步驟 2（改用檔案→匯入→取代目前工作表→分隔符逗號）、步驟 3 補述一（`onOpen` 會被誤認成安裝紀錄，須確認函式名為 `installApprovalFormulas`）、步驟 3 補述二（execution ID 不存在於現行介面，改記函式名與開始時間，並於步驟 5／11／12 各加指標補述）、步驟 6（逐欄檢查表十格＋行為驗收＋實際 11 個範圍的說明）。`git diff` 對本票無任何刪除行，原句全部保留。
+- DONE: 依實際結果更新本票的 `## Acceptance criteria` 判定與 `## Documentation impact`；並在票內明確記錄兩項要交給 feature 050 的結論。
+  `### 判定（2026-09-15，probe 執行後追加）` 九列判定表：AC-5／8／9 通過；AC-1／2／4 通過但記錄粒度或缺口逐項寫明；AC-3 判為**部分達成**（只記五格，未達 AC 原文十一項）；AC-6 SKIPPED 並註明維持 `UNPROVEN` 與補做路徑。新增 `## 執行結果與交給 feature 050 的結論` 一節載明結論一（保護範圍須以非擁有者帳號逐格實測，本次因此抓到 `Track 1_history` 僅 Q、R 兩欄真正受保護）與結論二（責任編輯首次使用 `Review` 選單不需額外授權，050 步驟 4 不需補充授權說明）。`## Documentation impact` 追加「實際完成狀況」表。`docs/INDEX.md` 內容產線表新增一列。
+
+### 可失敗的證據
+
+- `093cd013…3b84` 這個 commit 在 040 的 worktree 中存在，且 `git show 093cd013…:scripts/apps-script/approval-workflow.gs | shasum -a 256` 輸出 `cd380aee…6d67`，與工作記錄所載的 `.gs` 雜湊逐字相同；`wc -l` 為 263 行，`appsscript.json` 為 `89fea586…3ad7`。**若證據文件記錯 commit 或記錯雜湊，這三項會對不上。**
+- Risk evidence 的離線 oracle 重跑：三組建議標題各解析出 18／21／12 欄，與票內記載相同。**若 `resolveApprovalHeaders_` 的欄位清單或分隔符表被改動，欄數會變。**
+- AC-7 指令一對新檔無輸出（exit 1）；指令二輸出第 7 行的 commit sha（exit 0）。**若文件寫進任何 email 或試算表網址，指令一會有輸出。**
+- AC-8 的 `git grep` 對 `src`、`scripts` 無輸出（exit 1）。**任何 probe 測試值進入 `src/` 或 `scripts/` 都會讓它有輸出。**
+- `npx tsc --noEmit` 無錯誤輸出。**本票若誤觸 `src/` 下的程式會失敗。**
+- `git diff` 對本票只有 `+` 行、無 `-` 行。**任何改寫原句的行為都會產生 `-` 行。**
+
+### Summary
+
+證據文件如實記錄 P2 的假通過與重驗全程，因為那是本 probe 最有價值的發現：保護範圍設定看起來正確卻未生效，而它是阻止投稿者偽造自洽核可的唯一防線——同步端指紋閘門擋不住這條路。
+判定時沒有把記錄缺口寫成通過。AC-3 只實測五格、未達原文要求的十一項，判為**部分達成**並列出未測項目，是否補測交 captain 決定；AC-1 的指紋比對只做頭尾各 8 碼、AC-2 與 AC-4 的指紋值未逐字記錄，三項都在判定表中寫明落差。
+一項要 captain 注意的衝突：本票 checklist 要求證據文件記錄 Apps Script commit sha，但該值為 40 個十六進位字元，會被 AC-7 第二條洩漏檢查指令命中。指令實測輸出該行。這不是洩漏（公開 repo 的 commit），但依 AC 原文即為有輸出。AC 原文未改，落差記在判定表中。
