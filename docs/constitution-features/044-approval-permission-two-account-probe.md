@@ -46,6 +46,14 @@ gates:
               application:
                 target-stage: review
                 state: consumed
+        - id: gate:044:review
+          stage: review
+          attempts:
+            - id: gate-attempt:044-review-1
+              briefing:
+                id: briefing:044:review:attempt-1:revision-1
+                digest: sha256:b4608f5c4578a8e6ebf3e6299dded217bbeefa6b2baa5873d7d9b23b897c0e2e
+                room-ref: '@review/review/briefing-1'
 ---
 
 在隔離測試表上以兩個 Google 帳號實跑，證明核可欄位的權限邊界與 `status` 公式對「他人修改內容」與「責任編輯自行修改內容」都會重新計算。
