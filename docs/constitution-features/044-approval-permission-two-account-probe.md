@@ -30,6 +30,11 @@ gates:
                 at: "2026-09-17T20:20:26.914189Z"
                 decision: revise
                 reason: verify cycle 2 判 PASSED，七命題行為結論全部成立、安全掃描九道全乾淨、cycle 1 的美化問題已確實修正且未靠刪句掩蓋。退回僅為兩處記錄精確度：Finding 2（檔頭寫「五個已知缺口」，實際七個，漏列 P5 與 AC-1 兩項）與 Finding 3（檔頭日期歸屬誤植）。理由是本文件狀態為 record、永久保存且依規定不改寫，檔頭數字錯誤日後只能以追加註記更正；而本文件的主題即為誠實揭露缺口，檔頭低估缺口數有損其可信度。captain 2026-09-17 併同裁示兩項：(1) 接受 AC-2／AC-3／AC-7 的記錄粒度低於 AC 原文——行為結論不受影響，對 feature 040 的 AC-2／AC-4 已足夠；(2) AC-3 的「整列複製貼上」與「刪除整欄」兩項繞道不補測，該範圍屬 feature 043，測試表保留供日後補測。Finding 4 依 FO 授權 decline，040 合併後自動消失。
+            - id: gate-attempt:044-verify-2
+              briefing:
+                id: briefing:044:verify:attempt-2:revision-1
+                digest: sha256:6943b791de7964d6b3904dd8f3dfe119acf23b84d7a34ab47d9daa6d7594db87
+                room-ref: '@review/verify/briefing-2'
 ---
 
 在隔離測試表上以兩個 Google 帳號實跑，證明核可欄位的權限邊界與 `status` 公式對「他人修改內容」與「責任編輯自行修改內容」都會重新計算。
