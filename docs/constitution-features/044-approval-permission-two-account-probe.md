@@ -1,7 +1,7 @@
 ---
 id: 044
 title: 隔離測試表兩帳號 probe：驗證核可欄位權限與公式重算
-status: verify
+status: review
 source: captain 2026-09-04（feature 040 verify gate 裁決方案 B 拆出）
 started: 2026-09-08T02:35:20Z
 completed:
@@ -35,6 +35,17 @@ gates:
                 id: briefing:044:verify:attempt-2:revision-1
                 digest: sha256:6943b791de7964d6b3904dd8f3dfe119acf23b84d7a34ab47d9daa6d7594db87
                 room-ref: '@review/verify/briefing-2'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:044:verify:2
+                briefing: briefing:044:verify:attempt-2:revision-1
+                by: person:captain
+                at: "2026-09-17T20:38:22.795153Z"
+                decision: approve
+                reason: verify cycle 3 判 PASSED。Finding 2（檔頭缺口數由五改為七，補入 P5 三欄與 AC-1 比對粒度）與 Finding 3（日期歸屬）已正確修正，且由 verify 自行逐節清點內文確認，未採信 implement 的宣稱。未破壞既有成果以最強證據確認：證據文件分隔線之後 418 行逐位元組相同、票的本輪刪除行數為 0、九列 AC 判定逐字相同。七道安全掃描乾淨，src/data 兩檔 sha256 與 main 相同。Finding 5 與 Finding 6 經 FO 授權 decline——前者為巧合但檔頭數目已由 verify 獨立確認正確，後者的缺口已在表格內印為「未記錄」且 captain 已於前一道 gate 接受記錄粒度低於 AC 原文。Finding 7（原始記錄 /tmp/sd044-probe-log.md 不在 repo）captain 於 2026-09-17 裁決選項 A：核可 044 進入 review，原始記錄另開小票併入 repo，不阻擋本票。
+              application:
+                target-stage: review
+                state: consumed
 ---
 
 在隔離測試表上以兩個 Google 帳號實跑，證明核可欄位的權限邊界與 `status` 公式對「他人修改內容」與「責任編輯自行修改內容」都會重新計算。
@@ -1306,5 +1317,92 @@ Finding 2 與 Finding 3 都已正確修正。檔頭缺口數由五改為七，�
 未破壞既有成果一項以最強證據確認：證據文件分隔線之後 418 行**逐位元組相同**，票的本輪刪除行數為 0，九列 AC 判定逐字相同。七道安全掃描乾淨，`src/data/*.json` 兩檔 sha256 與 main 相同，本分支四個改動檔全在 `docs/` 之下。
 
 另查出三項：implement 的第一條可失敗證據是巧合而非集合相符（Finding 5）、`:371` 的函式名漏記未列入檔頭（Finding 6）、原始記錄不在 repo 內（Finding 7）。三者依四項證據欄逐一檢驗均不成立 Material——無現行使用者可見損失，不影響任何命題的行為結論，不改變任何 AC 判定。
+
+**判定：PASSED。**
+
+## Stage Report: review
+
+- DONE: 逐項重現九項 acceptance criteria 的判定，不採信 implement 或 verify 的自我回報。特別確認三項：AC-2／AC-3／AC-7 判為「部分達成」是否與證據文件實際內容相符（captain 已於 2026-09-17 接受此粒度，故此處查的是判定誠實與否，不是要求補足）；AC-6 的 SKIPPED 是否附完整補做路徑；AC-9（P7）的三項子測試是否都有對應記錄。
+  九列判定逐項對回證據文件原句，全部相符，無一列誇大。詳見下方逐項表。三項重點查核結果：**AC-2／AC-3／AC-7 的「部分達成」誠實**——所列九項缺口在證據文件都找得到對應原句（AC-2 三項 → `:142`、`:146`、`:227`；AC-3 五格與二繞道 → `:206-216`；AC-7 三項 → `:362`、`:366-371`、實跑指令二）。**AC-6 補做路徑完整**：證據文件 `:285-291` 五步加票內步驟 12 補述，涵蓋測試表保留、CSV 與 `.gs` 保留、獨立性論證（只寫 `reject_reason`，唯一會被污染的 P4 已驗畢）、可單獨補跑的步驟編號與時間、結果以追加補述寫入。**AC-9 三項子測試齊備**：`:302-306` 的 a／b／c 三列，且 AC-9 兩項失敗條件都有反證（`:312` 明記 `無法取得核可者身分。` 未出現；`:305` 記 `K2` 被擋）。
+- DONE: 依實際交付行為查核 `## Documentation impact` 每一筆，並評估 `docs/content-pipeline/approval-permission-probe.md` 作為一份永久 `record` 文件是否稱職：檔頭七項缺口與內文是否一致、P2 假通過的全程是否讀得懂、一個未參與本次 probe 的人能否據此判斷證據強度。若有任何地方會讓讀者高估證據強度，即為 REJECTED。
+  Documentation impact 三區逐筆以 `git diff --name-only main...HEAD` 核對：「現在更新」與「實作後更新」各筆均已交付（證據文件新增、`docs/INDEX.md` 加一列、`050` 未被本票代改）；「不更新」十項全部未出現在改動清單。`record` 稱職度：**檔頭七項全部能在內文找到出處，無虛構、無誇大**（我自行清點內文 10 處缺口陳述，對上檔頭 7 項——第 4、5 項各涵蓋兩處，`:371` 函式欄那一處未列入，即 verify 的 Finding 6，captain 已於 gate 接受）。**P2 假通過全程讀得懂**：`:154-216` 依序給出首次判定、發現經過（五格全「可改」表）、為什麼更嚴重（投稿者可自造一份通過 `validateApprovalBinding` 全部檢查的核可紀錄）、重驗五格「擋」表、記錄粒度實話，沒有靠刪句掩蓋錯判。**外人可判斷證據強度**：檔頭缺口總覽、各節 `記錄缺口` 區塊、`:334`「依據是閱讀程式碼，不是實跑同步」、`:408-413` 主動警告 040 gate「`approved_*` 逐字不變的證據不齊」、`:440-448`「本 probe 不能證明什麼」五欄表，五層揭露都在。**未發現任何會讓讀者高估證據強度之處**；三項殘留見 Finding 8／9／10，均為 Polish 或 Deferred risk。
+- DONE: 評估這份 diff 的品質與風險：本票只新增 `approval-permission-probe.md` 一份文件並更新 `docs/INDEX.md`。確認未觸及 `src/`、`scripts/`、試算表與其他 `record` 文件；重跑安全掃描（帳號 email、測試表 ID 原值、正式 SSOT 網址三者皆須零命中）。另注意本票與 feature 040 的關係：證據文件引用的 `validateApprovalBinding` 目前只存在於 040 的 commit `093cd01`，040 合併後才會進 main——請在報告中記錄此依賴，供合併順序參考。
+  `git diff --stat main...HEAD -- src scripts` 為**空**；改動五檔全在 `docs/` 下（證據文件、`INDEX.md`、本票、兩份 gate briefing JSON），其他 `record` 文件零改動。`src/data/*.json` 兩檔 sha256 與 main 逐字相同。六道安全掃描全部重跑，結果見下。`INDEX.md` 新列五欄齊全，`負責人` 欄的 `—` 與既有 13 筆 `record` 列的寫法一致。040 依賴已查證並記於 Finding 10。
+
+### 逐項重現九項 AC（不採信下游自我回報）
+
+| AC | 票內判定 | 本階段重現方式 | 相符 |
+|---|---|---|---|
+| AC-1 | 通過（粒度不足） | 從 commit `093cd01` 取出 `.gs`（sha256 `cd380aee…`、263 行，與證據文件 `:77` 逐字相同），在 scratchpad 重跑票內離線 oracle：**七個 `current_fingerprint` 全部重現**，證據文件 `:101-107` 的頭尾各 8 碼逐格命中 | ✅ |
+| AC-2 | 部分達成 | oracle 重現 `bab4a7d2…6843`（AC-2 要求值）與 `核可後內容被改 -> Needs review`；行為結論成立，三項記錄缺口原句齊備 | ✅ |
+| AC-3 | 部分達成 | `:211-213` 自陳實測五格、四欄未逐格測、二繞道未測，與判定列逐字一致 | ✅ |
+| AC-4 | 通過（間接證明） | oracle 重現 `只改 reject_reason -> Approved`，故 `status` 維持 `Approved` 確可反推指紋未變；`:248-250` 已揭露此為間接 | ✅ |
+| AC-5 | 通過（記錄缺口） | `:256-266` 三欄未查核的自陳與判定列一致；`probe-reject` 是輸入值一句已明寫 | ✅ |
+| AC-6 | SKIPPED | 補做路徑五步完整（見上）；`design.md`／`operations.md` 零改動，未放寬同步端檢查 | ✅ |
+| AC-7 | 部分達成 | 指令一實跑無輸出（exit 1）；指令二實跑輸出**恰為一行**第 11 行 commit sha，再挖掉 40hex 後無輸出——與判定列 (c) 逐字相符 | ✅ |
+| AC-8 | 通過 | `git grep` 五個佔位值於 `src scripts` 實跑 exit 1；`AGENTS.md` 第 3 條佔位值掃 `src/data/` 亦 exit 1 | ✅ |
+| AC-9 | 通過 | `:302-306` 三項子測試齊備，兩項失敗條件均有反證 | ✅ |
+
+### 安全掃描實跑（本階段獨立重跑，HEAD ＝ `7700715` ＋ 未提交的 review 報告）
+
+    # 1 證據文件掃 email／docs.google.com／spreadsheets/d → 無輸出（exit 1）
+    # 2 證據文件 `@` 字元全文掃 → 無輸出（exit 1）。全檔無任何 email 形狀
+    # 3 挖掉 64hex 後掃 40+ 裸識別碼 → 僅第 11 行 commit sha；再挖 40hex → 無輸出（exit 1）
+    # 4 全 diff 掃 docs.google.com／spreadsheets/d／script.google.com → 4 行，全為 stage report 內的 grep 樣式字串本身，非網址
+    # 5 全 diff 掃 email（排除 grep 樣式行）→ 2 行，為 verify cycle 3 報告轉述 `a@example.invalid`（RFC 2606 保留域）與 `someone@gmail.com`（design stage 的注入測試字串）。證據文件本身零命中
+    # 6 全 diff 挖掉 64hex／40hex 後掃 44 字元 ID 形狀 → 1 行，是 diff hunk header 的 worktree 分支名，非試算表 ID
+    # sha256：discussions.json `4071978a7ad0b3d0`、history.json `4d1992e3a5fbb21e`，HEAD 與 main 相同
+
+**測試表 ID 原值零命中**：證據文件只存 SHA-256 雜湊（`:9`），掃描 3 與 6 均無 44 字元 base64 形狀殘留。
+
+### Finding 8（Polish）：`:374` 的「證明」缺指紋比對粒度的但書
+
+`:374`「它證明測試表上執行的程式就是 repo 的 `approval-workflow.gs`」寫在「Apps Script 執行紀錄」一節，
+未帶 `:109-111` 的「只比對頭尾各 8 碼」但書。只讀該節的讀者會以為是完整 64 字元驗證。
+
+- 釋出使用者與正常流程：日後查閱本 `record` 以判斷程式版本證據強度的人。
+- 可觀察的損害：極小。`:373` 已把讀者指回「指紋核對」一節，該節開頭即是但書。
+- 受影響的 AC／邊界：AC-1，已判「通過（粒度不足）」，captain 已接受該粒度。
+- 觸發證據：`approval-permission-probe.md:374` vs `:109-111`。
+
+分類：**Polish**。最小修正為 `:374` 補「（比對粒度見該節）」五字。**本階段未改動任何候選位元組。**
+
+### Finding 9（Polish）：`:124` 的「三份相同」未標示為間接推得
+
+`:124`「`review_fingerprint`、`approved_fingerprint`、`current_fingerprint` 三份相同」列在「結果：」之下，
+讀來像直接觀察值；實際依據是 `:123` 觀察到的 `status` 轉 `Approved`。P4（`:248-250`）對同型推論標了「間接證明」，此處沒標。
+
+- 可觀察的損害：無。推論本身健全——本階段 oracle 重現 `核可完成 -> Approved` 與 `手填 Approved 無指紋 -> Needs review`，證實 `APPROVAL_STATUS` 僅在三份相符時回 `Approved`。檔頭缺口第 5 項的「各命題」亦已概括涵蓋。
+- 受影響的 AC／邊界：無。此處是核可前置，不對應任何 AC。
+- 觸發證據：`:123-124` vs `:248-250` 的標示方式差異。
+
+分類：**Polish**。**本階段未改動任何候選位元組。**
+
+### Finding 10（Deferred risk）：證據文件的兩項程式依賴只存在於 feature 040 分支
+
+實測確認：`scripts/apps-script/approval-workflow.gs` 在 `main` **不存在**（`git show main:… → fatal`）；
+`validateApprovalBinding` 在 `main` 與本分支 HEAD 的 `scripts/sync-content.mjs` 均為 **0 次命中**，
+只存在於 `spacedock-ensign/040-approval-content-version-binding`（5 次命中），commit `093cd01` 含於該分支。
+另查證：證據文件 `:331-332` 引用的兩句錯誤訊息確實由 040 的 `validateApprovalBinding` 產生
+（模板字串 `核可紀錄缺少 ${field}。` 與 `${field} 與目前發布內容不符。需要重新核可。`，證據文件引後者時略去末句），
+`:326-327` 對 `status` 角色的描述亦與 `isApproved()` 的實作一致。**引用內容正確，問題只在合併順序。**
+
+- 升為 Material 的條件：**044 先於 040 合併進 main**。屆時 `main` 上的 `approval-permission-probe.md` 會引用兩個不存在的識別碼，讀者無從查證 `:325-339` 整節與 P2 的偽造攻擊分析。
+- 建議（供 captain 與 FO 排序，非本階段可決）：**040 先合併，044 後合併**；或 044 先合併時於證據文件追加一節補述，註明兩項識別碼待 040 合併後才進 `main`。
+- 觸發證據：上列三條 `git show` / `git grep` 實測。`:10-11` 已把 `.gs` 釘到 commit `093cd01`，`validateApprovalBinding` 未釘版本（即 verify cycle 2 的 Finding 4，當時以「040 合併後自動消失」為由 decline——該理由成立，但**前提是合併順序為 040 在前**）。
+
+分類：**Deferred risk**，且屬任務範圍外（跨票合併順序）。**本階段未改動任何候選位元組。**
+
+### 未執行的檢查
+
+- `npx tsc --noEmit`（票內 Test plan 第 4 項）：worktree 無 `node_modules`，無法執行。**改以更強的證據取代**：`git diff --stat main...HEAD -- src scripts` 為空，本分支零程式改動，不存在可被 `tsc` 捕捉的回歸。
+
+### Summary
+
+九項 AC 全部以「重現」而非「採信」的方式查核：從 commit `093cd01` 取出 `.gs` 重跑離線 oracle，七個指紋、五個標題錯誤案例、五個 `APPROVAL_STATUS` 值逐字重現，證據文件 `:101-107` 的頭尾 8 碼與 AC-2 的 `bab4a7d2…6843` 全部對上；AC-7 的兩道洩漏指令與 AC-8 的 `git grep` 亦實跑。AC-2／AC-3／AC-7 的「部分達成」判定**誠實**，九項缺口全部在證據文件有對應原句，無一項被判定列淡化。
+
+證據文件作為永久 `record` 稱職：檔頭七項缺口經本階段自行清點確認有出處且無誇大，P2 假通過的全程（含首次錯判、發現、嚴重性分析、重驗）完整可讀且未靠刪句掩蓋，並以五層揭露讓未參與者能自行判斷證據強度——包含主動警告 040 gate「`approved_*` 逐字不變的證據不齊」。**未發現任何會讓讀者高估證據強度之處。**
+
+diff 風險低：零程式改動、`src/data/*.json` sha256 與 main 相同、六道安全掃描乾淨、其他 `record` 文件未被改寫、`INDEX.md` 新列格式與既有 `record` 列一致。三項新 finding 均非 Material：Finding 8、9 為措辭層級的 Polish，Finding 10 是跨票合併順序的 Deferred risk，**須請 captain 確認 040 先於 044 合併**。
 
 **判定：PASSED。**
