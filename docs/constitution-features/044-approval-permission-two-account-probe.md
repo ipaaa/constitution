@@ -978,6 +978,7 @@ implement stage 要跑的檢查：
 ### Feedback Cycles
 
 - Cycle 1: REJECTED — verify；AC changed: no。安全查核與程序回寫兩項通過，退回原因為單一 Material finding：證據文件與 AC-2 判定列宣稱 P1／P3 的三個 `approved_*` 欄經實測不變，而原始記錄 P1 僅觀察兩欄、P3 完全未觀察。**成因在 FO**——probe 執行時 FO 只向 captain 詢問兩欄，撰寫時把 AC 的要求誤當成已觀察的事實。FO 授權 fix，方向為「如實縮小宣稱並揭露缺口」而非補做觀察（probe 已收尾）。修正後不僅改正該處，另主動揭露共五項記錄缺口並於檔頭加總覽，明載「記錄缺口，不是行為失敗；行為結論不受影響，但證據強度低於 AC 原文要求」。七命題的行為結論全數維持。
+- Cycle 2: REVISE — verify gate；AC changed: no。**verify 本身判 PASSED**（3 done / 0 failed，七命題行為結論全部成立、安全掃描九道全乾淨、cycle 1 的美化問題已確實修正且未靠刪句掩蓋）。captain 2026-09-17 於 gate 裁決 revise，僅為兩處記錄精確度：F2 fix（Polish：檔頭寫「五個已知缺口」，實際七個——漏列 P5 一節的三欄未查核與 AC-1 的比對粒度缺口，只讀檔頭會低估缺口數）；F3 fix（Polish：檔頭日期歸屬誤植，P7 的 2026-09-07 為核准納入日而非執行日）。退回理由為本文件狀態 `record`、永久保存且依規定不改寫，檔頭錯誤日後只能以追加註記更正；而本文件主題即為誠實揭露缺口，檔頭低估缺口數與其目的衝突。F4 decline（Deferred risk：`validateApprovalBinding` 引用未標版本，040 合併後自動消失）。captain 併同裁示二項：接受 AC-2／AC-3／AC-7 的記錄粒度低於 AC 原文（行為結論不受影響，對 040 足夠）；AC-3 的整列複製貼上與刪除整欄兩項繞道不補測（屬 feature 043 範圍，測試表保留供日後補測）。
 
 
 ## Out of scope
