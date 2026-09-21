@@ -3,7 +3,7 @@ id: 063
 title: requiredForRuling 的法律正確性（114憲判9）
 status: design
 source: constitution-features/056 第二節 D3
-started:
+started: 2026-09-21T21:16:25Z
 completed:
 verdict:
 score: 0.75
