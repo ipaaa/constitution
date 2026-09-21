@@ -3,7 +3,7 @@ id: "019"
 title: 不同意見總覽頁 + 文章摘要連結
 status: design
 source: captain-filed
-started:
+started: 2026-09-21T22:12:00Z
 completed:
 verdict:
 score: 0.7
