@@ -10,6 +10,17 @@ score: 0.8
 worktree: .worktrees/spacedock-ensign-012-threshold-case-analysis
 issue:
 pr:
+gates:
+    version: 1
+    records:
+        - id: gate:012:verify
+          stage: verify
+          attempts:
+            - id: gate-attempt:012-verify-1
+              briefing:
+                id: briefing:012:verify:attempt-1:revision-1
+                digest: sha256:9618cd2cc0a3302c28ab561720daceac00ebb182290e38ca401fe7f1e9d8feae
+                room-ref: '@review/verify/briefing-1'
 ---
 
 研究大法官會議時期通過舊案數量與提升門檻之間的關聯，製作時間軸 infographic。
