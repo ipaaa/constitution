@@ -1,7 +1,7 @@
 ---
 id: 063
 title: requiredForRuling 的法律正確性（114憲判1）
-status: implement
+status: verify
 source: constitution-features/056 第二節 D3
 started: 2026-09-21T21:16:25Z
 completed:
