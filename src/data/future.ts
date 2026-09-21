@@ -77,8 +77,14 @@ export const REFERENCE_DATE = '2026-04-29';
 /**
  * Human-readable date string for display on the page.
  * Update this whenever the dataset is refreshed.
+ *
+ * 2026-09-21：本次更新的是判決門檻相關內容（`RULING_THRESHOLD`、
+ * `RULINGS_SINCE_FLOOR_VOIDED`），取證日為 2026-09-21。
+ * 待審案件清單仍以 `REFERENCE_DATE`（2026-04-29）推導 `daysPending`，尚未重新收集。
+ * `REFERENCE_DATE` 牽動席次圖的 TODAY 線與倒數，更新它屬另一張票，
+ * 見 docs/constitution-features/063-required-for-ruling-legal-accuracy.md 第十二小節第 2 點。
  */
-export const LAST_UPDATED = '2026-04-29';
+export const LAST_UPDATED = '2026-09-21';
 
 /**
  * Real total number of pending cases before the Constitutional Court,
@@ -455,7 +461,7 @@ export const CRISIS_STATS = {
  */
 export const RULING_THRESHOLD = {
   /** 條文文字轉成的一句話敘述。渲染端的長版文案來源 */
-  rule: '大法官現有總額三分之二以上參與評議，並經現有總額過半數同意',
+  rule: '判決，除本法別有規定外，應經大法官現有總額三分之二以上參與評議，大法官現有總額過半數同意',
   /** 短版標籤用。掃讀場景，不超過 12 字 */
   ruleShort: '門檻依現有總額比例計算',
   /** 現行有效條文出處 */

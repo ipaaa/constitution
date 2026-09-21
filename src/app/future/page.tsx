@@ -199,8 +199,7 @@ export default function FutureTrack() {
             </h3>
             <p className="text-gray-600 leading-relaxed font-serif text-sm">
               即使在正常編制下，憲法法庭每年處理量約 30~40 件。以目前 {CRISIS_STATS.totalPending} 件待審案件計算，
-              即使全員到位也需要數年時間消化。而在 {CRISIS_STATS.activeJustices} 名大法官無法達到判決門檻的情況下，
-              案件只進不出，每一天都在加劇人民權利的損害。
+              即使全員到位也需要數年時間消化。
             </p>
           </div>
           <div className="bg-white p-6 md:p-8 border border-gray-200 shadow-sm rounded-sm">

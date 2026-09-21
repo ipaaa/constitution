@@ -96,6 +96,35 @@ curl -s https://constitution-nine.vercel.app/past -o p.html
 # 內容為 client-render，資料在 JS bundle 而非 HTML，需抓 /_next/static/*.js 比對
 ```
 
+> 📌 **2026-09-21 補充：要拿「渲染後的真 HTML」時的安全作法。**
+>
+> 為什麼 `curl` 只拿得到外框：`src/components/LaunchGate.tsx` 的
+> `if (!ready) return null;` 中，`ready` 只在 `useEffect` 裡設為 true，
+> 而 `useEffect` 不在伺服器端執行。所以任何被 `LaunchGate` 包住的頁面，
+> 伺服器端渲染出來都是 `null`，`curl` 只會拿到導覽列與頁尾。
+>
+> **正確作法：把已 commit 的狀態複製到暫存目錄，只在副本裡改那一行。**
+> 候選檔（工作目錄裡真正要交付的檔案）一個位元都不動。
+>
+> ```bash
+> git archive HEAD | tar -x -C "$SCRATCH/repo"
+> cp -Rc <repo-root>/node_modules "$SCRATCH/repo/node_modules"   # -Rc 走 APFS clone，不佔空間
+> # 只在副本裡把 LaunchGate.tsx 那一行改成：
+> #   if (!ready && typeof window !== 'undefined') return null;
+> cd "$SCRATCH/repo" && ./node_modules/.bin/next dev -p <port>
+> curl -s "http://localhost:<port>/future" -o real.html
+> ```
+>
+> **限制：`git archive HEAD` 取的是「已 commit」的狀態。**
+> verify 階段正確（候選已 commit）。implement 階段邊改邊驗時它看不到未 commit 的修改，
+> 要改用 `git stash create` 產生暫時 commit 再 archive，或用
+> `rsync -a --exclude node_modules --exclude .next <repo-root>/ "$SCRATCH/repo/"`。
+>
+> ⛔ **不要用「暫時改候選檔、抓完再還原」的作法。**
+> 它的安全性取決於「改」與「還原」之間不被打斷。本專案常有多個 agent 同時作業，
+> 一旦那個狀態被 commit 出去，尚未發布的站台就會在**伺服器端**吐出完整內容，
+> 而 `noindex` 只擋遵守規則的爬蟲。
+
 ### ~~2. 回填 SSOT 的 10 格~~ 🟡 **大部分已完成（2026-09-01 查核）**
 
 → [`../content-rescue/ssot-backfill.md`](../content-rescue/ssot-backfill.md)
