@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:040:verify:attempt-1:revision-1",
+  "question": "verify 判 REJECTED。三項未過的 AC 是否改列為部署前提，讓 040 以 repo 端交付通過？",
+  "artifacts": [
+    {
+      "id": "artifact:040:verify:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/c11d4cdeffa664f28a340465ed13045b73d89029/docs/constitution-features/040-approval-content-version-binding.md",
+      "rev": "sha256:83afc8f9cb4f004da3c99af8564350b2ed8d102b15e691bc067399b09e6c23a0",
+      "mediaType": "text/markdown",
+      "summary": "AC-1/3/5 PASSED，由 44 項測試與獨立重跑支持。AC-2/AC-4 需兩帳號隔離表 probe，本環境無法執行。AC-6 與本 feature 自身 Out of scope 衝突（040 未部署時，舊 status 模型仍為現況）。三項皆屬 captain 才能改的驗收範圍。"
+    }
+  ]
+}
