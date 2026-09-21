@@ -302,6 +302,9 @@ A 類四項需在 `npm run dev` 的實際渲染上驗證，方式見 AC-2。**�
 
 ### 驗證與可否證性
 
+本階段的全部改動在 commit `6c9fc65`（分支 `spacedock-ensign/056-pre-launch-checklist`），
+共四個檔案：`src/app/layout.tsx`、`docs/health-check/TODO.md`、`AGENTS.md`、本票。diff 看 git log。
+
 - AC-3／G-7 的 `grep`：三檔各至少一筆命中（1／5／1）。斷言的是綁定存在。任何人刪掉 `layout.tsx:8` 那行註解，該檔即回到零命中，本項翻為失敗——那正是綁定要擋的動作。
 - **相鄰性以指令證明，不以閱讀證明**：`awk '/056-pre-launch-checklist/{n=NR; getline nxt; printf "binding at line %d; next line %d = %s\n", n, NR, nxt}' src/app/layout.tsx` → `binding at line 8; next line 9 =   robots: { index: false, follow: false },`。若有人把這行註解移到檔尾，`next line` 就不再是 `robots:` 那行，AC-3 的附加條件即失敗。
 - G-6 可原樣重跑：`grep -h "i.includes('h2')" docs/health-check/TODO.md | sed 's/^  //' | sort -u` 收斂為單一列（證明 P0-2 與 P0-6 兩處的指令位元組完全相同），把該列交給 `bash` 執行輸出 `false false`、離開碼 0。本票第三節 G-6 的離開碼型（`if(...)process.exit(1)`）亦回傳 0。若有人把 `h2` 或 `h28` 重新標成 `Approved`，下次同步會讓該列回到 `history.json`，輸出翻為 `true`／離開碼翻為 1，gate 失敗。這是這兩項「明確接受」唯一的失敗途徑。
