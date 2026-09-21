@@ -319,3 +319,117 @@ A 類四項需在 `npm run dev` 的實際渲染上驗證，方式見 AC-2。**�
 **未達成一項，如實記錄：AC-2（A 類四項的實際渲染驗證）本階段無法達成。** 本 repo 無 `playwright`／`puppeteer`，本機無 Chrome，而 `LaunchGate.tsx:30` 讓任何只讀 SSR HTML 的檢查必然假通過。AC-2 綁在 feature `039`（尚未獲 captain 核准動工）上，而本階段依指示不得自行建立任何常設檢查機制。此項留待 `039` 交付，或由 captain 人工開瀏覽器驗證。
 
 **本階段刻意未做三件事**：未開 `058`–`063` 六張新票（依 design 第二節為 FO 的工作）；未動 `PresentDetail.tsx`（C1 的覆寫點尚待 captain 回答是否有真實信箱）；未更新 `docs/INDEX.md` 的「最後查核」日期——本階段只複核 `TODO.md` 的 P0-2、P0-6、P3-8 三節，把整份文件的查核日期改成 2026-09-21 會是過度宣稱。
+
+## Stage Report: verify
+
+- DONE: 不採信 implement 報告的任何自我宣稱，獨立重跑 AC-3 的 `grep`、`layout.tsx` 綁定相鄰性的 `awk` 證明、G-6 的 `node`、`npx tsc --noEmit` 與 `npm run build`，逐條貼出實際輸出；並確認 build 產物仍輸出 `noindex, nofollow`、且 `src/data/*.json` 的 sha256 與 main 相同。任一項只有結論沒有輸出即視為未驗。
+  六項全部獨立重跑，輸出與 implement 報告一致。詳見下方「獨立重跑輸出」。
+- DONE: 執行本 stage 的具名 placeholder 掃描（G-5 的 `grep -rniE`），逐筆判定每個命中是否都對應到已開立的票，並確認沒有任何**新的**佔位值或設計文件的樣本資料流入 shipped 資料檔。
+  G-5 三筆命中，與 design 記錄相同，無新增。`src/data/*.json` 佔位掃描零命中，且與 main 位元組相同。**但票號對應只有兩筆成立**：`contributors.ts:16,21` → `052`（存在，`status: design`）；`PresentDetail.tsx:32` → `061` **不存在**（見 F-1）。
+- FAILED: 逐項判定 AC-1 至 AC-4 是否成立 …… 最後給出 PASSED 或 REJECTED 與理由。
+  判定完成，結論為 **REJECTED**。AC-3 成立；AC-2 未達成但誠實且歸因正確；**AC-1 部分不成立、AC-4 不成立**。理由見「AC 逐項判定」與 F-1／F-2。
+
+### 獨立重跑輸出
+
+| 項 | 指令 | 本階段實測輸出 | 與 implement 報告 |
+|---|---|---|---|
+| AC-3／G-7 | `grep -rn '056-pre-launch-checklist' src/app/layout.tsx docs/health-check/TODO.md AGENTS.md` | 七列；每檔命中數 `1／5／1`（`layout.tsx:8`、`AGENTS.md:52`、`TODO.md:217,246,330,356,807`） | 一致 |
+| AC-3 相鄰性 | `awk '/056-pre-launch-checklist/{n=NR; getline nxt; printf "binding at line %d; next line %d = %s\n", n, NR, nxt}' src/app/layout.tsx` | `binding at line 8; next line 9 =   robots: { index: false, follow: false },` | 逐字一致 |
+| G-6 離開碼型 | `node -e "…if(i.includes('h2')||i.includes('h28'))process.exit(1)"` | 無輸出，離開碼 `0` | 一致 |
+| G-6 印出型 | `node -e "…console.log(i.includes('h2'),i.includes('h28'))"` | `false false`，離開碼 `0` | 一致 |
+| G-6 位元組同一 | `grep -h "i.includes('h2')" docs/health-check/TODO.md \| sed 's/^  //' \| sort -u` | 收斂為單一列（`TODO.md:242` 與 `:352` 完全相同） | 一致 |
+| G-8 型別 | `npx tsc --noEmit` | 無輸出，離開碼 `0` | 一致 |
+| G-8 建置 | `npm run build` | 離開碼 `0`，`✓ Generating static pages (16/16)`，路由表 15 列 | 一致（「16 條路由」實為 16/16 靜態頁計數器，路由表 15 列；無實質差異） |
+| noindex 未被動到 | 掃 `.next/server/app/**/*.html` | 15 個 HTML 中 **14 個**帶 `<meta name="robots" content="noindex, nofollow"`；唯一例外 `_global-error.html`（見 F-4） | implement 只稱「仍輸出」，未量化；未偽稱 |
+| sync 未觸發 | `shasum -a 256 src/data/*.json`（build 前／後） | 前後相同：`4071978a…` `discussions.json`、`4d1992e3…` `history.json` | 一致 |
+| 與 main 相同 | `git show main:… \| shasum -a 256`；`git diff main...HEAD -- src/data/` | 兩檔 sha256 與 main **完全相同**；diff 為空 | 一致。`package.json` 的 `build` 為 `next build`，`sync-content` 為獨立 script |
+
+`src/components/PresentDetail.tsx` 未被改動：`git diff --name-only main...HEAD` 只有 `AGENTS.md`、`src/app/layout.tsx`、`docs/health-check/TODO.md`、本票四檔。
+
+### 具名 placeholder 掃描（本 stage 的具名輸出）
+
+`grep -rniE '某學者|某大學|lorem ipsum|前端工程師 [AB]|volunteer@addcourt\.tw|快速了解最新判決的5個重點' src/` → **三筆**：
+
+1. `src/components/PresentDetail.tsx:32` `mailto:volunteer@addcourt.tw` — 對應 C1。design 指派給**票 `061`，該票尚未開立**。依 dispatch，本階段不動此檔；命中為預期，但「對應到已開立的票」不成立。
+2. `src/data/contributors.ts:16` `"前端工程師 A"` — 對應 C2 → 票 `052`（存在，`status: design`、`verdict:` 空）。成立。
+3. `src/data/contributors.ts:21` `"前端工程師 B"` — 同上。成立。
+
+**無新增佔位值，也無設計文件樣本資料流入 shipped 資料檔。** 證據兩重：`grep -rniE '某學者|某大學|某法官|某教授|lorem ipsum|placeholder|TBD|待補|範例|sample|測試用|快速了解最新判決的5個重點|前端工程師' src/data/*.json` 零命中；且 `src/data/*.json` 與 main 位元組相同，本分支結構上不可能注入。`contributors.ts` 六筆佔位（`:11,16,21,26,31,36`）為 C2 既有範圍，非本分支新增。
+
+### design 第一節事實斷言複驗
+
+| 斷言 | 實測 | 判定 |
+|---|---|---|
+| `opinions.ts` 的 `justiceName` 現為 12 筆 | `grep -c "justiceName: '"` → `12`；`OPINIONS` 條目 12 筆 | 成立（`grep -c 'justiceName'` 為 13，多的一筆是 `:53` 的型別欄位宣告） |
+| `StanceSpectrum` 自帶 14 筆 | `JUSTICES` 陣列 14 筆（10 多數＋2 協同＋2 不同） | 成立 |
+| `LaunchGate.tsx:30` hydration 前回傳 `null` | `30:  if (!ready) return null;` | 成立，行號未漂移 |
+| `LaunchGate.tsx:32`／`Navbar.tsx:34`／`TrackCards.tsx:31` 兩分支同值 | 三處皆命中。`Navbar.tsx:8` 為 `const ALL_PAGES_LIST = ALL_PAGES;`，故 `:34` 的 `ALL_PAGES_LIST` 與 `ALL_PAGES` 同值 | 成立。`launch-status.ts:7-10` 的 env 預設邏輯亦確認（實際路徑為 `src/data/launch-status.ts`） |
+| `PresentDetail.tsx:32` 佔位信箱 | 行號未漂移 | 成立 |
+| `LazybagCtaSection.tsx:31,34` 取 `{OPINIONS.length}`／`{DIMENSIONS.length}` | `:31` `{OPINIONS.length} 則意見分析`、`:34` `{DIMENSIONS.length} 個觀察維度`；實測 `OPINIONS`=12、`DIMENSIONS`=4 | 成立，「12 則／4 個」數字正確 |
+| 未接線元件共 697 行 | 25＋95＋99＋293＋147＋38 = **697** | 成立 |
+| `discussions.json` 16 筆、無 `opposing_views`／`full_content` | `16 0 0`；`present/[id]/page.tsx:104` guard 恆 false | 成立 |
+| `history.json` 40 筆、`h34`／`h35` 標題重複 | 40 筆；重複標題恰一組，計數 2 | 成立 |
+| `future.ts:424` `requiredForRuling: 10`，渲染於三處 | `future.ts:424`、`future/page.tsx:79`、`:194`、`BottleneckFunnel.tsx:135` | 成立，四處行號全部未漂移 |
+| `049` 的線上風險只剩 `StanceSpectrum`／`DecisionFlowchart` | 兩檔皆被 `src/app/opinion-lazybag/page.tsx:3,2` import 並渲染於 `:66,:44`；`OpinionTooltip`／`OpinionScatterPlot` 確認無任何 import | 成立 |
+
+輕微漂移（語意位置仍成立，依 dispatch 不算錯）：`opinions.ts:96` 實際首筆 `justiceName` 在 `:97`；`StanceSpectrum.tsx:19-35` 實際區塊為 `19-37`；`TrackCards.tsx`／`LazybagCtaSection.tsx` 實際位於 `src/components/home/` 而 design 只寫檔名。
+
+### AC 逐項判定
+
+**AC-1 — 部分不成立。** 十五個項目（A1–A4、B1a、B1b、B2、B3、C1–C3、D1、D2、D3、D4）各有一個結論類型，無任何一項停在「待確認」或「待決定」——這一半成立。但 AC-1 另有一條：「**『修好』的項目必須指向可查證的證據——票號加合併記錄，或實際指令輸出**」。十個 `修` 項中，A2→`058`、A3→`059`、B1a→`060`、C1→`061`、D4→`062`、D3→`063` 六項所指的票**全部不存在**（見 F-1）。指向一個不存在的票號不是可查證的證據。
+
+**AC-2 — 未達成，但誠實且歸因正確。** implement 報告以粗體自陳「未達成一項」，未宣稱通過，也未用 SSR HTML 假通過。歸因獨立複核成立：(a) `package.json` 無 `playwright`／`puppeteer`；(b) `LaunchGate.tsx:30` 確實在 hydration 前回傳 `null`，故 `curl` 對整站必然零命中；(c) `docs/constitution-features/039-render-check-tool.md` 的 `status:` 為 `design`、`verdict:` 為空，即尚未獲核准動工。歸因對象與阻擋理由都正確，**本項不構成拒絕理由**。
+
+**AC-3 — 成立。** 三檔命中數 `1／5／1` 皆非零，且附加條件（`layout.tsx` 那一筆須在 `robots:` 正上方註解區塊內，不可放檔尾）已用 `awk` 證明下一行即 `robots:`。`git diff` 顯示 `layout.tsx` 為 `+1／-0` 純追加。本項是本票最紮實的一項。
+
+**AC-4 — 不成立。** AC-4 要求「六個 `機械` 項逐條執行並貼出輸出。任一項只有結論沒有輸出即為失敗」。六個機械項為 G-1、G-2、G-5、G-6、G-7、G-8。**implement 報告只貼出三項的輸出（G-6、G-7、G-8），G-1、G-2、G-5 完全沒有出現。** 更根本的問題：**G-1 與 G-2 在全票內沒有任何可執行的指令**，只有散文式的通過條件（「每張票 `status` 為 `archived` 且 `verdict` 非空」），而 Test plan 的指令區塊只給了四條（tsc／build→G-8、AC-3 grep→G-7、G-5 grep、G-6 node）。本階段為了產出輸出必須自行撰寫 `for` 迴圈。AC-4 的標題是「gate 執行清單**可重跑**」——兩個項目沒有指令可跑，這一點在票本身修好之前無法成立（見 F-2）。
+
+本階段已補跑 G-1 與 G-2，輸出如下（兩項現在都**不通過**，這是預期的：gate 在公開當下才跑，不是現在）：
+
+- G-1：`for n in 058 059 060 061 062 063; do ls docs/constitution-features/${n}-*.md 2>/dev/null || echo "$n: NOT FOUND"; done` → **六張票全部 `NOT FOUND`**。現有最大票號為 `057`。
+- G-2：`049` → `status: design`、`verdict:` 空；`052` → `status: design`、`verdict:` 空。兩張皆非 `archived`，故不通過。
+
+(c) **`AGENTS.md`、`TODO.md` 的 P0-2／P0-6／P3-8 原文保留** — 以 `git diff main...HEAD` 逐檔核對，**如報告所稱，無以刪改掩蓋**。`git diff --numstat`：`AGENTS.md` `+2／-0`、`src/app/layout.tsx` `+1／-0`、`docs/health-check/TODO.md` `+34／-1`、本票 `+28／-1`。`TODO.md` 唯一的那筆刪除是 P0-6 的「解除方式」一行，原文逐字重出後追加「。此步驟以上一條的確認記錄為前置」一句——implement 報告已明確自陳此事，未隱瞞。P0-2、P3-8 兩節為純追加。
+
+### Findings（本階段只做唯讀調查，不動候選位元組）
+
+**F-1 — `058`–`063` 六張新票未開立，G-1 無對象可查。**
+- 已釋出使用者與正常流程：captain 與 FO 依第三節「公開之前逐項跑」執行 gate。
+- 可觀察損害：G-1 的通過條件指向六張不存在的票；design 第二節六個 `修` 結論、以及 G-5 三筆命中中的 `PresentDetail.tsx:32`，全部指向不存在的票號。gate 跑不到結論。
+- 受影響的 value AC 或不可協商邊界：**AC-1**（「修好」須指向可查證證據）與 **AC-4**（G-1 須有輸出）。
+- 觸發證據：`for n in 058…063` 六筆 `NOT FOUND`；現有最大票號 `057`。
+- 建議：materiality = **Material**（兩條 AC 直接不成立）。task ownership = **FO**——design 第二節明文「由 FO 在本票 implement 階段開立」，implement 報告亦如實記錄它依此刻意未開；這不是 implement 的疏失。disposition 建議 = **fix by FO**（開立六張票），開完 G-1 即可執行。
+
+**F-2 — G-1 與 G-2 無可執行指令，AC-4 依現行規格無法滿足。**
+- 已釋出使用者與正常流程：同 F-1。
+- 可觀察損害：AC-4 要求六個機械項「逐條執行並貼出輸出」，但票內只提供四條指令。下一個執行 gate 的人對 G-1／G-2 只能自行發明查法，等於這兩項不可重跑。
+- 受影響的 AC：**AC-4**。
+- 觸發證據：第三節 Gate 執行清單 G-1／G-2 兩列的「通過條件」欄為散文；Test plan 指令區塊五行內無 G-1／G-2 相關指令。本階段自撰迴圈才產出輸出。
+- 建議：materiality = **Material**。task ownership = **本票自有範圍**（AC-4 是本票的 AC，補一行指令不擴張範圍）。disposition 建議 = **fix**——在 G-1／G-2 兩列補上可原樣重跑的指令（本階段自撰的兩條可直接採用）。**等 FO 授權後才動。**
+
+**F-3 — design 的票號查法指令錯誤（Polish）。**
+design 第二節寫「現有最大票號為 `057`（`grep -c . <(ls docs/constitution-features/0*.md)` 可查）」。該指令實測輸出 `22`，是檔案數，不是最大票號。`057` 這個結論本身由逐檔檢視確認**正確**。受影響的 AC：無。建議 disposition = **fix（一行）或 decline**。
+
+**F-4 — build 產物的 `_global-error.html` 不帶 noindex（Deferred risk）。**
+15 個預先產製 HTML 中 14 個帶 `noindex, nofollow`，唯 `.next/server/app/_global-error.html` 無。可觀察損害：**目前無**——該檔是 Next.js 的錯誤邊界回退頁，不在建置輸出的 15 列路由表內，且本站尚無對外網域。此缺口在 `main` 上即已存在，非本分支引入。promote-to-material 條件：若日後決定「已公開但仍保留 noindex」，這是唯一的漏洞。建議 disposition = **decline**，或由 FO 決定是否記入 `TODO.md` 的 P3-8。
+
+**F-5 — design 第一節的行號／路徑輕微漂移（Polish）。**
+三處：`opinions.ts:96`（首筆在 `:97`）、`StanceSpectrum.tsx:19-35`（區塊為 `19-37`）、`TrackCards.tsx`／`LazybagCtaSection.tsx` 未標出實際目錄 `src/components/home/`。所有語意位置與計數（12／14／4／697）皆成立。依 dispatch，漂移本身不算錯。建議 disposition = **decline**。
+
+### 驗證與可否證性
+
+- AC-3 的兩條指令是本階段最強的證據，因為它們**同時可證真與可證偽**：任何人刪掉 `layout.tsx:8` 那行註解，該檔即回到零命中；把它移到檔尾，`awk` 的 `next line` 就不再是 `robots:` 那行。兩種破壞都會讓 AC-3 立即翻為失敗。
+- `src/data/*.json` 未被動到，是用**與 main 的 sha256 相同**加上 `git diff` 為空兩種方式斷言，不是靠 build 前後相同——後者只能證明 build 未觸發同步，不能證明分支未手改。兩者都跑了。
+- G-6 的可否證途徑唯一且明確：若有人把 `h2` 或 `h28` 重新標回 `Approved`，下次同步會讓該列回到 `history.json`，印出型翻為 `true`、離開碼型翻為 `1`。本階段兩型都跑過，都是通過態。
+- AC-4 的失敗是**用缺席證明的**：我在 implement 報告全文中搜尋 G-1、G-2、G-5 的輸出，三者皆無。若 implement 曾貼出其中任一項，此判定即被推翻。
+- 「原文保留」的判定不靠閱讀，靠 `git diff --numstat` 的刪除行數：三個程式／文件檔的刪除數分別為 `0`、`0`、`1`，唯一那筆刪除已逐字比對為「原文重出＋追加一句」。若 implement 曾悄悄改寫 P0-2 或 P3-8，刪除數不可能為 `0`。
+
+### Summary
+
+implement 的兩項 DONE 全部獨立重跑成立，逐字一致，無任何自我宣稱經不起重跑：AC-3 的三檔命中（`1／5／1`）、`awk` 相鄰性、G-6 兩型、`tsc`、`build`、build 產物的 noindex、以及 `src/data/*.json` 與 main 的 sha256 相同。`PresentDetail.tsx` 依 dispatch 未被動到。design 第一節十一項事實斷言全部與當下 repo 相符，僅三處行號／路徑輕微漂移且語意位置成立。具名 placeholder 掃描交付：三筆命中皆為既有範圍，shipped 資料檔零命中且與 main 位元組相同，**無新佔位值或設計文件樣本資料流入**。
+
+implement 的誠實度值得記錄：它主動以粗體自陳 AC-2 未達成、歸因到未獲核准的 `039`、並列出三件「刻意未做」的事。AC-2 的歸因經獨立複核完全正確，**不構成拒絕理由**。
+
+**判定：REJECTED。** 兩條 AC 不成立，而且兩者同源——**六張新票 `058`–`063` 從未開立**。因此 AC-1 的「『修好』須指向可查證證據」對六個 `修` 項不成立（票號不存在），AC-4 的 G-1 無對象可查；再加上 G-1／G-2 在票內根本沒有可執行的指令，AC-4 的「可重跑」依現行規格無法滿足（六個機械項中 implement 只貼出三項輸出）。
+
+**拒絕的落點不在 implement。** design 第二節明文把開票指派給 FO，implement 亦如實記錄它依此刻意未開。F-1 的 task ownership 屬 FO，F-2 屬本票自有範圍。依 README 的 `## Review-finding disposition`，本階段保留 finding、只做唯讀調查、不動候選位元組，等 FO 的明確授權。
