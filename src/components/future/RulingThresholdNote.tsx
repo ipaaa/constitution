@@ -27,12 +27,12 @@ const { rule, ruleShort, statute, voidedFloor, headcount } = RULING_THRESHOLD;
  */
 const VOIDED_FLOOR_SHORT =
   `${voidedFloor.statute}的 ${voidedFloor.participants} 人參與評議下限，` +
-  `已由${voidedFloor.voidedBy}宣告違憲，自 ${voidedFloor.voidedOn} 起失其效力`;
+  `已由 ${voidedFloor.voidedBy}宣告違憲，自 ${voidedFloor.voidedOn} 起失其效力`;
 
 const VOIDED_FLOOR_FULL =
   `${voidedFloor.statute}（參與評議之大法官不得低於 ${voidedFloor.participants} 人、` +
   `作成違憲宣告之同意人數不得低於 ${voidedFloor.unconstitutionalityVotes} 人），` +
-  `已由${voidedFloor.voidedBy}宣告違憲，自公告日 ${voidedFloor.voidedOn} 起失其效力`;
+  `已由 ${voidedFloor.voidedBy}宣告違憲，自公告日 ${voidedFloor.voidedOn} 起失其效力`;
 
 export default function RulingThresholdNote({ variant, className }: RulingThresholdNoteProps) {
   if (variant === 'compact') {
@@ -59,7 +59,7 @@ export default function RulingThresholdNote({ variant, className }: RulingThresh
       <p className="text-gray-600 leading-relaxed font-serif text-sm">
         114 年 1 月 23 日修法增訂的{VOIDED_FLOOR_FULL}，
         存續期間為 114 年 1 月 23 日至 114 年 12 月 19 日。
-        該期間內憲法法庭只作成一則判決，就是宣告這一項違憲的 {voidedFloor.voidedBy} 本身；
+        該期間內憲法法庭只作成一則判決，就是宣告這一項違憲的 {voidedFloor.voidedBy}本身；
         該判決並未適用這一項作為自己的程序規範——理由【41】載明它
         「既嚴重妨礙本庭行使憲法職權⋯⋯自不得作為本件判決的程序規範」，
         【43】改依第 30 條第 1 項定評議及評決門檻。
