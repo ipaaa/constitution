@@ -3,7 +3,7 @@ id: "012"
 title: 解釋門檻與案件數量關聯視覺化
 status: design
 source: meetup-20260416
-started:
+started: 2026-09-21T19:21:11Z
 completed:
 verdict:
 score: 0.8
