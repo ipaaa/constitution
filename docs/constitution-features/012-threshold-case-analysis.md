@@ -643,6 +643,24 @@ Verified by: 施工前後比對 `src/data/discussions.json` 與 `src/data/histor
 
 以上四項不阻擋施工。D1、D2 已有明確的「未確認就留白」處置，D3、D4 在施工後處理。
 
+- **D5 — 行動版與桌機的視覺檢查。** 375px 與 1280px 各看一次，需截圖。
+  原列為 implement 的 checklist 項目，由 FO 於 2026-09-21 改派。
+  **worker 做不到的原因（三項實測證據）：** 唯一可用的瀏覽器是 puppeteer cache 內的
+  Chrome for Testing 147.0.7727.56，它在 worker 機器上連 `--dump-dom about:blank` 都
+  `SEGV_ACCERR`（`--headless`、`--headless=old`、`chrome-headless-shell`、`--single-process`、
+  關掉 sandbox 全部一樣）；`/Applications` 被 macOS TCC 擋住（`Operation not permitted`），
+  沒有 Playwright cache；規格明文不得新增相依，因此不能裝 `puppeteer` 或 `playwright`。
+  處置：由 captain 或任何有可用瀏覽器的人執行，截圖附回本票。
+  **在此之前，行動版視覺行為視為未驗證。** implement 階段補的四條結構斷言驗的是機制
+  —— 行動版字級數值、桌機長標籤不外洩到行動版、對照條的 grid 欄數、選取後展開的逐年清單
+  —— **不是「看起來對」**。字級 26px 在 375px 下的實際可讀性、標籤有無互相重疊、
+  色帶與長條的視覺對比，這幾件事只有人眼看得出來。
+  拍板者：captain。
+  **本項不阻擋進入 verify**，但 gate presentation 必須把它列為未達成的驗證項。
+
+> **2026-09-21 補述：** 上面「以上四項不阻擋施工」寫於 D5 追加之前。
+> D5 同樣不阻擋施工與進入 verify，但它是**未達成的驗證項**，不是已處置項。原句保留。
+
 ## Documentation impact
 
 ### 現在更新
@@ -732,7 +750,8 @@ D4 朗讀測試）都不阻擋施工，D1／D2 已定「未確認就留白」的
   兩者各跑兩次（加行動版字級之前與之後）皆 0。`npx eslint` 對本票全部檔案 0 error。
 - DONE: `src/data/discussions.json` 與 `src/data/history.json` 的 sha256 與 main 相同
   建置前後與 main 的 git blob 三方相同：`discussions.json` = `4071978a…3162`，`history.json` = `4d1992e3…cea3b`。`git status` 自始至終未列出這兩個檔。`git diff main...HEAD -- package.json` 為空，`build` 仍是 `next build`。
-- FAILED: 行動版行為在 `npm run dev` 下於 375px 與 1280px 各人工看一次並把截圖附進 stage report
+- SKIPPED: 行動版行為在 `npm run dev` 下於 375px 與 1280px 各人工看一次並把截圖附進 stage report
+  **本項由 FO 誤派給 worker，已重新指派給 captain 執行，追蹤於 `## 需外部拍板的項目` 的 D5。** 改判為 SKIPPED 由 FO 授權（見下方「### FO 授權的改判」）。**改判的意思是換人做，不是做完了——視覺檢查未完成、未確認。** 原判為 FAILED，失敗證據逐字保留於下：
   **本機無法產生截圖。** 唯一可用的瀏覽器是 puppeteer cache 內的 Chrome for Testing 147.0.7727.56，它在本機連 `--dump-dom about:blank` 都 `SEGV_ACCERR`（`--headless`、`--headless=old`、`chrome-headless-shell`、`--single-process`、關掉 sandbox 全部一樣）。`/Applications` 被 macOS TCC 擋住（`Operation not permitted`），沒有 Playwright cache，且規格明文不得新增相依。**不寫「已確認」。** 視覺檢查留給有可用瀏覽器的人執行。
 - DONE: 補上四條可自動驗證的行動版／桌機結構斷言，代替不了視覺檢查，但把機制本身驗起來
   `tests/threshold-analysis.test.mjs` 新增四條：x 軸桌機 26 個年份刻度／行動版 8 個且字級 ≥ 20；門檻分界線桌機帶門檻一句話、行動版只留 4 位數公布年份且長句不重複出現；`EraComparisonStrip` 為 `grid-cols-1 md:grid-cols-4`；選取某期後展開 29 個 `<dt>` 且含 `1994 → 37`。把行動版字級改回 10、或把桌機長句漏進行動版，這四條會失敗。
@@ -757,6 +776,22 @@ D4 朗讀測試）都不阻擋施工，D1／D2 已定「未確認就留白」的
 - SKIPPED: `docs/INDEX.md` 更新
   本階段沒有新增任何 `.md` 文件，而 `INDEX.md` 索引到資料夾層級、不索引個別 feature 票，因此沒有可加的列。`constitution-features/` 那一列寫的是票數快照，`AGENTS.md` 明文不建議把會漂移的快照寫進 evergreen 文件，未擅自改動。
 
+### FO 授權的改判（2026-09-21）
+
+上面「375px／1280px 人工視覺檢查」一項，原判 FAILED，現改判 SKIPPED。**本次改判由 FO 授權。**
+
+FO 給的理由摘要：該 checklist 項目是 FO 誤派——dispatch 假設 worker 環境有可用瀏覽器，
+事實不是這樣。worker 拒絕假通過、並完整記下三項失敗證據，處置正確。
+階段守門以 `FAILED item ... is unresolved` 擋住推進，解法不是讓該項消失，
+而是**改派給有可用瀏覽器的人執行**，與 AC-3 朗讀測試同一類。
+
+本輪據此只做兩件事：改判該項並保留原證據逐字不動、在 `## 需外部拍板的項目` 追加 D5。
+FO 明文指示其餘七項規格偏離與淨行數超標本輪一律不動，交由 verify／review 裁量，
+因此下一節原文保留，未做任何辯護性修改或刪減。
+
+本輪的 `git diff` 只有本檔一個檔案。未動任何程式碼、資料或 `package.json`，
+未執行 `npm run sync-content`，未改動任何 acceptance criteria 的文字。
+
 ### 超出容差與規格偏離（需 gate 裁量）
 
 1. **淨行數超出容差。** 規格估 +1380、容差 828–1932，實際 `git diff --shortstat main...HEAD` 為 **+2611／−2**。主要來自兩處：測試檔 507 行（估 180）、資料模組 473 行（估 230，78 個年份各一列物件，為了讓數字進 PR diff 受人工審閱）。另有兩個估算表沒有的檔：`ChartText.tsx` 55 行、`tests/tsx-loader.mjs` 71 行。沒有為了對齊估算而刪減測試。
@@ -779,3 +814,7 @@ D2 在本階段解除：抓到 2019-01-04 版憲法訴訟法第 30 條逐字核�
 `/Applications` 被 TCC 擋住，規格又不准新增相依），只補了四條結構斷言，不宣稱視覺已確認；
 以及**淨行數 +2611 超出 828–1932 的容差**，主要是測試與逐年資料列，未為了對齊估算而刪測試。
 AC-3 朗讀測試記為 `PENDING-CAPTAIN`。
+
+**2026-09-21 補述：** 上一段第一件事（行動版視覺檢查）已由 FO 授權改判為 SKIPPED
+並改派給 captain，追蹤於 D5。**改派不等於做完——它仍是未達成的驗證項。**
+原句保留。詳見上方「### FO 授權的改判」。
