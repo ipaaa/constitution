@@ -1,7 +1,7 @@
 ---
 id: 056
 title: 上線前檢查清單：公開之前每一項都必須有結論
-status: implement
+status: verify
 source: captain 2026-09-07（把關機制體檢與任務地圖的綜合結論）
 started: 2026-09-21T18:56:47Z
 completed:
@@ -292,3 +292,30 @@ A 類四項需在 `npm run dev` 的實際渲染上驗證，方式見 AC-2。**�
 複驗推翻了快照的三項事實：A2 的 CTA 數字不是硬寫的 16 而是 `{OPINIONS.length}`（現為 12），且 CTA 的數字來源與目的地渲染的資料不是同一份；D1／D2 的錯誤列已被 `isApproved()` 濾出線上。另外找到兩件快照沒有的事：`h34`／`h35` 標題一字不差（列為 D4，開票 `063` 之外另開 `062`），以及 `049` 的一項前提已失效——它指的兩個渲染點現在無任何 import，該票的線上風險只剩 `StanceSpectrum.tsx`。
 
 兩項設計決定值得 captain 特別看：**B1b 判定「夥伴看全部、公眾看三頁」在現行架構下做不到**（無登入機制，前端 `localStorage` 可被繞過），因此把該目標移除而非修它，這推翻了已封存的 `033` 的假設；**AC-2 的驗收綁在 feature `039` 上**——本 repo 無瀏覽器工具，而 `LaunchGate.tsx:30` 讓 `curl` 對整站零命中，任何只讀 SSR HTML 的驗證都會假通過。這一點本次複驗獨立重現了一遍。
+
+## Stage Report: implement
+
+- DONE: 三處 noindex 綁定全部落地：`src/app/layout.tsx` 第 5–7 行註解區塊緊貼 `robots:` 上方追加指向本票的一行、`docs/health-check/TODO.md` 的 P3-8 補「解除條件」、`AGENTS.md:51` 同時指向 P3-8 與本票。可否證方式為 `grep -rn '056-pre-launch-checklist'` 對三檔各至少一筆命中——目前三檔皆零命中，所以這項現在一定是失敗的。
+  三檔命中數為 1／5／1，全部非零；`grep -rn '056-pre-launch-checklist' src/app/layout.tsx docs/health-check/TODO.md AGENTS.md` 現輸出七列，先前為零列。**行號已漂移**：綁定註解落在 `layout.tsx:8`，`robots:` 因此推到第 9 行；語意位置以指令證實，見下節。`AGENTS.md` 原第 51 行原文保留，新增第 52–53 行。`TODO.md` P3-8 在「狀態」下方新增「解除條件」一條（`:807`）。
+- DONE: D1／D2 的反向保護寫進 `docs/health-check/TODO.md` 的 P0-2 與 P0-6：`h2`／`h28` 重新標 `Approved` 之前必須經法學確認，並讓第三節 G-6 的檢查指令可原樣重跑並印出 `false false`。
+  P0-2（`:239-246`）與 P0-6（`:348-356`）各新增「反向保護」一條，寫明重新標 `Approved` 之前必須先有法學確認記錄，並在兩節開頭各追加一則 2026-09-21 補述。兩節原文全部保留；P0-6 的「解除方式」只追加「此步驟以上一條的確認記錄為前置」一句。G-6 指令從 `TODO.md` 抽出後原樣執行，輸出 `false false`、離開碼 0。
+
+### 驗證與可否證性
+
+本階段的全部改動在 commit `6c9fc65`（分支 `spacedock-ensign/056-pre-launch-checklist`），
+共四個檔案：`src/app/layout.tsx`、`docs/health-check/TODO.md`、`AGENTS.md`、本票。diff 看 git log。
+
+- AC-3／G-7 的 `grep`：三檔各至少一筆命中（1／5／1）。斷言的是綁定存在。任何人刪掉 `layout.tsx:8` 那行註解，該檔即回到零命中，本項翻為失敗——那正是綁定要擋的動作。
+- **相鄰性以指令證明，不以閱讀證明**：`awk '/056-pre-launch-checklist/{n=NR; getline nxt; printf "binding at line %d; next line %d = %s\n", n, NR, nxt}' src/app/layout.tsx` → `binding at line 8; next line 9 =   robots: { index: false, follow: false },`。若有人把這行註解移到檔尾，`next line` 就不再是 `robots:` 那行，AC-3 的附加條件即失敗。
+- G-6 可原樣重跑：`grep -h "i.includes('h2')" docs/health-check/TODO.md | sed 's/^  //' | sort -u` 收斂為單一列（證明 P0-2 與 P0-6 兩處的指令位元組完全相同），把該列交給 `bash` 執行輸出 `false false`、離開碼 0。本票第三節 G-6 的離開碼型（`if(...)process.exit(1)`）亦回傳 0。若有人把 `h2` 或 `h28` 重新標成 `Approved`，下次同步會讓該列回到 `history.json`，輸出翻為 `true`／離開碼翻為 1，gate 失敗。這是這兩項「明確接受」唯一的失敗途徑。
+- `npx tsc --noEmit` 離開碼 0、無輸出。斷言的是註解追加未破壞 `metadata` 物件的型別；若漏掉 `//` 或把該行寫進物件字面值中間，此項會失敗。
+- `npm run build` 離開碼 0，16 條路由全數產出。建置產物仍輸出 `<meta name="robots" content="noindex, nofollow"`。斷言 noindex 本身未被動到——本階段只建立綁定，不解除 noindex。
+- `npm run build` 前後 `src/data/*.json` 的 sha256 相同（`discussions.json` `4071978a…`、`history.json` `4d1992e3…`）。斷言 build 未觸發內容同步。
+
+### Summary
+
+三處綁定與兩處反向保護全部落地，AC-3 的 `grep` 從三檔零命中翻為三檔皆命中。`layout.tsx` 的綁定是關鍵一處，其相鄰性已用 `awk` 證明「下一行就是 `robots:`」，而非只確認字串存在。G-6 的指令在 P0-2 與 P0-6 兩處位元組完全相同，可從文件抽出直接執行。
+
+**未達成一項，如實記錄：AC-2（A 類四項的實際渲染驗證）本階段無法達成。** 本 repo 無 `playwright`／`puppeteer`，本機無 Chrome，而 `LaunchGate.tsx:30` 讓任何只讀 SSR HTML 的檢查必然假通過。AC-2 綁在 feature `039`（尚未獲 captain 核准動工）上，而本階段依指示不得自行建立任何常設檢查機制。此項留待 `039` 交付，或由 captain 人工開瀏覽器驗證。
+
+**本階段刻意未做三件事**：未開 `058`–`063` 六張新票（依 design 第二節為 FO 的工作）；未動 `PresentDetail.tsx`（C1 的覆寫點尚待 captain 回答是否有真實信箱）；未更新 `docs/INDEX.md` 的「最後查核」日期——本階段只複核 `TODO.md` 的 P0-2、P0-6、P3-8 三節，把整份文件的查核日期改成 2026-09-21 會是過度宣稱。
