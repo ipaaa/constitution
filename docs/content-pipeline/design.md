@@ -479,6 +479,20 @@ staging 顯示的是「目前所有已核可內容」，那是另一個問題。
 > 驗證指令：`python3 -c "import json;print([x['id'] for x in json.load(open('src/data/history.json'))])"`。
 > 原表格保留。本次更正見文末修訂紀錄「2026-09-04 —— 修正與實際行為不符的敘述」。
 
+> 📌 **2026-09-21 追加一項未處理事項（提案，待 captain 核可，尚未實作）。**
+> feature `019`（不同意見總覽頁）的 design 階段提出在 `Track 2_discussion`
+> 新增 `case_ref`（判決字號）與 `stance`（立場）兩個**平面選填欄位**。
+> **與本文 2026-09-01「取消 `Track 2_opposing`」的決定不衝突**：
+> 那則決定取消的是「收集反方意見」這個新管道；本提案不收集任何新意見，
+> 只標記**已經收集並核可**的 16 篇文章各自在談哪個判決、站哪一邊。
+> 兩欄的值域、白名單機制與同步程式改動寫在
+> [`../constitution-features/019-opposing-views-overview-page.md`](../constitution-features/019-opposing-views-overview-page.md)
+> 的 `## Design` 第三節。
+> **目前狀態：尚未核可、尚未實作、試算表未新增任何欄位、同步程式未改。**
+> 驗證目標：核可並實作後，`grep -n "case_ref" scripts/sync-content.mjs` 須同時命中
+> 欄位定義、白名單驗證與 projection 三處；在那之前該指令零命中即為正確狀態。
+> 本則為提案記錄，不是決定。第二節的欄位表與第五節的施工順序表**在核可前不得改動**。
+
 ---
 
 ## 修訂紀錄
@@ -592,3 +606,21 @@ feature 040 實作後才會取代該模型。保留原文，避免把預定行�
 - captain 於 2026-09-03 回報 `status` 保護範圍已設定。
 
 **施工單**：[`../constitution-features/041-correct-stale-pipeline-docs.md`](../constitution-features/041-correct-stale-pipeline-docs.md)
+
+### 2026-09-21 — 記錄 `019` 提出的兩個 Track 2 欄位（提案，未核可）
+
+**起因**：feature `019` 的 design 階段查出，原票依賴的 `opposing_views` 欄
+**沒有任何合法填入途徑**——`scripts/sync-content.mjs` 的 `buildTrack2` 回傳值是逐鍵列舉的
+白名單，不含該欄；而 `src/data/*.json` 不可手改（不變式 #2）。
+`019` 因此改採不依賴該欄的設計，並提出兩個平面欄位。
+
+**改了什麼**：第七節「本設計未處理的事項」追加一則 `📌` 提案記錄。
+
+**沒有改什麼**：第二節的 `Track 2_discussion` 欄位表、第五節的施工順序表、
+2026-09-01「取消 `Track 2_opposing`」那一則修訂紀錄，全部一字未改。
+**提案在 captain 核可前不得寫進那三處。** 寫進去會讓本文看起來像已經決定。
+
+**這不是推翻 2026-09-01 的決定。** 那則決定的對象是「收集反方意見」；
+本提案的對象是「標記已核可文章的屬性」。`019` 的 `## Design` 第二節有兩案對照表。
+
+**施工單**：[`../constitution-features/019-opposing-views-overview-page.md`](../constitution-features/019-opposing-views-overview-page.md)
