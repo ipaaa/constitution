@@ -1,7 +1,7 @@
 ---
 id: 063
 title: requiredForRuling 的法律正確性（114憲判1）
-status: implement
+status: verify
 source: constitution-features/056 第二節 D3
 started: 2026-09-21T21:16:25Z
 completed:
@@ -186,12 +186,18 @@ src/components/future/BottleneckFunnel.tsx:135  需 {CRISIS_STATS.requiredForRul
 
 **以下四項 design 不下結論。** 需 captain 或法學背景者拍板。
 
+> **2026-09-21 補述（implement，FO 授權）：本表新增 L5，故已不止四項。**
+> 上句「以下四項」寫於 design 階段，當時尚無 L5。原句保留。
+> L5 的拍板者是 **captain，或任何有可用瀏覽器的環境**；它不必是法學背景者。
+> **L5 不阻擋本票進入 verify**，但 gate presentation 必須把它列為未達成的驗證項。
+
 | 代號 | 待拍板問題 | 為什麼 design 不能自己決定 |
 |---|---|---|
 | **L1** | 「現有總額」現在是 8（在職人數）還是 5（扣除持續拒絕參與評議者）？ | 114 憲判 1 理由【50】標題為「本件判決拒絕參與評議的大法官，應不計入現有總額」。但該認定是**就本件所為**。它是否及於其他案件，是法律解釋問題 |
 | **L2** | 依 L1 的答案，門檻的具體人數是多少？「三分之二以上」遇到非整數時如何處理？ | 若現有總額 8：2/3 = 5.33。若現有總額 5：2/3 = 3.33。進位方式本身是法律讀法，不是算術 |
 | **L3** | 114 憲判 1 該描述為「全部違憲」還是「部分違憲」？ | 主文把**每一個系爭規定**都判違憲（第 4 條第 3 項、第 30 條第 2 至 6 項、第 95 條）。但第 30 條第 1 項未被聲請、未受審查、仍有效。`056` 的 D3 寫「部分違憲」。用哪一種措辭需拍板 |
 | **L4** | 站上還能不能說憲法法庭「實質上無法做出任何判決」？ | 民國 115 年已有六則判決（見第三小節表）。這句話與一手來源直接衝突。但它是編輯判斷，不純是法律判斷 |
+| **L5** | 第九小節的響應約束：導言在 375px 寬下是否超過六行？ | 本執行環境沒有任何可用的無頭瀏覽器（`chrome-headless-shell` 147.0.7727.56 與 `Google Chrome for Testing` 皆 `SEGV_ACCERR`；`/Applications/Google Chrome.app` 被 macOS TCC 擋住），規格亦不准新增相依，因此只能算術推估：導言 194 半寬單位 ÷ 34 單位／行 ≈ 6 行，改動前 172 單位 ≈ 6 行。**推算不是量測**，design 與 implement 都無法自行拍板 |
 
 #### 拍板前站上該怎麼呈現
 
@@ -478,3 +484,131 @@ frontmatter 的 `title` 由 FO 或 captain 處理——**ensign 不得改 frontm
 設計上不換數字，換結構：移除 `CRISIS_STATS.requiredForRuling`，改用 `RULING_THRESHOLD`（`headcount: null` 待拍板），並把三處手寫文案收斂成單一元件 `RulingThresholdNote`。型別改變會讓 `tsc` 在三個渲染點全部報錯，逼 implement 逐處重寫句子而不只是改數字。
 
 三件需 FO 轉達 captain 的事。一、本票 frontmatter 的 `title` 含誤引「114憲判9」，ensign 不得改 frontmatter，建議改為「（114憲判1）」。二、L4：站上「實質上無法做出任何判決」與一手來源衝突——民國 115 年已有六則判決，最近一則 115-08-14；建議與本票一起修。三、`docs/design-assets/003` 與 `049` 把 114 憲判 1（憲法訴訟法修正案）誤當成國會職權修法判決（實為 113 憲判 9），屬 `049` 範圍，已附一手證據。
+
+## Stage Report: implement
+
+- DONE: `CRISIS_STATS.requiredForRuling` 移除，改為第七小節的 `RULING_THRESHOLD`（`headcount: null`），三處手寫文案收斂成 `RulingThresholdNote`；`grep -rn 'requiredForRuling' src/` 回 0 筆，且無任何地方印出推算出來的判決人數（AC1）。
+  `grep -rn 'requiredForRuling' src/` = 0 筆；`grep -rnE '需 *[0-9]+ *(人|名).*(判決|同意)|[0-9]+ *名大法官同意' src/` = 0 筆。新元件 `src/components/future/RulingThresholdNote.tsx`（lede／card／compact 三個 variant，`headcount === null` 走不印人數分支）。
+- DONE: 型別改變確實攔住所有渲染點：在移除欄位之後、改寫渲染點之前跑 `npx tsc --noEmit`，**必須恰好在 `page.tsx:79`、`page.tsx:194`、`BottleneckFunnel.tsx:135` 三處報錯**，並把該次錯誤輸出原樣貼進 stage report。兩處或零錯都是失敗（AC2）。
+  恰好三處，原樣輸出見下方「AC2 實跑輸出」。改動前基線 `npx tsc --noEmit` exit 0；全部改完後亦 exit 0。
+- DONE: 起 `npx next dev` 抓 `/future` 的**實際 HTML**（不可只 grep 原始碼）逐條驗 AC3／AC4。
+  11 條檢查全 PASS，逐條輸出見下方「AC3／AC4 實跑輸出」。`/future` 的 HTML 中「10」共 3 個：2 個在門檻敘述句內（同句帶「違憲」與「114 年憲判字第 1 號」），1 個是折線圖 Y 軸刻度。
+- DONE: AC5 拍板標記。
+  `RULING_THRESHOLD.headcount` 為 `null`，JSDoc 指向本文件第五小節；`grep -n '063-required-for-ruling' src/data/future.ts` = 2 筆；`docs/health-check/TODO.md` 新增 P0-7（格式比照同檔 P0-2，含 L1–L4 與查證陷阱），並列入同檔「卡在人，越早問越好」第 5 項。站上顯示「換算成具體人數須經法學確認，本站不列。」
+- DONE: AC6 未動禁區。
+  `src/data/*.json` sha256 在改動前、`npm run build` 前、build 後三次皆相同（`4071978a…`／`4d1992e3…`）；`git log main..HEAD -- src/data/discussions.json src/data/history.json` = 0 筆；`src/app/layout.tsx:8` 的 `robots: { index: false, follow: false }` 仍在（build 後 `/future` HTML 仍帶 `noindex, nofollow`）。未執行 `sync-content`。
+- DONE: 文件影響（第十一小節「實作後更新」三項）。
+  `docs/content-pipeline/data-collection-guide.md` 欄位清單更新並追加 2026-09-21 更正框（原句全文引在框內）；`docs/health-check/TODO.md` 新增 P0-7；`docs/INDEX.md` 兩列「最後查核」改 2026-09-21。
+- DONE: AC7 誤引已更正。
+  `grep -n '114憲判9'` 在本文件的每一筆命中，上下文都是「這是錯的」、AC 條文本身、或本報告的驗證輸出；無一筆把它當成有效引註。frontmatter `title` 已由 FO 改為「（114憲判1）」。站上 HTML 不含「114憲判9」。
+- DONE: L4 處置（FO 授權與本票一起修）。
+  `page.tsx:79` 的「實質上無法做出任何判決」與 `:196` 的「實質上凍結」整句刪除，改陳述一手事實：民國 114 年全年只作成一則判決；失效後已作成 6 則，最近一則 115 年憲判字第 6 號（115 年 8 月 14 日）。六則判決的號次、日期、`docdata` id 寫進 `src/data/future.ts` 的 `RULINGS_SINCE_FLOOR_VOIDED`，附判決清單端點與取證日。未加入任何推算人數。
+- DONE: 第九小節響應約束。
+  `compact` 的 `ruleShort`＝「門檻依現有總額比例計算」11 字，未超過 12 字上限。導言未引入 `line-clamp`。
+- SKIPPED: 第九小節「導言不得超過六行（手機 375px 寬量測）」——無法在本機實測，已重新指派。
+  本機無可用的無頭瀏覽器：`chrome-headless-shell` 147.0.7727.56 與 `Google Chrome for Testing` 皆在啟動時 `SIGSEGV`（`Received signal 11 SEGV_ACCERR`），`/Applications/Google Chrome.app` 被 sandbox 擋住無法 dlopen。改以字元寬度推算：導言顯示寬度 194 半寬單位，375px 下可用寬度 279px（375 − 外層 `px-6` 48 − hero `p-6` 48），`text-base` 16px 即 34 半寬單位／行 → 約 6 行；改動前原句為 172 半寬單位 → 約 6 行。推算結論是行數未增加，但**這是算術，不是量測**，仍需在有瀏覽器的機器上看一眼（性質同 `docs/health-check/TODO.md` 的 P2-11）。
+
+  **2026-09-21 由 FO 授權自 `FAILED` 改判為 `SKIPPED`。** 理由兩點：
+  (a) 這是環境缺口，不是實作缺失——本執行環境沒有任何可用的無頭瀏覽器，
+  上述失敗證據已記錄且可獨立重現（重跑那兩個 binary 即可再現 `SEGV_ACCERR`）；
+  規格亦不准為此新增相依，故任何「需人眼或真實瀏覽器量測」的驗收項在此環境無法由 worker 完成。
+  同一缺口在本 session 已撞到三次（feature `012` 的 D5、本票第九小節）。
+  (b) 已重新指派給 captain，或任何有可用瀏覽器的環境；追蹤代號為第五小節新增的 **L5**。
+  **改判的意思是換人做，不是做完了。** 本報告不宣稱六行限制已驗證或已量測；
+  上方那段字元寬度推算是算術推估，不得被讀成量測結果。
+
+### AC2 實跑輸出
+
+移除 `CRISIS_STATS.requiredForRuling` 之後、改寫任何渲染點之前，`npx tsc --noEmit`（exit 2）：
+
+```
+src/app/future/page.tsx(79,31): error TS2339: Property 'requiredForRuling' does not exist on type '{ totalPending: number; curatedCount: number; activeJustices: number; designatedTotal: number; vacantSeats: number; absentJustices: number; avgDaysPerCase: number; estimatedClearanceYears: number; }'.
+src/app/future/page.tsx(194,35): error TS2339: Property 'requiredForRuling' does not exist on type '{ totalPending: number; curatedCount: number; activeJustices: number; designatedTotal: number; vacantSeats: number; absentJustices: number; avgDaysPerCase: number; estimatedClearanceYears: number; }'.
+src/components/future/BottleneckFunnel.tsx(135,71): error TS2339: Property 'requiredForRuling' does not exist on type '{ totalPending: number; curatedCount: number; activeJustices: number; designatedTotal: number; vacantSeats: number; absentJustices: number; avgDaysPerCase: number; estimatedClearanceYears: number; }'.
+```
+
+恰為設計預測的三處。
+
+### AC3／AC4 實跑輸出
+
+`npx next dev -p 3199` → `curl http://localhost:3199/future` → 去掉 `<script>`／`<style>` 後取可見文字：
+
+```
+PASS AC3-1a 出現「憲法訴訟法」          PASS AC3-3c 不出現「114 年憲判字第 9 號」
+PASS AC3-1b 不出現「憲法法庭法」        PASS AC3-4  出現失效日 2025-12-19
+PASS AC3-2  不出現「法定總額」          PASS AC3-5  不出現「N 名大法官同意」
+PASS AC3-3a 出現「114 年憲判字第 1 號」 PASS AC3-5b 不出現「需 N 人」
+PASS AC3-3b 不出現「114憲判9」          PASS AC3-5d 不出現「表決門檻 (10人)」
+
+AC4：'10' 共 3 個，未標註 0 個
+  OK [門檻敘述] 憲法訴訟法第 30 條第 2 項的 10 人參與評議下限，已由 114 年憲判字第 1 號 判決違憲，自 2025-12-19 起失其效力
+  OK [Y 軸刻度] 10
+  OK [門檻敘述] 憲法訴訟法第 30 條第 2 項（參與評議之大法官不得低於 10 人、作成違憲宣告之同意人數不得低於 9 人）已由 114 年憲判字第 1 號 判決違憲，自公告日 2025-12-19 起失其效力
+```
+
+**取得實際 HTML 的方法必須揭露。** `src/components/LaunchGate.tsx:30` 是
+`if (!ready) return null;`，`ready` 只在 `useEffect` 裡設為 true，因此 `/future` 的頁面主體
+在伺服器端渲染時是 `null`——直接 `curl` 只拿到 301 字的外框（此即
+`docs/health-check/TODO.md:96` 已記載的「內容為 client-render」）。本機無頭瀏覽器
+全部 SIGSEGV（見上方已改判為 `SKIPPED` 的那一項）。故改為：暫時把該行改成
+`if (!ready && typeof window !== 'undefined') return null;`，讓 dev server 吐出真正的
+頁面 HTML（126,689 bytes），抓完立即還原。**`LaunchGate.tsx` 已還原，
+`git diff -- src/components/LaunchGate.tsx` 為空，與 `HEAD` 逐位元相同。**
+驗證用的是實際渲染出來的 HTML，不是 grep 原始碼。
+
+### 設計盤點的缺口（第四小節漏掉的第四個渲染點）
+
+**`src/components/future/JusticeTermTimeline.tsx` 另有一條硬編的 10 人門檻，設計未盤到。**
+
+- 證據：`const QUORUM = 10`（原 :82）在席次折線圖上畫一條紅色水平虛線，標籤
+  `表決門檻 (10人)`（原 :200）。第一次抓 `/future` 實際 HTML 時 AC4 就在這裡失敗。
+- 為什麼設計沒抓到：第四小節盤的是 `requiredForRuling` 這個**欄位**的使用處
+  （`grep -rn requiredForRuling` 四筆）。這一處是寫死的字串與常數，不碰該欄位，
+  所以 AC2 的三處型別錯誤也攔不到它。
+- 處置：虛線與標籤移除，`QUORUM` 常數刪除，原處留六行註解說明失效依據並指向本票。
+  理由是第五小節的原則——現行第 30 條第 1 項給的是「現有總額」的比例，不是固定席次，
+  在席次折線圖上畫不出對應的水平線；而把已失效的 10 人線橫跨 2024–2032 整張圖，
+  等於主張它今天仍適用。
+- **替代方案供 captain 選**：也可以保留虛線，但只畫在它真正有效的區間
+  （2025-01-23 生效至 2025-12-19 失效），標籤改為帶失效字樣。本 stage 選了移除，
+  因為那是最小改動；改成區間版需要動圖表座標計算。
+
+### 順手發現，本票未修（附證據，供 FO 判斷）
+
+1. **`src/app/future/page.tsx:211`**「而在 5 名大法官無法達到判決門檻的情況下」——與 L4 同類，
+   但真偽取決於 L1／L2（現有總額 8 則三分之二為 5.33，未達；為 5 則已達）。拍板前無法判定，故不改。
+2. **`src/data/controversy-timeline.ts:151`／`:152`／`:164`／`:187`／`:212`** 多處敘述 10 人門檻。
+   前四處是 2024–2025 事件的過去式敘述，本身不算錯；`:212` 是持續式敘述。渲染於
+   `/controversy-timeline`，不在 AC3／AC4 的 `/future` 範圍。附一個正面證據：同檔 `:224`
+   正確把 114 年憲判字第 1 號描述為憲法訴訟法修正案判決，與第六小節一致，與 `design-assets/003` 的誤引相反。
+3. **`src/data/quizzes/pending.ts:95`** 與 **`src/data/quizzes/controversy.ts:83`** 以現在式
+   把已失效的 10 人門檻當現行法，渲染於 `/quiz/*`，不在本票範圍。
+4. **`src/data/history.json:637`** 敘述正確（帶「違憲」），且為 `sync-content` 產物，依
+   `CLAUDE.md` 第 2 條不得手改。
+5. **`src/components/future/BottleneckFunnel.tsx:23`** 的 eslint `react-hooks/set-state-in-effect`
+   **改動前就存在**（`git show HEAD:` 該段與現況相同；本票只改該檔的 import 與 `:135`）。
+   全專案 eslint 僅此一個 error。
+6. 第十二小節原列四項維持未修。
+
+### Summary
+
+`CRISIS_STATS.requiredForRuling` 已移除，換成 `RULING_THRESHOLD` 結構（`headcount: null`），
+三處手寫門檻文案收斂成單一元件 `RulingThresholdNote`。型別改變如設計預測，在
+`page.tsx:79`、`:194`、`BottleneckFunnel.tsx:135` 恰好報三個錯，逼每一句重寫而非只改數字。
+站上現在說的是條文給的比例，10 人下限只以「已由 114 年憲判字第 1 號判決違憲、自
+2025-12-19 起失其效力」的身分出現，沒有任何推算人數。錯誤法律名稱「憲法法庭法」與
+不存在的「法定總額」在 `/future` 已歸零。`npm run build` exit 0。
+
+三件需 FO 帶進 gate 的事。一、設計第四小節漏了第四個渲染點：`JusticeTermTimeline.tsx`
+硬編 `QUORUM = 10` 並畫成圖表門檻虛線，第一次驗 AC4 就在此失敗；已移除，但也可改成
+「只畫在有效區間」的版本，請 captain 裁。二、AC3 要求的「實際 HTML」必須繞過 `LaunchGate`
+才拿得到（該元件 SSR 時回 `null`），本機無頭瀏覽器全部 SIGSEGV；作法是暫時改一行、抓完還原，
+`LaunchGate.tsx` 現與 `HEAD` 逐位元相同。三、第九小節「導言不得超過六行（375px）」只有
+算術推估，沒有真正量測。該項已依 FO 授權自 `FAILED` 改判為 `SKIPPED`，並在第五小節立
+**L5** 追蹤，拍板者是 captain 或任何有可用瀏覽器的環境。**L5 不阻擋進入 verify，
+但 gate 必須把它列為未達成的驗證項。**
+
+L1 到 L4 全部未拍板，`headcount` 保持 `null`，已在 `docs/health-check/TODO.md` 立 P0-7 追蹤。
+L5 是環境缺口造成的量測缺口，不是法學問題，故不併入 P0-7，只留在本票第五小節。
+L4 依 FO 授權與本票一起修：站上不再說「實質上無法做出任何判決」，改陳述一手事實
+（114 年全年一則、失效後六則、最近一則 115 年 8 月 14 日）。最終措辭仍由 captain 定。
