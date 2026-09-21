@@ -1,7 +1,7 @@
 ---
 id: 056
 title: 上線前檢查清單：公開之前每一項都必須有結論
-status: verify
+status: implement
 source: captain 2026-09-07（把關機制體檢與任務地圖的綜合結論）
 started: 2026-09-21T18:56:47Z
 completed:
@@ -118,7 +118,14 @@ mod-block:
 | D4 | **修（新發現）** | `h34`／`h35` 標題一字不差，兩筆都在線上。與 P0-6 同型，需內容判斷，FO 不擬標題 | **開新票 `062`**：`h34 與 h35 標題重複` |
 | D3 | **修** | 開專票。掛在 `021`／`026` 兩張已封存的票上等於沒人負責——這正是本票 Problem 一節說的「各自漂走」 | **開新票 `063`**：`requiredForRuling 的法律正確性（114憲判9）` |
 
-**共六張新票（`058`–`063`）**，由 FO 在本票 implement 階段開立。現有最大票號為 `057`（`grep -c . <(ls docs/constitution-features/0*.md)` 可查），故 `058` 起連號無衝突。
+**共六張新票（`058`–`063`）**，由 FO 在本票 implement 階段開立。現有最大票號為 `057`，故 `058` 起連號無衝突。
+
+> **2026-09-21 更正：上句括號內原寫的查法指令錯了，已換掉。原句其餘部分與結論不變。**
+> 原指令為 `grep -c . <(ls docs/constitution-features/0*.md)`，實測輸出 `22`——那是檔案數，不是最大票號。
+> 正確查法：`ls docs/constitution-features/0*.md | sed 's#.*/##' | cut -d- -f1 | sort -n | tail -1`。
+> **`057` 這個結論本身正確**，是 design 當時逐檔檢視確認的。
+> 但現在重跑上面那條指令會輸出 `063`，不是 `057`——因為 `058`–`063` 六張票已於 implement 階段由 FO 開立。
+> 輸出不同不代表結論錯，是 repo 的狀態已經前進。要復現 design 當時的輸出，須回到開票前的 commit。
 
 ### 三、Gate 機制
 
@@ -157,8 +164,8 @@ grep -rn '056-pre-launch-checklist' src/app/layout.tsx docs/health-check/TODO.md
 
 | 項 | 類型 | 內容 | 通過條件 |
 |---|---|---|---|
-| G-1 | 機械 | `058`–`063` 六張新票的狀態 | 每張票 `status` 為 `archived` 且 `verdict` 非空，或 captain 逐票明確接受並記錄理由 |
-| G-2 | 機械 | `052`、`049` 兩張既有票 | 同 G-1 |
+| G-1 | 機械 | `058`–`063` 六張新票的狀態 | 指令（2026-09-21 補，整列可原樣複製執行，不含需轉義的字元）：`for n in 058 059 060 061 062 063; do f=$(ls docs/constitution-features/$n-*.md docs/constitution-features/_archive/$n-*.md 2>/dev/null); if test -n "$f"; then echo "$n $(grep -m1 '^status:' $f) $(grep -m1 '^verdict:' $f)"; else echo "$n NOT FOUND"; fi; done`。通過條件：每張票印出的 `status` 為 `archived` 且 `verdict` 非空，或 captain 逐票明確接受並記錄理由。任一張印 `NOT FOUND` 即不通過 |
+| G-2 | 機械 | `052`、`049` 兩張既有票 | 指令（2026-09-21 補）與 G-1 同一條，只換票號：`for n in 049 052; do f=$(ls docs/constitution-features/$n-*.md docs/constitution-features/_archive/$n-*.md 2>/dev/null); if test -n "$f"; then echo "$n $(grep -m1 '^status:' $f) $(grep -m1 '^verdict:' $f)"; else echo "$n NOT FOUND"; fi; done`。通過條件同 G-1 |
 | G-3 | 人工 | Vercel 的 Build Command 與 `NEXT_PUBLIC_PUBLIC_MODE` 實際值 | captain 開 dashboard 確認並把實際值抄回本票 |
 | G-4 | 人工 | A1、A4、B1b 三項「明確接受」 | captain 簽字，理由寫入本票 |
 | G-5 | 機械 | 佔位字串全站掃描 | `grep -rniE '某學者\|某大學\|lorem ipsum\|前端工程師 [AB]\|volunteer@addcourt\.tw\|快速了解最新判決的5個重點' src/` 零命中 |
@@ -167,6 +174,10 @@ grep -rn '056-pre-launch-checklist' src/app/layout.tsx docs/health-check/TODO.md
 | G-8 | 機械 | 建置與型別 | `npx tsc --noEmit` 與 `npm run build` 皆通過 |
 
 八項全數通過，才移除 `layout.tsx:8`。移除後在本票 Feedback Cycles 記下執行日期與 commit SHA，並把本票 `status` 推進到封存。
+
+> **已知的非阻擋缺口（2026-09-21 記錄，不修）**：`npm run build` 產出的 15 個預先產製 HTML 中，唯 `.next/server/app/_global-error.html` 不帶 `<meta name="robots" content="noindex, nofollow">`。重跑（先 `npm run build`，指令整列可原樣複製）：`find .next/server/app -name '*.html' -exec grep -L 'content="noindex' {} +` → 只印該一檔。
+> 此缺口在 `main` 上即已存在，非本票引入；該檔是 Next.js 的錯誤邊界回退頁，不在建置輸出的路由表內，且本站尚無對外網域，故目前無可觀察損害，不阻擋任何 gate 項。
+> **promote-to-material 條件**：若日後決定「已公開但仍保留 noindex」，這是唯一的漏洞，屆時必須另開票處理。
 
 ### 四、Component hierarchy、Data requirements、Responsive
 
@@ -265,6 +276,8 @@ A 類四項需在 `npm run dev` 的實際渲染上驗證，方式見 AC-2。**�
 | 本票 `## 清單` 的四張表 | 2026-09-07 的快照，保留原文。複驗結果另列於第一節，已在表上方加警告 |
 
 ### Feedback Cycles
+
+- Cycle 1: REJECTED — verify；surface 4 檔／+150 淨行（+151/-1）vs estimate 無（本票 design 未產出 `## Expected surface and tolerance` 段，記為缺口，本輪不因此退回）；AC unchanged。F-1 fix by FO（Material，ownership = FO：058–063 在本 worktree 內 NOT FOUND 使 AC-1「修好須指向可查證證據」與 AC-4 的 G-1 不成立；根因為 worktree 過時而非票未開立——六張票已於 main commit `ae68618` 開立，本分支分岔於 `24e2c44` 在其之前；FO 已 merge main 進分支修復，commit `10d82e8`，六張票現全部 FOUND，不派給 implement）；F-2 fix（Material，本票自有範圍：G-1／G-2 無可執行指令，六個機械項中 implement 只貼出三項輸出，AC-4「可重跑」無法滿足）；F-3 fix（Polish：design 第二節票號查法 `grep -c . <(ls …)` 實測輸出 22 為檔案數非最大票號，`057` 結論本身正確）；F-4 decline 修 build 產物＋授權補一行記錄（Deferred risk：15 個預製 HTML 僅 `_global-error.html` 不帶 noindex，目前無損害且 main 上即存在，promote-when = 決定「已公開但仍保留 noindex」）；F-5 decline（Polish：design 第一節三處行號／路徑漂移，語意位置與 12／14／4／697 全部計數皆成立）。implement 的兩項 DONE 經 verify 獨立重跑逐字一致，無自我宣稱經不起重跑；AC-3 以 `awk` 證明綁定下一行即 `robots:`，AC-2 未達成但歸因至未獲核准的 feature `039`，經獨立複核正確，不構成拒絕理由。
 
 ## Out of scope
 
@@ -433,3 +446,33 @@ implement 的誠實度值得記錄：它主動以粗體自陳 AC-2 未達成、�
 **判定：REJECTED。** 兩條 AC 不成立，而且兩者同源——**六張新票 `058`–`063` 從未開立**。因此 AC-1 的「『修好』須指向可查證證據」對六個 `修` 項不成立（票號不存在），AC-4 的 G-1 無對象可查；再加上 G-1／G-2 在票內根本沒有可執行的指令，AC-4 的「可重跑」依現行規格無法滿足（六個機械項中 implement 只貼出三項輸出）。
 
 **拒絕的落點不在 implement。** design 第二節明文把開票指派給 FO，implement 亦如實記錄它依此刻意未開。F-1 的 task ownership 屬 FO，F-2 屬本票自有範圍。依 README 的 `## Review-finding disposition`，本階段保留 finding、只做唯讀調查、不動候選位元組，等 FO 的明確授權。
+
+## Stage Report: implement (cycle 2)
+
+本輪只執行 FO 逐項授權的三項處置（F-2 fix、F-3 fix、F-4 補記錄）。F-1 由 FO 自行修復，F-5 授權 decline，兩者皆未動一個位元組。
+
+- DONE: 在第三節 Gate 執行清單的 G-1 與 G-2 兩列補上可原樣重跑的指令，使六個「機械」項全部有指令可跑；貼出兩條指令的實測輸出。AC-4 的「可重跑」在此之前不成立。不得改動 AC-4 的文字。
+  第三節 `:167`（G-1）、`:168`（G-2）各補一條 `for` 迴圈，印出每張票的 `status` 與 `verdict`，並涵蓋 `_archive/` 路徑（票封存後會搬家）。兩條指令刻意不含 `|`，因此在 markdown 表格內無需轉義，複製即可執行。實測輸出見下節。**AC-4 的文字逐字未動**，以指令證明（見下節）。
+- DONE: 修正 design 第二節括號內的票號查法指令（現寫 `grep -c . <(ls docs/constitution-features/0*.md)`，實測輸出 22 即檔案數，不是最大票號），並說明 main 現已有 058–063 故重跑輸出會與 design 當時不同；`057` 這個結論本身正確，不要改結論。
+  `:121` 移除括號內的錯誤指令，`:123-128` 追加一則 2026-09-21 更正，寫明原指令、它為何錯（輸出 `22` 是檔案數）、正確查法、以及「`057` 結論本身正確」。同時寫明重跑現在會輸出 `063` 而非 `057`，原因是六張票已開立，並註明輸出不同不代表結論錯。**結論 `057` 未改。**
+- DONE: 在第三節補一行記錄 `_global-error.html` 不帶 noindex 為已知的非阻擋缺口，並寫明 promote-to-material 條件（若日後決定「已公開但仍保留 noindex」，這是唯一漏洞）。這是記錄，不得改動 build 產物、`layout.tsx` 或 Next.js 設定。
+  `:178-180` 在 Gate 執行清單下方補三行 blockquote：缺口內容與重跑指令、為何目前無可觀察損害（main 上即存在、錯誤邊界回退頁、無對外網域）、以及 promote-to-material 條件。**`layout.tsx`、`next.config.ts`、build 產物皆未改**，本輪 `git diff --name-only` 只有本票一檔。
+
+### 驗證與可否證性
+
+- **G-1／G-2 的「可原樣重跑」以抽出執行證明，不以閱讀證明**：用 python 從 `| G-1 `／`| G-2 ` 兩列的反引號內抽出指令字串寫入檔案，再交給 `bash` 執行。G-1 輸出六列 `058`–`063` 全部 `status: design`／`verdict:` 空，離開碼 0；G-2 輸出 `049`、`052` 兩列同樣 `design`／空，離開碼 0。**兩項現在都不通過 gate，這是正確結果**——八張票都還沒封存，gate 本來就該在公開當下才通過。若有人把指令改成不可執行（漏引號、誤加 `|` 未轉義），這條抽出執行會失敗。
+- **AC-4 文字未動以指令證明**：比對 `git show HEAD:…056…md` 與工作區檔案的 `## Acceptance criteria` 段落，兩邊各 20 行且**逐字相同**（`a == b` 為 `True`），`AC-4 — gate 執行清單可重跑` 原句仍在。若本輪動了任何一個 AC 字元，此比對即為 `False`。
+- **F-3 的新查法可執行**：`ls docs/constitution-features/0*.md | sed 's#.*/##' | cut -d- -f1 | sort -n | tail -1` → `063`。原指令 `grep -c . <(ls docs/constitution-features/0*.md)` → `22`。兩者輸出不同即證明原指令查的不是最大票號。
+- **F-4 的新指令可執行**：`find .next/server/app -name '*.html' -exec grep -L 'content="noindex' {} +` → 只印 `.next/server/app/_global-error.html`。15 個預製 HTML 中僅此一檔，與 verify 報告的計數一致，本階段獨立重現。此指令取代原先寫入的巢狀引號版本，因為那一版複製後容易轉義出錯，不算「可原樣重跑」。
+- **F-1 獨立確認，未動位元組**：`for n in 058…063; do ls …; done` 六筆全部存在（`058-opinion-lazybag-unwired-removal-cta-alignment.md` 等）。merge `10d82e8` 已生效，無需回報異常。
+- **其餘四個機械項本輪重跑**：G-5 三筆命中（`PresentDetail.tsx:32`、`contributors.ts:16`、`:21`）→ 不通過，**這是預期的**，兩者各有其票（`061`／`052`），依禁令未動；G-6 `false false`；G-7 三檔 `1／5／1`；G-8 `npx tsc --noEmit` 離開碼 0、`npm run build` 離開碼 0（15 條路由）。build 前後 `src/data/*.json` 的 sha256 相同。
+- **本輪的四筆刪除逐筆交代**（`git diff --numstat` 為 `+46／-4`，只有本票一檔）：`status: verify` 一行是 **FO 推進階段時改的 frontmatter**，在本 ensign 開工前就已存在於工作區，非本 ensign 所改（本 ensign 不改 frontmatter）；另三筆是被取代的原文——design 第二節那一句（更正說明已把原指令逐字重出）、G-1 與 G-2 兩列（通過條件文字保留並擴充）。**無以刪改掩蓋。**
+- merge `10d82e8` 未觸及 `src/`、`package.json`、`package-lock.json`（`git diff --name-only 96e056b 10d82e8 --` 對三者為空），故 cycle 1 的型別與建置基準線仍成立；本輪仍重跑一次確認。
+
+### Summary
+
+三項授權處置全部落地，本輪 `git diff` 只有本票一個檔案——沒有動任何程式碼、build 產物或 Next.js 設定。AC-4 現在可以依原文被滿足：六個機械項都有指令，而且 G-1／G-2 的指令已用「從表格列抽出後交給 bash」的方式證明可原樣執行，不是只寫在紙上。
+
+**gate 目前仍不通過，而且應該不通過。** G-1／G-2 八張票全在 `design`、`verdict` 空；G-5 有三筆佔位命中。這兩件事各有其票，本輪依禁令一項未動。gate 的用途是在公開當下擋住，不是現在就綠燈。
+
+**AC-2 維持未達成。** 依 FO 指示不建立任何常設檢查機制，仍綁在未獲核准的 feature `039` 上。此項與 cycle 1 的記錄一致，本輪無新進展也無新阻擋。
