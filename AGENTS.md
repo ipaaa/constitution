@@ -49,6 +49,8 @@ robots: { index: false, follow: false },
 
 現在刻意保持。網站尚未對外發布，不要讓搜尋引擎收錄。
 正式發布時才移除。追蹤項目見 `docs/health-check/TODO.md` 的 P3-8。
+移除前必須通過 `docs/constitution-features/056-pre-launch-checklist.md` 的上線前檢查清單。
+該票第三節的 gate 執行清單 G-1 至 G-8 八項全數通過，才可移除這一行。
 
 ---
 
