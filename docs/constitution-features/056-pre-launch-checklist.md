@@ -27,6 +27,10 @@ mod-block:
 
 下列每一項在公開之前必須有明確結論——**修好、明確接受、或移除**。不接受「待確認」。
 
+> ⚠️ **下面四張表是 2026-09-07 的快照，保留原文不改。**
+> 2026-09-21 的逐項複驗結果、以及每一項的結論，見本文 `## Proposed approach` 的第一、二節。
+> 部分項目的事實已經改變，**不要直接引用下表的「查證」欄**。
+
 ### A. 交付物到不了使用者（已查證，皆無票）
 
 | # | 項目 | 查證 |
@@ -62,13 +66,119 @@ mod-block:
 
 ## Proposed approach
 
-**待 design stage 定案。** 本票的形狀是 gate 而非施工票，因此 design stage 的主要工作是：
+本票是 gate，不是施工票。design 階段的產出是三樣東西：**複驗結果**、**每一項的結論**、**gate 機制**。
 
-1. 逐項確認上表在**當下**是否仍成立（清單本身會過時，這是它的固有風險）。
-2. 為每一項指定結論類型：修（開票或併入現有票）／明確接受並記錄理由／移除。
-3. 決定這道 gate 由誰、在什麼時點執行——**它必須綁在「移除 `noindex`」這個動作上**，否則會被跳過。
+### 一、2026-09-21 逐項複驗
 
-**不要在本票內施工。** 每一項該修的，開它自己的票或併入既有票；本票只保證公開之前每一項都有結論。
+基準：`main` 的 `bd4fca2`。驗證方式分三種——`repo`（讀檔案，附行號）、`data`（跑 node 讀 `src/data/*.json`）、`page`（起 `npx next dev -p 3199` 後實際抓頁面）。
+
+| # | 2026-09-21 狀態 | 複驗結果與可重跑證據 |
+|---|---|---|
+| A1 | **仍成立** | `data`：`node -e "const a=require('./src/data/discussions.json');console.log(a.length, a.filter(x=>x.opposing_views).length)"` → `16 0`。`repo`：`src/app/present/[id]/page.tsx:104` 以 `item.opposing_views && .length > 0` 為渲染條件，條件恆為 false |
+| A2 | **部分已變動** | 未接線元件仍在，共 **697 行**（非原記的約 800 行）：`ArgumentTag` 25、`DimensionSelector` 95、`OpinionLazybag` 99、`OpinionScatterPlot` 293、`OpinionTable` 147、`OpinionTooltip` 38。重跑：`for f in src/components/opinion-lazybag/*.tsx; do b=$(basename "$f" .tsx); grep -rqln "opinion-lazybag/$b" src/ \|\| echo "orphan $f"; done`。**CTA 數字已變動**：`LazybagCtaSection.tsx:31,34` 不是硬寫的「16」，是 `{OPINIONS.length}`／`{DIMENSIONS.length}`，`page` 實測渲染為「12 則意見分析」「4 個觀察維度」 |
+| A3 | **仍成立** | `page`：對 `/`、`/past`、`/present`、`/future`、`/about`、`/controversy-timeline`、`/opinion-lazybag` 逐頁抓 `href="/quiz"`，**七頁全部零命中**。`repo`：`Navbar.tsx:10-15` 的 `NAV_ITEMS` 無 `/quiz`；`Footer.tsx:47-50` 無 `/quiz`。唯一 `/quiz` 連結仍是 `QuizResult.tsx:149` 的回程連結 |
+| A4 | **仍成立** | `data`：`discussions.json` 16 筆全無 `full_content`。`repo`：`src/components/PresentDetail.tsx:14,17` 渲染「尚未收錄」「完整轉譯尚未收錄」 |
+| B1 | **仍成立，機制已精確定位** | `launch-status.ts:7-10`：env 未設 → `LAUNCHED_PAGES === ALL_PAGES`。`LaunchGate.tsx:32`、`Navbar.tsx:34`、`TrackCards.tsx:31` 三處都寫 `isPublicMode ? LAUNCHED_PAGES : ALL_PAGES`，**兩個分支同值**，所以 `?public=true` 是 no-op |
+| B2 | **仍成立** | `repo`：`src/app/layout.tsx:8`。`page`：`curl -s http://localhost:3199/ \| grep -o '<meta name="robots" content="[^"]*"'` → `noindex, nofollow` |
+| B3 | **仍成立，且仍無法從 repo 查** | `.vercel/project.json` 只有 `projectId`／`orgId`／`projectName`，無建置設定。無 `vercel.json`。`.env.local` 七行內無 `NEXT_PUBLIC_PUBLIC_MODE`。重跑：`grep -rn NEXT_PUBLIC_PUBLIC_MODE .env* vercel.json .vercel/ 2>/dev/null` → 零輸出（判斷依據是輸出，不是離開碼；`vercel.json` 不存在會讓離開碼為 2） |
+| C1 | **仍成立** | `repo`：`src/components/PresentDetail.tsx:32` 的 `mailto:volunteer@addcourt.tw`。此區塊對 16 篇文章詳情頁全部渲染 |
+| C2 | **仍成立** | `repo`：`src/data/contributors.ts` 六筆全佔位（`專案發起人`／`前端工程師 A`／`前端工程師 B`／`法律文案`／`資料整理志工`／`顧問`），渲染於 `src/app/about/page.tsx:60,63` |
+| C3 | **仍成立，但範圍需更正** | `repo`：`src/components/opinion-lazybag/StanceSpectrum.tsx:19-35` 硬編 14 位具名大法官，**正在線上渲染**。`src/data/opinions.ts:96` 起的 `justiceName` 共 12 筆，但其唯二渲染點 `OpinionTooltip.tsx`／`OpinionScatterPlot.tsx` 現在**無任何檔案 import**（見 A2），那條渲染路徑已死 |
+| D1 | **已消失（線上）** | `data`：`node -e "const a=require('./src/data/history.json');console.log(a.length, a.map(x=>x.id).includes('h2'), JSON.stringify(a).includes('272'))"` → `40 false false`。原因：captain 清空 `status`，`scripts/sync-content.mjs:354` 的 `isApproved()` 把該列濾掉 |
+| D2 | **已消失（線上），但同型缺陷仍在** | `h28` 不在 40 筆內。**新發現**：`h34`（釋字第708號）與 `h35`（釋字第710號）的 `reality.title` 一字不差，兩筆都在線上。重跑：`node -e "const a=require('./src/data/history.json');const t={};a.forEach(x=>t[x.reality.title]=(t[x.reality.title]\|\|0)+1);console.log(Object.entries(t).filter(([,v])=>v>1))"` |
+| D3 | **仍成立** | `repo`：`src/data/future.ts:424` 的 `requiredForRuling: 10`，渲染於 `src/app/future/page.tsx:79`、`:194`、`src/components/future/BottleneckFunnel.tsx:135`。既有票 `021`／`026` 皆已封存於 `docs/constitution-features/_archive/`，兩票都沒解這一項 |
+
+#### 複驗時發現的兩件事，會影響驗收方式
+
+**第一，整站的伺服器端 HTML 目前不含任何頁面內容。**
+`src/components/LaunchGate.tsx:30` 在 hydration 前回傳 `null`，所以 `curl` 抓 `/present/d1` 得到的 32KB HTML 裡，「尚未收錄」「volunteer@addcourt.tw」「前往原始出處」全部零命中。feature `039` 的 Problem 一節已記錄這個陷阱，本次複驗獨立重現。**任何只讀 SSR HTML 的驗證都會給出假通過。**
+
+**第二，`049` 的一項前提需要更正。**
+`049` 第 31 行寫 `justiceName` 渲染於 `OpinionTooltip.tsx:27` 與 `OpinionScatterPlot.tsx:265`。這兩個檔現在無任何 import，該渲染路徑是死的。`049` 的實際線上風險只剩 `StanceSpectrum.tsx` 與 `DecisionFlowchart.tsx`（即 `049` 第 39 行那一項）。這件事要回報給 `049`。
+
+### 二、每一項的結論
+
+**所有項目都在下表定案。沒有任何一項停在「待確認」。**
+
+| # | 結論類型 | 內容與理由 | 誰執行 |
+|---|---|---|---|
+| A1 | **明確接受** | `opposing_views` 恆為空，`present/[id]/page.tsx:104` 的 guard 讓整個區塊完全不渲染，對讀者零可見，不是破口。**相依**：feature `019` 若要施工，須先讓產線產出 `opposing_views` 欄；這是 `019` 的前置，不是本 gate 的 | 接受者：captain（gate 執行時簽字） |
+| A2 | **移除 ＋ 修** | 移除六個未接線元件（697 行）——`027` 改版後已由 `DecisionFlowchart` ＋ `StanceSpectrum` 取代，留著會讓下一個人以為它在線上。修 CTA：`LazybagCtaSection.tsx:31,34` 的數字取自 `opinions.ts`，但 CTA 連去的 `/opinion-lazybag` 渲染的是 `StanceSpectrum` 自帶的 14 筆資料，**數字與目的地不是同一份資料**。改為取自目的地實際資料，或改成不帶數字的文案 | **開新票 `058`**：`opinion-lazybag 未接線元件移除與 CTA 數字對齊` |
+| A3 | **修** | 加站內入口。`018` 已交付四份測驗與結果圖，移除等於丟棄完成品；加入口的成本遠低於重做 | **開新票 `059`**：`測驗全站無入口` |
+| A4 | **明確接受** | 「完整轉譯尚未收錄」是誠實的缺漏聲明，不是佔位假內容，且同一區塊有「前往原始出處」連結，讀者拿得到原文。**但同區塊的 C1 必須先處理** | 接受者：captain（gate 執行時簽字） |
+| B1a | **修** | `LaunchGate.tsx:32`、`Navbar.tsx:34`、`TrackCards.tsx:31` 三處的真分支應取 `PUBLIC_PAGES` 而非 `LAUNCHED_PAGES`，讓 `?public=true` 真的鎖成三頁，成為可用的預覽開關 | **開新票 `060`**：`?public=true 預覽開關失效` |
+| B1b | **移除（移除目標，不是移除程式）** | 「夥伴看全部、公眾看三頁」這個目標刪除。理由：本站無登入機制；`noindex` 解除後，靠前端 `localStorage` 做的分頁可見性控制，任何人改 `localStorage` 即可繞過，不是真的控制。公開等於整站公開 | 接受者：captain（gate 執行時簽字）。此項推翻 `033` 的分階段上線假設 |
+| B2 | **修** | 移除 `layout.tsx:8`。**這就是 gate 的觸發動作**，見第三節 | captain ＋ FO（gate 通過後） |
+| B3 | **修（人工項）** | 只有 captain 能開 Vercel dashboard。不開票，列為 gate 的人工項 `G-3` | captain |
+| C1 | **移除** | 移除「我想協助轉譯」按鈕。沒有人收 `volunteer@addcourt.tw`，留著是承諾一個不存在的管道；`Footer.tsx:37` 的 GitHub issue 回報連結功能重疊。**覆寫點**：若 captain 提供真實信箱，該票改為替換而非移除 | **開新票 `061`**：`移除佔位信箱按鈕` |
+| C2 | **修（既有票）** | 指向 feature `052`。本 gate 只追其結論，不重複施工 | `052` 的負責人 |
+| C3 | **修（既有票）** | 指向 feature `049`，並回報上述前提更正 | `049` 的負責人 |
+| D1 | **明確接受** | 線上已無此列，讀者看不到。**加一道反向保護**：`h2` 重新標 `Approved` 之前必須經法學確認。這條寫進 `docs/health-check/TODO.md` 的 P0-2 與本 gate 的 `G-6` | 接受者：captain |
+| D2 | **明確接受（原項）** | `h28` 線上已無此列。反向保護同 D1 | 接受者：captain |
+| D4 | **修（新發現）** | `h34`／`h35` 標題一字不差，兩筆都在線上。與 P0-6 同型，需內容判斷，FO 不擬標題 | **開新票 `062`**：`h34 與 h35 標題重複` |
+| D3 | **修** | 開專票。掛在 `021`／`026` 兩張已封存的票上等於沒人負責——這正是本票 Problem 一節說的「各自漂走」 | **開新票 `063`**：`requiredForRuling 的法律正確性（114憲判9）` |
+
+**共六張新票（`058`–`063`）**，由 FO 在本票 implement 階段開立。現有最大票號為 `057`（`grep -c . <(ls docs/constitution-features/0*.md)` 可查），故 `058` 起連號無衝突。
+
+### 三、Gate 機制
+
+#### 誰、在哪個時點執行
+
+**執行者：captain，FO 代跑機械項。**
+**時點：在移除 `src/app/layout.tsx` 的 `robots: { index: false, follow: false }` 之前，作為該次改動的前置。**
+
+不設日期。日期會過期，而「要移除 noindex 的那一刻」不會。
+
+#### 與移除 noindex 的綁定
+
+綁定要做三處，其中第一處是關鍵。
+
+| 處 | 檔案與位置 | 寫什麼 | 為什麼 |
+|---|---|---|---|
+| 1 | `src/app/layout.tsx` 第 5–7 行的註解區塊（緊貼在第 8 行 `robots:` 正上方） | 追加一行：`// 移除前必須通過 docs/constitution-features/056-pre-launch-checklist.md` | **這是唯一繞不過的位置。** 任何人要刪第 8 行，游標一定經過這幾行。另外兩處都要主動去找才看得到 |
+| 2 | `docs/health-check/TODO.md` 的 P3-8（第 772 行起） | 在「狀態」下方加「解除條件」一條，指向 `docs/constitution-features/056-pre-launch-checklist.md` | P3-8 目前只寫「發布時必須移除」，沒寫「移除前要做什麼」 |
+| 3 | `AGENTS.md` 第 51 行 | 現為「追蹤項目見 `docs/health-check/TODO.md` 的 P3-8」，改為同時指向 P3-8 與本票 | AGENTS.md 是每個 agent 的第一份必讀 |
+
+**反向引用**：本票第三節已列出上述三處的檔案與行號，兩邊互指。
+
+#### 「一道不會被觸發的 gate」怎麼被查證排除
+
+綁定是否成立，用一條指令查：
+
+```bash
+grep -rn '056-pre-launch-checklist' src/app/layout.tsx docs/health-check/TODO.md AGENTS.md
+```
+
+三個檔案各至少一筆命中，即綁定成立；任一檔零命中即為失敗。這條指令進 `## Test plan`，也是 AC-3 的驗收方式。
+
+#### Gate 執行清單
+
+公開之前逐項跑。`機械` 項 FO 代跑並附輸出；`人工` 項 captain 判斷並留下簽字（寫在本票的 Feedback Cycles）。
+
+| 項 | 類型 | 內容 | 通過條件 |
+|---|---|---|---|
+| G-1 | 機械 | `058`–`063` 六張新票的狀態 | 每張票 `status` 為 `archived` 且 `verdict` 非空，或 captain 逐票明確接受並記錄理由 |
+| G-2 | 機械 | `052`、`049` 兩張既有票 | 同 G-1 |
+| G-3 | 人工 | Vercel 的 Build Command 與 `NEXT_PUBLIC_PUBLIC_MODE` 實際值 | captain 開 dashboard 確認並把實際值抄回本票 |
+| G-4 | 人工 | A1、A4、B1b 三項「明確接受」 | captain 簽字，理由寫入本票 |
+| G-5 | 機械 | 佔位字串全站掃描 | `grep -rniE '某學者\|某大學\|lorem ipsum\|前端工程師 [AB]\|volunteer@addcourt\.tw\|快速了解最新判決的5個重點' src/` 零命中 |
+| G-6 | 機械 | D1／D2 的反向保護 | `node -e "const a=require('./src/data/history.json');const i=a.map(x=>x.id);if(i.includes('h2')\|\|i.includes('h28'))process.exit(1)"` 回傳 0。若任一列回來了，表示有人重新標了 `Approved`，必須先有法學確認記錄 |
+| G-7 | 機械 | gate 綁定仍在 | 上面那條 `grep -rn '056-pre-launch-checklist'` 三檔皆命中 |
+| G-8 | 機械 | 建置與型別 | `npx tsc --noEmit` 與 `npm run build` 皆通過 |
+
+八項全數通過，才移除 `layout.tsx:8`。移除後在本票 Feedback Cycles 記下執行日期與 commit SHA，並把本票 `status` 推進到封存。
+
+### 四、Component hierarchy、Data requirements、Responsive
+
+**無。** 本票不動任何元件、不新增任何型別、不渲染任何畫面。第二節列出的六張新票各自負責自己的元件與資料設計。唯一的程式碼改動是 `src/app/layout.tsx` 註解區塊加一行（第三節的綁定第 1 處），無視覺輸出，無響應式行為。
+
+### 五、相依與已知阻擋
+
+| 相依 | 對象 | 影響 |
+|---|---|---|
+| AC-2 的驗收方式 | feature `039`（常設渲染檢查工具，仍在 `design`） | 本 repo 目前無 `playwright`／`puppeteer`，本機亦無 Chrome。`curl` 因 `LaunchGate.tsx:30` 的 hydration 陷阱必然假通過。AC-2 只能靠 `039` 的 jsdom 掛載方案，或 captain 人工開瀏覽器 |
+| `019` 的前置 | A1 的 `opposing_views` 欄 | `019` 施工前須先讓產線產出該欄。不是本 gate 的阻擋 |
+| B1b 推翻的舊決定 | feature `033`（progressive-launch-strategy，已封存） | `033` 假設可以分階段開放頁面。本票判定該目標在現行架構下做不到 |
 
 ## Risk evidence
 
@@ -76,43 +186,109 @@ mod-block:
 
 **但清單有固有風險**：它是 2026-09-07 的快照。design stage 必須重新逐項確認，不得直接沿用。
 
+> **2026-09-21 補述：複驗已完成，結果見 `## Proposed approach` 第一節。**
+> 十三項中，**十項仍成立、一項部分變動（A2）、兩項在線上已消失（D1／D2）**。
+> 複驗另外找到一項舊快照沒有的缺陷（`h34`／`h35` 標題重複，列為 D4），
+> 以及 `049` 的一項前提需更正。
+> **固有風險未被消除，只是重新計時。** 本票的 gate 執行清單（第三節 `G-1`–`G-8`）
+> 全部是可重跑的指令或人工簽字，就是為了讓「公開當下」再跑一次，而不是信任今天的結果。
+
 ## Acceptance criteria
 
 **AC-1 — 公開之前，清單每一項都有明確結論。**
-Verified by: 逐項檢查其結論類型與依據。任何一項停在「待確認」「待決定」即為失敗。**「修好」的項目必須指向可查證的證據**（票號＋合併記錄，或實際指令輸出），不接受口頭宣稱。
+Verified by: 逐項檢查 `## Proposed approach` 第二節的結論表。任何一項停在「待確認」「待決定」即為失敗。**「修好」的項目必須指向可查證的證據**——票號加合併記錄，或實際指令輸出，不接受口頭宣稱。設計階段的通過條件是十五個項目（A1–A4、B1a、B1b、B2、B3、C1–C3、D1、D2、D3、D4）各有一個結論類型。
 
 **AC-2 — A 類每一項都能以實際頁面行為驗證。**
-Verified by: 對 A1–A4 各構造一次實際訪問或渲染檢查。例如 A3 必須從站上實際入口點到測驗頁，不接受直接打網址。任一項無法從真實入口達成即為失敗。
+Verified by: 對 A1–A4 各做一次真實渲染檢查。**不得只讀 SSR HTML**——`src/components/LaunchGate.tsx:30` 在 hydration 前回傳 `null`，`curl` 對整站都會零命中而看似通過。合格方式只有兩種：feature `039` 的 jsdom ＋ `react-dom/client` 掛載，或 captain 人工開瀏覽器。A3 必須從站上實際入口點進測驗頁，不接受直接打網址。任一項無法從真實入口達成即為失敗。
 
 **AC-3 — 這道 gate 與移除 `noindex` 綁定。**
-Verified by: `docs/health-check/TODO.md` 的 P3-8 與本票互相引用，且 `AGENTS.md` 的 noindex 條目指向本票。未綁定即為失敗——**一道不會被觸發的 gate 等於沒有。**
+Verified by: 下列指令三個檔案各至少一筆命中。
+
+```bash
+grep -rn '056-pre-launch-checklist' src/app/layout.tsx docs/health-check/TODO.md AGENTS.md
+```
+
+任一檔零命中即為失敗——**一道不會被觸發的 gate 等於沒有。** 其中 `src/app/layout.tsx` 那一筆必須位於 `robots:` 那一行的正上方註解區塊內，不可放在檔尾。
+
+**AC-4 — gate 執行清單可重跑。**
+Verified by: `G-1`–`G-8` 八項中，六個 `機械` 項逐條執行並貼出輸出。任一項只有結論沒有輸出即為失敗。
 
 ## Test plan
 
-`npx tsc --noEmit`。A 類各項需在 `npm run dev` 的實際頁面上驗證，不可只讀程式碼。不執行 `npm run sync-content`。
+設計階段不改動渲染邏輯，故不需回歸測試。下列為 gate 執行時要跑的完整指令，也是 implement／verify 的驗收依據。
+
+```bash
+npx tsc --noEmit                       # G-8
+npm run build                          # G-8；不會觸發同步，PR #32 已把 sync 移出 build
+grep -rn '056-pre-launch-checklist' src/app/layout.tsx docs/health-check/TODO.md AGENTS.md   # AC-3 / G-7
+grep -rniE '某學者|某大學|lorem ipsum|前端工程師 [AB]|volunteer@addcourt\.tw' src/            # G-5
+node -e "const a=require('./src/data/history.json');const i=a.map(x=>x.id);console.log(i.includes('h2'),i.includes('h28'))"   # G-6
+```
+
+**2026-09-21 實測結果**（這是現況，不是通過狀態）：
+
+| 指令 | 通過條件 | 2026-09-21 實測 |
+|---|---|---|
+| `npx tsc --noEmit` | 無輸出 | **通過**，無輸出 |
+| AC-3 的 `grep` | 三檔各至少一筆命中 | **不通過**，三檔皆零命中——綁定尚未建立，這是本票 implement 的工作 |
+| G-5 的 `grep` | 零命中 | **不通過**，三筆命中：`PresentDetail.tsx:32`（C1）、`contributors.ts:16`、`:21`（C2）。兩者各有其票，gate 追其結論 |
+| G-6 的 `node` | `false false` | **通過**，輸出 `false false` |
+
+`npm run build` 本階段未跑——本票 design 未改動任何程式碼，`npx tsc --noEmit` 已足以確認型別基準線。`build` 列在 `G-8`，於 gate 執行時跑。
+
+A 類四項需在 `npm run dev` 的實際渲染上驗證，方式見 AC-2。**不執行 `npm run sync-content`。**
 
 ## Documentation impact
 
 ### 現在更新
 
-| 文件 | 為什麼現在要改 | 更新內容 |
-|---|---|---|
-| `docs/health-check/TODO.md` | P3-8 目前無人追蹤解除時點 | 於 P3-8 加註：解除 `noindex` 前必須通過 feature 056 |
+| 文件 | 為什麼現在要改 | 更新內容 | 狀態與驗證目標 |
+|---|---|---|---|
+| `docs/health-check/TODO.md` | P3-8（第 772 行起）只寫「發布時必須移除」，沒寫「移除前要做什麼」，因此無人追蹤解除時點 | 在 P3-8 的「狀態」下方加「解除條件」一條，指向 `docs/constitution-features/056-pre-launch-checklist.md` | **方向已定，尚未實作。** 驗證目標：`grep -n '056-pre-launch-checklist' docs/health-check/TODO.md` 至少一筆命中 |
+| `docs/health-check/TODO.md` | P0-2 目前只寫「待法學確認」，沒寫「`h2` 已被 `isApproved` 濾掉」這個現況 | 在 P0-2 追加一則補述，寫明線上已無此列、以及重新標 `Approved` 前必須有法學確認記錄。**原文保留** | **方向已定，尚未實作。** 驗證目標：P0-2 一節內出現「反向保護」與 `G-6` 的指令 |
+| `AGENTS.md` | 第 44–51 節的 noindex 條目只指向 P3-8，未指向本票 | 第 51 行改為同時指向 P3-8 與本票 | **方向已定，尚未實作。** 驗證目標：`grep -n '056-pre-launch-checklist' AGENTS.md` 至少一筆命中 |
 
 ### 實作後更新
 
 | 文件 | 完成條件 | 更新內容 |
 |---|---|---|
-| `AGENTS.md` | 本票的 gate 定案 | 「不要移除 noindex」條目指向本票 |
+| `docs/constitution-features/049-opinion-lazybag-content-provenance.md` | 本票 design 通過 gate | 追加一則補述：該票第 31 行所述的 `OpinionTooltip.tsx`／`OpinionScatterPlot.tsx` 渲染路徑已死（兩檔無任何 import），線上風險只剩第 39 行那一項。**原文保留** |
+| `docs/INDEX.md` | `058`–`063` 六張新票開立後 | 若索引收錄 feature 票，同步補入；若不收錄則不動 |
+| `docs/health-check/TODO.md` | 本票封存 | P3-8 記下 gate 執行日期與移除 `noindex` 的 commit SHA |
 
 ### 不更新
 
 | 文件 | 理由 |
 |---|---|
 | 狀態為 `record` 的文件與 `docs/_archive/**` | 歷史記錄，不改寫 |
+| `docs/constitution-features/_archive/033-progressive-launch-strategy.md` | 已封存。B1b 推翻其假設一事記在本票，不回頭改封存票 |
+| 本票 `## 清單` 的四張表 | 2026-09-07 的快照，保留原文。複驗結果另列於第一節，已在表上方加警告 |
 
 ### Feedback Cycles
 
 ## Out of scope
 
 不施工任何一項——每項該修的另循其票。不處理 SSOT 產線把關（features 040／042／043／050）。不建立防止文件過時的機制（feature 054）。
+
+## Stage Report: design
+
+- DONE: 清單 A1–A4、B1–B3、C1–C3、D1–D2 全部以當下 repo 與實際頁面重新查證，每項標明「仍成立／已變動／已消失」並附可重跑的指令或檔案行號；不得沿用 2026-09-07 快照的結論。
+  第一節的十三列複驗表（含檢查清單未列的 D3）。十項仍成立、A2 部分變動、D1／D2 線上已消失。實際頁面查證用 `npx next dev -p 3199` 起站後逐頁抓取，非只讀程式碼。快照表原文保留，上方已加警告不得引用其「查證」欄。
+- DONE: 每一項指定一種結論類型——修（指向既有票號，或明確說明該開哪張新票）／明確接受（記下理由與接受者）／移除——且沒有任何一項停在「待確認」或「待決定」。
+  第二節結論表共十五項（B1 拆為 B1a／B1b，新增 D4）。修：A2、A3、B1a、B2、B3、C1、C2、C3、D3、D4；明確接受：A1、A4、B1b、D1、D2；移除：A2 的六個未接線元件、B1b 的目標、C1 的按鈕。六張新票 `058`–`063` 已指名標題，兩張既有票指向 `052`／`049`。
+- DONE: 決定這道 gate 由誰、在哪個時點執行，並寫明它與「移除 noindex」的綁定方式（哪個檔案、哪一行、雙向引用怎麼做），使「一道不會被觸發的 gate」這個失敗模式可被查證排除。
+  第三節。執行者 captain ＋ FO 代跑機械項；時點為移除 `layout.tsx:8` 之前，不設日期。綁定三處：`layout.tsx` 第 5–7 行註解（緊貼 `robots:` 上方，唯一繞不過的位置）、`TODO.md` 的 P3-8、`AGENTS.md:51`；本票第三節反向列出三者的檔案與行號。可查證排除的依據是 AC-3 的 `grep -rn '056-pre-launch-checklist'`，三檔各需至少一筆命中。
+
+### 驗證與可否證性
+
+- `npx tsc --noEmit` 通過（無輸出）。斷言的是型別基準線未被本階段破壞；本階段未改任何 `.ts`／`.tsx`，故此項若失敗代表 repo 本身在 `bd4fca2` 就是壞的。
+- AC-3 的 `grep` 目前**三檔皆零命中**，即設計要求的綁定尚未建立。這是 implement 的工作，已如實寫入 Test plan 的實測表，不宣稱通過。
+- G-5 的佔位掃描目前**三筆命中**（C1 一筆、C2 兩筆），故 gate 現在不通過。同樣如實記錄。
+- G-6 的 `node` 輸出 `false false`。若日後有人把 `h2` 或 `h28` 重新標成 `Approved`，同步會讓該列回到 `history.json`，此指令即翻為 `true`，gate 失敗——這是 D1／D2「明確接受」的反向保護，也是該項唯一的失敗途徑。
+- A3 的零入口結論以七個頁面的實際抓取為據。若任何人在 `Navbar.tsx` 的 `NAV_ITEMS` 或 `Footer.tsx` 加上 `/quiz`，該檢查即出現命中，結論翻轉。
+
+### Summary
+
+複驗推翻了快照的三項事實：A2 的 CTA 數字不是硬寫的 16 而是 `{OPINIONS.length}`（現為 12），且 CTA 的數字來源與目的地渲染的資料不是同一份；D1／D2 的錯誤列已被 `isApproved()` 濾出線上。另外找到兩件快照沒有的事：`h34`／`h35` 標題一字不差（列為 D4，開票 `063` 之外另開 `062`），以及 `049` 的一項前提已失效——它指的兩個渲染點現在無任何 import，該票的線上風險只剩 `StanceSpectrum.tsx`。
+
+兩項設計決定值得 captain 特別看：**B1b 判定「夥伴看全部、公眾看三頁」在現行架構下做不到**（無登入機制，前端 `localStorage` 可被繞過），因此把該目標移除而非修它，這推翻了已封存的 `033` 的假設；**AC-2 的驗收綁在 feature `039` 上**——本 repo 無瀏覽器工具，而 `LaunchGate.tsx:30` 讓 `curl` 對整站零命中，任何只讀 SSR HTML 的驗證都會假通過。這一點本次複驗獨立重現了一遍。
