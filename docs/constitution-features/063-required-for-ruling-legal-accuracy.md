@@ -27,6 +27,10 @@ design stage 先界定：要確認的具體命題是什麼、以什麼為權威�
 
 **拍板需法學背景者。** 這一項的結論可能是「修正」也可能是「確認原本就對」，design stage 不預設答案。
 
+### Feedback Cycles
+
+- Cycle 1: REJECTED — verify；surface 9 檔／+557 淨行（+605/-48；不含本票流程記錄則 +224）vs estimate 無（本票 design 未產出 `## Expected surface and tolerance` 段，記為缺口，本輪不因此退回）；AC unchanged。V1 fix（Material，本票擁有：`future.tsx:202`「5 名大法官無法達到判決門檻」與本票自己新加的「失效後已作成 6 則判決」在同一 grid 相鄰兩格直接互相否證；第五小節 L4 指示「不可原樣留下」的兩條分支都沒走到；「法庭做不出判決」是經驗事實非法學解釋——七則判決加 115憲判6【30】的援引先例）；V2 fix（Material：card 首句「生效期間／全年」矛盾，且 114 年唯一一則判決就是 114憲判1 本身，而它以【41】【43】明文拒絕適用該下限，原句語意恰好相反）；V3 fix（Material，FO 裁量最小修法：只更新 `LAST_UPDATED`，不動 `REFERENCE_DATE`——既有過期問題被本票新增內容升級為同頁自相矛盾，故責任歸屬改變）；V4／V5／V6 fix（Polish：多餘空格與「判決違憲」改「宣告違憲」、破句補字、`rule` 補回「除本法別有規定外」）；V7 Needs decision 維持不動（Material 但本票 AC3／AC4 範圍明文限於 `/future`，不得擴張範圍；建議另開票）；V8 不處置（屬 `049`／`design-assets`）；V9 併入 L1（115憲判6【30】證據，L1 問法改寫，原句保留）。reviewer 對 cycle 1 的 AC1–AC7 七項全部獨立重跑通過（真頁面 HTML 123,621 bytes、AC2 自 main 獨立重製 tsc 三筆、還原以三種互不相依方法比對）；cycle 2 中 implement 自我修正一次（V1 首版改寫會引入無來源敘述，改為整句刪除），並另抓到兩處同類空格問題。L5（375px 六行量測）維持未達成——環境無可用無頭瀏覽器，八種旗標組合全部 `SEGV_ACCERR`。
+
 ## Out of scope
 
 不改同步程式或發布欄位。不處理 D1／D2（`h2`／`h28`）——`056` 已明確接受，並加了重新核可前須經法學確認的反向保護。
