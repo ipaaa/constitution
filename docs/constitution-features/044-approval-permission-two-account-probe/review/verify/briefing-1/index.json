@@ -1,0 +1,24 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:044:verify:attempt-1:revision-1",
+  "question": "verify cycle 2 判 PASSED。是否核可 044 進入 review？另有兩項只有 captain 能決定：(1) 多項 AC 的記錄粒度低於原文要求（AC-2／AC-3 部分達成），是否接受；(2) AC-3 的十一項繞道只測了五格，是否補測。",
+  "artifacts": [
+    {
+      "id": "artifact:044:verify:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/aadae666f66ae19d14d78000615b1efe9f260587/docs/constitution-features/044-approval-permission-two-account-probe.md",
+      "rev": "sha256:0e523db4105248837a3bff613673d736383a58a3ab78bb49afa7dcd6af6b859d",
+      "mediaType": "text/markdown",
+      "summary": "七個命題的行為結論全部成立，probe 已交付 414 行 record 證據文件。cycle 1 的美化問題已修正且未靠刪句掩蓋，implement 主動揭露五項記錄缺口。安全掃描九道全乾淨，src/data 的 sha256 與 main 相同。AC 判定：AC-8／AC-9 通過，AC-1／AC-4／AC-5 通過但有記錄缺口，AC-2／AC-3／AC-7 部分達成，AC-6 SKIPPED（P6 跳過，維持 UNPROVEN，補做路徑已記）。三項新 finding 經 FO 授權：Finding 2（檔頭缺口總覽漏列兩項）與 Finding 3（日期歸屬誤植）授權 fix；Finding 4（validateApprovalBinding 引用未標版本，040 合併後自動消失）授權 decline。"
+    }
+  ],
+  "context": [
+    {
+      "type": "Reference",
+      "id": "reference:044:verify:attempt-1:revision-1:item-2",
+      "uri": "git-root://main/e9933c90b36f10fd5846d53e9ab891b76c8a541c/docs/constitution-features/050-ssot-approval-deployment.md",
+      "mediaType": "text/markdown",
+      "rev": "sha256:f7213820892000a44cfb69eb6d6eea913c5c634542a78750ff47aea48d52b4a8"
+    }
+  ]
+}
