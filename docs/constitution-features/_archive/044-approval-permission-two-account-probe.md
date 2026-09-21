@@ -1,16 +1,16 @@
 ---
 id: 044
 title: 隔離測試表兩帳號 probe：驗證核可欄位權限與公式重算
-status: review
+status: complete
 source: captain 2026-09-04（feature 040 verify gate 裁決方案 B 拆出）
 started: 2026-09-08T02:35:20Z
-completed:
-verdict:
+completed: 2026-09-21T18:35:02Z
+verdict: PASSED
 score: 0.96
 worktree: .worktrees/spacedock-ensign-044-approval-permission-two-account-probe
 issue:
 pr: pr-merge:36
-mod-block: merge:pr-merge
+mod-block:
 gates:
     version: 1
     records:
@@ -64,7 +64,8 @@ gates:
                 reason: review 判 PASSED。九項 AC 全部以重現而非採信查核——reviewer 自 commit 093cd01 取出 .gs 重跑離線 oracle，七個指紋、五個標題錯誤案例、五個 APPROVAL_STATUS 值逐字重現。AC-2／AC-3／AC-7 的部分達成判定經確認誠實，九項缺口全部在證據文件有對應原句、無一被淡化。證據文件作為永久 record 稱職，並主動警告 040 gate「approved_* 逐字不變的證據不齊」；review 明確結論為未發現任何會讓讀者高估證據強度之處。零程式改動、六道安全掃描乾淨。Finding 8／9 經 FO 授權 decline。Finding 10（合併順序）captain 於 2026-09-17 裁決選項 A：現在合併。理由為 044 與 040 各占一個併發名額，押後合併會使 feature 050 無法派工、卡住整條相依鏈；而 validateApprovalBinding 的引用在 040 合併後自動可解析，reviewer 已查證引用內容本身正確，窗口為暫時性。
               application:
                 target-stage: complete
-                state: pending
+                state: consumed
+archived: 2026-09-21T18:35:03Z
 ---
 
 在隔離測試表上以兩個 Google 帳號實跑，證明核可欄位的權限邊界與 `status` 公式對「他人修改內容」與「責任編輯自行修改內容」都會重新計算。
