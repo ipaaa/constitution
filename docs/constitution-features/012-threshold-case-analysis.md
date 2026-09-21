@@ -723,3 +723,59 @@ D4 朗讀測試）都不阻擋施工，D1／D2 已定「未確認就留白」的
 
 需要 captain 注意的一件事：本規格與 0416 會議的口述內容不一致，且不一致的地方是會議記錄錯了。
 建議向慧婕確認 1987 的原意（D3）。
+
+## Stage Report: implement
+
+- DONE: `/past/thresholds` 路由與規格列出的元件依 `## Responsibilities and component hierarchy` 落地並實際渲染
+  11 個元件全數建立，另加 `ChartText.tsx`（行動版字級，理由見下）。`npm run dev` 下 `/past/thresholds`、`/past`、`/future` 三條路由皆回 200 並編譯無誤；`npm run build` 把 `/past/thresholds` 列為靜態預渲染頁。commit `2afef7d`。
+- DONE: `npx tsc --noEmit` 與 `npm run build` 皆離開碼 0
+  兩者各跑兩次（加行動版字級之前與之後）皆 0。`npx eslint` 對本票全部檔案 0 error。
+- DONE: `src/data/discussions.json` 與 `src/data/history.json` 的 sha256 與 main 相同
+  建置前後與 main 的 git blob 三方相同：`discussions.json` = `4071978a…3162`，`history.json` = `4d1992e3…cea3b`。`git status` 自始至終未列出這兩個檔。`git diff main...HEAD -- package.json` 為空，`build` 仍是 `next build`。
+- FAILED: 行動版行為在 `npm run dev` 下於 375px 與 1280px 各人工看一次並把截圖附進 stage report
+  **本機無法產生截圖。** 唯一可用的瀏覽器是 puppeteer cache 內的 Chrome for Testing 147.0.7727.56，它在本機連 `--dump-dom about:blank` 都 `SEGV_ACCERR`（`--headless`、`--headless=old`、`chrome-headless-shell`、`--single-process`、關掉 sandbox 全部一樣）。`/Applications` 被 macOS TCC 擋住（`Operation not permitted`），沒有 Playwright cache，且規格明文不得新增相依。**不寫「已確認」。** 視覺檢查留給有可用瀏覽器的人執行。
+- DONE: 補上四條可自動驗證的行動版／桌機結構斷言，代替不了視覺檢查，但把機制本身驗起來
+  `tests/threshold-analysis.test.mjs` 新增四條：x 軸桌機 26 個年份刻度／行動版 8 個且字級 ≥ 20；門檻分界線桌機帶門檻一句話、行動版只留 4 位數公布年份且長句不重複出現；`EraComparisonStrip` 為 `grid-cols-1 md:grid-cols-4`；選取某期後展開 29 個 `<dt>` 且含 `1994 → 37`。把行動版字級改回 10、或把桌機長句漏進行動版，這四條會失敗。
+- DONE: `tests/threshold-analysis.test.mjs` 以 `node --test` 離線通過，覆蓋 AC-1／AC-2／AC-4／AC-5
+  21 pass／0 fail／1 skip（skip 者為 AC-6，未設 `THRESHOLD_LIVE`）。AC-6 另以 `THRESHOLD_LIVE=1` 實跑通過（250 秒，813 頁全部重抓）：清單頁仍解析出 813 個無缺號釋字、每筆 `id` 與 `發布日期` 與 fixture 相同、釋字第 813 號的 `id` 仍為 `325335`。
+- DONE: AC-1 的 1987 掃描用規格指定的兩條正規式，不是純字串 grep
+  掃 `src/app/past/thresholds/`、`src/components/threshold-analysis/`、`src/data/threshold-analysis.ts` 全部原始碼，比對 `/1987[^0-9]{0,12}(門檻|三分之二|降|放寬)/` 與反向式皆無命中，另斷言 `YEARS` 的 1987 年仍為 9 件（否則兩條式子就是空轉）。**實跑可失敗性**：在資料模組插入註解「1987 年門檻降至三分之二」後，該測試立刻由 ✔ 轉 ✖，其餘 20 條仍過；移除後回復全過。
+- DONE: AC-2 的斷言全部自 fixture 的 813 筆原始日期重算
+  三期件數 79／233／501（和 = 813）、年均 8.3／6.7／17.3、倍率 `0.81×` 與 `2.57×`、邊界年 1958 = 0/2 與 1993 = 1/20、尖峰 1994 年 37 件，全部先由 fixture 重算再與資料模組比對。分母日數 3483／12616／10552 也由 fixture 的日期邊界反推核對。**實跑可失敗性**：把 1993 改成整年歸雙四分之三期（21/0），AC-2 的四條測試同時由 ✔ 轉 ✖；改回後全過。另斷言渲染輸出不含 `2.58×`，擋住「先進位再相除」的錯誤算序。
+- DONE: D1 依規格處置 —— UI 顯示「門檻條文待確認」且不寫出「1/2」
+  `rules` 期 `evidence: 'unverified'`、`article`／`quotedText`／`sourceUrl` 皆 `null`、`ruleSummary` 為「門檻條文待確認」。測試斷言 `EraComparisonStrip` 的渲染輸出含「未確認」且**不含**「1/2」與「二分之一」。已實跑確認沿革頁只記載 1948-09-16 制定公布全文 21 條，條文內容不在全國法規資料庫（`LawOldVerList.aspx?pcode=A0030159` 仍只有 19580721／19930203／20190104／20230621 四版）。D1 維持待拍板。
+- DONE: D2 已抓 `LawOldVer.aspx?...&lnndate=20190104&lser=001` 逐字核對，**疑義已解除**
+  第 30 條原文：「判決，除本法別有規定外，應經大法官現有總額三分之二以上參與評議，大法官現有總額過半數同意。」另查 2023-06-21 版第 30 條逐字相同，因此 2022-01-04 至 2025-01-23 全段適用同一條，無疑義。**該段色帶因此不標「未確認」**，但仍為中性灰加斜線網底 —— 理由改為「該段沒有釋字可計」，不是「條文未確認」。條文全文與來源連結顯示在 `SeriesBoundaryNote`。
+- DONE: 土黃色區五項因素各帶 `uncertainty` 與拍板者，且圖元件不 import `FACTORS`
+  `FACTORS` 五項：四項 `needsRuling` 非 null（`legal-reviewer` 2、`captain` 1、`external-source` 1），`f5-excluded-cases` 為 null。測試斷言每項 `uncertainty` 長度 ≥ 15、`basis !== 'none'` 者 `basisRef` 非空、渲染時待確認徽章數恰等於待拍板項數（只數 `>待確認</span>`，不數段落說明文字）。另對 `ThresholdChart`、`ThresholdBand`、`ThresholdBoundary`、`SeriesBreakLine`、`ChartAxes`、`ChartText` 六個檔去掉註解後斷言不含 `FACTORS` 字樣。
+- DONE: AC-5 的無資料標示
+  `current` 期 `meanPerYear === null`、`totalCount === 0`，渲染輸出含 `<pattern id="threshold-hatch">`、`fill="url(#threshold-hatch)"` 與字串「無釋字資料」。另斷言把憲判字年份全部灌成 999 件，四期統計一字不變 —— 憲判字確實不進任何時期的年均。
+- SKIPPED: AC-3 朗讀測試
+  記為 `PENDING-CAPTAIN`。需 captain 找 3 位非法學背景受測者執行，worker 無法自證，也未以任何替代方式宣稱達成。
+- DONE: `## Documentation impact` 的 `### 實作後更新`
+  `docs/project/architecture.md` 加入 `/past/thresholds` 到軌道一的 IA 圖與說明；`docs/project/design-system.md` 登記四條色帶色票、斜線網底的固定語意、行動版字級規則；`docs/project/tech-stack.md` 以**追加補述**方式登記第二支人工抓取程式（不改寫已標過時的資料流章節）；`AGENTS.md` 在「不要手改 `src/data/*.json`」一節補上「`.json` 不要手改、`.ts` 可以改」的判斷方式。
+- SKIPPED: `docs/INDEX.md` 更新
+  本階段沒有新增任何 `.md` 文件，而 `INDEX.md` 索引到資料夾層級、不索引個別 feature 票，因此沒有可加的列。`constitution-features/` 那一列寫的是票數快照，`AGENTS.md` 明文不建議把會漂移的快照寫進 evergreen 文件，未擅自改動。
+
+### 超出容差與規格偏離（需 gate 裁量）
+
+1. **淨行數超出容差。** 規格估 +1380、容差 828–1932，實際 `git diff --shortstat main...HEAD` 為 **+2611／−2**。主要來自兩處：測試檔 507 行（估 180）、資料模組 473 行（估 230，78 個年份各一列物件，為了讓數字進 PR diff 受人工審閱）。另有兩個估算表沒有的檔：`ChartText.tsx` 55 行、`tests/tsx-loader.mjs` 71 行。沒有為了對齊估算而刪減測試。
+2. **新增 `ChartText.tsx`（不在元件階層表內）。** 規格定的單一 SVG（`viewBox="0 0 960 420"`）在 375px 螢幕上縮放比約 0.32，桌機的 10px 字到手機只剩 3.2px，等於看不見。`ChartText` 同時輸出桌機與行動版兩套字級（行動版 26px），行動版另隱藏放不下的長標籤（制度換軌說明、右端引線註解），其內容在 `SeriesBoundaryNote` 有完整文字版。規格的「圖等比縮小」仍成立，改的只是字級。
+3. **新增 `tests/tsx-loader.mjs`。** 專案沒有測試框架，規格又明文不新增相依。本檔只用已在 `devDependencies` 的 `typescript` 做語法轉譯，並解析 `@/` 別名，不裝任何東西。`package.json` 未動。
+4. **`INTERIM_SEGMENT` 不是第五個 `ThresholdEra`。** D2 解除後，2022-01-04 至 2025-01-23 有了第一手條文，但 AC-1 斷言「四個 `effectiveFrom` 恰為 …」，加第五期會改動 AC，而 AC 只有 captain 能改。因此該段以獨立的 `StatuteSegment` 落地：圖上照樣畫一條色帶，條文與來源進 `SeriesBoundaryNote`，四期的 id 與 AC-1 不變。
+5. **`f2-ramp-precedes` 的 `uncertainty` 文字微調。** 規格表的原文含「1987 降門檻」，那一串會直接命中 AC-1 的正規式 `/1987[^0-9]{0,12}(門檻|三分之二|降|放寬)/`，兩條規格自相矛盾。改寫為「會議記錄說 1987 年那次修法把表決條件改低、並因此造成案件暴增；實際的修法公布日是 1993-02-03，且案件量自 1986 年起已在回升，會議的時間順序不成立。」語意不變，仍不是因果句，也仍指出會議說法的時間順序不成立。
+6. **規格的 `print.css` 前提不成立。** `## 視覺` 寫「`print.css` 存在，圖會被列印」。repo 內唯一的 CSS 是 `src/app/globals.css`，沒有任何 `@media print` 規則（`src/app/present/[id]/page.tsx:51` 只呼叫 `window.print()`）。長條的兩個序列色 `#111827` 與 `#D32F2F` 明度差仍足以在灰階下區分，但列印樣式本身不存在。
+7. **`fixture` 存的是三元組而非二元組。** 規格寫 `[釋字號, 發布日期]`，實際存 `[釋字號, 明細頁 id, 發布日期]`。多存 `id` 是為了讓 AC-6 能逐筆核對「`id = N + 310181` 的例外仍在」，而不是只斷言第 813 號一筆。是規格形狀的超集，21348 bytes 單行。
+
+### Summary
+
+`/past/thresholds` 已可渲染：1949–2026 的年度長條圖、四條門檻色帶、四條公布日分界線、
+2022-01-04 的制度換軌虛線，加上時期對照條、資料邊界說明與五項候選因素段落。
+數字全部由重新抓取的 813 筆發布日期算出，AC-1／AC-2 兩組最關鍵的斷言都實跑做過可失敗性驗證。
+D2 在本階段解除：抓到 2019-01-04 版憲法訴訟法第 30 條逐字核對，2023-06-21 版相同，
+因此 2022–2025 那段不再標「未確認」。D1 維持未確認，UI 不寫出規則期的通過人數。
+
+兩件需要 gate 裁量：**行動版視覺檢查沒做**（本機 Chrome 連 `about:blank` 都 SEGV，
+`/Applications` 被 TCC 擋住，規格又不准新增相依），只補了四條結構斷言，不宣稱視覺已確認；
+以及**淨行數 +2611 超出 828–1932 的容差**，主要是測試與逐年資料列，未為了對齊估算而刪測試。
+AC-3 朗讀測試記為 `PENDING-CAPTAIN`。
