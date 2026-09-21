@@ -7,6 +7,7 @@ import RightsCalculator from '@/components/future/RightsCalculator';
 import BottleneckFunnel from '@/components/future/BottleneckFunnel';
 import CaseCard from '@/components/future/CaseCard';
 import JusticeTermTimeline from '@/components/future/JusticeTermTimeline';
+import RulingThresholdNote from '@/components/future/RulingThresholdNote';
 
 type SortMode = 'urgency' | 'recent';
 
@@ -75,9 +76,9 @@ export default function FutureTrack() {
             {CRISIS_STATS.designatedTotal} 名大法官，僅存 {CRISIS_STATS.activeJustices} 名運作（三名不參與評議會）
           </h2>
           <p className="text-gray-400 max-w-2xl leading-relaxed">
-            由於立法院未行使新任大法官人事同意權，加上憲法法庭法修正將判決門檻提高至法定總額
-            2/3（{CRISIS_STATS.requiredForRuling} 名），目前僅存 {CRISIS_STATS.activeJustices} 名大法官的憲法法庭
-            <strong className="text-white">實質上無法做出任何判決</strong>。{CRISIS_STATS.totalPending} 件案件陷入無限等待。
+            立法院未行使新任大法官人事同意權，目前僅存 {CRISIS_STATS.activeJustices} 名大法官參與評議。
+            <RulingThresholdNote variant="lede" />
+            <strong className="text-white">{CRISIS_STATS.totalPending} 件案件仍在待審。</strong>
           </p>
         </div>
       </div>
@@ -187,14 +188,9 @@ export default function FutureTrack() {
           <div className="bg-white p-6 md:p-8 border border-gray-200 shadow-sm rounded-sm">
             <h3 className="text-lg font-serif font-bold mb-3 flex items-center gap-2">
               <div className="w-3 h-3 bg-gray-800 rounded-full" />
-              憲法法庭法修正
+              憲法訴訟法修正
             </h3>
-            <p className="text-gray-600 leading-relaxed font-serif text-sm">
-              同時，立法院通過修法，將憲法法庭判決門檻由「現有總額」改為「法定總額」的 2/3
-              （即至少需 {CRISIS_STATS.requiredForRuling} 名大法官同意）。
-              在目前僅存 {CRISIS_STATS.activeJustices} 人的現實下，
-              實質上<strong>凍結</strong>了所有正在排隊且需要判決的憲法訴訟案。
-            </p>
+            <RulingThresholdNote variant="card" />
           </div>
           <div className="bg-white p-6 md:p-8 border border-gray-200 shadow-sm rounded-sm">
             <h3 className="text-lg font-serif font-bold mb-3 flex items-center gap-2">

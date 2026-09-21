@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { CRISIS_STATS } from '@/data/future';
+import RulingThresholdNote from './RulingThresholdNote';
 
 interface BottleneckFunnelProps {
   filteredCount: number;
@@ -132,7 +133,7 @@ export default function BottleneckFunnel({ filteredCount, totalCount }: Bottlene
         </div>
         <div className="flex justify-between mt-1.5">
           <span className="text-[10px] text-gray-500">{CRISIS_STATS.vacantSeats} 席空缺</span>
-          <span className="text-[10px] text-gray-500">需 {CRISIS_STATS.requiredForRuling} 人始得判決</span>
+          <RulingThresholdNote variant="compact" />
         </div>
       </div>
     </div>

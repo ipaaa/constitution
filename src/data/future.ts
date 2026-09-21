@@ -421,7 +421,6 @@ export const CRISIS_STATS = {
   /** Number of curated cases displayed in the card list. */
   curatedCount: CURATED_COUNT,
   activeJustices: ATTENDING_JUSTICES.length,
-  requiredForRuling: 10,
   designatedTotal: 15,
   /** Seats where the term has expired and no replacement appointed */
   vacantSeats: 15 - ACTIVE_JUSTICES.length,
@@ -430,3 +429,71 @@ export const CRISIS_STATS = {
   avgDaysPerCase: 120,
   estimatedClearanceYears: 3.4,
 };
+
+// ---------------------------------------------------------------------------
+// Ruling threshold (憲法訴訟法第 30 條)
+// ---------------------------------------------------------------------------
+
+/**
+ * 憲法法庭判決門檻。
+ *
+ * 現行有效的規定是憲法訴訟法第 30 條第 1 項，給的是**比例**，不是固定人數：
+ * 「判決，除本法別有規定外，應經大法官現有總額三分之二以上參與評議，
+ *   大法官現有總額過半數同意。」
+ *
+ * 114 年 1 月 23 日修正曾增訂第 30 條第 2 項，訂下固定人數下限
+ * （參與評議不得低於 10 人、同意違憲宣告不得低於 9 人）。
+ * 該項已由 114 年憲判字第 1 號（114-12-19）宣告違憲，自公告日起失其效力。
+ *
+ * 注意：全國法規資料庫至今仍原樣顯示已失效的第 30 條第 2 至 6 項，不加失效標註。
+ * 條文是否有效，權威在憲判主文，不在法規資料庫的顯示。
+ *
+ * `headcount` 為 null，代表尚未經法學背景者拍板具體人數。
+ * **渲染端在 headcount 為 null 時，必須完全不顯示人數，並改敘述 `rule`。**
+ * 不得顯示替代字元或推算值。拍板事項見
+ * docs/constitution-features/063-required-for-ruling-legal-accuracy.md 第五小節。
+ */
+export const RULING_THRESHOLD = {
+  /** 條文文字轉成的一句話敘述。渲染端的長版文案來源 */
+  rule: '大法官現有總額三分之二以上參與評議，並經現有總額過半數同意',
+  /** 短版標籤用。掃讀場景，不超過 12 字 */
+  ruleShort: '門檻依現有總額比例計算',
+  /** 現行有效條文出處 */
+  statute: '憲法訴訟法第 30 條第 1 項',
+  /** 已失效的固定人數下限。保留是因為它是報導的主題，不是現行法 */
+  voidedFloor: {
+    participants: 10,
+    unconstitutionalityVotes: 9,
+    statute: '憲法訴訟法第 30 條第 2 項',
+    voidedOn: '2025-12-19',
+    voidedBy: '114 年憲判字第 1 號',
+    rulingUrl: 'https://cons.judicial.gov.tw/docdata.aspx?fid=38&id=355485',
+  },
+  /** 具體人數。待 L1／L2 拍板前一律為 null */
+  headcount: null as number | null,
+} as const;
+
+/**
+ * 憲法法庭在 10 人下限失效（2025-12-19）之後作成的判決。
+ *
+ * 用途：站上先前寫「實質上無法做出任何判決」。該敘述與一手來源衝突，
+ * 本清單即為否證材料。民國 114 年全年只作成第 1 號一則判決，
+ * 下限失效後，民國 115 年已作成下列六則。
+ *
+ * 來源：憲法法庭判決清單 https://cons.judicial.gov.tw/judcurrentNew1.aspx?fid=38
+ * 逐則開啟確認，`id` 為 docdata.aspx 的查詢參數。
+ * 取證日期 2026-09-21。待拍板事項見
+ * docs/constitution-features/063-required-for-ruling-legal-accuracy.md 第五小節。
+ */
+export const RULINGS_SINCE_FLOOR_VOIDED = [
+  { docket: '115 年憲判字第 1 號', rocDate: '115-01-02', dateLabel: '115 年 1 月 2 日', id: 350743 },
+  { docket: '115 年憲判字第 2 號', rocDate: '115-02-06', dateLabel: '115 年 2 月 6 日', id: 343660 },
+  { docket: '115 年憲判字第 3 號', rocDate: '115-03-27', dateLabel: '115 年 3 月 27 日', id: 358150 },
+  { docket: '115 年憲判字第 4 號', rocDate: '115-05-08', dateLabel: '115 年 5 月 8 日', id: 351300 },
+  { docket: '115 年憲判字第 5 號', rocDate: '115-06-05', dateLabel: '115 年 6 月 5 日', id: 343661 },
+  { docket: '115 年憲判字第 6 號', rocDate: '115-08-14', dateLabel: '115 年 8 月 14 日', id: 352140 },
+] as const;
+
+/** 下限失效後最近一則判決。`RULINGS_SINCE_FLOOR_VOIDED` 依日期遞增排列 */
+export const LATEST_RULING =
+  RULINGS_SINCE_FLOOR_VOIDED[RULINGS_SINCE_FLOOR_VOIDED.length - 1];

@@ -332,6 +332,48 @@ curl -s https://constitution-nine.vercel.app/past -o p.html
   print(t); print('相同' if len(set(t.values()))==1 else '已區分 ✅')"
   ```
 
+### P0-7　判決門檻的具體人數待法學確認（法律判斷）　🔺 與 P0-2 同級
+
+- **狀態**：**待法學確認** — 程式碼已停止顯示任何人數，確認前不要填回數字
+- **背景**：站上原本寫「判決門檻 10 名大法官同意」。這句錯兩層：
+  10 是「參與評議人數下限」，不是同意人數；而訂下它的條文已經失效
+- **一手來源**：
+
+| 項目 | 內容 | 出處 |
+|---|---|---|
+| 現行有效門檻 | 「應經大法官現有總額三分之二以上參與評議，大法官現有總額過半數同意」 | 憲法訴訟法第 30 條第 1 項 |
+| 已失效的固定下限 | 參與評議不得低於 10 人；同意違憲宣告不得低於 9 人 | 同法第 30 條第 2 項 |
+| 失效依據 | 114 年憲判字第 1 號，114-12-19（2025-12-19）公告日起失其效力 | https://cons.judicial.gov.tw/docdata.aspx?fid=38&id=355485 |
+
+- **⚠️ 查證陷阱**：全國法規資料庫至今仍原樣顯示已失效的第 30 條第 2 至 6 項，
+  不加任何失效標註。**只查該站會得到「10 是對的」這個錯誤結論。**
+  條文是否有效，權威在憲判主文，不在法規資料庫的顯示
+- **待拍板的四項**（編號沿用
+  `docs/constitution-features/063-required-for-ruling-legal-accuracy.md` 第五小節）：
+
+| 代號 | 待拍板問題 |
+|---|---|
+| L1 | 「現有總額」現在是 8（在職人數）還是 5（扣除持續拒絕參與評議者）？114 憲判 1 理由【50】的認定是否及於其他案件 |
+| L2 | 依 L1 的答案，「三分之二以上」遇到非整數時如何進位 |
+| L3 | 114 憲判 1 該描述為「全部違憲」還是「部分違憲」。第 30 條第 1 項未被聲請、未受審查、仍有效 |
+| L4 | 站上還能不能說憲法法庭「實質上無法做出任何判決」。民國 115 年已有六則判決，最近一則 115-08-14 |
+
+- **目前的擋法**：`src/data/future.ts` 的 `RULING_THRESHOLD.headcount` 為 `null`。
+  渲染端 `src/components/future/RulingThresholdNote.tsx` 在 `null` 時完全不顯示人數，
+  改敘述條文給的比例。站上寫「換算成具體人數須經法學確認，本站不列。」
+- **誰能做**：法學協作者拍板 L1 到 L4 → 工程師填 `headcount` 並改文案
+- **卡在**：需要一位法學背景的人拍板
+- **解除方式**：拍板後把結論寫進本節，再把 `headcount` 從 `null` 改為拍定的數字
+- **驗證**：
+  ```bash
+  # headcount 仍為 null 時，站上不得出現任何推算人數
+  grep -n 'headcount' src/data/future.ts
+  grep -rnE '需 *[0-9]+ *(人|名).*(判決|同意)|[0-9]+ *名大法官同意' src/ ; echo "exit=$? （1 = 0 筆，正確）"
+  ```
+  `headcount` 不是 `null` 而本節沒有對應的已拍板記錄，即為失敗
+
+---
+
 ---
 
 ## P1 — 資料有遺失風險
@@ -870,15 +912,16 @@ git log -1 --format='%ad %s' --date=short -- src/data/discussions.json
 ### 卡在人，越早問越好
 
 4. **P0-2** 找法學協作者確認 `h2` 釋字第 272 號
-5. **P1-6** 確認網站版貓頭鷹短評是否為 AI 生成
+5. **P0-7** 找法學協作者拍板判決門檻的具體人數（L1 到 L4）—— 目前站上不顯示人數擋住
+6. **P1-6** 確認網站版貓頭鷹短評是否為 AI 生成
 
 ### 之後
 
-6. **[feature 040](../constitution-features/040-approval-content-version-binding.md)** 核可綁定內容版本（score 0.95，全 workflow 最高）。這是 P3-1 與下次正式同步的前置
-7. **P1-8** 盤點全站無 SSOT 來源的內容 —— 建議先處理 `opinion-lazybag` 那兩個檔
-8. **`docs/constitution-features/039`** 常設渲染檢查工具（機械檢查，非 AI 內容偵測）
-9. **P2-10** `dangerouslySetInnerHTML` 淨化 —— **必須在 P3-1 分享試算表之前處理**
-10. **P3-8** 發布前移除 `noindex`
+7. **[feature 040](../constitution-features/040-approval-content-version-binding.md)** 核可綁定內容版本（score 0.95，全 workflow 最高）。這是 P3-1 與下次正式同步的前置
+8. **P1-8** 盤點全站無 SSOT 來源的內容 —— 建議先處理 `opinion-lazybag` 那兩個檔
+9. **`docs/constitution-features/039`** 常設渲染檢查工具（機械檢查，非 AI 內容偵測）
+10. **P2-10** `dangerouslySetInnerHTML` 淨化 —— **必須在 P3-1 分享試算表之前處理**
+11. **P3-8** 發布前移除 `noindex`
 
 不擋任何事：P3-9 的內容品質雜項、`vibe` 下拉選單、
 文件整併第 2／4 階段、`design-assets` refit、`019` 票。

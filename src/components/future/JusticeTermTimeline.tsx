@@ -78,8 +78,12 @@ function buildDataPoints(): DataPoint[] {
   return points;
 }
 
-// Quorum threshold
-const QUORUM = 10;
+// 此圖原本畫一條「表決門檻 (10人)」的水平虛線。該門檻是憲法訴訟法第 30 條第 2 項
+// 的參與評議人數下限，已由 114 年憲判字第 1 號於 2025-12-19 宣告違憲失效。
+// 現行有效的第 30 條第 1 項給的是「現有總額」的比例，不是固定席次，
+// 因此在席次折線圖上畫不出對應的水平線。虛線與標籤已移除，
+// 門檻敘述改由 RulingThresholdNote 單一來源負責。
+// 見 docs/constitution-features/063-required-for-ruling-legal-accuracy.md
 
 // Year markers for X axis
 const YEAR_MARKS = [2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032];
@@ -176,29 +180,6 @@ export default function JusticeTermTimeline() {
               </g>
             );
           })}
-
-          {/* Quorum threshold dashed line */}
-          <line
-            x1={PAD.left}
-            y1={yForCount(QUORUM)}
-            x2={PAD.left + PLOT_W}
-            y2={yForCount(QUORUM)}
-            stroke="#D32F2F"
-            strokeWidth={1}
-            strokeDasharray="6 4"
-            opacity={0.5}
-          />
-          <text
-            x={PAD.left + 4}
-            y={yForCount(QUORUM) - 6}
-            textAnchor="start"
-            fontFamily="monospace"
-            fontSize="9"
-            fill="#D32F2F"
-            opacity={0.7}
-          >
-            表決門檻 (10人)
-          </text>
 
           {/* "You are here" vertical line */}
           <line

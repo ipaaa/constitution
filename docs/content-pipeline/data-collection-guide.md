@@ -86,7 +86,21 @@
 
 #### 危機統計（`CRISIS_STATS`）
 
-包含 `totalPending`、`activeJustices`、`requiredForRuling`（10）、`designatedTotal`（15）、`vacantSeats`、`absentJustices` 等欄位，由其他常數自動推導。
+包含 `totalPending`、`activeJustices`、`designatedTotal`（15）、`vacantSeats`、`absentJustices` 等欄位，由其他常數自動推導。
+
+> ⚠️ **2026-09-21 更正：`requiredForRuling`（10）欄位已移除。**
+> 原句把它列為 `CRISIS_STATS` 的欄位之一，該描述自本日起不成立。
+> 移除原因：10 是憲法訴訟法第 30 條第 2 項的「參與評議人數下限」，不是同意人數；
+> 且該項已由 114 年憲判字第 1 號於 2025-12-19 宣告違憲失效。
+> 判決門檻改由 `src/data/future.ts` 的 `RULING_THRESHOLD` 承載，渲染走
+> `src/components/future/RulingThresholdNote.tsx`。
+> 具體人數（`RULING_THRESHOLD.headcount`）仍為 `null`，待法學背景者拍板。
+> 見 `docs/constitution-features/063-required-for-ruling-legal-accuracy.md`
+> 與 `docs/health-check/TODO.md` 的 P0-7。
+>
+> 本檔為 `evergreen`，描述現況，故上方欄位清單已更新。
+> 更新前的原句為：「包含 `totalPending`、`activeJustices`、`requiredForRuling`（10）、
+> `designatedTotal`（15）、`vacantSeats`、`absentJustices` 等欄位，由其他常數自動推導。」
 
 ### 誰負責更新
 
