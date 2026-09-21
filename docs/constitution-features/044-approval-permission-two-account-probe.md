@@ -9,7 +9,7 @@ verdict:
 score: 0.96
 worktree: .worktrees/spacedock-ensign-044-approval-permission-two-account-probe
 issue:
-pr: "#36"
+pr: pr-merge:36
 mod-block: merge:pr-merge
 gates:
     version: 1
