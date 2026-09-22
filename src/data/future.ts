@@ -27,7 +27,23 @@
 //
 // Refresh procedure
 // -----------------
-// 1. Update `REFERENCE_DATE` and `LAST_UPDATED` below to the new snapshot date.
+// 1. The two dates below are NOT the same thing and are no longer updated together.
+//
+//    `REFERENCE_DATE` — the case-list snapshot date. `daysPending` is derived
+//    from each `filingDate` against it, and the justice-seat chart's TODAY line
+//    and countdown are drawn from it. Update it ONLY together with steps 2-4,
+//    because moving it re-ages every case and moves the chart.
+//
+//    `LAST_UPDATED` — the date shown in the page header. It records when the
+//    data on this page was last refreshed, which is not necessarily the
+//    case-list snapshot date.
+//
+//    They may legitimately differ. As of 2026-09-21 they do: the ruling-threshold
+//    content (`RULING_THRESHOLD`, `RULINGS_SINCE_FLOOR_VOIDED`) was refreshed on
+//    2026-09-21, while the case list is still the 2026-04-29 snapshot. The page
+//    header therefore prints both dates — see `src/app/future/page.tsx`. If you
+//    refresh the case list, set both to the new snapshot date and the two header
+//    lines will agree again.
 // 2. Visit cons.judicial.gov.tw/docdata.aspx?fid=52 and update `RAW_CASES`.
 // 3. Update `REAL_TOTAL_PENDING` from aggregate statistics or media reports.
 // 4. Update `CRISIS_STATS` institutional numbers if justices change.

@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import Image from 'next/image';
-import { PENDING_CASES, CRISIS_STATS, LAST_UPDATED, IdentityTag } from '@/data/future';
+import { PENDING_CASES, CRISIS_STATS, LAST_UPDATED, REFERENCE_DATE, IdentityTag } from '@/data/future';
 import RightsCalculator from '@/components/future/RightsCalculator';
 import BottleneckFunnel from '@/components/future/BottleneckFunnel';
 import CaseCard from '@/components/future/CaseCard';
@@ -69,7 +69,8 @@ export default function FutureTrack() {
               </span>
             </div>
             <div className="font-mono text-[10px] text-gray-500">
-              資料更新日期：{LAST_UPDATED}
+              <div>資料更新日期：{LAST_UPDATED}</div>
+              <div>待審案件統計截至 {REFERENCE_DATE}</div>
             </div>
           </div>
           <h2 className="font-serif text-2xl md:text-3xl font-bold leading-tight mb-3">
