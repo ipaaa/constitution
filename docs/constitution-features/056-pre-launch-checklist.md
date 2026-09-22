@@ -629,3 +629,95 @@ F-6 修好：G-1／G-2 的通過條件從一個 workflow 裡根本不存在的 `
 **我沒有照抄 FO 括號內的建議。** FO 寫「`verdict` 非空」，我改用 `verdict: PASSED`，因為「非空」包含 `REJECTED`——一張被否決的後續票不代表該項修好了，沿用「非空」會做出第二道假通過。`REJECTED`、空 `verdict`、`NOT FOUND` 三者一律歸為「尚未有結論」，走兩列原本就有的 captain 人工出口。
 
 順帶找到一件支持這個判斷的事實：`_archive/023` 的 `status` 是 `design`、`verdict` 是空的。**票可以未結案就被封存**，所以判準不能看檔案在不在 `_archive/`，必須看兩個欄位。
+
+## Stage Report: verify (cycle 3)
+
+- DONE: 獨立重驗 F-6 是否真的修好且**新判準構得到**……並確認舊判準 `status: archived` 命中 0 張……另請獨立驗證 `_archive/023-owl-mascot-unification.md`。
+  **新判準構得到，舊判準構不到，兩個數字獨立重現。** 自行解析全 63 張票的 frontmatter：符合 `status: complete` 且 `verdict: PASSED` 者 **34 張**；符合舊判準 `status: archived` 者 **0 張**。`_archive/023-owl-mascot-unification.md` 確為 `status='design'`、`verdict` 空，且是 35 張封存票中**唯一**的例外。implement 舉的反例精確無誤。
+- DONE: 判定 implement 刻意採比 FO 建議更嚴的判準……以及它把 `REJECTED`／空 `verdict`／`NOT FOUND` 三種情形一律歸為「尚未有結論」並走人工出口，是否會讓 gate 卡死或漏放。
+  **三項理由我都實質評估過，結論是：判準正確、不卡死、不漏放，但第 3 項的出口欠缺器械。** 詳見下方「三項理由的實質評估」。
+- DONE: 確認未越界也未回歸……最後給出 PASSED 或 REJECTED。
+  無越界、無回歸，全部以位元組比對或實跑證明。判定 **PASSED**。另記兩筆新 finding：**F-7**（人工出口未指定記錄位置）與 **F-8**（G-8 的 `tsc` 會因 `.next/` 殘留而假失敗）。兩者皆非本輪引入，皆不使任何 AC 失敗。
+
+### F-6 修法重驗
+
+| 檢查 | 實測 | 判定 |
+|---|---|---|
+| 新判準命中數 | `status: complete` ∧ `verdict: PASSED` → **34 張** | 構得到 ✅ |
+| 舊判準命中數 | `status: archived` → **0 張** | 構不到，F-6 成立 ✅ |
+| 全 repo `status`×`verdict` 分布 | `complete`＋`PASSED` 34／`design`＋空 27／`review`＋空 1／`verify`＋空 1 | 無其他組合 |
+| `_archive/023` 反例 | `status='design'`、`verdict` 空；35 張封存票中唯一例外 | 反例成立 ✅ |
+| 判準與 workflow 終局定義是否一致 | `README.md:161`：「Terminal stage……`verdict: PASSED`, entity archived」 | 新判準恰為 workflow 文件定義的終局狀態 ✅ |
+
+### 三項理由的實質評估
+
+**理由 1（用 `PASSED` 而非「非空」）——成立，且與 F-6 不同型。**
+`README.md:85` 寫明 `verdict` 是 enum：`PASSED or REJECTED`。**`REJECTED` 在 enum 內，`archived` 不在 status enum 內**——這是關鍵分野：F-6 錯在指定了一個不存在的值，理由 1 指定的是 schema 允許的值，不是同一個錯誤的翻版。
+惟須誠實記下尺度：全 repo 目前 **0 張票**帶 `verdict: REJECTED`，`verdict` 實際只出現 `PASSED` 與空兩種。因此今天「非空」與「等於 `PASSED`」**效果完全相同**，這條更嚴的判準此刻是空轉的。它的價值在於 schema 允許的未來狀態，代價為零。**在兩個當下等價的選項中選了安全的那個，理由正確，我背書。**
+
+**理由 2（不能看檔案在不在 `_archive/`）——成立，但它防的是一個沒被採用的作法。**
+`023` 的反例我獨立驗證無誤。須指出：兩列的指令本來就讀 `status` 與 `verdict` 兩個欄位，從未以路徑為判準，所以這條理由是**為既有設計辯護**，不是改變了什麼。作為寫進文件的理由它有價值——它擋住未來有人「簡化」成看路徑。
+
+**理由 3（`REJECTED`／空／`NOT FOUND` 一律走 captain 人工出口）——出口真的存在，不會變成第二個 F-6，但欠缺器械。**
+
+*出口存在嗎？* 存在。G-1 現行文字逐字含「或 captain 逐票明確接受並記錄理由」；G-2 以「通過條件同 G-1（含 2026-09-22 的更正）」繼承。以讀取實際位元組確認，非採信報告。
+
+*它會變成另一個永遠不被觸發的分支嗎？* **不會，而且與 F-6 的差別是結構性的。** F-6 的 `status: archived` 是**構造上不可達**——workflow 裡沒有任何行為者能產生那個值，再多人力也無法使它為真。captain 出口則是**一個真實行為者能執行的動作**：captain 正是第三節指定的 gate 執行者；`### Feedback Cycles` 是活的記錄位置，目前已載有 Cycle 1／Cycle 2 兩筆；G-4 本身就是同形狀的既有 `人工` 項。三者都在，分支可執行。
+
+*會卡死嗎？* 不會——**這條出口正是防卡死的設計**。若沒有它，六張後續票只要有一張被否決或放棄，gate 就永遠無法通過，反而製造 F-6 型的死結。
+
+*會漏放嗎？* 系統性漏放不會，但有一個未上器械的縫。第三節「Gate 執行清單」前言寫「`人工` 項 captain 判斷並留下簽字（**寫在本票的 Feedback Cycles**）」——但 **G-1／G-2 的類型欄是 `機械`，不是 `人工`**，該句字面上沒有涵蓋到「在機械項內動用人工出口」這個情形；出口本身只寫「記錄理由」，沒寫記在哪，也沒有任何指令能驗證「確實有一筆記錄存在」。於是 gate 執行時，機械那半產出可查的輸出，人工出口那半不產出任何可查的東西。這是**器械不足**，不是分支不可達。列為 F-7。
+
+### 未越界、未回歸（全部以位元組比對或實跑證明）
+
+| 檢查 | 方法 | 結果 |
+|---|---|---|
+| G-1／G-2 **指令**逐字未變 | 自行從兩版的表格列抽出反引號字串比對，不採信報告 | G-1 `257B` vs `257B`、G-2 `241B` vs `241B`，**皆 `True`** |
+| AC 全節逐字未變 | 與 `1f58ad8` 比對 `## Acceptance criteria` 全段 | `1622B` vs `1622B`，**`True`**（與 cycle 1／2 亦同值） |
+| 原通過條件逐字保留 | 抽出 cycle 2 的 G-1 原句，與 `:177` blockquote 內「」中的字串比對 | **`VERBATIM MATCH: True`** |
+| 抽出後仍可跑 | 改完後重新抽出交給 `bash` | G-1 印六列、G-2 印兩列，離開碼皆 `0` |
+| 八張票對照新條件 | 全部 `status: design`、`verdict` 空 | 仍不通過——**正確結果**，gate 該在公開當下才綠燈 |
+| `git diff` 範圍 | `git diff --name-only 1f58ad8..HEAD` | **只有本票一個檔案**；對 `src/`／`next.config.ts`／`package.json` 為空 |
+| AC-3／G-7 | 三檔 `grep` | `1／5／1` |
+| AC-3 相鄰性 | `awk` | `binding at line 8; next line 9 =   robots: { index: false, follow: false },` |
+| G-5 | 佔位掃描 | 三筆（皆既有，各有其票 `061`／`052`） |
+| G-6 | `node` | `false false` |
+| G-8 build | `npm run build` | 離開碼 `0`；`src/data/*.json` build 前後 sha256 相同，且與 `main` 位元組相同 |
+| G-8 型別 | `npx tsc --noEmit` | **離開碼 `0`**——但本輪第一次執行曾失敗，原因已查明並非候選改動，見 F-8 |
+
+### 新 finding
+
+**F-7 — G-1／G-2 的 captain 人工出口沒有指定記錄位置，也沒有任何檢查。**
+- 已釋出使用者與正常流程：captain 於公開前執行 gate，遇到後續票未結案而動用「逐票明確接受」出口。
+- 可觀察損害：目前無。出口可執行，但不產生可查的產物；gate 可能在沒有任何書面記錄的情況下通過 G-1／G-2。
+- 受影響的 AC 或邊界：無 AC 失敗（AC-4 只要求六個機械項有指令並產出輸出，仍成立）。受影響的是第三節 gate 的可稽核性。
+- 觸發證據：G-1 現行文字只寫「記錄理由」未寫位置；第三節前言把「寫在本票的 Feedback Cycles」限定於 `人工` 項，而 G-1／G-2 的類型欄為 `機械`；全票無任何指令可驗證該記錄存在。對照組 G-4 寫的是「理由寫入本票」。
+- 建議：materiality = **Deferred risk**（觸發情境尚未發生）。**promote-to-material 條件**：gate 實際執行、G-1 或 G-2 經由該出口通過、而 `### Feedback Cycles` 無對應記錄。task ownership = 本票自有範圍。disposition 建議 = **fix（一個子句）**：比照 G-4，把出口改寫為「captain 逐票明確接受，理由寫入本票的 `### Feedback Cycles`」。**非本輪引入**——該子句自 design 原稿即存在，cycle 2、cycle 3 均逐字保留，處置正確。
+
+**F-8 — G-8 的 `npx tsc --noEmit` 會因 `.next/` 內的殘留檔案假失敗。**
+- 已釋出使用者與正常流程：FO 於 gate 執行時代跑 G-8。
+- 可觀察損害：**本輪實際發生過一次。** 本輪第一次跑 `npx tsc --noEmit` 得到 `.next/types/routes.d 2.ts(65,8): error TS2300: Duplicate identifier 'LayoutProps'.`、離開碼 `2`。`tsconfig.json` 的 `include` 含 `.next/types/**/*.ts`，故 `.next/types/` 內任何重複檔都會被納入編譯。該 ` 2.ts` 檔是檔案系統層的重複產物（本 repo 位於 `Documents/` 下的同步資料夾），不是候選改動產生的。
+- 受影響的 AC 或邊界：無 AC 失敗。受影響的是 G-8 的可信度——**這是假失敗，不是假通過**，方向是 fail-safe，但一個會亂叫的 gate 項會訓練人忽略它。
+- 觸發證據（三段式，可完整複現）：(1) `.next/types/` 清空重建後 `npx tsc --noEmit` → 離開碼 `0`；(2) 刻意 `cp '.next/types/routes.d.ts' '.next/types/routes.d 2.ts'` 後重跑 → **逐字重現同一則錯誤**、離開碼 `2`；(3) 刪除該檔後重跑 → 離開碼 `0`。且 `git diff --name-only 1f58ad8..HEAD -- '*.ts' '*.tsx'` 為空，候選一個原始碼檔都沒動。
+- 建議：materiality = **Deferred risk**（觸發已實際觀察到，但成因在環境不在候選）。task ownership = 本票自有範圍。disposition 建議 = **fix（一個子句）**：G-8 改為先 `npm run build`（會重建 `.next/types/`）再跑 `tsc`，或在跑 `tsc` 前 `rm -rf .next`。**非本輪引入。**
+
+### 驗證與可否證性
+
+- F-6 修法的核心可否證點是**兩個計數**：新判準 34、舊判準 0。若新判準也是 0，修法即與 F-6 同錯——本輪獨立解析 63 張票的 frontmatter 得到 34，反證成立。
+- 「指令與 AC 未變」以**位元組比對**斷言（257/241/1622 三個長度全等且 `==` 為 `True`），不是肉眼掃過；任何一個字元被動，比對即翻 `False`。
+- 「原句逐字保留」不是看有沒有引號，是把 cycle 2 的原句抽出來與 blockquote 內的字串做相等比較，得 `True`。
+- F-8 的歸因以**刻意重現**證明，不是推測：造一個重複檔就重現錯誤，刪掉就消失，來回兩次。若候選真有型別錯誤，清空 `.next/` 後仍會失敗——實測離開碼 `0`。
+- 理由 1 的評估可被單一事實推翻：若 `README.md:85` 的 `verdict` enum 不含 `REJECTED`，則理由 1 就是 F-6 的翻版；實測 enum 為 `PASSED or REJECTED`，故不是。
+- 理由 3 的評估可被推翻：若 `### Feedback Cycles` 不存在或從未被使用，該出口即為不可達；實測該節存在且已載 Cycle 1／Cycle 2 兩筆記錄。
+
+### Summary
+
+F-6 修好，且修法本身通過了與當初抓它時同一套標準：新判準 `status: complete` ∧ `verdict: PASSED` 實測 **34 張票構得到**，舊判準 `status: archived` **0 張**，兩個數字獨立重現；新判準恰好等於 `README.md:161` 定義的 workflow 終局狀態。`_archive/023` 的反例精確——35 張封存票中唯一一張未結案卻已封存的票，它證明判準必須看欄位不能看路徑。
+
+**implement 不照抄 FO 建議、改用更嚴的 `verdict: PASSED`，我判定正確並背書**，理由是 `REJECTED` 在 `README.md:85` 的 verdict enum 內（與 F-6 的 `archived` 不在 status enum 內是結構性差別）。同時誠實記下：全 repo 目前 0 張 `REJECTED`，這條更嚴的判準此刻與「非空」等價、實際空轉，價值在未來、代價為零。
+
+**第 3 項理由——人工出口——我的判斷是：出口真實存在、可執行、防的正是卡死，不會變成第二個 F-6。** 與 F-6 的分野是結構性的：`archived` 構造上不可達，而 captain 是 gate 的指定執行者、`Feedback Cycles` 是已載有兩筆記錄的活位置、G-4 是同形狀的既有人工項。但它**欠缺器械**：出口沒寫記在哪（前言的 Feedback Cycles 指示只涵蓋 `人工` 項，而這兩列是 `機械`），也沒有任何指令能驗證記錄存在。列為 F-7。
+
+無越界、無回歸：指令 `257B`／`241B`、AC `1622B`、原句逐字保留，三者位元組比對皆 `True`；`git diff` 只有本票一檔。
+
+**判定：PASSED。** 兩筆新 finding 皆為 Deferred risk、皆非本輪引入、皆不使任何 AC 失敗，依 `## Review-finding disposition` 只記錄不動位元組：**F-7** 人工出口未指定記錄位置；**F-8** G-8 的 `tsc` 會因 `.next/` 殘留假失敗（本輪實際撞到一次，已用刻意重現證明成因在環境不在候選）。兩者建議的修法各是一個子句，宜在 gate 實際執行前一併處置。
