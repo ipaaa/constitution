@@ -476,3 +476,89 @@ implement 的誠實度值得記錄：它主動以粗體自陳 AC-2 未達成、�
 **gate 目前仍不通過，而且應該不通過。** G-1／G-2 八張票全在 `design`、`verdict` 空；G-5 有三筆佔位命中。這兩件事各有其票，本輪依禁令一項未動。gate 的用途是在公開當下擋住，不是現在就綠燈。
 
 **AC-2 維持未達成。** 依 FO 指示不建立任何常設檢查機制，仍綁在未獲核准的 feature `039` 上。此項與 cycle 1 的記錄一致，本輪無新進展也無新阻擋。
+
+## Stage Report: verify (cycle 2)
+
+- DONE: 獨立重驗 F-2 是否真的修好：G-1 與 G-2 兩列現在是否有**可原樣重跑**的指令……貼出實際輸出與離開碼；並確認六個「機械」項現在全部有指令可跑，AC-4 的「可重跑」因此成立。
+  **成立。** 未閱讀表格取信，改以 python 從 `| G-1 `（`:167`）與 `| G-2 `（`:168`）兩列的反引號內抽出唯一以 `for n in` 開頭的字串（G-1 該列 7 個反引號區段中唯一一個、G-2 該列 3 個中唯一一個），分別寫入 `extracted-G-1.sh`（257 bytes）、`extracted-G-2.sh`（241 bytes），交給 `bash` 執行。輸出見下節，兩者離開碼皆 `0`。六個機械項現在全部有指令，AC-4 成立。
+- DONE: 重驗 F-3 與 F-4。
+  F-3 已修：`:121` 的句子移除括號內錯誤指令、`057` 結論逐字未改，`:123-128` 追加更正並說明重跑會輸出 `063` 的原因。F-4 只在第三節 `:178-180` 補三行記錄，`git diff --name-only c222313..HEAD -- src/ next.config.ts next.config.js package.json package-lock.json` **輸出為空**，build 產物、`layout.tsx`、Next.js 設定一個位元組未動。
+- DONE: 確認 cycle 2 沒有回歸也沒有越界……最後給出 PASSED 或 REJECTED 與理由。
+  無回歸、無越界。AC 文字逐位元組未改（見下節）。判定 **PASSED**。另記一筆新 finding **F-6**（非本輪引入、不阻擋本輪判定，須在 gate 實際執行前處置）。
+
+### F-2 重驗：從表格抽出、交給 bash 執行
+
+```
+$ bash extracted-G-1.sh                    $ bash extracted-G-2.sh
+058 status: design verdict:                049 status: design verdict:
+059 status: design verdict:                052 status: design verdict:
+060 status: design verdict:                G2_EXIT=0
+061 status: design verdict:
+062 status: design verdict:
+063 status: design verdict:
+G1_EXIT=0
+```
+
+**兩項都不通過 gate，而這是正確結果**——八張票都還在 `design`，gate 本來就該在公開當下才通過。
+
+**額外做一次可否證性探針**（implement 未做）：把 G-1 的票號換成三張已封存票加一個不存在的號碼，驗證 `_archive/` 分支與 `NOT FOUND` 分支都真的會動作，證明該指令不是恆真的空轉——
+`021 status: complete verdict: PASSED` ／ `026 status: complete verdict: PASSED` ／ `033 status: complete verdict: PASSED` ／ `999 NOT FOUND`，離開碼 `0`。指令確實會依 repo 狀態給出不同結果。
+
+### F-3／F-4 重驗
+
+| 項 | 檢查 | 實測 |
+|---|---|---|
+| F-3 舊指令 | `grep -c . <(ls docs/constitution-features/0*.md)` | `28`（cycle 1 時為 `22`；六張新票開立後檔案數 +6）。輸出隨檔案數漂移，與最大票號無關，**原判斷成立** |
+| F-3 新指令 | `ls docs/constitution-features/0*.md \| sed 's#.*/##' \| cut -d- -f1 \| sort -n \| tail -1` | `063`，正確 |
+| F-3 結論 | `057` 是否被改動 | 未改。`:121` 仍為「現有最大票號為 `057`，故 `058` 起連號無衝突」 |
+| F-3 原文 | 錯誤指令是否被悄悄刪除 | 否。更正區塊 `:124` 逐字重出原指令再說明它為何錯，符合 `AGENTS.md`「不要悄悄改寫原文」 |
+| F-4 指令 | `find .next/server/app -name '*.html' -exec grep -L 'content="noindex' {} +` | 只印 `.next/server/app/_global-error.html`；預製 HTML 共 `15` 個。與記錄一致 |
+| F-4 範圍 | `src/`／`next.config`／`package*` 是否被動 | `git diff --name-only c222313..HEAD` 對四者**皆空**。本輪 `056` 之外只有 merge 帶進的票檔 |
+
+### 無回歸確認
+
+| 項 | 實測 | 對比 cycle 1 |
+|---|---|---|
+| AC-3／G-7 | 七列；`1／5／1` | 一致 |
+| AC-3 相鄰性 | `binding at line 8; next line 9 =   robots: { index: false, follow: false },` | 逐字一致 |
+| G-5 | 三筆（`PresentDetail.tsx:32`、`contributors.ts:16`、`:21`） | 一致；**兩張對應票現在都存在**（`061`／`052`） |
+| G-6 | 離開碼型 `0`；印出型 `false false` | 一致 |
+| G-8 | `npx tsc --noEmit` 離開碼 `0` 無輸出；`npm run build` 離開碼 `0`，`16/16` 靜態頁 | 一致 |
+| `src/data/*.json` | build 前後 sha256 相同；且與 `main` 位元組相同（`git diff main..HEAD -- src/data/` 為空） | 一致 |
+| AC 文字 | `## Acceptance criteria` 段落與 `c222313` 比對：**1622 bytes 對 1622 bytes，`a == b` 為 `True`** | 一個位元組未改 |
+
+`src/app/layout.tsx` 相對 `main` 仍只有 cycle 1 那一行綁定（`+1／-0`），cycle 2 未再動它。
+
+### F-1 重驗（FO 修復，非本輪 implement 範圍）
+
+六張票全部 FOUND，且**標題與 design 第二節的指派逐字相符**：`058` 未接線元件移除與 CTA 數字對齊、`059` 測驗全站無入口、`060` `?public=true` 預覽開關失效、`061` 移除佔位信箱按鈕、`062` `h34` 與 `h35` 標題重複、`063` `requiredForRuling` 的法律正確性（114憲判9）。不是只有號碼對上：`061` 內文 `:20` 明寫 `PresentDetail.tsx:32` 的 `volunteer@addcourt.tw`，`052` 內文 `:16` 明寫 `src/data/contributors.ts` 六筆佔位。**G-5 三筆命中現在全部對應到已開立且確實擁有該處的票**，cycle 1 的 AC-1 缺口因此消失。
+
+我 cycle 1 判「六張票未開立」是對當時 worktree 的誠實觀察，但根因是 worktree 過時而非票未開；FO 的歸因正確，我接受更正。
+
+### 新 finding
+
+**F-6 — G-1／G-2 的機械通過條件指定了本 workflow 不存在的 `status` 值。**
+- 已釋出使用者與正常流程：captain 與 FO 依第三節「公開之前逐項跑」執行 gate。
+- 可觀察損害：兩列的通過條件寫「每張票印出的 `status` 為 `archived` 且 `verdict` 非空」，但本 workflow 沒有 `archived` 這個值。指令跑得出結果，**但該結果永遠不可能滿足所寫的條件**。這正是本票 Problem 一節要防的「一道不會被觸發的 gate」。
+- 受影響的 value AC 或邊界：無 AC 直接失敗（AC-4 只要求六個機械項有指令並產出輸出，這一點成立），受影響的是第三節 gate 機制本身的可結論性。
+- 觸發證據：`docs/constitution-features/README.md:81` 的 enum 為 `design, implement, verify, review, complete`；`grep -rl '^status: archived' docs/constitution-features/` **零命中**；全 repo `status:` 值統計為 `complete 34／design 27／verify 1／review 1`；上節探針顯示已封存的 `021`／`026`／`033` 印出的是 `status: complete verdict: PASSED`。
+- 建議：materiality = **Material**（gate 的機械條件不可達），惟兩列另有「或 captain 逐票明確接受並記錄理由」的人工出口，故非硬性阻斷，嚴重度低、修法為兩格各改一個詞。task ownership = **本票自有範圍**（不動 AC 文字）。disposition 建議 = **fix**：把 `archived` 改為 `complete`，或寫成「`complete` 且檔案已移入 `_archive/`」。
+- **此項非 cycle 2 引入**：原 design 的 G-1 列即如此寫，cycle 2 依授權只補指令、刻意保留通過條件原文，處置正確。**cycle 1 是我漏看**——我當時只查「有沒有指令」，沒查「條件可不可達」；是 cycle 2 讓指令可跑、我拿已封存票做探針才顯出來。**不阻擋本輪判定，但須在 gate 實際執行前處置。**
+
+### 驗證與可否證性
+
+- F-2 的「可原樣重跑」是**抽出執行**證明的，不是閱讀證明：若指令漏引號、誤含未轉義的 `|`、或 `_archive/` 分支寫錯，抽出後交給 `bash` 會報錯或輸出錯誤筆數。另以四票探針證明它會隨 repo 狀態改變輸出，排除恆真空轉。
+- AC 文字未改以**位元組比對**斷言（1622 == 1622 且 `a == b`），不是靠肉眼掃過。本輪若動了任何一個 AC 字元，此比對即為 `False`。
+- F-4 的「未越界」以 `git diff --name-only` 對 `src/`、`next.config.*`、`package*` 四個路徑斷言為空，不是靠 implement 的自述。
+- G-6 的可否證途徑不變：`h2` 或 `h28` 被重標 `Approved` 後同步回檔，印出型即翻 `true`、離開碼型翻 `1`。
+- F-6 的判定可被單一指令推翻：若 `grep -rl '^status: archived' docs/constitution-features/` 出現任何命中，或 README 的 enum 含 `archived`，此 finding 即不成立。兩者本輪皆已跑，皆否定。
+
+### Summary
+
+三項授權處置全部獨立重驗成立，且都在授權範圍內收手：F-2 的兩條指令從表格抽出後交給 `bash` 實跑，離開碼皆 `0`，六個機械項現在全部有指令，**AC-4 的「可重跑」成立**；F-3 換掉錯誤查法、逐字保留 `057` 結論並重出原指令說明錯在哪；F-4 只補三行記錄，`src/`、Next.js 設定、build 產物一個位元組未動。無回歸：AC-3 的 `1／5／1` 與 `awk` 相鄰性、`tsc`、`build`、`src/data/*.json` 與 `main` 相同，全部與 cycle 1 逐字一致，**AC 文字 1622 bytes 位元組相同**。
+
+F-1 經獨立重驗確認由 FO 修復：六張票不只號碼存在，標題與 design 指派逐字相符，`061`／`052` 內文確實擁有 G-5 命中的那兩處，cycle 1 的 AC-1 缺口消失。
+
+**判定：PASSED。** AC-1 成立（十五項各有結論，六個 `修` 項現在指向確實存在且擁有該處的票）；AC-3 成立；AC-4 成立；AC-2 維持未達成，但依 FO 指示綁在未獲核准的 feature `039`，歸因經獨立複核正確，且本輪未以任何替代方式假稱通過——**這是誠實的未達成，不是缺失**。
+
+**一項必須帶走：F-6。** gate 的 G-1／G-2 通過條件寫的 `status: archived` 在本 workflow 不存在（enum 為 `design/implement/verify/review/complete`，全 repo 零命中）。它不是 cycle 2 引入的，也不讓任何 AC 失敗，因此不阻擋本輪；但 gate 實際執行前必須處置，否則這兩項的機械條件永遠不可達。依 `## Review-finding disposition`，本階段只記錄、不動位元組，等 FO 授權。
