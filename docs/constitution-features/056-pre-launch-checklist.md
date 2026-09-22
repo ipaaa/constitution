@@ -11,6 +11,17 @@ worktree: .worktrees/spacedock-ensign-056-pre-launch-checklist
 issue:
 pr:
 mod-block:
+gates:
+    version: 1
+    records:
+        - id: gate:056:verify
+          stage: verify
+          attempts:
+            - id: gate-attempt:056-verify-1
+              briefing:
+                id: briefing:056:verify:attempt-1:revision-1
+                digest: sha256:a314d03de98cb8dc1316e5553cf8cfb0de9105e13b92b70e633173dcaaa232ca
+                room-ref: '@review/verify/briefing-1'
 ---
 
 網站目前是 `noindex` 且無對外網域，「讀者」是有連結的夥伴而非公眾。因此下列破口不是「今天要修」，而是**「公開之前必須為真」**。本票把六個散落的無票缺口收成一道 launch gate。
