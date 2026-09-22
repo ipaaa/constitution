@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:063:verify:attempt-1:revision-1",
+  "question": "verify cycle 3 判 PASSED——V10 已修好，且 reviewer 明說 implement 拒絕它原本排第一的方案是對的。要核可 063 進入 review 嗎？三件需你知道：一、**V11**（Needs decision，reviewer 不因此退回）：`REFERENCE_DATE` 還牽動倒數「1980 天後歸零」（以 LAST_UPDATED 起算應為 1835，高估 145 天）與席次圖的 TODAY 垂直線（畫在 2026-04-29 卻標 TODAY），兩者落在「待審案件」名詞之外、第二行標頭救不到；reviewer 判定傷害有限（絕對終點「2031年09月，最後 5 名大法官任期屆滿」就印在旁邊且完全正確；5.4 年跨度上 7% 誤差），病根是 `REFERENCE_DATE` 身兼「案件快照日」與「參照今日」兩職，根治屬第十二小節第 2 點那張票。二、**L5**（375px 導言六行）仍未量測，本環境八種旗標組合全部 SEGV，只有算術推估。三、**L1／L2／L3** 仍未拍板（現有總額是 8 還是 5、非整數門檻如何進位、全部違憲或部分違憲），`headcount` 維持 `null`，站上不印任何推算人數。另有 **V7** 建議另開票：`/quiz/*` 的 pending.ts:95 與 controversy.ts:83、以及 `page.tsx:201` 的「每年處理量約 30~40 件」。",
+  "artifacts": [
+    {
+      "id": "artifact:063:verify:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/80e08269d1718a0715c91db34c4f6b754dc45fdc/docs/constitution-features/063-required-for-ruling-legal-accuracy.md",
+      "rev": "sha256:54f92c1216ebabc7b101b01fcaf93e101e2763c13249a3387f7f454ce346e07d",
+      "mediaType": "text/markdown",
+      "summary": "站上每一條法律敘述都對得回一手來源，且經三輪逐字查核：114憲判1 的號次／案由／公告日 2025-12-19、主文違憲範圍（第4條第3項、第30條第2至6項、第95條）與第30條第1項未受審查仍有效、理由【41】【43】【50】的引文、115憲判6【30】、以及失效後六則判決的號次與日期逐筆，全部經 curl 實跑一手來源核對。最關鍵的攔截是查證陷阱：全國法規資料庫的資料截止日只落後 10 天，卻仍原樣顯示已失效的第30條第2至6項且該區塊內「失其效力｜失效｜憲判｜停止適用」命中 0 筆——只查該站會得到「10 人下限是現行法」這個錯誤結論。cycle 1 的兩項退回（同頁相鄰卡片互相否證、card 首句與判決語意相反）已修好，V1 走的是整句刪除而非換成另一個無來源敘述（實際 HTML 中「新進案量」「能結案的量」皆 0 筆）。cycle 2 的 V10（標頭由低報翻為高報）成因是 FO 的處置，已由兩行並排修好，且兩行各綁一個常數——將來兩個日期分岔會自己顯示在頁面上，不可能再無聲。AC1–AC7 三輪皆無回歸；具名 placeholder 掃描十項全 0；禁區三檔與 main 逐位元相同；跨輪渲染文字 diff 只多出一行。"
+    }
+  ]
+}

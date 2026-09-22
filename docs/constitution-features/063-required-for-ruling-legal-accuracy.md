@@ -11,6 +11,17 @@ worktree: .worktrees/spacedock-ensign-063-required-for-ruling-legal-accuracy
 issue:
 pr:
 mod-block:
+gates:
+    version: 1
+    records:
+        - id: gate:063:verify
+          stage: verify
+          attempts:
+            - id: gate-attempt:063-verify-1
+              briefing:
+                id: briefing:063:verify:attempt-1:revision-1
+                digest: sha256:bf931d2854e94bd2d770d9657dc1f6e6804af5b740ed055282f8d324407d7b65
+                room-ref: '@review/verify/briefing-1'
 ---
 
 確認 `requiredForRuling` 這項法律內容的正確性，並讓它有明確的負責人。
