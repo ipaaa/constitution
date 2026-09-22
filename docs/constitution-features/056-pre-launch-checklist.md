@@ -574,7 +574,7 @@ F-1 經獨立重驗確認由 FO 修復：六張票不只號碼存在，標題與
 
 ## Stage Report: implement (cycle 3)
 
-本輪只處理 F-6 一件事。未動 `src/`、build 產物、`layout.tsx`、Next.js 設定、`PresentDetail.tsx`，未跑 `sync-content`。
+本輪只處理 F-6 一件事，全部改動在 commit `5c1be8c`。未動 `src/`、build 產物、`layout.tsx`、Next.js 設定、`PresentDetail.tsx`，未跑 `sync-content`。
 
 - DONE: 把第三節 G-1 與 G-2 兩格的通過條件從「`status` 為 `archived` 且 `verdict` 非空」改成實際可達成的判準（封存票的實際訊號是 `status: complete` 且 `verdict` 非空，檔案並已移入 `_archive/`）；原句以追加補述方式保留並說明它為何不可達成，比照先前處理 F-3 的作法。不得改動兩列的指令本身，也不得改動任何 AC 文字。
   `:167`（G-1）改為「`status` 為 `complete` 且 `verdict` 為 `PASSED`」；`:168`（G-2）改為「同 G-1（含 2026-09-22 的更正）」。`:176-183` 追加七行 blockquote，逐字保留原句並說明它為何構不到。**指令與 AC 皆逐字未變**，以程式比對證明（見下節）。
