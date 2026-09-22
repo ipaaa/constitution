@@ -1,7 +1,7 @@
 ---
 id: 063
 title: requiredForRuling 的法律正確性（114憲判1）
-status: verify
+status: implement
 source: constitution-features/056 第二節 D3
 started: 2026-09-21T21:16:25Z
 completed:
@@ -880,3 +880,111 @@ cycle 1 退回的兩項都真的修好了，而且修的方式是對的。V1 走
 最有說服力的單一證據是跨輪的渲染文字 `diff`：整頁可見文字只有四處變動，全部是授權範圍內的。這同時證明了沒有越界——V7／V8 零變動、AC 全節逐字未變、`headcount` 仍是 `null`、`REFERENCE_DATE` 未動。七項 AC 無回歸，具名 placeholder 掃描全 0，禁區三檔與 main 逐位元相同。
 
 留一句給 gate：V10 是我這輪唯一的新 finding，它不改變裁決（FO 已就 V3 做過處置，我不 re-triage），但**它是發布前值得 captain 看一眼的東西**——標頭現在說資料更新到 2026-09-21，而案件年齡、TODAY 線與倒數都還停在 2026-04-29，而且 `future.ts:30` 的程序註解仍寫著這兩個日期應該一起動。最便宜的處理是改一處標頭文案。另外 L5（375px 六行）仍未量測，本環境無法量測，gate 必須照實列為未達成。
+
+## Stage Report: implement (cycle 3)
+
+處理 verify cycle 2 的新 finding V10。授權範圍只有兩件事，兩件都不動任何常數。
+
+- DONE: `/future` 標頭不得再讓讀者高估待審案件資料的新鮮度；貼出改完後實際 HTML 的標頭字樣。**不得動 `REFERENCE_DATE` 與 `LAST_UPDATED` 兩個常數本身。**
+  採第二種作法（維持原字樣＋加一行）。實際 HTML 標頭現為兩行，見下方「標頭實際字樣」。兩個常數零變動（`git diff 2ebfdae..HEAD -- src/data/future.ts` 不含任何 `REFERENCE_DATE = ` 或 `LAST_UPDATED = ` 的增刪行）。
+- DONE: `src/data/future.ts:30` 的 Refresh procedure 第 1 步改寫，並貼出改動前後對照。
+  對照見下方「Refresh procedure 前後對照」。
+- DONE: 確認本輪未越界。
+  `git diff --name-only 2ebfdae..HEAD` 只有本票、`src/app/future/page.tsx`、`src/data/future.ts`（另有兩筆是 verify 與 FO 自己的 commit，非本輪產出）。AC 全節自 `7f1f44e` 以來**逐字相同**（2425 bytes，程式比對）。`headcount` 仍為 `null`。`src/data/discussions.json`、`history.json`、`LaunchGate.tsx`、`quizzes/pending.ts`、`quizzes/controversy.ts`、`controversy-timeline.ts`、`docs/design-assets/` 與 `main` **逐位元相同**。`page.tsx:201` 的「30~40 件」依授權未動。
+
+### V10 的成因
+
+**V10 是 FO 在 cycle 1 的 V3 處置造成的，不是 implement 的執行偏差。**
+cycle 1 FO 裁定「只更新 `LAST_UPDATED`，不動 `REFERENCE_DATE`」，implement 精確照做，
+並在 `LAST_UPDATED` 的 JSDoc 主動揭露殘留。但拆開兩個日期的後果是標頭從**低報**翻成**高報**：
+cycle 1 的低報被本票新增內容當場戳破，讀者看得見矛盾；cycle 2 的高報讓案件清單默默過期，
+讀者沒有任何線索。本票製造出這個 delta，故由本票修。
+
+### 為什麼選第二種作法
+
+FO 給兩個選項，判準是「讀者看完標頭後不會高估案件清單的新鮮度」。
+
+選**維持「資料更新日期」原字樣＋加一行「待審案件統計截至 2026-04-29」**。理由：
+只把標籤改成「門檻資料更新日期」雖然把宣稱範圍縮小了，但讀者仍然**不知道案件清單是什麼時候的**——
+它靠省略來避免高估。頁面正下方就印著「473 件待審案件」，讀者看到一個九月的日期，
+仍可能把 473 當成九月的數字。第二種作法把兩個日期並排攤開，讀者不必推論。
+
+實作上「2026-04-29」直接讀 `REFERENCE_DATE` 常數，不寫死字串——
+日後有人更新案件快照時，這一行會自動跟上，不會再漂移成第二個 V10。
+
+### 標頭實際字樣（副本作法取得的真 HTML，124,296 bytes）
+
+```
+Constitutional Emergency
+資料更新日期：2026-09-21
+待審案件統計截至 2026-04-29
+15 名大法官，僅存 5 名運作（三名不參與評議會）
+```
+
+### Refresh procedure 前後對照（`src/data/future.ts`）
+
+改動前（一行）：
+
+```
+// 1. Update `REFERENCE_DATE` and `LAST_UPDATED` below to the new snapshot date.
+```
+
+改動後：
+
+```
+// 1. The two dates below are NOT the same thing and are no longer updated together.
+//
+//    `REFERENCE_DATE` — the case-list snapshot date. `daysPending` is derived
+//    from each `filingDate` against it, and the justice-seat chart's TODAY line
+//    and countdown are drawn from it. Update it ONLY together with steps 2-4,
+//    because moving it re-ages every case and moves the chart.
+//
+//    `LAST_UPDATED` — the date shown in the page header. It records when the
+//    data on this page was last refreshed, which is not necessarily the
+//    case-list snapshot date.
+//
+//    They may legitimately differ. As of 2026-09-21 they do: the ruling-threshold
+//    content (`RULING_THRESHOLD`, `RULINGS_SINCE_FLOOR_VOIDED`) was refreshed on
+//    2026-09-21, while the case list is still the 2026-04-29 snapshot. The page
+//    header therefore prints both dates — see `src/app/future/page.tsx`. If you
+//    refresh the case list, set both to the new snapshot date and the two header
+//    lines will agree again.
+```
+
+### 實跑驗證（副本作法，候選檔零變動）
+
+```
+AC3: PASS      AC4: PASS（'10' 3 個，未標註 0）
+V1 無「無法達到判決門檻」: True
+標頭兩行皆在：資料更新日期：2026-09-21 ✓　待審案件統計截至 2026-04-29 ✓
+```
+
+`git status --porcelain` 全程只有本票一個檔；`diff -rq` 確認副本與候選的 `src/`
+只差 `LaunchGate.tsx` 一檔。`npx tsc --noEmit` exit 0。
+
+### 一件與本票無關的環境雜訊（已處理，記錄備查）
+
+`npx tsc --noEmit` 本輪一度回報 `.next/types/routes.d 2.ts(65,8): error TS2300:
+Duplicate identifier 'LayoutProps'`。該檔與 `.next/types/validator 2.ts` 是**檔案同步工具
+產生的重複檔**（檔名帶「 2」，與正本 `diff` 逐位元相同，時間戳為 2026-09-21 15:53）。
+本專案位於 `~/Documents` 下，屬雲端同步路徑。
+
+兩檔皆在 `.next/`，`.gitignore:17` 已忽略，`git ls-files .next` 為空，**與候選產出無關**。
+已刪除該兩個重複檔，`tsc` 隨即 exit 0；`npm run build` 會重新產生它們。
+`find src docs -name "* 2.*"` 無命中，原始碼目錄乾淨。
+記在此是因為它會再發生，而症狀（tsc 報 duplicate identifier）看起來像程式碼問題，其實不是。
+
+### Summary
+
+V10 兩項都完成，兩個日期常數零變動。標頭改為並排兩行，讀者同時看到
+「資料更新日期：2026-09-21」與「待審案件統計截至 2026-04-29」，不必推論就知道
+案件清單不是九月的數字。選這個作法而不是改標籤，是因為改標籤只縮小宣稱範圍、
+不告訴讀者案件清單的日期，靠省略避免高估；而頁面正下方就印著 473 件待審。
+案件日期直接讀 `REFERENCE_DATE`，不寫死字串，避免日後再漂移。
+
+`future.ts` 的 Refresh procedure 第 1 步原本寫「把兩個日期一起更新」，在兩者被拆開後
+已成錯誤指示。改寫為各自的意義、為何現在不同步、何時可以分開動，並指向標頭那兩行。
+
+V10 的成因是 FO 在 cycle 1 的 V3 處置，不是 implement 的執行偏差，已記在上方專節。
+V7／V8 與 `page.tsx:201` 的「30~40 件」依授權維持零變動。
+L1／L2／L3／L5 仍未拍板，`headcount` 維持 `null`。
