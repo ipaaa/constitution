@@ -1,7 +1,7 @@
 ---
 id: 056
 title: 上線前檢查清單：公開之前每一項都必須有結論
-status: verify
+status: implement
 source: captain 2026-09-07（把關機制體檢與任務地圖的綜合結論）
 started: 2026-09-21T18:56:47Z
 completed:
@@ -164,14 +164,23 @@ grep -rn '056-pre-launch-checklist' src/app/layout.tsx docs/health-check/TODO.md
 
 | 項 | 類型 | 內容 | 通過條件 |
 |---|---|---|---|
-| G-1 | 機械 | `058`–`063` 六張新票的狀態 | 指令（2026-09-21 補，整列可原樣複製執行，不含需轉義的字元）：`for n in 058 059 060 061 062 063; do f=$(ls docs/constitution-features/$n-*.md docs/constitution-features/_archive/$n-*.md 2>/dev/null); if test -n "$f"; then echo "$n $(grep -m1 '^status:' $f) $(grep -m1 '^verdict:' $f)"; else echo "$n NOT FOUND"; fi; done`。通過條件：每張票印出的 `status` 為 `archived` 且 `verdict` 非空，或 captain 逐票明確接受並記錄理由。任一張印 `NOT FOUND` 即不通過 |
-| G-2 | 機械 | `052`、`049` 兩張既有票 | 指令（2026-09-21 補）與 G-1 同一條，只換票號：`for n in 049 052; do f=$(ls docs/constitution-features/$n-*.md docs/constitution-features/_archive/$n-*.md 2>/dev/null); if test -n "$f"; then echo "$n $(grep -m1 '^status:' $f) $(grep -m1 '^verdict:' $f)"; else echo "$n NOT FOUND"; fi; done`。通過條件同 G-1 |
+| G-1 | 機械 | `058`–`063` 六張新票的狀態 | 指令（2026-09-21 補，整列可原樣複製執行，不含需轉義的字元）：`for n in 058 059 060 061 062 063; do f=$(ls docs/constitution-features/$n-*.md docs/constitution-features/_archive/$n-*.md 2>/dev/null); if test -n "$f"; then echo "$n $(grep -m1 '^status:' $f) $(grep -m1 '^verdict:' $f)"; else echo "$n NOT FOUND"; fi; done`。通過條件（**2026-09-22 更正，原條件不可達成，原句與理由見表下補述**）：每張票印出的 `status` 為 `complete` 且 `verdict` 為 `PASSED`，或 captain 逐票明確接受並記錄理由。印出 `NOT FOUND`、`verdict` 為空、或 `verdict` 為 `REJECTED`，一律視為該項尚未有結論，不通過 |
+| G-2 | 機械 | `052`、`049` 兩張既有票 | 指令（2026-09-21 補）與 G-1 同一條，只換票號：`for n in 049 052; do f=$(ls docs/constitution-features/$n-*.md docs/constitution-features/_archive/$n-*.md 2>/dev/null); if test -n "$f"; then echo "$n $(grep -m1 '^status:' $f) $(grep -m1 '^verdict:' $f)"; else echo "$n NOT FOUND"; fi; done`。通過條件同 G-1（含 2026-09-22 的更正）|
 | G-3 | 人工 | Vercel 的 Build Command 與 `NEXT_PUBLIC_PUBLIC_MODE` 實際值 | captain 開 dashboard 確認並把實際值抄回本票 |
 | G-4 | 人工 | A1、A4、B1b 三項「明確接受」 | captain 簽字，理由寫入本票 |
 | G-5 | 機械 | 佔位字串全站掃描 | `grep -rniE '某學者\|某大學\|lorem ipsum\|前端工程師 [AB]\|volunteer@addcourt\.tw\|快速了解最新判決的5個重點' src/` 零命中 |
 | G-6 | 機械 | D1／D2 的反向保護 | `node -e "const a=require('./src/data/history.json');const i=a.map(x=>x.id);if(i.includes('h2')\|\|i.includes('h28'))process.exit(1)"` 回傳 0。若任一列回來了，表示有人重新標了 `Approved`，必須先有法學確認記錄 |
 | G-7 | 機械 | gate 綁定仍在 | 上面那條 `grep -rn '056-pre-launch-checklist'` 三檔皆命中 |
 | G-8 | 機械 | 建置與型別 | `npx tsc --noEmit` 與 `npm run build` 皆通過 |
+
+> **2026-09-22 更正：G-1／G-2 的原通過條件寫錯了，永遠不可能成立，已換掉。兩列的指令本身不變。**
+> 原句為：「每張票印出的 `status` 為 `archived` 且 `verdict` 非空，或 captain 逐票明確接受並記錄理由。任一張印 `NOT FOUND` 即不通過」。
+> **它為何不可達成**：本 workflow 的 `status` 沒有 `archived` 這個值。`README.md:81` 寫明 enum 是 `design`／`implement`／`verify`／`review`／`complete`；`grep -rl '^status: archived' docs/constitution-features/` 命中 **0 張票**。
+> 指令跑得動，但它比對的標準構不到——這正是本票 Problem 一節要防的事：一道**永遠不會通過**的 gate 等於沒有 gate。
+> **為何改成 `verdict` 為 `PASSED`，而不是沿用「`verdict` 非空」**：`verdict` 非空包含 `REJECTED`。本 gate 的用意是「每一項都必須有結論——修好、明確接受、或移除」，而一張 `REJECTED` 的後續票代表它的工作**沒有被接受**，那一項並沒有修好。沿用「非空」會讓一張被否決的票也算通過，是第二道假通過。
+> **為何不能只看檔案在不在 `_archive/`**：`_archive/023-owl-mascot-unification.md` 的 `status` 是 `design`、`verdict` 是空的。票可以未結案就被封存。**人在 `_archive/` 不代表有結論。** 實測 35 張封存票中，34 張為 `complete`＋`PASSED`，`023` 是唯一的例外，也正是這個例外證明了判準必須看 `status` 與 `verdict`，不能看路徑。
+> **`REJECTED` 與空 `verdict` 怎麼辦**：一律視為該項尚未有結論，走原本就寫在條件裡的那條出口——captain 逐票明確接受並記錄理由，或另開後續票。gate 不替被否決的票背書。
+> 本次只改 G-1／G-2 兩格的通過條件。G-3 至 G-8 的通過條件已逐條複核，無同類的不可達成問題。
 
 八項全數通過，才移除 `layout.tsx:8`。移除後在本票 Feedback Cycles 記下執行日期與 commit SHA，並把本票 `status` 推進到封存。
 
@@ -562,3 +571,60 @@ F-1 經獨立重驗確認由 FO 修復：六張票不只號碼存在，標題與
 **判定：PASSED。** AC-1 成立（十五項各有結論，六個 `修` 項現在指向確實存在且擁有該處的票）；AC-3 成立；AC-4 成立；AC-2 維持未達成，但依 FO 指示綁在未獲核准的 feature `039`，歸因經獨立複核正確，且本輪未以任何替代方式假稱通過——**這是誠實的未達成，不是缺失**。
 
 **一項必須帶走：F-6。** gate 的 G-1／G-2 通過條件寫的 `status: archived` 在本 workflow 不存在（enum 為 `design/implement/verify/review/complete`，全 repo 零命中）。它不是 cycle 2 引入的，也不讓任何 AC 失敗，因此不阻擋本輪；但 gate 實際執行前必須處置，否則這兩項的機械條件永遠不可達。依 `## Review-finding disposition`，本階段只記錄、不動位元組，等 FO 授權。
+
+## Stage Report: implement (cycle 3)
+
+本輪只處理 F-6 一件事。未動 `src/`、build 產物、`layout.tsx`、Next.js 設定、`PresentDetail.tsx`，未跑 `sync-content`。
+
+- DONE: 把第三節 G-1 與 G-2 兩格的通過條件從「`status` 為 `archived` 且 `verdict` 非空」改成實際可達成的判準（封存票的實際訊號是 `status: complete` 且 `verdict` 非空，檔案並已移入 `_archive/`）；原句以追加補述方式保留並說明它為何不可達成，比照先前處理 F-3 的作法。不得改動兩列的指令本身，也不得改動任何 AC 文字。
+  `:167`（G-1）改為「`status` 為 `complete` 且 `verdict` 為 `PASSED`」；`:168`（G-2）改為「同 G-1（含 2026-09-22 的更正）」。`:176-183` 追加七行 blockquote，逐字保留原句並說明它為何構不到。**指令與 AC 皆逐字未變**，以程式比對證明（見下節）。
+- DONE: 自行判斷通過條件該不該同時要求 `verdict: PASSED`，或該如何處理 `verdict: REJECTED`（被取代／作廢的後續票代表該項並未被修好），並把判斷理由寫進 stage report——不接受只改一個字。
+  **判斷：要求 `verdict: PASSED`，比 FO 括號內建議的「`verdict` 非空」更嚴。理由見下方「判斷理由」一節。**
+- DONE: 貼出改完後把 G-1／G-2 兩列指令原樣抽出執行的實際輸出與離開碼，並對照新的通過條件逐票說明現在為何仍不通過（八張票皆未結案，這是正確結果）。
+  輸出與逐票對照見下方「逐票對照」一節。八張票全部 `status: design`、`verdict` 空，兩條指令離開碼皆 0。
+
+### 判斷理由：為何是 `PASSED`，不是「非空」
+
+FO 的括號寫「`status: complete` 且 `verdict` 非空」。**我刻意沒照抄，改用 `verdict: PASSED`。** 三個理由：
+
+1. **「非空」把 `REJECTED` 也算通過。** 本 gate 的用意是「每一項都必須有結論——修好、明確接受、或移除」。一張 `verdict: REJECTED` 的後續票代表它的工作**沒有被接受**，那一項並沒有修好。用「非空」會讓一張被否決的票替該項背書，這是第二道假通過——與本票要防的事同型。
+2. **「在 `_archive/` 裡」本身不是結論的證據。** `_archive/023-owl-mascot-unification.md` 的 `status` 是 `design`、`verdict` 是空的。票可以**未結案就被封存**。所以判準必須看 `status` 與 `verdict` 兩個欄位，不能看檔案路徑。實測 35 張封存票中 34 張為 `complete`＋`PASSED`，`023` 是唯一例外，而正是這個例外證明路徑靠不住。
+3. **`REJECTED` 與空 `verdict` 不是死路，有既有出口。** 兩列原本就寫著「或 captain 逐票明確接受並記錄理由」。我把 `REJECTED`、空 `verdict`、`NOT FOUND` 三種情形一律歸為「尚未有結論」，走這條人工出口，或另開後續票。gate 不替被否決的票背書，但也不會因此卡死。
+
+### 逐票對照：現在為何仍不通過
+
+G-1 抽出執行（離開碼 0）：
+
+| 票 | 指令輸出 | 對照新條件 |
+|---|---|---|
+| `058` | `status: design` `verdict:` | 非 `complete`，`verdict` 空 → 尚未有結論 |
+| `059` | `status: design` `verdict:` | 同上 |
+| `060` | `status: design` `verdict:` | 同上 |
+| `061` | `status: design` `verdict:` | 同上 |
+| `062` | `status: design` `verdict:` | 同上 |
+| `063` | `status: design` `verdict:` | 同上 |
+
+G-2 抽出執行（離開碼 0）：`049` 與 `052` 同樣 `status: design`、`verdict` 空，兩張皆尚未有結論。
+
+**八張票全部不通過，這是正確結果。** 六張新票 `058`–`063` 是本票 implement 階段才由 FO 開立的，兩張既有票 `049`／`052` 也還在 `design`。gate 的用途是在公開當下擋住，不是現在就綠燈。
+
+### 驗證與可否證性
+
+- **新判準構得到，舊判準構不到**——這是 F-6 的核心可否證點。掃全 repo：符合 `status: complete` 且 `verdict: PASSED` 的票有 **34 張**；符合舊條件 `status: archived` 的票有 **0 張**。拿兩張已封存票套 G-1 的指令形狀：`044 status: complete verdict: PASSED`、`033 status: complete verdict: PASSED`，兩張都會過新條件。若新判準也是零命中，本輪的修法即與 F-6 同錯。
+- **指令逐字未變**：從 HEAD 版本與工作區版本的 `| G-1 `／`| G-2 ` 兩列各抽出反引號內字串比對，`G-1 指令逐字未變: True`、`G-2 指令逐字未變: True`。若我順手動了指令，此比對即為 `False`。
+- **AC 文字逐字未變**：比對兩版的 `## Acceptance criteria` 段落，`True`。
+- **抽出執行仍可跑**：改完後重新抽出兩列指令交給 `bash`，G-1 印六列、G-2 印兩列，離開碼皆 0。修通過條件沒有破壞可重跑性。
+- **殘留檢查**：`grep -n 'archived' 本票` 只剩兩類命中——`:177-178` 是刻意逐字保留的原句與它的反證，其餘全在既往 stage report 與 verify 報告內，屬歷史記錄，依專案規範不改寫。本票已無任何**現行有效**的條件仍以 `archived` 為判準。
+- **未越界**：本輪 `git diff --name-only` 只有本票一個檔案，`--numstat` 為 `+69／-3`。三筆刪除逐筆交代：`status: verify` 是 **FO 推進階段改的 frontmatter**，本 ensign 開工前就在工作區，非本 ensign 所改；另兩筆是 G-1／G-2 兩列被整列取代，其中指令部分已證明逐字相同，被改的只有通過條件那一句，原句已逐字保留在 `:177`。**無以刪改掩蓋。**
+
+### 一件觀察，未改，供 FO 判斷
+
+第三節結尾那句「並把本票 `status` 推進到封存」用的是白話的「封存」，不是機器判準，故不屬 F-6 同型問題，本輪依指示未改。若 FO 認為該與新判準用語對齊（改寫為 `complete` 並移入 `_archive/`），請另行授權；我不自行擴張範圍。G-3 至 G-8 的通過條件已逐條複核，無不可達成的判準。
+
+### Summary
+
+F-6 修好：G-1／G-2 的通過條件從一個 workflow 裡根本不存在的 `status: archived`，換成實測 34 張票構得到的 `status: complete` 且 `verdict: PASSED`。原句逐字保留在表下補述，並附上「為何構不到」的反證指令。
+
+**我沒有照抄 FO 括號內的建議。** FO 寫「`verdict` 非空」，我改用 `verdict: PASSED`，因為「非空」包含 `REJECTED`——一張被否決的後續票不代表該項修好了，沿用「非空」會做出第二道假通過。`REJECTED`、空 `verdict`、`NOT FOUND` 三者一律歸為「尚未有結論」，走兩列原本就有的 captain 人工出口。
+
+順帶找到一件支持這個判斷的事實：`_archive/023` 的 `status` 是 `design`、`verdict` 是空的。**票可以未結案就被封存**，所以判準不能看檔案在不在 `_archive/`，必須看兩個欄位。
