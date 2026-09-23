@@ -744,7 +744,7 @@ F-6 修好，且修法本身通過了與當初抓它時同一套標準：新判�
 - DONE: F-8：G-8 補一句——先 `npm run build`（重建 `.next/types/`）或 `rm -rf .next` 再跑 `npx tsc --noEmit`；並寫明成因（`tsconfig.json` 的 include 含 `.next/types/**/*.ts` 而 exclude 只有 `node_modules`，本專案位於 `~/Documents/` 下的同步資料夾會產生檔名帶「 2」的重複檔），讓 gate 執行者遇到時知道這是環境問題、不要去改原始碼。貼出改完後照新步驟實跑的輸出與離開碼。
   `:174` 的 G-8 通過條件補上執行順序；`:193-197` 追加補述，寫明成因、解法與三段實測。照新步驟實跑：`npm run build` 離開碼 `0`，接著 `npx tsc --noEmit` 無輸出、離開碼 `0`。
 - DONE: 確認未越界也未回歸：G-1／G-2 的**指令本身**與 F-6 修好的通過條件逐字未變（自行抽出比對）、AC 全節逐字未變、`git diff` 只有本票一個檔案；並重跑 AC-3 的三檔 `grep` 與 `awk` 相鄰性確認無回歸。
-  六項全部 `True`／無回歸，逐項輸出見下方「驗證與可否證性」。本輪 `git diff --numstat` 為 `+16／-3`，只有本票一檔。
+  六項全部 `True`／無回歸，逐項輸出見下方「驗證與可否證性」。本輪只有本票一檔；修法本身為 `+16／-3`，連同本節 stage report 一併提交後為 `+59／-3`（commit `c2988e8`）。
 
 ### F-7：這條出口現在怎麼被查核
 
@@ -768,11 +768,11 @@ F-6 修好，且修法本身通過了與當初抓它時同一套標準：新判�
 - **AC 全節逐字未變**：`True`。
 - **AC-3 無回歸**：三檔命中數仍為 `1／5／1`；`awk` 相鄰性仍為 `binding at line 8; next line 9 =   robots: { index: false, follow: false },`。
 - **其餘機械項無回歸**：G-6 `false false`；G-7 三檔共七列命中。
-- **未越界**：`git diff --name-only` 只有本票一檔，`--numstat` `+16／-3`。三筆刪除逐筆交代：`status: verify` 是 **FO 推進階段改的 frontmatter**，本 ensign 開工前就在工作區；另兩筆是 G-1 與 G-8 兩列被整列取代，G-1 的指令部分已證明逐字相同、F-6 判準片段仍在，G-8 只在原通過條件前加上執行順序。**無以刪改掩蓋。**
+- **未越界**：`git diff --name-only` 只有本票一檔。修法本身 `+16／-3`；連同本節 stage report 提交為 `+59／-3`。三筆刪除逐筆交代：`status: verify` 是 **FO 推進階段改的 frontmatter**，本 ensign 開工前就在工作區；另兩筆是 G-1 與 G-8 兩列被整列取代，G-1 的指令部分已證明逐字相同、F-6 判準片段仍在，G-8 只在原通過條件前加上執行順序。**無以刪改掩蓋。**
 
 ### Summary
 
-F-7 與 F-8 都修好，本輪 `git diff` 只有本票一檔。F-7 給那條原本「存在但查不到」的出口指定了記錄位置（`### Feedback Cycles`，固定格式）與一條逐票印 `RECORDED`／`NO-RECORD` 的查核指令，並以副本翻轉測試證明它翻得動，不是裝飾品。F-8 在 G-8 前面補上「先 `npm run build` 或 `rm -rf .next`」，並寫明成因是 `~/Documents/` 同步資料夾產生的重複檔被 `tsconfig` 的 `include` 掃進去——寫進票裡是為了讓 gate 執行者遇到時不要去改原始碼。
+F-7 與 F-8 都修好，本輪 `git diff` 只有本票一檔，全部改動在 commit `c2988e8`。F-7 給那條原本「存在但查不到」的出口指定了記錄位置（`### Feedback Cycles`，固定格式）與一條逐票印 `RECORDED`／`NO-RECORD` 的查核指令，並以副本翻轉測試證明它翻得動，不是裝飾品。F-8 在 G-8 前面補上「先 `npm run build` 或 `rm -rf .next`」，並寫明成因是 `~/Documents/` 同步資料夾產生的重複檔被 `tsconfig` 的 `include` 掃進去——寫進票裡是為了讓 gate 執行者遇到時不要去改原始碼。
 
 **一件必須講的事：F-7 的查核指令我沒有照自己第一版寫法交付。** 第一版用中文前綴與中文輸出，從文件抽出成獨立腳本跑會逐圈噴 `grep: illegal byte sequence`，`LC_ALL` 明寫也沒用。一條在本機跑就報錯的指令不算「可查核」，所以改成純 ASCII 前綴 `gate-exception` 與 `RECORDED`／`NO-RECORD` 輸出，實測乾淨。記錄行的其餘內容仍是中文。
 
