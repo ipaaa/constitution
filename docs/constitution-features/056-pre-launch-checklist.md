@@ -11,6 +11,25 @@ worktree: .worktrees/spacedock-ensign-056-pre-launch-checklist
 issue:
 pr:
 mod-block:
+gates:
+    version: 1
+    records:
+        - id: gate:056:verify
+          stage: verify
+          attempts:
+            - id: gate-attempt:056-verify-1
+              briefing:
+                id: briefing:056:verify:attempt-1:revision-1
+                digest: sha256:a314d03de98cb8dc1316e5553cf8cfb0de9105e13b92b70e633173dcaaa232ca
+                room-ref: '@review/verify/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:056:verify:1
+                briefing: briefing:056:verify:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-23T17:49:23.330602Z"
+                decision: revise
+                reason: captain 2026-09-23 退回，並授權本票的 Cycle 3（README 的 disposition 規定 Cycle 3 升級給 captain，此授權即為該升級的答覆）。理由：本票的交付物就是「一道能被執行的 gate」，而 F-7 與 F-8 兩項恰恰是關於它能不能被執行——F-7 的「captain 逐票明確接受」出口沒有記錄位置也沒有查核指令（章節導言把「寫在 Feedback Cycles」限定在人工項，而 G-1／G-2 標的是機械項，涵蓋不到）；F-8 的 G-8 會因 .next 殘留重複檔假性失敗，本輪實際撞到一次，而一個會狼來了的檢查項最後會被忽略。兩項修法各是一個子句，留到後續票等於把這張票存在的理由留一半沒做完。
 ---
 
 網站目前是 `noindex` 且無對外網域，「讀者」是有連結的夥伴而非公眾。因此下列破口不是「今天要修」，而是**「公開之前必須為真」**。本票把六個散落的無票缺口收成一道 launch gate。
@@ -778,3 +797,121 @@ F-7 與 F-8 都修好，本輪 `git diff` 只有本票一檔，全部改動在 c
 **一件必須講的事：F-7 的查核指令我沒有照自己第一版寫法交付。** 第一版用中文前綴與中文輸出，從文件抽出成獨立腳本跑會逐圈噴 `grep: illegal byte sequence`，`LC_ALL` 明寫也沒用。一條在本機跑就報錯的指令不算「可查核」，所以改成純 ASCII 前綴 `gate-exception` 與 `RECORDED`／`NO-RECORD` 輸出，實測乾淨。記錄行的其餘內容仍是中文。
 
 **AC-2 維持未達成**，仍綁在未獲核准動工的 feature `039`，本輪未以任何替代方式宣稱通過，也未自建常設檢查機制。gate 整體仍不通過（G-1／G-2 八張票皆未結案、G-5 三筆佔位命中），各有其票，依禁令未動。
+
+## Stage Report: verify (cycle 4)
+
+- DONE: 獨立重驗 F-7：把新的查核指令從文件抽出成獨立腳本執行，貼出實際輸出與離開碼；並獨立重現它的翻轉測試。
+  抽出為 194 bytes 的獨立腳本（純 ASCII 確認 `True`），執行輸出八張票全部 `NO-RECORD`、離開碼 `0`、**stderr 為 0 bytes**（無 `illegal byte sequence`）。翻轉測試在副本上獨立重現：補一筆 `058` 的例外記錄後，同一腳本把 `058` 印成 `RECORDED`、其餘七張不變。**出口翻得動，不是裝飾品。**
+- DONE: 獨立重驗 F-8：照 G-8 新的執行順序實跑，貼出兩段離開碼；並判定補述對成因的描述是否足以讓 gate 執行者不會去改原始碼。
+  四段實跑全部通過，含一段 implement 未做的**復原驗證**：`npm run build` 確實會刪掉殘留檔。補述**足以**阻止執行者改原始碼——但它指名的成因（iCloud）經查不成立，見 F-10。
+- DONE: 判定 implement 的論證是否成立……以及新的固定格式會不會因為格式漂移而讓查核指令漏掉真實存在的例外記錄。最後確認未越界並給出 PASSED 或 REJECTED。
+  論證**成立**。格式漂移**會**漏掉，但漏的方向全部是 fail-safe；真正的問題是反方向的 **fail-open**，見 F-9。未越界，判定 **PASSED**。
+
+### F-7 重驗：抽出執行與翻轉測試
+
+```
+$ bash f7-check.sh            (194 bytes, pure ASCII = True)
+058 NO-RECORD   059 NO-RECORD   060 NO-RECORD   061 NO-RECORD
+062 NO-RECORD   063 NO-RECORD   049 NO-RECORD   052 NO-RECORD
+EXIT=0          stderr = 0 bytes
+```
+
+**翻轉測試（在副本上，候選位元組未動）**：複製本票到暫存目錄 → 於 `### Feedback Cycles` 補一筆 `058` 的例外記錄 → 同一腳本輸出 `058 RECORDED`，其餘七張仍 `NO-RECORD`、離開碼 `0`。事後 `git status --porcelain` 對候選為空。**翻得動。**
+
+**關於 `grep: illegal byte sequence`：我無法重現，但這不影響結論。** 我以中文前綴的變體在本機測了 ugrep 7.8.4 與 `/usr/bin/grep`、四種 locale（未設／`C`／`POSIX`／`en_US.UTF-8`）、腳本與互動兩種形式，**全部乾淨退出，無一報錯**。implement 描述的故障在我手上沒有出現。這不構成問題：ASCII pattern 在所有上述組合下都可靠，是嚴格更安全的選擇，交付物本身實測無誤。合理的成因可能是當時腳本檔被寫入時多位元組序列截斷，而非中文 pattern 本身——若是如此，那是寫檔方式的問題，改用 ASCII 同樣正確地迴避了它。**我只記錄「未能重現」這個事實，不據此質疑修法。**
+
+### 判斷題一：「出口沒被用到不算壞掉，主條件不可達才算」
+
+**這個區分站得住，我同意。** 兩者在 gate 的因果位置不同：
+
+| | F-6 的 `status: archived` | F-7 的 captain 例外出口 |
+|---|---|---|
+| 位置 | **主條件** | **例外出口** |
+| 可達性 | 構造上不可達（enum 無此值，全 repo 0 命中） | 主條件已證明可達（34 張票符合） |
+| 不被觸發的後果 | **gate 永遠不會通過**——致命 | 沒有票被否決時本來就用不到——正常 |
+| 可觀察性 | 無 | 逐票印 `RECORDED`／`NO-RECORD` |
+
+一條路徑「目前為空」與「原理上走不通」是兩回事。F-6 是後者，這條出口是前者。**而且現在它可觀察**：用沒用、用在哪張票，都在輸出裡，不能只靠口頭宣稱——這正是 F-7 當初要求的東西。
+
+### 判斷題二：格式漂移會不會漏掉真實記錄
+
+**會，而且漏得不少。** 我在副本上實測十種合理寫法，只有兩種被認得：
+
+| 寫法 | 結果 |
+|---|---|
+| 文件所列的標準格式 | **認得** |
+| 全形冒號改成半形 `:` | **認得**（pattern 只比對到票號為止） |
+| 縮排兩格或四格（巢狀在 Cycle 行下） | 漏掉 |
+| 票號前多一個空格 | 漏掉 |
+| 用 `*` 當項目符號 | 漏掉 |
+| 票號省略前導零（`59`） | 漏掉 |
+| 首字大寫 `Gate-exception` | 漏掉 |
+| 票號前加 `#` | 漏掉 |
+| 連字號寫成底線 | 漏掉 |
+
+**但這八種漏掉全部指向 `NO-RECORD`，也就是 gate 不通過。方向是 fail-safe。** 後果是 captain 明明簽了字卻被判沒簽，gate 卡住——會惹人惱，不會放行不該放行的東西。以 gate 的用途而言，這個方向可以接受。
+
+**真正的問題在反方向，而它存在。** 見 F-9。
+
+### F-8 重驗：四段實跑
+
+| 段 | 動作 | 離開碼 |
+|---|---|---|
+| A | `rm -rf .next` → `npx tsc --noEmit` | **`0`** |
+| B | `npm run build` → `npx tsc --noEmit`（文件所列順序） | build `0`／tsc **`0`** |
+| C | 對照組：`cp` 重建 `routes.d 2.ts` → `tsc` | **`2`**，逐字重現 `error TS2300: Duplicate identifier 'LayoutProps'` |
+| D | **復原驗證（implement 未做）**：再跑 `npm run build` → `tsc` | build `0`；`ls` 確認殘留檔**已被 build 刪除**；tsc **`0`** |
+
+全程 `git status --porcelain` 為空，`src/` 零變動。D 段是這次補上的關鍵一環：它證明文件所列的解法**真的會清掉那個檔**，而不只是碰巧沒撞到。
+
+**補述足以阻止執行者去改原始碼嗎？足以。** 它逐字給出執行者會看到的錯誤字串、以粗體標明「這是環境問題，不是候選缺陷——遇到時不要去改原始碼」、給出一行解法、並附可自行重跑的三段證據。四者齊備。**但它指名的成因不成立**，見 F-10。
+
+### 未越界
+
+| 檢查 | 結果 |
+|---|---|
+| G-1／G-2 **指令**逐字未變 | `257B` vs `257B`、`241B` vs `241B`，皆 `True` |
+| F-6 的兩段判準片段仍在 G-1 格內 | 皆 `True` |
+| G-2 整列與 cycle 3 相同 | `True` |
+| F-6 的 2026-09-22 補述（`archived` 原句） | 逐字未變 `True` |
+| AC 全節 | `1622B` vs `1622B`，`True`（與 cycle 1／2／3 同值） |
+| `git diff` 範圍 | 只有本票一檔 |
+| AC-3／G-7、G-6 | `1／5／1`；`awk` 相鄰性不變；`false false` |
+
+### 新 finding
+
+**F-9 — 查核指令未限定於 `### Feedback Cycles`，本票任何一處的格式舉例都會被判為 `RECORDED`。**
+- 已釋出使用者與正常流程：captain／FO 於公開前執行 gate 的 G-1／G-2。
+- 可觀察損害：指令是對**整份本票**做 `grep`，不是對 `### Feedback Cycles` 一節。只要本票任何位置有一行以該前綴加真實票號起頭，該票即被印成 `RECORDED`。**副本實測兩處**：把一行格式舉例放進某個 `## Stage Report` 一節 → `060` 印出 `RECORDED`；放進 `## Out of scope` → `061` 印出 `RECORDED`。**兩者都不是 captain 簽字。**
+- 受影響的 AC 或邊界：無 AC 直接失敗。受影響的是 F-7 建立的可稽核性本身——**方向是 fail-open**：gate 宣稱有簽字而實際沒有。這與上一節八種漏掉（fail-safe）方向相反，嚴重度也相反。
+- 觸發證據：上述兩次副本實測。本票現況安全——八張全部 `NO-RECORD`，且現行補述以 `{票號}` 佔位示範格式，未使用真實票號。
+- 建議：materiality = **Deferred risk**（候選目前無此行），**但方向為 fail-open，是本輪三筆 finding 中最該優先處置的一筆**。promote-to-material 條件：本票任何一處出現以該前綴加真實票號起頭的行。task ownership = 本票自有範圍。disposition 建議 = **fix（一個子句）**：查核前先以 `awk '/^### Feedback Cycles/,/^## /'` 把該節切出來再 `grep`，或在 pattern 尾端要求接續「captain 明確接受」字樣。
+- **這一筆與 F-6／F-7／F-8 不同，它是本輪新造物的性質，不是既有文字。** 我在撰寫本報告時刻意避免製造該條件：全文提及格式時一律寫在句中或用 `{票號}` 佔位，未在行首寫出真實票號。報告寫完後重跑查核指令，八張仍全部 `NO-RECORD`。
+
+**F-10 — G-8 補述指名的成因（iCloud）查無實據。**
+- 可觀察損害：目前無；解法正確且已驗證，執行者照做即可。
+- 觸發證據：補述寫「本專案位於 `~/Documents/` 下的同步資料夾，macOS／iCloud 會產生「 2」這類重複檔」。實測：`~/Library/Mobile Documents/com~apple~CloudDocs` **不存在**，`brctl status` **無輸出**，`~/Documents` 無 iCloud 管理跡象。**本機的 `~/Documents` 並未啟用 iCloud 同步**，故該歸因不成立。重複檔確實出現過（cycle 3 我親眼遇到 `routes.d 2.ts`），但成因不是 iCloud。
+- 受影響的 AC 或邊界：無。受影響的是文件正確性——`AGENTS.md` 明訂不得把錯誤前提留在文件裡。未來讀者可能去關一個根本沒開的 iCloud，或因發現 iCloud 沒開而連帶不信任整則補述。
+- 建議：materiality = **Polish**。task ownership = 本票自有範圍。disposition 建議 = **fix（一行）**：把成因改寫為「重複檔的產生來源尚未確認（可能為檔案同步、備份工具或編輯器）」，保留已驗證的部分——`tsconfig` 的 `include` 會把 `.next/types/` 掃進來、解法是重建或清除 `.next`。
+
+**兩則小觀察，不列為 finding**：(1) G-2 的條件寫「同 G-1（含 2026-09-22 的更正）」，未提 2026-09-23 的更正；操作上不受影響，因為查核指令本身就涵蓋 `049`／`052` 兩張。(2) 我未能重現 `illegal byte sequence`（詳見前節），但 ASCII 版本無論如何都是更安全的選擇。
+
+### 驗證與可否證性
+
+- 翻轉測試是 F-7 的核心可否證點：**翻不動就是裝飾品**。實測 `058` 由 `NO-RECORD` 翻為 `RECORDED` 且其餘七張不動，故出口可觀察。
+- F-9 以**兩次獨立位置**的副本實測證明，不是推論：格式舉例放進 stage report 與 out-of-scope 兩處，分別讓 `060`、`061` falsely 印出 `RECORDED`。若指令有限定節區，這兩次都應維持 `NO-RECORD`。
+- F-8 的 D 段（復原驗證）是這次新增的可否證點：若 `npm run build` 其實不會刪掉殘留檔，文件所列的解法就是假的；實測 `ls` 回報該檔已不存在、`tsc` 離開碼 `0`。
+- F-10 可被單一事實推翻：若 `~/Library/Mobile Documents/com~apple~CloudDocs` 存在或 `brctl status` 有輸出，該歸因即成立；兩者實測皆否。
+- 「未越界」全部以位元組比對斷言（`257`／`241`／`1622` 三個長度全等且 `==` 為 `True`），不是肉眼掃過。
+
+### Summary
+
+F-7 與 F-8 都修好，且都通過了我當初抓它們時的同一套標準。F-7 的查核指令抽成獨立腳本實跑乾淨——八張 `NO-RECORD`、離開碼 `0`、**stderr 零位元組**——翻轉測試在副本上獨立重現，`058` 翻為 `RECORDED` 而其餘不動，**證明這條出口不是裝飾品**。F-8 四段實跑全過，其中我補了 implement 沒做的復原驗證：`npm run build` 確實會刪掉那個殘留檔，所以文件所列的解法是真的能用的。
+
+**implement 的論證我判定成立**：「主條件不可達」與「例外出口暫時沒被用到」在 gate 的因果位置上確實不同——前者讓 gate 永遠不通過，後者只是目前無票被否決。加上出口現在逐票可觀察，這個區分站得住。
+
+**格式漂移確實會漏，十種寫法漏掉八種——但全部漏向 `NO-RECORD`，方向是 fail-safe，可以接受。** 真正的問題在反方向：查核指令是對整份本票 `grep`，沒有限定在 `### Feedback Cycles` 一節，因此本票任何位置的一行格式舉例都會讓該票 falsely 印出 `RECORDED`。我在副本上於兩個不同節區各重現一次。這是 **fail-open**，是本輪最該優先處置的一筆（F-9）。另查出 G-8 補述指名的 iCloud 成因在本機查無實據（F-10）。
+
+**判定：PASSED。** 兩項授權處置都已交付並獨立驗證，未越界，指令與 AC 逐字未變，無 AC 失敗。兩筆新 finding 依 `## Review-finding disposition` 只記錄、未動位元組。
+
+**但我要把話講清楚，讓 FO 與 captain 能推翻我這個判定**：F-9 與先前幾筆不同——它是本輪新造物的性質，而且方向是 fail-open，一個會謊報簽字的查核比一個查不到的出口更糟。我仍判 PASSED，理由是候選現況安全（八張全 `NO-RECORD`，現行補述以 `{票號}` 佔位）、觸發需要一個特定的撰寫失誤、修法是一個子句、且八張票全在 `design`，距離 gate 實際執行還很遠。**若認為 fail-open 不該帶著走，這是合理的相反判斷，退回即可。** 無論如何，F-9 必須在 gate 實際執行之前處置。
