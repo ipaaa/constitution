@@ -38,6 +38,10 @@ gates:
                 id: briefing:063:verify:attempt-2:revision-1
                 digest: sha256:bff03c77d6885e7612352902a44db513c3c4ba85a575b12c66c8350808152cfc
                 room-ref: '@review/verify/briefing-2'
+              withdrawal:
+                by: agent:first-officer
+                at: "2026-09-23T18:04:36.696038Z"
+                reason: FO 誤開：branch->main 的 entity mirror 把 status 由 review 蓋回 verify，致本次 prepare 錯誤地開出 verify attempt-2。captain 已於 2026-09-23 核准並 consume 過 verify gate，本票應在 review。撤回此 attempt，修正 status 後改開 review gate。
 ---
 
 確認 `requiredForRuling` 這項法律內容的正確性，並讓它有明確的負責人。
