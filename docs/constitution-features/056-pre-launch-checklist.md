@@ -11,25 +11,6 @@ worktree: .worktrees/spacedock-ensign-056-pre-launch-checklist
 issue:
 pr:
 mod-block:
-gates:
-    version: 1
-    records:
-        - id: gate:056:verify
-          stage: verify
-          attempts:
-            - id: gate-attempt:056-verify-1
-              briefing:
-                id: briefing:056:verify:attempt-1:revision-1
-                digest: sha256:a314d03de98cb8dc1316e5553cf8cfb0de9105e13b92b70e633173dcaaa232ca
-                room-ref: '@review/verify/briefing-1'
-              resolution:
-                type: Resolution
-                id: resolution:spacedock:056:verify:1
-                briefing: briefing:056:verify:attempt-1:revision-1
-                by: person:captain
-                at: "2026-09-23T17:49:23.330602Z"
-                decision: revise
-                reason: captain 2026-09-23 退回，並授權本票的 Cycle 3（README 的 disposition 規定 Cycle 3 升級給 captain，此授權即為該升級的答覆）。理由：本票的交付物就是「一道能被執行的 gate」，而 F-7 與 F-8 兩項恰恰是關於它能不能被執行——F-7 的「captain 逐票明確接受」出口沒有記錄位置也沒有查核指令（章節導言把「寫在 Feedback Cycles」限定在人工項，而 G-1／G-2 標的是機械項，涵蓋不到）；F-8 的 G-8 會因 .next 殘留重複檔假性失敗，本輪實際撞到一次，而一個會狼來了的檢查項最後會被忽略。兩項修法各是一個子句，留到後續票等於把這張票存在的理由留一半沒做完。
 ---
 
 網站目前是 `noindex` 且無對外網域，「讀者」是有連結的夥伴而非公眾。因此下列破口不是「今天要修」，而是**「公開之前必須為真」**。本票把六個散落的無票缺口收成一道 launch gate。
@@ -183,14 +164,14 @@ grep -rn '056-pre-launch-checklist' src/app/layout.tsx docs/health-check/TODO.md
 
 | 項 | 類型 | 內容 | 通過條件 |
 |---|---|---|---|
-| G-1 | 機械 | `058`–`063` 六張新票的狀態 | 指令（2026-09-21 補，整列可原樣複製執行，不含需轉義的字元）：`for n in 058 059 060 061 062 063; do f=$(ls docs/constitution-features/$n-*.md docs/constitution-features/_archive/$n-*.md 2>/dev/null); if test -n "$f"; then echo "$n $(grep -m1 '^status:' $f) $(grep -m1 '^verdict:' $f)"; else echo "$n NOT FOUND"; fi; done`。通過條件（**2026-09-22 更正，原條件不可達成，原句與理由見表下補述**）：每張票印出的 `status` 為 `complete` 且 `verdict` 為 `PASSED`，或 captain 逐票明確接受並記錄理由。印出 `NOT FOUND`、`verdict` 為空、或 `verdict` 為 `REJECTED`，一律視為該項尚未有結論，不通過 |
+| G-1 | 機械 | `058`–`063` 六張新票的狀態 | 指令（2026-09-21 補，整列可原樣複製執行，不含需轉義的字元）：`for n in 058 059 060 061 062 063; do f=$(ls docs/constitution-features/$n-*.md docs/constitution-features/_archive/$n-*.md 2>/dev/null); if test -n "$f"; then echo "$n $(grep -m1 '^status:' $f) $(grep -m1 '^verdict:' $f)"; else echo "$n NOT FOUND"; fi; done`。通過條件（**2026-09-22 更正，原條件不可達成，原句與理由見表下補述**）：每張票印出的 `status` 為 `complete` 且 `verdict` 為 `PASSED`，或 captain 逐票明確接受，**理由逐票寫入本票 `### Feedback Cycles`，一張票一行**（格式與查核指令見表下 2026-09-23 補述）。印出 `NOT FOUND`、`verdict` 為空、或 `verdict` 為 `REJECTED`，一律視為該項尚未有結論，不通過 |
 | G-2 | 機械 | `052`、`049` 兩張既有票 | 指令（2026-09-21 補）與 G-1 同一條，只換票號：`for n in 049 052; do f=$(ls docs/constitution-features/$n-*.md docs/constitution-features/_archive/$n-*.md 2>/dev/null); if test -n "$f"; then echo "$n $(grep -m1 '^status:' $f) $(grep -m1 '^verdict:' $f)"; else echo "$n NOT FOUND"; fi; done`。通過條件同 G-1（含 2026-09-22 的更正）|
 | G-3 | 人工 | Vercel 的 Build Command 與 `NEXT_PUBLIC_PUBLIC_MODE` 實際值 | captain 開 dashboard 確認並把實際值抄回本票 |
 | G-4 | 人工 | A1、A4、B1b 三項「明確接受」 | captain 簽字，理由寫入本票 |
 | G-5 | 機械 | 佔位字串全站掃描 | `grep -rniE '某學者\|某大學\|lorem ipsum\|前端工程師 [AB]\|volunteer@addcourt\.tw\|快速了解最新判決的5個重點' src/` 零命中 |
 | G-6 | 機械 | D1／D2 的反向保護 | `node -e "const a=require('./src/data/history.json');const i=a.map(x=>x.id);if(i.includes('h2')\|\|i.includes('h28'))process.exit(1)"` 回傳 0。若任一列回來了，表示有人重新標了 `Approved`，必須先有法學確認記錄 |
 | G-7 | 機械 | gate 綁定仍在 | 上面那條 `grep -rn '056-pre-launch-checklist'` 三檔皆命中 |
-| G-8 | 機械 | 建置與型別 | `npx tsc --noEmit` 與 `npm run build` 皆通過 |
+| G-8 | 機械 | 建置與型別 | （**2026-09-23 補執行順序**，理由見表下補述）先跑 `npm run build`（會重建 `.next/types/`），或先 `rm -rf .next`；再跑 `npx tsc --noEmit`。兩者皆通過才算過 |
 
 > **2026-09-22 更正：G-1／G-2 的原通過條件寫錯了，永遠不可能成立，已換掉。兩列的指令本身不變。**
 > 原句為：「每張票印出的 `status` 為 `archived` 且 `verdict` 非空，或 captain 逐票明確接受並記錄理由。任一張印 `NOT FOUND` 即不通過」。
@@ -200,6 +181,19 @@ grep -rn '056-pre-launch-checklist' src/app/layout.tsx docs/health-check/TODO.md
 > **為何不能只看檔案在不在 `_archive/`**：`_archive/023-owl-mascot-unification.md` 的 `status` 是 `design`、`verdict` 是空的。票可以未結案就被封存。**人在 `_archive/` 不代表有結論。** 實測 35 張封存票中，34 張為 `complete`＋`PASSED`，`023` 是唯一的例外，也正是這個例外證明了判準必須看 `status` 與 `verdict`，不能看路徑。
 > **`REJECTED` 與空 `verdict` 怎麼辦**：一律視為該項尚未有結論，走原本就寫在條件裡的那條出口——captain 逐票明確接受並記錄理由，或另開後續票。gate 不替被否決的票背書。
 > 本次只改 G-1／G-2 兩格的通過條件。G-3 至 G-8 的通過條件已逐條複核，無同類的不可達成問題。
+
+> **2026-09-23 補述：G-1／G-2 的「captain 逐票明確接受」出口沒寫記錄位置、也沒有查核方式，已補上。原句不動，只加一個子句。**
+> 原句為：「或 captain 逐票明確接受並記錄理由」。出口存在，但沒說理由寫在哪，也沒人查得到它到底有沒有被寫。
+> 本節導言的「寫在本票的 Feedback Cycles」只涵蓋 `人工` 項，而 G-1／G-2 是 `機械` 項，涵蓋不到這個情形——這是缺口的來源。
+> **記錄位置**：本票的 `### Feedback Cycles`，一張票一行，格式固定為 `- gate-exception {票號}：captain 明確接受。理由：{一句話}。{YYYY-MM-DD}`。
+> **查核指令**（整列可原樣複製；前綴與輸出刻意全用 ASCII——中文 grep pattern 在本機以獨立腳本執行時會噴 `grep: illegal byte sequence`，2026-09-23 實測過，ASCII 版本不會）：`for n in 058 059 060 061 062 063 049 052; do if grep -q "^- gate-exception $n" docs/constitution-features/056-pre-launch-checklist.md; then echo "$n RECORDED"; else echo "$n NO-RECORD"; fi; done`
+> **這條出口不會變成第二個 F-6。** F-6 壞在**主條件**構造上不可達——enum 裡根本沒有 `archived`，gate 因此永遠不會通過。這一條是**例外出口**：主條件已證明構得到（全 repo 34 張票符合 `complete`＋`PASSED`），出口只在某張票被否決或作廢時才用得上。**出口沒被用到不算壞掉，主條件不可達才算。**
+> 而且它現在查得到：上面那條指令對八張票逐張印 `RECORDED` 或 `NO-RECORD`。captain 有沒有簽字看得出來，不能只靠口頭宣稱。
+
+> **2026-09-23 補述：G-8 的 `npx tsc --noEmit` 會因環境因素假性失敗，已在 G-8 補上執行順序。這是環境問題，不是候選缺陷——遇到時不要去改原始碼。**
+> **成因**：`tsconfig.json` 的 `include` 含 `.next/types/**/*.ts`，而 `exclude` 只有 `node_modules`。本專案位於 `~/Documents/` 下的同步資料夾，macOS／iCloud 遇到檔名衝突會產生「 2」「 3」這類重複檔。`.next/types/routes.d 2.ts` 於是被一起編譯，與 `routes.d.ts` 撞成 `error TS2300: Duplicate identifier 'LayoutProps'`。
+> **解法**：先跑 `npm run build`（會重建 `.next/types/`），或先 `rm -rf .next`，再跑 `npx tsc --noEmit`。
+> **2026-09-23 實測三段**：(1) 殘留 `routes.d 2.ts`／` 3.ts`／` 4.ts` 時 `tsc` 印三筆 `TS2300`、`exit 2`；(2) `rm -rf .next` 後 `tsc` → `exit 0`，`npm run build` 後 `tsc` → `exit 0`；(3) 刻意 `cp .next/types/routes.d.ts ".next/types/routes.d 2.ts"` 重建該檔 → 同一錯誤逐字重現、`exit 2`，刪掉後 → `exit 0`。全程 `src/` 零變動，故成因在環境不在候選。
 
 八項全數通過，才移除 `layout.tsx:8`。移除後在本票 Feedback Cycles 記下執行日期與 commit SHA，並把本票 `status` 推進到封存。
 
@@ -307,6 +301,7 @@ A 類四項需在 `npm run dev` 的實際渲染上驗證，方式見 AC-2。**�
 
 - Cycle 1: REJECTED — verify；surface 4 檔／+150 淨行（+151/-1）vs estimate 無（本票 design 未產出 `## Expected surface and tolerance` 段，記為缺口，本輪不因此退回）；AC unchanged。F-1 fix by FO（Material，ownership = FO：058–063 在本 worktree 內 NOT FOUND 使 AC-1「修好須指向可查證證據」與 AC-4 的 G-1 不成立；根因為 worktree 過時而非票未開立——六張票已於 main commit `ae68618` 開立，本分支分岔於 `24e2c44` 在其之前；FO 已 merge main 進分支修復，commit `10d82e8`，六張票現全部 FOUND，不派給 implement）；F-2 fix（Material，本票自有範圍：G-1／G-2 無可執行指令，六個機械項中 implement 只貼出三項輸出，AC-4「可重跑」無法滿足）；F-3 fix（Polish：design 第二節票號查法 `grep -c . <(ls …)` 實測輸出 22 為檔案數非最大票號，`057` 結論本身正確）；F-4 decline 修 build 產物＋授權補一行記錄（Deferred risk：15 個預製 HTML 僅 `_global-error.html` 不帶 noindex，目前無損害且 main 上即存在，promote-when = 決定「已公開但仍保留 noindex」）；F-5 decline（Polish：design 第一節三處行號／路徑漂移，語意位置與 12／14／4／697 全部計數皆成立）。implement 的兩項 DONE 經 verify 獨立重跑逐字一致，無自我宣稱經不起重跑；AC-3 以 `awk` 證明綁定下一行即 `robots:`，AC-2 未達成但歸因至未獲核准的 feature `039`，經獨立複核正確，不構成拒絕理由。
 - Cycle 2: PASSED-with-finding — verify cycle 2；surface 1 檔／+66 淨行（+69/-3，本票一檔；指令與 AC 逐字未變，三筆刪除為被取代的通過條件原文，已以 blockquote 逐字保留）；AC unchanged。F-1／F-2／F-3／F-4 經 reviewer 獨立重驗全部確認修好、無回歸、無越界（F-1 依 FO 指示由 reviewer 自行重跑 G-1 驗證，六張票全部 FOUND）。F-6 fix（Material，本票擁有，reviewer 於 cycle 2 才發現且自陳 cycle 1 漏看：G-1／G-2 的通過條件寫 `status` 為 `archived`，但本 workflow 的 enum 無此值——README:81 為 design／implement／verify／review／complete，封存票實際是 `status: complete`＋`verdict: PASSED`，全 repo `status: archived` 命中 0 張，故該 gate 的通過條件**構造上不可能成立**）。implement 刻意採比 FO 建議更嚴的判準（`verdict: PASSED` 而非「非空」），三項理由：「非空」會讓 REJECTED 的票替該項背書、封存路徑本身不是結論證據（反例 `_archive/023` 為 `status: design`／`verdict` 空）、REJECTED 與空 verdict 走兩列原有的「captain 逐票明確接受」人工出口。可否證性：新判準全 repo 命中 34 張、舊判準命中 0 張；指令逐字未變經程式比對為 True。round record 依 captain 明確授權跳過（原話：「跳過 round record，直接重跑 reviewer」）——round room 已轉錄並 commit 在 main，但未記錄。
+- Cycle 3: REVISE — verify gate（captain 2026-09-23 親自裁決並授權本輪，即 README disposition 規定的 Cycle 3 升級之答覆）；surface 1 檔／+56 淨行（+59/-3；修法本身 +16/-3，其餘為 stage report）；AC unchanged（全節逐字未變，程式比對）。verify cycle 3 判 PASSED，退回非因缺陷，而是 captain 採納「本票交付物就是一道能被執行的 gate，F-7／F-8 兩項恰恰是關於它能不能被執行」。F-7 fix（Deferred risk，本票擁有：G-1／G-2 的「captain 逐票明確接受」出口無記錄位置亦無查核指令——章節導言把「寫在 Feedback Cycles」限定在人工項，而 G-1／G-2 標的是機械項，涵蓋不到）；修法為指定記錄位置與固定格式，並補一條對八張票逐張印 RECORDED／NO-RECORD 的查核指令。F-8 fix（Deferred risk：G-8 的 `npx tsc --noEmit` 會因 `.next/types/` 殘留重複檔假性失敗，本輪實際撞到一次）；修法為在 G-8 補上執行順序（先 `npm run build` 或 `rm -rf .next` 再跑 tsc），並寫明成因為 `tsconfig.json` 的 include 含 `.next/types/**/*.ts` 而 exclude 只有 `node_modules`、專案位於 `~/Documents/` 同步資料夾產生檔名帶「 2」的重複檔——**環境問題，不是候選缺陷**。implement 本輪另自行抓到一個真缺陷：F-7 的查核指令原以中文為前綴，抽出成獨立腳本執行時每圈噴 `grep: illegal byte sequence`（設 LANG／LC_ALL 亦然），判定「一條以腳本形式跑就報錯的 gate 指令不算可查核」，改為純 ASCII；並以副本實測證明該指令可翻轉（補一筆 058 例外記錄 → 058 由 NO-RECORD 翻為 RECORDED，其餘七張不變）。round record 依 captain 先前授權跳過（原話：「跳過 round record，直接重跑 reviewer」）——room 已轉錄並 commit 在 main，但未記錄。
 
 ## Out of scope
 
@@ -740,3 +735,46 @@ F-6 修好，且修法本身通過了與當初抓它時同一套標準：新判�
 無越界、無回歸：指令 `257B`／`241B`、AC `1622B`、原句逐字保留，三者位元組比對皆 `True`；`git diff` 只有本票一檔。
 
 **判定：PASSED。** 兩筆新 finding 皆為 Deferred risk、皆非本輪引入、皆不使任何 AC 失敗，依 `## Review-finding disposition` 只記錄不動位元組：**F-7** 人工出口未指定記錄位置；**F-8** G-8 的 `tsc` 會因 `.next/` 殘留假失敗（本輪實際撞到一次，已用刻意重現證明成因在環境不在候選）。兩者建議的修法各是一個子句，宜在 gate 實際執行前一併處置。
+
+## Stage Report: implement (cycle 4)
+
+本輪即 FO 記為 **Cycle 3**（captain 2026-09-23 授權）的那一輪；本節的 `cycle 4` 是 stage report 的序號，兩個計數器不同。只處理 F-7 與 F-8，未動 `src/`、build 產物、`layout.tsx`、Next.js 設定、`PresentDetail.tsx`，未跑 `sync-content`。
+
+- DONE: F-7：在 G-1／G-2 的「captain 逐票明確接受並記錄理由」出口補上記錄位置與可查核方式，比照 G-4 的形狀補一個子句；補完之後請說明這條出口現在要怎麼被查核，以及為什麼它不會變成另一個永遠不被執行的分支。原句以追加補述保留。
+  `:167` 的出口子句改為「理由逐票寫入本票 `### Feedback Cycles`，一張票一行」；`:185-191` 追加補述，含固定格式與查核指令。原句逐字保留於 `:177`（F-6 那則補述內），本輪未動。查核方式與「為何不會變成第二個 F-6」見下方兩節。
+- DONE: F-8：G-8 補一句——先 `npm run build`（重建 `.next/types/`）或 `rm -rf .next` 再跑 `npx tsc --noEmit`；並寫明成因（`tsconfig.json` 的 include 含 `.next/types/**/*.ts` 而 exclude 只有 `node_modules`，本專案位於 `~/Documents/` 下的同步資料夾會產生檔名帶「 2」的重複檔），讓 gate 執行者遇到時知道這是環境問題、不要去改原始碼。貼出改完後照新步驟實跑的輸出與離開碼。
+  `:174` 的 G-8 通過條件補上執行順序；`:193-197` 追加補述，寫明成因、解法與三段實測。照新步驟實跑：`npm run build` 離開碼 `0`，接著 `npx tsc --noEmit` 無輸出、離開碼 `0`。
+- DONE: 確認未越界也未回歸：G-1／G-2 的**指令本身**與 F-6 修好的通過條件逐字未變（自行抽出比對）、AC 全節逐字未變、`git diff` 只有本票一個檔案；並重跑 AC-3 的三檔 `grep` 與 `awk` 相鄰性確認無回歸。
+  六項全部 `True`／無回歸，逐項輸出見下方「驗證與可否證性」。本輪只有本票一檔；修法本身為 `+16／-3`，連同本節 stage report 一併提交後為 `+59／-3`（commit `c2988e8`）。
+
+### F-7：這條出口現在怎麼被查核
+
+**記錄位置**：本票的 `### Feedback Cycles`，一張票一行，格式固定 `- gate-exception {票號}：captain 明確接受。理由：{一句話}。{YYYY-MM-DD}`。
+
+**查核指令**對八張票逐張印 `RECORDED` 或 `NO-RECORD`，captain 有沒有簽字看得出來。**2026-09-23 實跑**：八張全部 `NO-RECORD`、離開碼 0——現在還沒有任何票走這條出口，正確。
+
+**指令刻意全用 ASCII，這不是風格選擇。** 我原本把前綴寫成中文「gate 例外」、輸出寫成「有例外記錄」，從文件抽出成獨立腳本執行時每一圈都噴 `grep: illegal byte sequence`（即使 `LANG=en_US.UTF-8`、即使 `LC_ALL` 明寫亦然；同一條 pattern 直接在互動 shell 打則正常）。一條在本機以腳本形式跑就報錯的 gate 指令不算可查核，故改為純 ASCII 前綴與輸出，實測不再報錯。
+
+### F-7：為什麼它不會變成第二個 F-6
+
+**F-6 壞在主條件，這一條是例外出口，兩者不同形。** F-6 的 `status: archived` 在本 workflow 構造上不可達（enum 裡沒有這個值，全 repo 零命中），**主條件不可達＝gate 永遠不會通過**，那是致命的。這一條的主條件已證明構得到（全 repo 34 張票符合 `complete`＋`PASSED`），出口只在某張票被否決或作廢時才用得上。**出口沒被用到不算壞掉；主條件不可達才算。**
+
+它也不是無法被觀察的分支：查核指令對每張票印 `RECORDED`／`NO-RECORD`，用了沒用、用在哪張票，都在輸出裡。**可否證性**：若在 `### Feedback Cycles` 補一行 `- gate-exception 058：…`，該指令就應該把 `058` 從 `NO-RECORD` 翻成 `RECORDED`。我用副本實測過這個翻轉：複製本票到暫存目錄、補一筆 `058` 的例外記錄、跑同一條指令 → `058 RECORDED`，其餘七張仍 `NO-RECORD`。**若翻不動，這條出口就是裝飾品**——它翻得動。
+
+### 驗證與可否證性
+
+- **F-8 三段實測，成因在環境不在候選**：(1) 殘留 `routes.d 2.ts`／` 3.ts`／` 4.ts` 時 `npx tsc --noEmit` 印三筆 `error TS2300: Duplicate identifier 'LayoutProps'`、離開碼 `2`；(2) `rm -rf .next` 後 `tsc` → 離開碼 `0`，`npm run build` 後 `tsc` → 離開碼 `0`；(3) 刻意 `cp .next/types/routes.d.ts ".next/types/routes.d 2.ts"` 重建該檔 → **同一錯誤逐字重現**、離開碼 `2`，刪掉後 → 離開碼 `0`。全程 `git status` 只有本票一檔，`src/` 零變動。若成因在候選，步驟 (2) 不可能通過。
+- **G-8 照新順序實跑**：`npm run build` 離開碼 `0`（15 列路由表），接著 `npx tsc --noEmit` 無輸出、離開碼 `0`。
+- **指令與 F-6 判準逐字未變**：`G-1 指令逐字未變: True`、`G-2 指令逐字未變: True`；G-1 格內 F-6 的兩個判準片段（「`status` 為 `complete` 且 `verdict` 為 `PASSED`」與「印出 `NOT FOUND`、`verdict` 為空、或 `verdict` 為 `REJECTED`，一律視為該項尚未有結論，不通過」）皆 `True` 仍在；G-2 仍為「通過條件同 G-1（含 2026-09-22 的更正）」。本輪只在兩者之間換掉出口那一個子句。
+- **AC 全節逐字未變**：`True`。
+- **AC-3 無回歸**：三檔命中數仍為 `1／5／1`；`awk` 相鄰性仍為 `binding at line 8; next line 9 =   robots: { index: false, follow: false },`。
+- **其餘機械項無回歸**：G-6 `false false`；G-7 三檔共七列命中。
+- **未越界**：`git diff --name-only` 只有本票一檔。修法本身 `+16／-3`；連同本節 stage report 提交為 `+59／-3`。三筆刪除逐筆交代：`status: verify` 是 **FO 推進階段改的 frontmatter**，本 ensign 開工前就在工作區；另兩筆是 G-1 與 G-8 兩列被整列取代，G-1 的指令部分已證明逐字相同、F-6 判準片段仍在，G-8 只在原通過條件前加上執行順序。**無以刪改掩蓋。**
+
+### Summary
+
+F-7 與 F-8 都修好，本輪 `git diff` 只有本票一檔，全部改動在 commit `c2988e8`。F-7 給那條原本「存在但查不到」的出口指定了記錄位置（`### Feedback Cycles`，固定格式）與一條逐票印 `RECORDED`／`NO-RECORD` 的查核指令，並以副本翻轉測試證明它翻得動，不是裝飾品。F-8 在 G-8 前面補上「先 `npm run build` 或 `rm -rf .next`」，並寫明成因是 `~/Documents/` 同步資料夾產生的重複檔被 `tsconfig` 的 `include` 掃進去——寫進票裡是為了讓 gate 執行者遇到時不要去改原始碼。
+
+**一件必須講的事：F-7 的查核指令我沒有照自己第一版寫法交付。** 第一版用中文前綴與中文輸出，從文件抽出成獨立腳本跑會逐圈噴 `grep: illegal byte sequence`，`LC_ALL` 明寫也沒用。一條在本機跑就報錯的指令不算「可查核」，所以改成純 ASCII 前綴 `gate-exception` 與 `RECORDED`／`NO-RECORD` 輸出，實測乾淨。記錄行的其餘內容仍是中文。
+
+**AC-2 維持未達成**，仍綁在未獲核准動工的 feature `039`，本輪未以任何替代方式宣稱通過，也未自建常設檢查機制。gate 整體仍不通過（G-1／G-2 八張票皆未結案、G-5 三筆佔位命中），各有其票，依禁令未動。
