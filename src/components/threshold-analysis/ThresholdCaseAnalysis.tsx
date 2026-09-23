@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ERAS,
   FACTORS,
+  RULES_ERA_UNCOVERED,
   YEARS,
   deriveEraStats,
   type ThresholdEra,
@@ -110,6 +111,18 @@ export default function ThresholdCaseAnalysis() {
           <span className="hidden md:inline">滑鼠移到長條上看單一年份</span>
           <span className="md:hidden">點色帶選取時期，下方會展開該期逐年件數</span>
         </div>
+
+        {/*
+          規則期的條文只取得 1952-04-16 修正後的版本。這兩筆早於該次修正，
+          不在那份條文的涵蓋範圍內，因此在圖下另作標示，不讓讀者以為整段一致。
+        */}
+        <p className="mt-2 font-serif text-[11px] text-gray-500 leading-relaxed">
+          ※ {RULES_ERA_UNCOVERED.date} 的 {RULES_ERA_UNCOVERED.interpretationNumbers.length} 件（釋字第{' '}
+          {RULES_ERA_UNCOVERED.interpretationNumbers.join('、第 ')} 號）早於{' '}
+          {RULES_ERA_UNCOVERED.amendedOn} 的修正，適用的是本頁未取得的原始版規則。
+          規則期其餘 {RULES_ERA_UNCOVERED.coveredCount} 件（共 {RULES_ERA_UNCOVERED.totalCount} 件）
+          才在已引條文之下。
+        </p>
       </div>
 
       <EraComparisonStrip

@@ -1,4 +1,9 @@
-import { ERA_YEAR_SPLITS, type ThresholdEra, type YearCount } from '@/data/threshold-analysis';
+import {
+  ERA_YEAR_SPLITS,
+  RULES_ERA_UNCOVERED,
+  type ThresholdEra,
+  type YearCount,
+} from '@/data/threshold-analysis';
 
 /**
  * hover 單一年份時的浮層。桌機限定，行動版改用色帶選取＋逐年清單。
@@ -23,6 +28,7 @@ const SERIES_LABEL: Record<YearCount['series'], string> = {
 
 export default function ThresholdTooltip({ year, eras, x, y }: ThresholdTooltipProps) {
   const split = ERA_YEAR_SPLITS.find((s) => s.year === year.year);
+  const uncovered = year.year === Number(RULES_ERA_UNCOVERED.date.slice(0, 4));
   const countFor = (eraId: ThresholdEra['id']) =>
     split?.parts.find((p) => p.eraId === eraId)?.count ?? null;
 
@@ -59,6 +65,15 @@ export default function ThresholdTooltip({ year, eras, x, y }: ThresholdTooltipP
       {split && (
         <div className="mt-1.5 border-t border-white/20 pt-1.5 text-gray-300 font-serif">
           本年 {split.changeoverDate} 換法，前後適用不同門檻。圖上長條為全年合計，未依門檻加權。
+        </div>
+      )}
+
+      {/* 規則期的條文只取得 1952 修正版，這兩筆早於該次修正，不在那份條文之下。 */}
+      {uncovered && (
+        <div className="mt-1.5 border-t border-white/20 pt-1.5 text-amber-200 font-serif">
+          本年的 {RULES_ERA_UNCOVERED.interpretationNumbers.length} 件（釋字第{' '}
+          {RULES_ERA_UNCOVERED.interpretationNumbers.join('、第 ')} 號）早於{' '}
+          {RULES_ERA_UNCOVERED.amendedOn} 的修正，適用的是本頁未取得的原始版規則。
         </div>
       )}
     </div>

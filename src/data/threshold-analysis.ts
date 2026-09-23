@@ -44,8 +44,25 @@ export interface ThresholdEra {
   sourceUrl: string | null;
   /** 條文依據的取得狀態。'unverified' 時 UI 必須顯示未確認標記。 */
   evidence: 'primary-source' | 'unverified';
+  /**
+   * 條文依據的但書。每一項都是已查證的限制，**UI 必須逐項顯示，不得摺疊或省略**。
+   *
+   * 「拿到條文」不等於「條文涵蓋整段」。規則期就是這種情況：
+   * 取得的是修正版，不是該期起點的原始版，因此前兩筆解釋不在這份條文之下。
+   * 沒有但書的時期不帶這個欄位。
+   */
+  caveats?: readonly StatuteCaveat[];
   /** 色帶顏色 token，見設計文件的 `## 視覺` */
   colorToken: string;
+}
+
+/** 一條條文但書。needsRuling 非 null 時，UI 必須顯示待確認標記與拍板者。 */
+export interface StatuteCaveat {
+  id: string;
+  /** 已查證的限制本身。只寫事實，不下結論。 */
+  text: string;
+  /** 誰有權把這項限制解除或作成解讀。null = 本頁資料即可斷言，無須外部拍板。 */
+  needsRuling: 'legal-reviewer' | null;
 }
 
 /**
@@ -179,25 +196,85 @@ export const INTERPRETATION_BOUNDS = { first: '1949-01-06', last: '2021-12-24' }
 export const SERIES_BREAK_DATE = '2022-01-04';
 
 /**
+ * 規則期沒有被已取得條文涵蓋的解釋。
+ *
+ * 釋字第 1、2 號同日作成（1949-01-06），早於 1952-04-16 的修正。
+ * 已取得的第 12 條是修正**後**的版本，因此這兩筆不在該條文之下。
+ * 數字由 tests/fixtures/interpretation-dates.json 重算驗證：
+ * 規則期 79 筆之中，發布日早於 1952-04-16 的恰為這兩筆，其餘 77 筆自釋字第 3 號
+ * （1952-05-21）起算。
+ */
+export const RULES_ERA_UNCOVERED = {
+  /** 落在未取得的 1948 原始版之下的釋字號。 */
+  interpretationNumbers: [1, 2] as const,
+  /** 這兩筆的發布日，同日。 */
+  date: '1949-01-06',
+  /** 已取得條文涵蓋的筆數。 */
+  coveredCount: 77,
+  /** 規則期總筆數。 */
+  totalCount: 79,
+  /** 修正日。已取得的版本是這一天之後的版本。 */
+  amendedOn: '1952-04-16',
+} as const;
+
+/**
+ * 規則期條文的三項限制。**三項都必須顯示在站上，不得省略。**
+ *
+ * 「拿到條文」不等於「這段時期都適用這份條文」，也不等於「這份條文的意思已經確定」。
+ * 這三項就是這兩件事的具體內容。
+ */
+export const RULES_ERA_CAVEATS: readonly StatuteCaveat[] = [
+  {
+    id: 'c1-amended-version',
+    text:
+      '取得的是 1952-04-16 修正後的版本，不是 1948-09-16 的原始版。第 12 條正是該次修正的三條之一（另兩條為第 8、15 條）。全國法規資料庫的歷史條文只提供民國 90 年 4 月之後的版本，本規則的 LawOldVerList 回「查無資料」，因此原始版取不到。',
+    needsRuling: null,
+  },
+  {
+    id: 'c2-coverage-gap',
+    text:
+      '這份條文涵蓋規則期 79 筆中的 77 筆。釋字第 1 號與第 2 號（皆 1949-01-06）早於該次修正，落在未取得的原始版之下，不在這份條文的涵蓋範圍內。',
+    needsRuling: null,
+  },
+  {
+    id: 'c3-scope-wording',
+    text:
+      '條文寫的是「在中央政府所在地全體大法官」，與後續法規的「總額」「現有總額」不是同一個概念。本頁不解釋這個限定語，也不把它換算成人數。',
+    needsRuling: 'legal-reviewer',
+  },
+];
+
+/**
  * 四條門檻時期。
  *
  * effectiveFrom 一律為法規公布日，取自 law.moj.gov.tw 的沿革頁。
- * 規則期的條文全文不在全國法規資料庫內（歷史條文只回溯到 1958-07-21），
- * 因此 article／quotedText／sourceUrl 皆為 null，evidence 為 'unverified'。
- * 見設計文件 D1：**不得在網站上寫出規則期的門檻數字。**
+ *
+ * 規則期的條文一度標為 'unverified'：A0030159（現行憲法訴訟法）的歷史條文只回溯到
+ * 1958-07-21，查不到《司法院大法官會議規則》。2026-09-23 於**另一個 pcode**
+ * （A0030300，廢止法規）取得全文 21 條，第 12 條可查證，因此改為 'primary-source'。
+ * 但取得的是 1952 修正版，限制見 RULES_ERA_CAVEATS —— **三項限制必須顯示在站上。**
+ *
+ * 設計文件 D1 的「不得在網站上寫出 1/2」**仍然成立，而且已證明是對的**：
+ * 實際條文是「三分之二以上出席＋過半數之同意」，寫 1/2 會是錯的。
  */
 export const ERAS: readonly ThresholdEra[] = [
   {
     id: 'rules',
     label: '規則期',
-    ruleSummary: '門檻條文待確認',
+    // 照抄條文的用語。**不得把「在中央政府所在地全體大法官」換算成人數，也不得改寫成「總額」**
+    // —— 那是兩個不同的概念，解讀未經法學背景者拍板。見 caveats 的 c3。
+    ruleSummary: '在中央政府所在地全體大法官 2/3 以上出席，過半數同意',
     statute: '司法院大法官會議規則',
     effectiveFrom: '1948-09-16',
     effectiveTo: '1958-07-21',
-    article: null,
-    quotedText: null,
-    sourceUrl: null,
-    evidence: 'unverified',
+    article: '第 12 條',
+    quotedText:
+      '大法官會議開會時，須有在中央政府所在地全體大法官三分之二以上出席。如為決議，須有在中央政府所在地全體大法官過半數之同意。可否同數，取決於主席。',
+    // 本規則於民國 107-07-31 廢止，另有獨立的廢止法規 pcode A0030300。
+    // A0030159（現行憲法訴訟法）的歷史條文只回溯到 1958-07-21，查不到這一份。
+    sourceUrl: 'https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0030300',
+    evidence: 'primary-source',
+    caveats: RULES_ERA_CAVEATS,
     colorToken: '#7C8B9A',
   },
   {

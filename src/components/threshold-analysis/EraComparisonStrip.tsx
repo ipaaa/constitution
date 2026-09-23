@@ -55,6 +55,7 @@ export default function EraComparisonStrip({
           const { era } = item;
           const selected = selectedEraId === era.id;
           const unverified = era.evidence === 'unverified';
+          const caveats = era.caveats ?? [];
           return (
             <div
               key={era.id}
@@ -91,6 +92,11 @@ export default function EraComparisonStrip({
                   {unverified && (
                     <span className="ml-1 inline-block bg-amber-100 text-amber-800 text-[10px] font-bold px-1.5 py-0.5 rounded">
                       未確認
+                    </span>
+                  )}
+                  {caveats.length > 0 && (
+                    <span className="ml-1 inline-block bg-gray-200 text-gray-700 text-[10px] font-bold px-1.5 py-0.5 rounded">
+                      附但書 {caveats.length}
                     </span>
                   )}
                 </div>
@@ -130,6 +136,30 @@ export default function EraComparisonStrip({
                       全國法規資料庫的歷史條文只回溯到 1958-07-21，本期的條文全文不在其中。
                       本頁因此不寫出本期的通過人數。
                     </p>
+                  </div>
+                )}
+
+                {/*
+                  條文但書。**三項都必須顯示，不得摺疊或省略。**
+                  拿到條文不等於條文涵蓋整段，也不等於條文的意思已經確定。
+                */}
+                {caveats.length > 0 && (
+                  <div className="mt-3 border-t border-gray-100 pt-2">
+                    <div className="font-mono text-[10px] uppercase tracking-widest text-gray-400 mb-1.5">
+                      這段條文的 {caveats.length} 項限制
+                    </div>
+                    <ul className="space-y-1.5">
+                      {caveats.map((c) => (
+                        <li key={c.id} className="font-serif text-[11px] text-gray-600 leading-relaxed">
+                          {c.needsRuling !== null && (
+                            <span className="mr-1 inline-block bg-amber-100 text-amber-800 text-[10px] font-bold px-1.5 py-0.5 rounded align-middle">
+                              待確認·法學背景審閱者
+                            </span>
+                          )}
+                          {c.text}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 )}
               </button>

@@ -27,6 +27,7 @@ const { default: EraComparisonStrip } = await import('@/components/threshold-ana
 const { default: OchreBandFactors } = await import('@/components/threshold-analysis/OchreBandFactors');
 const { default: ChartAxes } = await import('@/components/threshold-analysis/ChartAxes');
 const { default: ThresholdBoundary } = await import('@/components/threshold-analysis/ThresholdBoundary');
+const { default: ThresholdCaseAnalysis } = await import('@/components/threshold-analysis/ThresholdCaseAnalysis');
 
 const {
   ERAS,
@@ -34,6 +35,7 @@ const {
   ERA_YEAR_SPLITS,
   FACTORS,
   DAYS_PER_YEAR,
+  RULES_ERA_UNCOVERED,
   YEARS,
   deriveEraStats,
 } = data;
@@ -104,14 +106,19 @@ test('AC-1 四個 effectiveFrom 恰為法規公布日', () => {
   );
 });
 
-test('AC-1 primary-source 的三期各有非空 article／quotedText／sourceUrl', () => {
+test('AC-1 primary-source 的四期各有非空 article／quotedText／sourceUrl', () => {
+  // 原為三期。2026-09-23 captain 於 verify gate 授權改為四期：
+  // 規則期的條文已於 pcode=A0030300 取得第一手依據。這是本票唯一被授權的 AC 變更。
   const primary = ERAS.filter((e) => e.evidence === 'primary-source');
-  assert.equal(primary.length, 3);
+  assert.equal(primary.length, 4);
+  assert.equal(ERAS.length, 4);
   for (const era of primary) {
     assert.ok(era.article && era.article.length > 0, `${era.id} 缺 article`);
     assert.ok(era.quotedText && era.quotedText.length > 0, `${era.id} 缺 quotedText`);
     assert.ok(era.sourceUrl && era.sourceUrl.startsWith('https://'), `${era.id} 缺 sourceUrl`);
   }
+  // 沒有任何一期還停在 unverified。
+  assert.equal(ERAS.filter((e) => e.evidence === 'unverified').length, 0);
 });
 
 test('AC-1 沒有一處把門檻變動寫成 1987 年', () => {
@@ -437,19 +444,70 @@ test('行動版選取某期後展開該期逐年件數清單', () => {
 // D1／D2 — 未確認的處置
 // ---------------------------------------------------------------------------
 
-test('D1 規則期標未確認，且網站不寫出該期的通過人數', () => {
+test('D1 規則期已補上一手條文，且網站仍然不寫出 1/2', () => {
+  // 條文取自 pcode=A0030300（廢止法規），不是 A0030159。後者的歷史條文只回溯到 1958-07-21。
   const rules = eraOf('rules');
-  assert.equal(rules.evidence, 'unverified');
-  assert.equal(rules.quotedText, null);
-  assert.equal(rules.article, null);
-  assert.ok(rules.ruleSummary.includes('待確認'));
+  assert.equal(rules.evidence, 'primary-source');
+  assert.equal(rules.article, '第 12 條');
+  assert.equal(
+    rules.quotedText,
+    '大法官會議開會時，須有在中央政府所在地全體大法官三分之二以上出席。如為決議，須有在中央政府所在地全體大法官過半數之同意。可否同數，取決於主席。',
+  );
+  assert.ok(rules.sourceUrl.includes('pcode=A0030300'));
 
   const html = renderToStaticMarkup(
     createElement(EraComparisonStrip, { items: STATS, selectedEraId: null, onSelectEra: () => {} }),
   );
-  assert.ok(html.includes('未確認'));
+  // 「不寫出 1/2」的決定仍然成立，而且已證明是對的：實際條文是三分之二出席＋過半數同意。
   assert.equal(html.includes('1/2'), false);
   assert.equal(html.includes('二分之一'), false);
+  // 也不得把限定語換算成人數或改寫成「總額」。
+  assert.equal(/規則期[\s\S]{0,200}總額/.test(rules.ruleSummary), false);
+  assert.equal(rules.ruleSummary.includes('總額'), false);
+  assert.ok(rules.ruleSummary.includes('在中央政府所在地全體大法官'));
+});
+
+test('D1 規則期的三項限制都存在，且都渲染得出來', () => {
+  const rules = eraOf('rules');
+  assert.equal(rules.caveats.length, 3);
+  for (const c of rules.caveats) {
+    assert.ok(c.text.length >= 20, `${c.id} 的但書太短`);
+  }
+  // 只有「限定語解讀」那一項需要法學拍板，另外兩項是已查證的事實。
+  const pending = rules.caveats.filter((c) => c.needsRuling !== null);
+  assert.deepEqual(pending.map((c) => c.id), ['c3-scope-wording']);
+  assert.equal(pending[0].needsRuling, 'legal-reviewer');
+
+  const html = renderToStaticMarkup(
+    createElement(EraComparisonStrip, { items: STATS, selectedEraId: null, onSelectEra: () => {} }),
+  );
+  for (const c of rules.caveats) {
+    assert.ok(html.includes(c.text), `${c.id} 沒有渲染出來`);
+  }
+  assert.ok(html.includes('待確認·法學背景審閱者'));
+  // 三項限制的具體內容必須看得見，不能只留一句「有但書」。
+  assert.ok(html.includes('1952-04-16 修正後的版本'));
+  assert.ok(html.includes('79 筆中的 77 筆'));
+  assert.ok(html.includes('在中央政府所在地全體大法官'));
+});
+
+test('D1 規則期 79 筆中有 2 筆不在已引條文之下，且在圖下另作標示', () => {
+  // 由 fixture 重算，不吃資料模組的宣告值。
+  const inEra = RAW.filter(([, , d]) => d >= '1948-09-16' && d < '1958-07-21');
+  const before = inEra.filter(([, , d]) => d < RULES_ERA_UNCOVERED.amendedOn);
+  const after = inEra.filter(([, , d]) => d >= RULES_ERA_UNCOVERED.amendedOn);
+
+  assert.equal(inEra.length, RULES_ERA_UNCOVERED.totalCount);
+  assert.equal(after.length, RULES_ERA_UNCOVERED.coveredCount);
+  assert.deepEqual(before.map(([n]) => n), [...RULES_ERA_UNCOVERED.interpretationNumbers]);
+  for (const [, , d] of before) assert.equal(d, RULES_ERA_UNCOVERED.date);
+  assert.equal(before.length + after.length, 79);
+
+  // 圖下的固定註腳必須指名這兩筆，不能只放在 hover 才看得到的 tooltip。
+  const html = renderToStaticMarkup(createElement(ThresholdCaseAnalysis));
+  assert.ok(html.includes('釋字第 1、第 2 號'));
+  assert.ok(html.includes(RULES_ERA_UNCOVERED.amendedOn));
+  assert.ok(html.includes('未取得的原始版規則'));
 });
 
 test('D2 2022-01-04 至 2025-01-23 的條文已逐字核對，不標未確認', () => {
