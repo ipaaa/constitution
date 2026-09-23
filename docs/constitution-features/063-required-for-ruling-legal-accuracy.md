@@ -1,7 +1,7 @@
 ---
 id: 063
 title: requiredForRuling 的法律正確性（114憲判1）
-status: verify
+status: review
 source: constitution-features/056 第二節 D3
 started: 2026-09-21T21:16:25Z
 completed:
@@ -22,6 +22,17 @@ gates:
                 id: briefing:063:verify:attempt-1:revision-1
                 digest: sha256:bf931d2854e94bd2d770d9657dc1f6e6804af5b740ed055282f8d324407d7b65
                 room-ref: '@review/verify/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:063:verify:1
+                briefing: briefing:063:verify:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-23T17:47:28.259088Z"
+                decision: approve
+                reason: captain 2026-09-23 核准。站上每一條法律敘述都對得回一手來源且經三輪逐字查核；最關鍵的攔截是查證陷阱（全國法規資料庫仍原樣顯示已失效的第30條第2至6項，只查該站會得到錯誤結論）。AC1–AC7 三輪無回歸，AC3 在真實 HTML 上直接量測到端值。V11 隨 REFERENCE_DATE 那張票處理，V7 另開票，L1/L2/L3 與 L5 維持未拍板/未達成。
+              application:
+                target-stage: review
+                state: consumed
 ---
 
 確認 `requiredForRuling` 這項法律內容的正確性，並讓它有明確的負責人。
