@@ -56,7 +56,11 @@ export default function ThresholdsPage() {
             共 813 筆，無缺號。
           </li>
           <li>憲判字件數：司法院憲法法庭判決清單，民國 111 年至 115 年。</li>
-          <li>門檻條文：全國法規資料庫的歷史條文與現行條文（pcode A0030159）。</li>
+          <li>
+            門檻條文：全國法規資料庫。現行憲法訴訟法與其歷史條文為 pcode A0030159；
+            規則期的《司法院大法官會議規則》為另一筆已廢止法規 pcode A0030300，
+            取得的是 1952-04-16 修正後的版本。
+          </li>
           <li>
             抓取程式：<code className="font-mono text-xs">scripts/fetch-interpretation-counts.mjs</code>
             。人工執行，不進建置流程，也不改內容產線的資料檔。
