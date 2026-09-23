@@ -42,6 +42,14 @@ gates:
                 by: agent:first-officer
                 at: "2026-09-23T18:04:36.696038Z"
                 reason: FO 誤開：branch->main 的 entity mirror 把 status 由 review 蓋回 verify，致本次 prepare 錯誤地開出 verify attempt-2。captain 已於 2026-09-23 核准並 consume 過 verify gate，本票應在 review。撤回此 attempt，修正 status 後改開 review gate。
+        - id: gate:063:review
+          stage: review
+          attempts:
+            - id: gate-attempt:063-review-1
+              briefing:
+                id: briefing:063:review:attempt-1:revision-1
+                digest: sha256:e2f5c5b7019d1ad20c0e1ac9a539492aab3eef348952a46ae29365b2accaace7
+                room-ref: '@review/review/briefing-1'
 ---
 
 確認 `requiredForRuling` 這項法律內容的正確性，並讓它有明確的負責人。
