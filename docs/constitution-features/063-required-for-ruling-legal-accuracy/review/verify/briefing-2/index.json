@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:063:verify:attempt-2:revision-1",
+  "question": "review 判 PASSED，且 reviewer 明說「這份 diff 可以交付」。下一站是 complete（terminal）——核准即進入交付流程。我建議**先跑一輪把 R1 與 R2 補上再交付**，兩項各一行，理由是它們都留在「比這張票活得久」的文件裡：R1——本票第 22 行把不存在的「114 年憲判字第 9 號」當成事實陳述、未加更正標記，而本票封存後即為永久紀錄，一張以誤引為主題的票不該自己留一處未標記的誤引（站上真 HTML 0 筆、frontmatter title 已改、第六小節整節追溯，發布面無損害）；R2——docs/health-check/TODO.md 的 P0-7 的 L1 列仍是被取代前的問法、缺 V9 補進去的七則判決證據，而 P0-7 正是要交給法學協作者的東西，交付後他讀到的會是舊問題。R3（版面兩條 ---）與 R4（設計層的 aria-label，implement 照規格執行無誤）建議 decline。R5（缺 Cycle 3）經 FO 查證為計數器誤會：本票只有兩個修正輪（Cycle 1 為 V1–V9、Cycle 2 為 V10），Feedback Cycles 兩行齊備，reviewer 數的是 stage report 的序號。",
+  "artifacts": [
+    {
+      "id": "artifact:063:verify:attempt-2:revision-1:item-1",
+      "uri": "git-root://main/ab6e6cb3d235a8465c230bae9b3dfb03f3208420/docs/constitution-features/063-required-for-ruling-legal-accuracy.md",
+      "rev": "sha256:435b0b8a58b0ac0951f21e3bbe57a8130e9c031a30ec3758b44d87fe865f92f1",
+      "mediaType": "text/markdown",
+      "summary": "review 由新的獨立 reviewer 執行，七項 AC 全部自己重跑未採信前輪輸出：AC2 自 merge-base 獨立重製到恰好三筆型別錯誤；AC3／AC4 用副本作法取真 HTML 124,318 bytes，候選 LaunchGate.tsx sha256 全程未變、git status 全程為空；AC4 的 19 個「10」逐處列印上下文判讀。站上每一條法律敘述於 2026-09-23 當天重新取證逐字對回一手來源、全部成立，含兩處最易被放過者：「增訂」（靠 112-06-21 舊版第 30 條全條只有一項證成）與「該期間內只作成一則判決」（靠判決清單逐年去重並確認 114 年未被分頁截斷證成）。查證陷阱本日更強——法規資料庫資料截止日只落後 5 天，卻仍原樣顯示已失效的第 30 條第 2 至 6 項，該區塊失效標註命中 0 筆。文件影響三筆全部落地且合乎 CLAUDE.md。tsc 與 build 皆 exit 0、lint 與 baseline 逐筆相同、無死碼無回歸、禁區三項全守。三輪累積的未結項一項都沒消失。reviewer 的核心肯定：本票把「數字錯了」修成「結構上不可能再錯」——三個渲染點原本各自手寫文案而寫出三個不同的錯誤，現在共用 RulingThresholdNote，「10」只能透過 VOIDED_FLOOR 字串出現、失效依據被綁死在同一句裡；這不是字串修正，是把錯誤的成因移除。"
+    }
+  ]
+}

@@ -33,6 +33,11 @@ gates:
               application:
                 target-stage: review
                 state: consumed
+            - id: gate-attempt:063-verify-2
+              briefing:
+                id: briefing:063:verify:attempt-2:revision-1
+                digest: sha256:bff03c77d6885e7612352902a44db513c3c4ba85a575b12c66c8350808152cfc
+                room-ref: '@review/verify/briefing-2'
 ---
 
 確認 `requiredForRuling` 這項法律內容的正確性，並讓它有明確的負責人。
