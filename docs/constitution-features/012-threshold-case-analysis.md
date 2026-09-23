@@ -727,6 +727,10 @@ Verified by: 施工前後比對 `src/data/discussions.json` 與 `src/data/histor
 - `docs/meetup-chats/20260416 log.md`：會議記錄是 `record`。其中的 81 份與 1987 是當時的記錄，
   **不得回頭改寫**。更正寫在本檔的 `## Problem`。
 
+### Feedback Cycles
+
+- Cycle 1: REVISE — verify gate（captain 2026-09-23 親自裁決，採納 V1 並**明確授權修改 AC-1**）；surface 本輪 7 檔／+300 淨行（+320/-20；不含本票流程記錄則 +215/-18），累計 24 檔／+3094 淨行（不含本票流程記錄則 +2806）vs estimate +1380 ±40%（828–1932）——verify cycle 1 已判定超出為**估算漏列**而非 scope creep（19 檔中 14 檔小幅超出、無新增相依、無 runtime 網路、未刪測試），本輪增量為授權範圍內的條文、限制與測試；**AC changed（captain 授權）**：AC-1 的 `primary.length` 由 3 改為 4、敘述「三期」改「四期」，其餘 AC-2 至 AC-7 以程式切塊比對證明**逐字未變**（斷言 `changed == ['AC-1']`，不符即中止）。V1 fix（Material，ownership 非 implement——缺口在 design 只查了一個 pcode：verify 在 `pcode=A0030300`（廢止法規紀錄）找到《司法院大法官會議規則》全文，第 12 條載明「三分之二以上出席、過半數之同意」，規範規則期 79 筆中的 77 筆；頁面原顯示「門檻條文待確認」等於低報已知事實，並藏起一個支持 AC-3 第 1 題的對比）。implement 未沿用票內轉述，自行 `curl` `LawAll.aspx?pcode=A0030300`（49594 bytes）逐字核對，並實抓確認 `LawOldVerList.aspx?pcode=A0030300` 回「查無資料」、歷史條文只提供民國 90 年 4 月以後者——故取得的確為 1952-04-16 修正版。三項限制（1952 修正版非 1948 原始版／涵蓋 77 of 79／「在中央政府所在地全體大法官」與「現有總額」非同一概念且不換算人數）全部進資料並在站上不摺疊顯示，第三項標 `needsRuling: 'legal-reviewer'`；釋字第 1、2 號於圖下固定註腳、1949 tooltip、規則期 tile 三處另作標示。新測試經可失敗性實跑（`coveredCount` 77→79 與拿掉限定語那項，各自讓對應測試由 ✔ 轉 ✖）；測試 21→23 pass。**本輪最有價值的產出是從真實頁面 HTML 抓到一個補條文帶出來的錯**：「資料來源」原只寫 `pcode A0030159`，補完後頁面等於謊報自己的證據出處——讀原始碼看不出來，已修正並重新驗證。留給 verify 裁量一項：`f1-1958-drop` 未寫明 1958 年是**提高**門檻（前一期為 2/3 出席＋過半數同意），該句本身不錯且 tile 上看得到前後對照，implement 依授權範圍未改寫。AC-3（朗讀測試，D4）與 D5（375px／1280px 視覺檢查）仍為 captain 執行的未達成項；D1 的解讀拍板者仍是法學背景審閱者。
+
 ## Out of scope
 
 - 不做案件類型分類。那是 feature `016-case-keyword-classification`。
