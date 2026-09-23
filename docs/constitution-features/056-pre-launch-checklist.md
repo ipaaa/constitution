@@ -30,6 +30,11 @@ gates:
                 at: "2026-09-23T17:49:23.330602Z"
                 decision: revise
                 reason: captain 2026-09-23 退回，並授權本票的 Cycle 3（README 的 disposition 規定 Cycle 3 升級給 captain，此授權即為該升級的答覆）。理由：本票的交付物就是「一道能被執行的 gate」，而 F-7 與 F-8 兩項恰恰是關於它能不能被執行——F-7 的「captain 逐票明確接受」出口沒有記錄位置也沒有查核指令（章節導言把「寫在 Feedback Cycles」限定在人工項，而 G-1／G-2 標的是機械項，涵蓋不到）；F-8 的 G-8 會因 .next 殘留重複檔假性失敗，本輪實際撞到一次，而一個會狼來了的檢查項最後會被忽略。兩項修法各是一個子句，留到後續票等於把這張票存在的理由留一半沒做完。
+            - id: gate-attempt:056-verify-2
+              briefing:
+                id: briefing:056:verify:attempt-2:revision-1
+                digest: sha256:97a577971ecbeedd09a905b5c8909ddc0a133f66115726fffdc7cb6a583ba5a2
+                room-ref: '@review/verify/briefing-2'
 ---
 
 網站目前是 `noindex` 且無對外網域，「讀者」是有連結的夥伴而非公眾。因此下列破口不是「今天要修」，而是**「公開之前必須為真」**。本票把六個散落的無票缺口收成一道 launch gate。

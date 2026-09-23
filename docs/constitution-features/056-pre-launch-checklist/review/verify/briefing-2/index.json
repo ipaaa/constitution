@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:056:verify:attempt-2:revision-1",
+  "question": "verify cycle 4 判 PASSED，F-7／F-8 都以 reviewer 提出時的同一標準驗過。但它抓到一項新的、方向相反的問題並明白表示我可以推翻它：**F-9 —— 新的查核指令 grep 的是整份 entity，不是 `### Feedback Cycles` 區段**，所以檔案裡任何一行只要以該前綴加真實票號開頭就會回報 `RECORDED`。reviewer 在副本上重現兩次（stage report、out of scope 段各一）。**這是 fail-open：gate 會宣稱一個沒有人簽過的核准。** 它仍判 PASSED 的理由是候選目前安全（八張全 NO-RECORD、現行註記用 `{票號}` 佔位）、觸發需要特定的書寫失誤、修法只要一個子句、且八張票都還在 design 離執行很遠。**我建議退回修掉它**：這張票的主題就是「看起來對但執行時不成立的檢查」，F-6 是主條件不可達、F-7 是出口無法稽核、F-9 是檢查會說謊——前兩個都修了，第三個是 cycle 4 自己造出來的，不該帶著交付。另有 **F-10（Polish）**：G-8 的註記把成因歸給 iCloud，但 reviewer 查 CloudDocs 不存在、`brctl` 無輸出。**我的複核結果不同**：在本 sandbox 下這兩個檢查都回「Operation not permitted」，是被擋住不是不存在，所以 reviewer 的證據本身可能是 sandbox 產物。建議處置改為**不歸因**——只描述症狀與解法，不寫成因（該註記原本的 iCloud 歸因來自我寫進 scope notes 的內容，錯在我）。",
+  "artifacts": [
+    {
+      "id": "artifact:056:verify:attempt-2:revision-1:item-1",
+      "uri": "git-root://main/77c247834099607f3e7c88cd84e7c9d7c7edf99c/docs/constitution-features/056-pre-launch-checklist.md",
+      "rev": "sha256:5c41a0af6954ae8005c4240f9394da84392c8ec9827aa1342ec3c4c11bb13958",
+      "mediaType": "text/markdown",
+      "summary": "F-7 與 F-8 都以 reviewer 提出時的同一標準驗過：查核指令抽出成 194 bytes 獨立腳本執行，八張 NO-RECORD、exit 0、stderr 零位元組；翻轉測試在副本上獨立重現（058 翻為 RECORDED、其餘七張不變）。F-8 四段驗證含一段 implement 沒做的復原檢查——`npm run build` 確實會刪掉那個殘留檔，所以文件寫的解法真的有效。兩項判斷題都判 implement 正確：「主條件不可達 vs 出口未被使用」的區分成立（兩者在 gate 裡的因果位置不同）；格式漂移確實會漏掉 10 種合理寫法中的 8 種，但每一種漏掉都落在 NO-RECORD，是 fail-safe，可接受。reviewer 並刻意避免在自己的報告中製造觸發條件，寫完後重跑確認仍全部 NO-RECORD。"
+    }
+  ]
+}
