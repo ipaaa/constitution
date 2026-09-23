@@ -29,6 +29,11 @@ gates:
                 at: "2026-09-23T17:48:27.256551Z"
                 decision: revise
                 reason: captain 2026-09-23 退回，並授權修改 AC-1 的 primary-source 期數斷言由三期改為四期。採納 V1：verify 在 pcode=A0030300（廢止法規紀錄）找到 design 與 implement 都查不到的《司法院大法官會議規則》全文，第 12 條載明「三分之二以上出席、過半數之同意」，規範規則期 79 筆中的 77 筆。頁面目前對整個規則期顯示「門檻條文待確認」，等於低報已知事實，且藏起一個支持 AC-3 第 1 題敘事的事實。現在修比 review 跑完再修便宜。限制須逐項寫明：取得的是 1952-04-16 修正版而非 1948 原始版，釋字第 1、2 號（皆 1949-01-06）仍落在未取得的原始版之下；「在中央政府所在地全體大法官」這個限定語的解讀仍未經法學拍板，不得自行下定論。
+            - id: gate-attempt:012-verify-2
+              briefing:
+                id: briefing:012:verify:attempt-2:revision-1
+                digest: sha256:01e0b39f90da3c685c997fd4fd92ff7d1da0e5c4d20d7b2c49d174b17fb26497
+                room-ref: '@review/verify/briefing-2'
 ---
 
 研究大法官會議時期通過舊案數量與提升門檻之間的關聯，製作時間軸 infographic。

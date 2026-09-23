@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:012:verify:attempt-2:revision-1",
+  "question": "verify cycle 2 判 PASSED，零新 finding。要核可 012 進入 review 嗎？三項未達成的驗證項必須照實列出，且三項都在你或法學背景者身上：**AC-3 朗讀測試**（`PENDING-CAPTAIN`，需 3 位非法學背景受測者）、**D5 行動版／桌機視覺檢查**（本環境無可用無頭瀏覽器，依指示未再嘗試）、**`c3` 的法學解讀**（「在中央政府所在地全體大法官」與「總額」是否可比；未拍板前站上不得出現換算人數，也不得斷言 1958 那次的門檻變動方向）。reviewer 另就 `f1-1958-drop` 作了裁量並判為 Polish 不阻擋——理由見下方，我認為那個理由比結論本身更值得你看一眼。",
+  "artifacts": [
+    {
+      "id": "artifact:012:verify:attempt-2:revision-1:item-1",
+      "uri": "git-root://main/46683a643ae59bafa978e82620651b0cff4ea5ab/docs/constitution-features/012-threshold-case-analysis.md",
+      "rev": "sha256:29e8de8a7479ce39602070956dc0b5e620f59b82e7d0a3d38d5df0bf87d6b333",
+      "mediaType": "text/markdown",
+      "summary": "V1 是該 reviewer 自己在 cycle 1 提出的，本輪用同一套標準複驗未放寬：三個一手端點全部自行重抓（第 12 條與資料模組逐字相符、沿革恰為三筆、LawOldVerList 確回「查無資料」故 1948 原始版取不到）；77／79 的切分自 fixture 的 813 筆原始日期獨立重算相符（早於 1952-04-16 者恰為釋字第 1、2 號）；三項限制與三處標示改用真實渲染 HTML（57815 bytes）而非 grep 確認，全部到位且未摺疊；兩條新測試各自做突變實測確認真的轉紅，另加驗第三條。AC 變更經七塊逐字比對確認只動 AC-1（三期→四期，保留原文並追加授權註記），其餘六項未變。全頁掃描確認無任何換算後的人數，c3 的未拍板限制被遵守。implement 從真實 HTML 抓到的「資料來源只寫 A0030159」確為真錯也確實修好——頁面原本等於謊報自己的證據出處。reviewer 並追出 Next 預渲染只有 18025 bytes 的真因是 LaunchGate 用了 useSearchParams() 使子樹退出預渲染，非副本作法有誤，改以 renderToStaticMarkup 直接渲染元件樹取得真實 HTML。無回歸：78 列計數、四段既有條文、內容產線兩檔與 package.json 全部不動，建置與型別檢查皆 exit 0。f1-1958-drop 判為 Polish：要寫「1958 提高了門檻」必須拿「在中央政府所在地全體大法官 2/3 出席／過半數同意」比「總額 3/4 出席／出席人 3/4 同意」，兩組不只分母不同、分母的種類也不同，不知道「在所在地者」與「總額」的比例就無法斷言孰高——那正是 c3 標為待法學拍板的問題，若照補，頁面會違反自己剛宣告的克制。"
+    }
+  ]
+}
