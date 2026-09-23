@@ -1,7 +1,7 @@
 ---
 id: 063
 title: requiredForRuling 的法律正確性（114憲判1）
-status: review
+status: verify
 source: constitution-features/056 第二節 D3
 started: 2026-09-21T21:16:25Z
 completed:
@@ -11,28 +11,6 @@ worktree: .worktrees/spacedock-ensign-063-required-for-ruling-legal-accuracy
 issue:
 pr:
 mod-block:
-gates:
-    version: 1
-    records:
-        - id: gate:063:verify
-          stage: verify
-          attempts:
-            - id: gate-attempt:063-verify-1
-              briefing:
-                id: briefing:063:verify:attempt-1:revision-1
-                digest: sha256:bf931d2854e94bd2d770d9657dc1f6e6804af5b740ed055282f8d324407d7b65
-                room-ref: '@review/verify/briefing-1'
-              resolution:
-                type: Resolution
-                id: resolution:spacedock:063:verify:1
-                briefing: briefing:063:verify:attempt-1:revision-1
-                by: person:captain
-                at: "2026-09-23T17:47:28.259088Z"
-                decision: approve
-                reason: captain 2026-09-23 核准。站上每一條法律敘述都對得回一手來源且經三輪逐字查核；最關鍵的攔截是查證陷阱（全國法規資料庫仍原樣顯示已失效的第30條第2至6項，只查該站會得到錯誤結論）。AC1–AC7 三輪無回歸，AC3 在真實 HTML 上直接量測到端值。V11 隨 REFERENCE_DATE 那張票處理，V7 另開票，L1/L2/L3 與 L5 維持未拍板/未達成。
-              application:
-                target-stage: review
-                state: consumed
 ---
 
 確認 `requiredForRuling` 這項法律內容的正確性，並讓它有明確的負責人。
@@ -1071,3 +1049,116 @@ V10 修好了，而且修法比我建議的好。我給的第一案是把標頭�
 沒有越界，也沒有回歸。跨輪的渲染文字 `diff` 只多出一行，整頁其餘一字未動；兩個常數值與 cycle 2 逐字相同；AC 全節、第五小節、第十二小節三節逐字未變；`headcount` 仍是 `null`；V7／V8 與 `page.tsx:201` 零變動；AC1–AC7 全過；禁區三檔與 main 逐位元相同。
 
 留兩件事給 gate。一、**V11**：`REFERENCE_DATE` 還牽動倒數（1980 天，高估 145 天）與席次圖的 TODAY 線，這兩者不在「待審案件」的涵蓋範圍內。它是 cycle 2 V10 的未修殘餘、不是新缺陷，傷害也有限（絕對終點 2031年09月 就印在旁邊且正確），所以我不退回；病根是 `REFERENCE_DATE` 身兼「案件快照日」與「參照今日」兩職，根治屬第十二小節第 2 點那張票。二、**L5**（375px 六行）仍未量測，本環境無法量測，gate 必須照實列為未達成。
+
+## Stage Report: review
+
+**我是新的、獨立的 reviewer。以下每一項都自己重跑，未採信 implement 或 verify 的自我回報。**
+所有一手來源於 **2026-09-23 當日重新 `curl`**，未沿用前三輪的快取。
+
+- DONE: 逐項重現第十小節 AC1–AC7 的 `Verified by:` 子句，**不採信 implement 或 verify 的自我回報**；其中 AC3／AC4 必須以真實頁面 HTML 驗證（用 `git archive HEAD` ＋ `cp -Rc node_modules` 的副本作法，**不得暫改候選檔**），並判定站上每一條法律敘述是否仍逐字對得回一手來源。
+  **AC1–AC7 七項全過**，逐項證據見下方「AC 獨立重跑」。AC2 不採信貼上的輸出，自 merge-base `112d0af` 另開副本重製：基線 `tsc` exit 0，只刪 `requiredForRuling: 10,` 一行後 exit 2 且**恰為三筆** TS2339。AC3／AC4 取自副本 dev server 的真 HTML 124,318 bytes，候選 `LaunchGate.tsx` sha256 全程 `b1c80d70…` 未變、`git status` 全程為空。**站上每一條法律敘述都逐字對得回一手來源**，逐條核對見下方「一手來源獨立核對」。
+- DONE: 依實際交付行為查核 `## 文件影響` 每一筆：必要更新是否已完成、`record` 類文件是否未被改寫、`docs/INDEX.md` 是否符合實際的文件新增或刪除結果；並評估程式品質（型別、慣例、可重用性）與是否有回歸或被弄壞的功能。
+  三筆「實作後更新」全部完成且作法合乎 `CLAUDE.md`：`data-collection-guide.md`（`evergreen`）就地更新並附補述框保留原句；`TODO.md` 的 P0-7 欄位結構與 P0-2 逐項對應；`INDEX.md` 恰好只動這兩份的「最後查核」。**未動任何 `record` 文件**（本票改動的三份文件狀態為 `evergreen`／`evergreen`／`plan`）。本票未新增或刪除任何文件，故 `INDEX.md` 無須增減列。**程式品質與回歸見下方「程式品質」。**
+- DONE: 判定這份 diff 能不能交付，以及三輪累積的未結項是否都被正確地留在票內而非悄悄消失：L1／L2／L3 未拍板且 `headcount` 為 `null`、L5 未量測、V7／V8／V11 維持 Needs decision。最後給出 PASSED 或 REJECTED 與理由。
+  **未結項全部留在票內，無一項悄悄消失**（逐項見下方「未結項盤點」）。**裁決：PASSED**，理由見下方「裁決」。五項新 finding 全為 Polish 或 FO 記錄事項，無一項 Material。
+
+### 一手來源獨立核對（2026-09-23 重新取證）
+
+| 站上印出的敘述 | 一手來源實跑結果 |
+|---|---|
+| 「憲法訴訟法第 30 條第 2 項（參與評議之大法官不得低於 10 人、作成違憲宣告之同意人數不得低於 9 人）」 | `LawAll` 第 30 條：「不得低於十人」「不得低於九人」皆命中。主文用阿拉伯數字，係司法院行文體例 ✅ |
+| 「114 年 1 月 23 日修法**增訂**」 | `LawOldVer` 112-06-21 版第 30 條**全條只有一項**，`不得低於十人` 命中 **0** → 確為增訂而非修改 ✅ |
+| 「已由 114 年憲判字第 1 號宣告違憲，自公告日 2025-12-19 起失其效力」 | 主文：第 4 條第 3 項、**第 30 條第 2 項至第 6 項**、第 95 條「應自本判決公告之日起失其效力」；判決日期 114 年 12 月 19 日 ✅ |
+| 「存續期間為 114 年 1 月 23 日至 114 年 12 月 19 日」 | 沿革第 5 條目：「一百十四年一月二十三日……令修正公布第 4、30、95 條條文；**並自公布日起施行**」＋失效日 ✅ 起訖兩端皆有據 |
+| 「該期間內憲法法庭只作成一則判決，就是……114 年憲判字第 1 號本身」 | 判決清單**逐年去重**：115 年 6 則、**114 年 1 則**、113 年 11 則、112 年 20 則、111 年 20 則。**本頁橫跨 111–115 年，114 年未被分頁截斷** ✅ |
+| 「該判決並未適用這一項……理由【41】『既嚴重妨礙本庭行使憲法職權⋯⋯自不得作為本件判決的程序規範』」 | 原文：「系爭規定二**既嚴重妨礙本庭行使憲法職權**，依前所述，**自不得作為本件判決的程序規範**。」刪節號取代「，依前所述，」✅ 逐字 |
+| 「這一項」＝系爭規定二 | 原文「第30條第2項至第6項（**依序下稱系爭規定二至六**）」→ 系爭規定二＝第 2 項 ✅ 指涉正確 |
+| 「【43】改依第 30 條第 1 項定評議及評決門檻」 | 段落 43 原文含第 30 條第 1 項全文引述與「本庭自得本於程序自主權，決定本案審查的程序規範」✅ |
+| 「失效後憲法法庭已作成 6 則判決，最近一則為 115 年憲判字第 6 號（115 年 8 月 14 日）」 | 六個 `id` **逐一開 `docdata` 頁**核對自身的判決字號與判決日期，**六筆全中**（僅差在頁面用 `01月02日` 補零）；清單最高號為第 6 號，無第 7 號 ✅ |
+| 「現行有效的門檻是憲法訴訟法第 30 條第 1 項……判決，除本法別有規定外，應經大法官現有總額三分之二以上參與評議，大法官現有總額過半數同意」 | 與條文**逐字相符**，含句首但書 ✅ |
+| 導言「目前僅存 5 名大法官參與評議」 | 115 憲判 6【30】：「本庭現任大法官8人，因其中3人持續拒絕參與評議……應由**實際參與評議之大法官5人**作成本判決」✅ 逐字 |
+
+**查證陷阱本日複驗，成立且比前三輪更強。** 全國法規資料庫「法規整編資料截止日：**民國 115 年 09 月 18 日**」——
+只落後今日 **5 天**（前輪為 10 天），卻仍原樣顯示已失效的第 30 條第 2 至 6 項：
+該區塊內 `失其效力|失效|憲判|停止適用` 命中 **0** 筆，`不得低於十人`／`不得低於九人` 俱在。
+`法定總額` 全文 **0** 次、`現有總額` **13** 次。沿革確認最後一次修正即 114-01-23，其後無修正
+（`LawOldVerList` 本次**未**回「查無資料」，六個版本列齊，`012` 的那個陷阱本票未踩到）。
+另附一筆：被一併宣告失效的第 4 條第 3 項內容為「總統應於二個月內補足提名」，
+**不是**「現有總額」的定義——條文從未定義「現有總額」，這正是 L1 至今無法由條文自證的原因。
+站上不印任何人數，因此這個解釋空白對站上不構成錯誤陳述。
+
+### AC 獨立重跑
+
+取 HTML 的方法：`git archive HEAD | tar -x` ＋ `cp -Rc node_modules`，**只在副本改 `LaunchGate.tsx` 一行**。
+`diff -rq` 確認副本 `src/` 在 patch 前與候選**完全相同**、patch 後只差該一檔。
+
+- **AC1 PASS**　`grep -rn 'requiredForRuling' src/` **0** 筆；`grep -rnE '需 *[0-9]+ *(人|名).*(判決|同意)|[0-9]+ *名大法官同意' src/` **0** 筆；真 HTML 亦無。
+- **AC2 PASS（自 `112d0af` 獨立重製）**　基線 `tsc --noEmit` exit **0**；只刪 `requiredForRuling: 10,` 一行後 exit **2**，**恰好三筆**：`page.tsx(79,31)`、`page.tsx(194,35)`、`BottleneckFunnel.tsx(135,71)`，TS2339 訊息與 implement 所貼逐字相同。非兩筆、非零筆。
+- **AC3 PASS（十條全過）**　真 HTML 可見文字：有「憲法訴訟法」、**無**「憲法法庭法」、**無**「法定總額」、有「114 年憲判字第 1 號」、**無**「114憲判9」、**無**「114 年憲判字第 9 號」、有 `2025-12-19`、**無** `\d+ 名大法官同意`、**無** `需 \d+ 人`、**無**「表決門檻 (10人)」。
+- **AC4 PASS**　真 HTML 可見文字的 `10` 共 **19** 處，**逐處列印上下文判讀**：2 處為門檻敘述句（導言與卡片），**兩句都同時帶「宣告違憲／失其效力」與「114 年憲判字第 1 號」**；1 處為席次圖 Y 軸刻度（同組有 0／5／15）；其餘 16 處為日期與天數片段（`2024-10-31`×7、`2019/10/08`、`1008`／`1062`／`1099`／`1169`／`1307`／`210`／`189`×2）。**無任何無上下文的 10 人門檻數字。**
+- **AC5 PASS**　`headcount: null as number | null`（`future.ts:495`），JSDoc 指向本文件第五小節；`grep -n '063-required-for-ruling' src/data/future.ts` **3** 筆；`TODO.md:364` 的 P0-7 存在，欄位結構（狀態／背景／一手來源表／待拍板表／誰能做／卡在／解除方式／驗證）與 P0-2 對應。站上印「換算成具體人數須經法學確認，本站不列。」——未印推算人數、未用「約」包裝、未留破折號。
+- **AC6 PASS**　`discussions.json`／`history.json` sha256 與 `git show main:` **逐位元相同**（`4071978a…`／`4d1992e3…`），且 `npm run build` **前後不變**；`git log 112d0af..HEAD -- <兩檔>` **0** 筆；`layout.tsx:8` 的 `robots: { index: false, follow: false }` 仍在，build 產出的 `.next/server/app/future.html` 帶 `noindex, nofollow`。未執行 `sync-content`。
+- **AC7 PASS（就其 `Verified by:` 所寫的 grep 而言）**　`grep -n '114憲判9'` 19 筆逐筆讀過，**無一筆把它當成有效引註**；真 HTML **0** 筆；frontmatter `title` 已為「（114憲判1）」。**但另有一處同義不同寫法未被該 grep 涵蓋——見 finding R1。**
+- **L5 未量測，如實記錄**　依 dispatch 指示**未再嘗試任何瀏覽器**。本 stage 不宣稱 375px 六行限制已量測或已通過。它維持未達成，gate 必須照實列出。
+
+### 程式品質
+
+- **型別**：`npx tsc --noEmit` exit **0**；`npm run build` exit **0**。`headcount === null ? … : …` 的 else 分支因 `null as number | null` 而型別為 `number`，拍板後的接線點成立且現在就能編譯。`LATEST_RULING` 以 `[length - 1]` 取值，在 `as const` 唯讀元組上得到六個元素的聯集型別，`.docket`／`.dateLabel` 渲染正常——可讀性上 `.at(-1)` 略優，但不是缺陷。
+- **慣例**：`RulingThresholdNote` 直接 `import` 常數，與 `BottleneckFunnel.tsx:4` 既有模式一致；`compact` 的預設 `className` 與被取代的原 `<span>` 逐字相同（`text-[10px] text-gray-500`），真 HTML 確認樣式未變。
+- **可重用性**：把三處手寫文案收斂成單一元件，是對的結構修法——三處各自寫出三個不同的錯誤，正是分散手寫造成的。`VOIDED_FLOOR_SHORT`／`_FULL` 共用同一組欄位，使「10」在結構上不可能脫離「違憲」與失效依據單獨出現；這比逐處字串檢查更耐得住下一次改動。
+- **無回歸、無死碼**：`JusticeTermTimeline` 移除 `QUORUM` 後，`yForCount` 仍有 **9** 處使用，未成孤兒；原處留註解說明失效依據並指向本票，下一個人不會再畫一次。
+- **lint 與 baseline 逐筆相同**：候選與 `112d0af` 皆為 **10 problems（4 errors, 6 warnings）**，唯一差異是 `BottleneckFunnel` 的既有 `react-hooks/set-state-in-effect` 由 `22:5` 位移到 `23:5`（新增 import 所致）。**本票未引入任何新的 lint 問題。**
+- **環境雜訊本輪重現**：`npx tsc --noEmit` 首次 exit 2，錯誤為 `.next/types/routes.d 3.ts(65,8): TS2300 Duplicate identifier 'LayoutProps'`（本輪是「 3」變體，非前輪的「 2」）。`rm -rf .next` 後 `tsc` 立即 exit 0。**與候選無關**，`find src docs -name "* 2.*"` 無命中，原始碼目錄乾淨。cycle 3 的環境註記屬實且會再發生。
+
+### 未結項盤點（三輪累積）
+
+| 項目 | 應有狀態 | 實際查核結果 |
+|---|---|---|
+| L1／L2／L3 | 未拍板，`headcount` 為 `null` | ✅ `headcount: null`（`future.ts:495`）；第五小節三列俱在；P0-7 追蹤中 |
+| L5（375px 六行） | 未量測 | ✅ 第五小節、三輪 verify 報告與本報告皆記為未達成，無一處寫成已量測 |
+| V7（`/quiz/*`、`/controversy-timeline`） | Needs decision，零變動 | ✅ `git diff 112d0af..HEAD -- src/data/quizzes/ src/data/controversy-timeline.ts` **空** |
+| V8（`design-assets/003:28`） | Needs decision，零變動 | ✅ `git diff … -- docs/design-assets/ docs/constitution-features/049-*.md` **空** |
+| V11（`REFERENCE_DATE` 的倒數與 TODAY 線） | Needs decision，隨別票 | ✅ 記於 cycle 3 verify，四欄證據齊備，病根與路由都寫明 |
+| `page.tsx:201`「30~40 件」 | 依授權未動 | ✅ 該行在 diff 中為 context，未被增刪 |
+| 封存票與 `056` | 不改寫 | ✅ `_archive/`、`056`、`src/data/*.json`、`layout.tsx` 全部零變動 |
+
+**無一項悄悄消失。** 本票範圍乾淨：`git diff --name-only 112d0af..HEAD` 恰為 9 檔（4 份文件＋5 份程式）。
+
+### Findings（我擁有觀察，不擁有處置權；等 FO 授權才動候選位元組）
+
+**R1　本文件第 22 行把不存在的「114 年憲判字第 9 號」當成事實陳述，未加任何更正標記——建議 Polish／本票擁有／fix（一行補述）。**
+- 發布使用者與正常流程：讀本票的工作夥伴，以及 gate 上的 FO 與 captain。第 22 行位於 `## Problem`，在全文最前段。
+- 可觀察損害：原句為「內容涉及 114 年憲判字第 9 號，需要法學判斷才能拍板。」**沒有「這是錯的」標記**。第 45 行才更正，相隔 23 行；本文件其他保留原句之處（第五小節 L1、第六小節）都附了補述框，唯獨此處沒有。這正是第六小節記錄的擴散機制（`021` → `056` → 本票 title）。
+- 受影響的 value AC 或不可協商邊界：AC7 的標題句「把誤引當成正確引註繼續往下傳」即為其失敗條件；但 AC7 的 `Verified by:` 只寫了 `grep -n '114憲判9'` 這個**緊寫法**，而第 22 行用的是**空格寫法**「114 年憲判字第 9 號」，故三輪 verify 依該 grep 回報 AC7 PASS **並無錯誤**——是 AC 的 grep 沒涵蓋到這個寫法。
+- 觸發證據：`grep -n '114 年憲判字第 9 號' docs/constitution-features/063-…md` → 第 22 行命中，上下文無更正字樣；對照第 476／477 行（design 報告引用同樣錯誤的 checklist 原文，但下一行立即寫「命題的前提被否證」）。
+- 為什麼只是 Polish 而非 Material：站上真 HTML **0** 筆、frontmatter `title` 已更正、第六小節用整節追溯源頭與擴散。損害限於本票內部可讀性，不及於任何發布面。
+- 建議處置：加一行補述（保留原句，依 `CLAUDE.md`「不要悄悄改寫原文」）。**另建議 FO 把 AC7 的 grep 寫法缺口一併記下**，那是這個漏網的真正成因。
+
+**R2　`TODO.md` 的 P0-7 的 L1 列仍是**被取代前**的問法，缺 V9 補進去的七則判決證據——建議 Polish／本票擁有／fix。**
+- 發布使用者與正常流程：P0-7 明寫「誰能做：法學協作者拍板 L1 到 L4」。**P0-7 就是交到法學協作者手上的那份東西。**
+- 可觀察損害：P0-7 的 L1 列寫「114 憲判 1 理由【50】的認定是否及於其他案件」，而本票第五小節已於 cycle 2（V9）把問法改為「法庭已連續七則判決都採『拒絕參與評議者不計入現有總額』，站上要不要照法庭的算法寫？」並附 115 憲判 6【30】原文。**拍板者只讀 P0-7 的話，看到的是已被取代的問題，且拿不到最關鍵的那筆證據。**
+- 受影響的 value AC 或不可協商邊界：無 AC 涵蓋 P0-7 的內文同步。AC5 只要求「新增一列待法學確認項，格式比照 P0-2」，該要求已滿足。
+- 觸發證據：`TODO.md:364` 起的 L1 列 vs 本文件第五小節 L1 列（含 2026-09-21 補述）；P0-7 自己寫著「編號沿用……第五小節」，但內容未隨第五小節更新。
+- 建議處置：把 115 憲判 6【30】那段補進 P0-7 的 L1 列，或在該列加一句「最新問法與證據見本票第五小節」。成本一行。
+
+**R3　`TODO.md` P0-7 區段結尾有連續兩條 `---`——建議 Polish／本票擁有／fix 或 decline。** 純版面，`TODO.md:399-401`。
+
+**R4　`compact` variant 在無 `role` 的 `<span>` 上掛 `aria-label`——建議 Polish／非實作偏差，屬設計層。**
+多數螢幕閱讀器忽略 role-less 泛型元素上的 `aria-label`；少數會honour 的情況下，它會**取代**可見文字「門檻依現有總額比例計算」而非補充。真 HTML 確認 `title` 與 `aria-label` 字串相同且完整。**這是第八小節規格明文要求的，implement 照做無誤**，故不算執行偏差；若要改屬設計決定（例如改用 `<abbr>` 或把長敘述放進可見的 `title` 提示）。
+
+**R5　`### Feedback Cycles` 沒有 `- Cycle 3:` 那一行——FO 記錄事項，非本 diff 缺陷。**
+該節目前只有 Cycle 1 與 Cycle 2 兩列。處理 V10 的那一輪（implement cycle 3 → verify cycle 3）是第三個 correction round，但沒有對應的 `- Cycle {N}:` 列。stage 定義寫「The First Officer appends one `- Cycle {N}: ...` line ... per correction round」且「**Cycle 3 escalates to the captain**」。**V10 的實質內容並未消失**（成因、選項比較、實作與複驗都在 cycle 3 的兩份報告裡），消失的只是那一列 ledger。**這是 FO 擁有的簿記，不是 implement 的交付缺陷**，故不影響裁決，但 gate 應補上或明記為何跳過（Cycle 2 列已記載 captain 曾就**該輪**授權跳過 round record，但那句授權指的是 cycle 2）。
+
+### 裁決
+
+**PASSED。**
+
+先講這份 diff 最值得肯定的地方，因為它決定了我為什麼不在 R1 上退回：**本票把一個「數字錯了」的問題，修成了「結構上不可能再錯」。** 原本三個渲染點各自手寫文案，於是寫出三個不同的錯誤——錯的法律名稱、不存在的「法定總額」、把「參與評議」講成「同意」。現在三處共用 `RulingThresholdNote`，而「10」只能透過 `VOIDED_FLOOR_SHORT`／`_FULL` 出現，那兩個字串在結構上把失效依據綁死在同一句裡。這不是字串修正，是把錯誤的成因移除。`headcount: null` 的設計同理：條文從未定義「現有總額」（我今天讀了第 4 條確認過，連被宣告失效的第 4 條第 3 項都只是提名期限規定），所以任何具體人數都是站方的加工——不印數字不是規避，是唯一對得起一手來源的作法。
+
+七項 AC 我全部自己重跑，沒有一項採信前輪的輸出：AC2 自 merge-base 獨立重製到恰好三筆型別錯誤；AC3／AC4 用副本作法取真 HTML 124,318 bytes，候選檔 sha256 全程未變；AC4 的 19 個「10」我逐處列印上下文判讀，兩處門檻敘述都帶著失效標記，其餘全是刻度與日期。站上每一條法律敘述我都在 **2026-09-23 當天重新取證**逐字對回一手來源，**全部成立**——包含最容易被放過的兩處：「增訂」（靠 112-06-21 舊版全條只有一項證成）與「該期間內只作成一則判決」（靠判決清單逐年去重、並確認 114 年未被分頁截斷證成）。查證陷阱本日更強：法規資料庫只落後 5 天，仍原樣顯示已失效的第 30 條第 2 至 6 項，失效標註 0 筆。
+
+文件影響三筆全部落地且合乎 `CLAUDE.md`——`evergreen` 就地更新並保留原句、`record` 一份未動、`INDEX.md` 恰好只動該動的兩列、無增刪文件故無須增減索引列。程式面 `tsc` 與 `build` 皆 exit 0，lint 與 baseline 逐筆相同，無死碼，無回歸，禁區三項全守。三輪累積的未結項一項都沒消失：`headcount` 仍是 `null`、L5 明記未量測、V7／V8／V11 零變動且維持 Needs decision。
+
+五項 finding 沒有一項 Material。R1 是本票內部的一行未標記誤引，**站上真 HTML 0 筆**、`title` 已改、第六小節整節追溯，損害不及任何發布面；它之所以漏掉，是 AC7 的 `Verified by:` 只寫了緊寫法的 grep，前三輪依該 grep 回報 PASS 並沒有錯——這一點我認為比那一行本身更值得 FO 記下。R2 是 P0-7 的 L1 列停在舊問法，而 P0-7 正是要交給法學協作者的東西，成本一行、值得順手補。R3 版面、R4 屬設計層且 implement 照規格執行無誤、R5 是 FO 的 ledger 簿記。
+
+**這份 diff 可以交付。** 但交付不等於這件事做完了——`headcount` 還是 `null`，L1 到 L4 仍待法學背景者拍板，L5 在本環境無法量測，而 V7 指出的 `/quiz/*` 與 `/controversy-timeline` 仍以現在式把已失效的 10 人門檻當現行法，那是同一個法律錯誤的最大殘餘面，且 `/controversy-timeline` 在 `PUBLIC_PAGES` 內。這些都正確地留在票內等 captain，不是被這張票解決掉了。
