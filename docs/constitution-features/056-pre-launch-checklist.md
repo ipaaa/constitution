@@ -1940,7 +1940,7 @@ FO 建議「豁免改成區塊性判準」，implement 改成「只豁免帶 `# 
 
 ## Stage Report: implement (cycle 9)
 
-本輪處理 review (cycle 2) 判 REJECTED 的四筆：F-19／F-20（合併處置）、F-22、F-14 強化，F-21 依授權 decline。**只改一個檔案**：本票（`docs/health-check/TODO.md` 有兩處舊描述我**刻意沒改**，理由與建議處置見下方「一筆我沒改的東西」）。`git status --porcelain` 只有本票一筆；`git diff -- src/` 為空；`src/data/*.json` 與 `main` sha256 相同（`history.json` `4d1992e3a5fbb21e`、`discussions.json` `4071978a7ad0b3d0`），未跑 `sync-content`；`PresentDetail.tsx` 零改動。
+本輪處理 review (cycle 2) 判 REJECTED 的四筆：F-19／F-20（合併處置）、F-22、F-14 強化，F-21 依授權 decline。全部改動在 commit `41bfb34`。**只改一個檔案**：本票（`docs/health-check/TODO.md` 有兩處舊描述我**刻意沒改**，理由與建議處置見下方「一筆我沒改的東西」）。`git status --porcelain` 只有本票一筆；`git diff -- src/` 為空；`src/data/*.json` 與 `main` sha256 相同（`history.json` `4d1992e3a5fbb21e`、`discussions.json` `4071978a7ad0b3d0`），未跑 `sync-content`；`PresentDetail.tsx` 零改動。
 
 **reviewer 這一輪說對了一件難堪的事，我照實接下**：F-19／F-20 是我上一輪**自己新寫**的斷言，而它違反的是這張票**自己一個 cycle 前寫下的原則**——「兩個方向都要驗」「過寬和過窄一樣壞」。我對 G-6 的內容層驗了 (a) 沒驗 (b)，而且我在補述裡確實揭露了 fail-closed 的風險卻沒有實測、沒評估觸發面。**揭露不等於驗證**，這一點我沒有話說。本輪每一條改動都兩個方向實跑並貼輸出。
 
