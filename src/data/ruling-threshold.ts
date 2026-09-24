@@ -34,7 +34,7 @@
  * `headcount` 為 null，代表尚未經法學背景者拍板具體人數。
  * **渲染端在 headcount 為 null 時，必須完全不顯示人數，並改敘述 `rule`。**
  * 不得顯示替代字元或推算值。拍板事項見
- * docs/constitution-features/063-required-for-ruling-legal-accuracy.md 第五小節。
+ * docs/constitution-features/_archive/063-required-for-ruling-legal-accuracy.md 第五小節。
  */
 export const RULING_THRESHOLD = {
   /** 條文文字轉成的一句話敘述。渲染端的長版文案來源 */

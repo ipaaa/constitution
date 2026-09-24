@@ -98,7 +98,7 @@ export const REFERENCE_DATE = '2026-04-29';
  * `RULINGS_SINCE_FLOOR_VOIDED`），取證日為 2026-09-21。
  * 待審案件清單仍以 `REFERENCE_DATE`（2026-04-29）推導 `daysPending`，尚未重新收集。
  * `REFERENCE_DATE` 牽動席次圖的 TODAY 線與倒數，更新它屬另一張票，
- * 見 docs/constitution-features/063-required-for-ruling-legal-accuracy.md 第十二小節第 2 點。
+ * 見 docs/constitution-features/_archive/063-required-for-ruling-legal-accuracy.md 第十二小節第 2 點。
  */
 export const LAST_UPDATED = '2026-09-21';
 
@@ -459,7 +459,7 @@ export const CRISIS_STATS = {
 // `RULING_THRESHOLD` 已移到 `src/data/ruling-threshold.ts`，那裡是門檻文案的唯一定義處。
 // 這裡保留 re-export，讓既有的 `from '@/data/future'` import 不必改。
 // 搬移的理由見 docs/constitution-features/066-quiz-timeline-voided-quorum-present-tense.md 第五小節；
-// 門檻本身的法律依據與待拍板事項見 docs/constitution-features/063-required-for-ruling-legal-accuracy.md 第五小節。
+// 門檻本身的法律依據與待拍板事項見 docs/constitution-features/_archive/063-required-for-ruling-legal-accuracy.md 第五小節。
 export { RULING_THRESHOLD } from './ruling-threshold';
 
 /**
@@ -472,7 +472,7 @@ export { RULING_THRESHOLD } from './ruling-threshold';
  * 來源：憲法法庭判決清單 https://cons.judicial.gov.tw/judcurrentNew1.aspx?fid=38
  * 逐則開啟確認，`id` 為 docdata.aspx 的查詢參數。
  * 取證日期 2026-09-21。待拍板事項見
- * docs/constitution-features/063-required-for-ruling-legal-accuracy.md 第五小節。
+ * docs/constitution-features/_archive/063-required-for-ruling-legal-accuracy.md 第五小節。
  */
 export const RULINGS_SINCE_FLOOR_VOIDED = [
   { docket: '115 年憲判字第 1 號', rocDate: '115-01-02', dateLabel: '115 年 1 月 2 日', id: 350743 },

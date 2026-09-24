@@ -17,7 +17,7 @@ import {
  *
  * `RULING_THRESHOLD.headcount` 為 null 時，一律不顯示任何人數，
  * 也不顯示替代字元。見 `src/data/ruling-threshold.ts` 的 `RULING_THRESHOLD` JSDoc 與
- * docs/constitution-features/063-required-for-ruling-legal-accuracy.md 第五小節。
+ * docs/constitution-features/_archive/063-required-for-ruling-legal-accuracy.md 第五小節。
  */
 interface RulingThresholdNoteProps {
   variant: 'lede' | 'card' | 'compact';

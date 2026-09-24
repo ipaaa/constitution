@@ -83,7 +83,7 @@ function buildDataPoints(): DataPoint[] {
 // 現行有效的第 30 條第 1 項給的是「現有總額」的比例，不是固定席次，
 // 因此在席次折線圖上畫不出對應的水平線。虛線與標籤已移除，
 // 門檻敘述改由 RulingThresholdNote 單一來源負責。
-// 見 docs/constitution-features/063-required-for-ruling-legal-accuracy.md
+// 見 docs/constitution-features/_archive/063-required-for-ruling-legal-accuracy.md
 
 // Year markers for X axis
 const YEAR_MARKS = [2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032];
