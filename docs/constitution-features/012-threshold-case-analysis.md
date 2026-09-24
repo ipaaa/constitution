@@ -53,6 +53,14 @@ gates:
                 id: briefing:012:review:attempt-1:revision-1
                 digest: sha256:50c63aa24c1ddb057dedcdc0b0a6f136f27fdccfa29b1e7b9949073da76d041a
                 room-ref: '@review/review/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:012:review:1
+                briefing: briefing:012:review:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-24T17:29:46.540677Z"
+                decision: revise
+                reason: 'captain 2026-09-24 退回，一輪折進 F4／F5／F6／F7，並同日給出一次性授權：「授權修正 Verified by: 涵蓋既有寫法變體，不改 AC 要求本身」。review 重審已判 PASSED、F1 修得比 reviewer 要求的更完整，退回的理由是這四項全部指向同一件事——本票的核心紀律「對可斷言的講、對不可斷言的不講」目前沒有任何自動守衛。F6 是本 session 同型盲區的第八處（c3 明文承諾站上不得出現換算後的人數，卻無任何測試守著；目前 0 處違反故為 Deferred risk，補測試不涉 AC 變更）。F4 依本次授權修正 AC-1 的正規式詞彙表（現行詞彙表漏掉頁面上唯一真正的 1987 句子所用的「表決條件」「改低」，使全頁唯一讓 1987 與門檻變動主張同時出現之處正好在守衛之外）。F5 與 F4 同源（同一概念五種用詞，違反 AGENTS.md，且 reviewer 指出若 AC-3 朗讀測試理解度不如預期這是第一個該查的原因）。F7 為一條恆真斷言。'
 ---
 
 研究大法官會議時期通過舊案數量與提升門檻之間的關聯，製作時間軸 infographic。
