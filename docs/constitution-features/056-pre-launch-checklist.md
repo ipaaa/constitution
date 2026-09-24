@@ -93,6 +93,14 @@ gates:
                 id: briefing:056:review:attempt-1:revision-1
                 digest: sha256:6fb4d528ef244d42d7a7d98ec93d74a34d6b104a0bd07e4e77ff89c5a8ee57c3
                 room-ref: '@review/review/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:056:review:1
+                briefing: briefing:056:review:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-24T22:51:04.15649Z"
+                decision: revise
+                reason: Captain 退回：修那個日期檢查（F-27）。全票唯一已被證實會靜默回報 0 的查核，也是唯一沒有存成可執行形式的那一條；本票的主題就是檢查的涵蓋面要對得上它宣稱保護的東西，不修等於在自己的成果上留一個反例。一併修 F-25／F-26／F-28。
 ---
 
 網站目前是 `noindex` 且無對外網域，「讀者」是有連結的夥伴而非公眾。因此下列破口不是「今天要修」，而是**「公開之前必須為真」**。本票把六個散落的無票缺口收成一道 launch gate。
