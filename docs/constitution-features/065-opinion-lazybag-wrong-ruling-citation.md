@@ -9,7 +9,7 @@ verdict:
 score: 0.95
 worktree: .worktrees/spacedock-ensign-065-opinion-lazybag-wrong-ruling-citation
 issue:
-pr: "#38"
+pr: pr-merge:38
 mod-block: merge:pr-merge
 gates:
     version: 1
