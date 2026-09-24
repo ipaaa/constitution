@@ -1,7 +1,12 @@
 'use client';
 
 import React from 'react';
-import { RULING_THRESHOLD, RULINGS_SINCE_FLOOR_VOIDED, LATEST_RULING } from '@/data/future';
+import { RULINGS_SINCE_FLOOR_VOIDED, LATEST_RULING } from '@/data/future';
+import {
+  RULING_THRESHOLD,
+  VOIDED_FLOOR_SHORT,
+  VOIDED_FLOOR_FULL,
+} from '@/data/ruling-threshold';
 
 /**
  * 全站唯一的判決門檻文案來源。
@@ -11,8 +16,8 @@ import { RULING_THRESHOLD, RULINGS_SINCE_FLOOR_VOIDED, LATEST_RULING } from '@/d
  * 這個元件的存在就是為了讓那件事不再發生。
  *
  * `RULING_THRESHOLD.headcount` 為 null 時，一律不顯示任何人數，
- * 也不顯示替代字元。見 `src/data/future.ts` 的 `RULING_THRESHOLD` JSDoc 與
- * docs/constitution-features/063-required-for-ruling-legal-accuracy.md 第五小節。
+ * 也不顯示替代字元。見 `src/data/ruling-threshold.ts` 的 `RULING_THRESHOLD` JSDoc 與
+ * docs/constitution-features/_archive/063-required-for-ruling-legal-accuracy.md 第五小節。
  */
 interface RulingThresholdNoteProps {
   variant: 'lede' | 'card' | 'compact';
@@ -21,18 +26,9 @@ interface RulingThresholdNoteProps {
 
 const { rule, ruleShort, statute, voidedFloor, headcount } = RULING_THRESHOLD;
 
-/**
- * 已失效的固定人數下限。兩個版本共用同一組欄位，因此「10」永遠與
- * 「違憲」和失效依據出現在同一句裡。不要在別處另寫一次。
- */
-const VOIDED_FLOOR_SHORT =
-  `${voidedFloor.statute}的 ${voidedFloor.participants} 人參與評議下限，` +
-  `已由 ${voidedFloor.voidedBy}宣告違憲，自 ${voidedFloor.voidedOn} 起失其效力`;
-
-const VOIDED_FLOOR_FULL =
-  `${voidedFloor.statute}（參與評議之大法官不得低於 ${voidedFloor.participants} 人、` +
-  `作成違憲宣告之同意人數不得低於 ${voidedFloor.unconstitutionalityVotes} 人），` +
-  `已由 ${voidedFloor.voidedBy}宣告違憲，自公告日 ${voidedFloor.voidedOn} 起失其效力`;
+// 兩個失效句改由 `@/data/ruling-threshold` 提供，本檔不再自行組。
+// 資料檔（時間軸、quiz）無法渲染 React 元件，需要的是字串而非元件，
+// 因此句子的定義處必須在資料層。見 066 票第五小節。
 
 export default function RulingThresholdNote({ variant, className }: RulingThresholdNoteProps) {
   if (variant === 'compact') {

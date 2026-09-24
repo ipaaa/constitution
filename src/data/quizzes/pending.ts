@@ -1,4 +1,6 @@
 import type { QuizMeta } from "./controversy";
+// 失效句一律 import，不在本檔手寫。唯一定義處為 src/data/ruling-threshold.ts。
+import { VOIDED_FLOOR_CLAUSE } from "@/data/ruling-threshold";
 
 export const pendingQuiz: QuizMeta = {
   id: "pending",
@@ -53,7 +55,7 @@ export const pendingQuiz: QuizMeta = {
       ],
       correctIndex: 3,
       explanation:
-        "勞工加班工時、性侵害追訴時效、原住民狩獵權都是目前真實等待憲法法庭審理的案件類型。核能發電廠運轉許可爭議並非目前待審案件。法庭停擺意味著這些真實的權利爭議無法獲得解決。",
+        "勞工加班工時、性侵害追訴時效、原住民狩獵權都是目前真實等待憲法法庭審理的案件類型。核能發電廠運轉許可爭議並非目前待審案件。法庭停擺期間（2025 年 1 月 23 日至 2025 年 12 月 19 日），這些真實的權利爭議無法獲得解決。",
     },
     {
       id: "q3",
@@ -79,7 +81,7 @@ export const pendingQuiz: QuizMeta = {
       ],
       correctIndex: 1,
       explanation:
-        "兩次提名均遭國民黨與民眾黨控制的立法院否決。第一次為 2024 年 12 月 24 日，第二次為 2025 年 7 月 25 日。這使得憲法法庭始終無法補足人數，違憲審查持續停擺。",
+        "兩次提名均遭國民黨與民眾黨控制的立法院否決。第一次為 2024 年 12 月 24 日，第二次為 2025 年 7 月 25 日。",
     },
     {
       id: "q5",
@@ -92,7 +94,7 @@ export const pendingQuiz: QuizMeta = {
       ],
       correctIndex: 1,
       explanation:
-        "雖然目前有 8 位在任大法官，但蔡宗珍、楊惠欽、朱富美三位大法官拒絕出席，實際參與評議的只有 5 位。這遠低於修法後的 10 人門檻，也是法庭運作困難的關鍵原因。",
+        `雖然目前有 8 位在任大法官，但蔡宗珍、楊惠欽、朱富美三位大法官拒絕出席，實際參與評議的只有 5 位。修法後訂下的 10 人參與評議下限遠高於這個人數，曾是法庭運作困難的關鍵原因。${VOIDED_FLOOR_CLAUSE}，現行門檻回到憲法訴訟法第 30 條第 1 項的比例計算。`,
     },
   ],
 };

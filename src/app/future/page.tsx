@@ -198,9 +198,14 @@ export default function FutureTrack() {
               <div className="w-3 h-3 bg-amber-500 rounded-full" />
               案件持續積壓
             </h3>
+            {/* 這裡原本有一句沒有來源的年度產能數字。處置是刪除，不是換一個數字：
+                一手來源（憲法法庭判決清單）與本專案 future.ts 的 avgDaysPerCase、
+                estimatedClearanceYears 三者互斥，正確口徑（判決／結案／受理）須人工拍板。
+                見 docs/health-check/TODO.md 的 P1-9。 */}
             <p className="text-gray-600 leading-relaxed font-serif text-sm">
-              即使在正常編制下，憲法法庭每年處理量約 30~40 件。以目前 {CRISIS_STATS.totalPending} 件待審案件計算，
-              即使全員到位也需要數年時間消化。
+              以目前 {CRISIS_STATS.totalPending} 件待審案件計算，即使大法官全員到位，
+              消化這批積壓也需要時間。本站不列具體年數——憲法法庭的年度產能
+              尚無經查核的口徑。
             </p>
           </div>
           <div className="bg-white p-6 md:p-8 border border-gray-200 shadow-sm rounded-sm">
