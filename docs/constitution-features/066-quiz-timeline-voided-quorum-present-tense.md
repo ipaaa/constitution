@@ -33,6 +33,14 @@ gates:
               application:
                 target-stage: review
                 state: consumed
+        - id: gate:066:review
+          stage: review
+          attempts:
+            - id: gate-attempt:066-review-1
+              briefing:
+                id: briefing:066:review:attempt-1:revision-1
+                digest: sha256:2f8ac9b98a4ccdc38ef63456546d028c4ddd91d1e1038973657858df456e3ec7
+                room-ref: '@review/review/briefing-1'
 ---
 
 `/quiz/*` 與 `/controversy-timeline` 以現在式把已被宣告違憲失效的 10 人參與評議下限當成現行法，是 feature `063` 修完 `/future` 之後同一個法律錯誤的最大殘餘面。

@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:066:review:attempt-1:revision-1",
+  "question": "review 判 PASSED，七項 AC 由新的獨立 reviewer 自行重跑、基準一律 `cb341af`，14 處施工與分級處置逐處相符。下一站是 complete（terminal）——核准即進入交付流程（`pr-merge` 的 PR 仍會再問你一次）。**我建議核准。** 四筆新 findings 全在本票 AC 之外、皆不構成對 value AC 或保護邊界的實質損害，而 `/past` 與 `/present` 都**不在 `PUBLIC_PAGES`**。需你知道的兩筆：**R-1（Needs decision）**——`/past` 的 114憲判1 案件卡寫「憲法訴訟法十人開會門檻癱瘓憲法法庭，違憲」，有「違憲」而無「已失效」，正是票內 C 級的定義；但載體是 `src/data/history.json:637`，**`sync-content` 產物，本票被明令禁止碰**，修它要改 Google 試算表再走 sync + PR。promote 條件：`/past` 被列入 `PUBLIC_PAGES`。**R-2（Deferred risk）**——`/past/page.tsx:417`／`:519` 兩處現在式癱瘓敘述（「正因為政治僵局面臨癱瘓」），三項檢查**結構上**抓不到，因為句中不含 `憲法法庭|大法官|憲法訴訟法|評議|判決` 也不含門檻語彙；design 的掃描條件明訂為三組交集，故是**設計邊界之外、不是漏掃**，且真值未被一手來源否證（「卡人」那一半仍在：僅 8 位、兩輪提名皆遭否決）。另有 **R-4（Polish，一個詞）**：`ruling-threshold.ts:62` 的註解寫「兩個版本」而本檔現在 export 三個——成因是該 JSDoc 自 `RulingThresholdNote.tsx` 逐字搬移、在原處是對的。**我建議不為一個詞再開一輪**，併入 `049`（它重建時會動這個檔）；但考慮到我在 `056` 曾誤判「殘留只是展示形式」，我把判準講明：**R-4 不可能讓任何檢查說謊**，它只是註解，這是它與 `056` 那三筆 fail-open 的本質差別。",
+  "artifacts": [
+    {
+      "id": "artifact:066:review:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/a1d0ce4a3ed33737c1be3d59429fcf3a846fa003/docs/constitution-features/066-quiz-timeline-voided-quorum-present-tense.md",
+      "rev": "sha256:3c3260d65db7b7a089dbf4cc621b5b6367d5f1b51c4bbcdab98c30eff71489b9",
+      "mediaType": "text/markdown",
+      "summary": "七項 AC 全部自行重跑未採信前兩輪自我回報，基準一律 cb341af。AC2 自建 before／after 兩份副本與兩台 dev server：改動後六路由十八項全 PASS exit 0，基線 exit 1 且檢查 1 的四筆命中與 design 第 8.4 小節逐字相同，對照關係成立。腳本與票內 8.3 小節 cmp 逐字相同（5073 bytes、sha256 一致），五組 regex 原文掃全樹只命中 entity 與腳本兩處——**「AC 只引用不複製」名副其實**。14 處施工逐處相符：:152 字元級差異只有「持續」→「當時已」、:151／:187 逐字未動、:168 的日期與 evt-09 一致且時序錯置已解、B1／B2 整句刪除、四個 quiz 檔的題幹與答案欄位行逐字未動；AC6 是刪除而非換數字，/future 全頁中文句差集證實只換了那一句。三項負面對照各自且僅各自 FAIL；AC5 的合讀判準亦經施加失敗情境證明可失敗；F-7 的頁級粒度缺口如記載重現（q2 失去子句而 /quiz/controversy 仍 exit 0），確認為既知、經裁示維持、非新缺陷。**R-3 是 reviewer 主動排除的誤報**：/present 的三筆下限數字全落在 2025-10-13 錢建榮投書的引文視窗內，引述一篇有日期的投書不等於主張該門檻是現行法；它記此一筆以免下一輪把 FAIL 誤讀成新缺陷。**方法上一筆值得記**：reviewer 一度自己重寫正規化函式去查 /present 得到 0 筆、與腳本的 3 筆不符，追出**錯的是它自己的複製品**（手寫空白字元類不等價於腳本的），改為從腳本原樣切出定義區段重用後一致——它的原話是「本票把三項檢查收斂成單一可執行定義是對的，而我剛剛親自示範了為什麼」。"
+    }
+  ]
+}
