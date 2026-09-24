@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:050:verify:attempt-1:revision-1",
+  "question": "050 部署 runbook 已收斂：verify 跑了五輪，最後一輪依收斂判準判 PASSED（無擋住部署之事、無 Material 缺陷）。是否核准這份 runbook 進入 review？另：票內的 🔴 仍未解——040 Out of scope 的「隔離測試表完成驗證並由 captain 確認」兩個條件中，前一半已由 044 於 2026-09-21 完成並 PASSED，後一半仍在 captain 手上。",
+  "artifacts": [
+    {
+      "id": "artifact:050:verify:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/77630e46f1efc7291663538cd40d3c0fb1e7d90e/docs/constitution-features/050-ssot-approval-deployment.md",
+      "rev": "sha256:fd144494d11fc9ae24a27b9638849a0b6398266501d1fe8c548e491f856c3363",
+      "mediaType": "text/markdown",
+      "summary": "runbook 由推測校正為實測：步驟 0 原指令會靜默截斷標題列（D1）；要建的欄由 17 改為 24（D2）；Track 2 缺 owl_depth_comment／full_content 致照票做完步驟 4 必定失敗（D3）；窗口不從建欄就打開——有 9 欄安全前綴、窗口只涵蓋 15 欄，兩個方向逐一驗過（D4）；步驟 2 的改前字串寫錯（D5）；保護範圍 12 個而非 15（D6）。承重數字 24／9／15 欄、59 列、12／15 範圍、6 段、d3 單一風險點皆經三個獨立來源確認。五輪 verify 依序找出五族引用漂移：位置、檔名、票的狀態、不存在的票，最後一族使 🔴 的三個選項全部失真。S3 補上兩項機器可判前置後誤刪列擋得住、合法填值仍放行。全程對正式試算表零寫入零讀取。"
+    }
+  ]
+}

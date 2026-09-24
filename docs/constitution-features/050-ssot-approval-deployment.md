@@ -11,6 +11,17 @@ worktree: .worktrees/spacedock-ensign-050-ssot-approval-deployment
 issue:
 pr:
 mod-block:
+gates:
+    version: 1
+    records:
+        - id: gate:050:verify
+          stage: verify
+          attempts:
+            - id: gate-attempt:050-verify-1
+              briefing:
+                id: briefing:050:verify:attempt-1:revision-1
+                digest: sha256:e57202b091ba96ecc437ef7e4d20ad5949a12d8c642d05aed86415c583a761ae
+                room-ref: '@review/verify/briefing-1'
 ---
 
 feature 040 把八個審核欄位全部改為必填。正式試算表尚未建立這些欄位。**順序做錯會讓整條產線停擺。**
