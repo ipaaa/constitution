@@ -159,30 +159,56 @@ A5 採「保留敘述、改正號次」而非「保留號次、改寫敘述」�
 
 ### 六、Acceptance criteria
 
+> **2026-09-24 更正（captain 一次性授權）：AC-1、AC-2、AC-3、AC-4、AC-5 的 `Verified by:` 已改寫，涵蓋面對齊語意。**
+> 授權原文：「授權修正 `Verified by:` 涵蓋既有寫法變體，不改 AC 要求本身。」
+> **五項 AC 的「要求」逐字未動**，動的只有驗證指令。原因：站上的判決號有兩種寫法——
+> 緊接的 `114年憲判字第1號`（9 處）與加空格的 `114 年憲判字第 1 號`（2 處，即 B10／B11），
+> 另有 `111 年 憲判字第 17 號` 這種連 `年` 後也有空格的第三種寫法。
+> 原本的固定字串 grep 只掃得到緊接寫法，因此 AC-5 宣稱要涵蓋 11 行卻只可能回 9 行，
+> 而 AC-1／AC-2／AC-3 的「不含 114憲判1」這類**不存在斷言**對加空格寫法是盲的。
+> 改法：判決號一律改用容許空白的 regex `114[[:space:]]*年[[:space:]]*憲判字第[[:space:]]*1[[:space:]]*號`（113憲判9 同理）。
+> 逐項改了什麼、為什麼，見本檔 `## Stage Report: implement (cycle 2)`。
+> 每一處改寫都附了實測值；AC-1／AC-2／AC-3 的期望值不因改寫而變動（緊接與容許空白兩種寫法在現行候選檔上同值），AC-5 由 9 變 11。
+
 驗證一律在**副本**上做：`rsync` 出一份（排除 `node_modules`／`.next`／`.git`／`.worktrees`），`cp -Rc` 複製 `node_modules`（**不可用 symlink**，Turbopack 會以 `Symlink node_modules is invalid, it points out of the filesystem root` 失敗），`npx next build` 後 `npx next start -p <port>`。design stage 已實跑此流程，下列基準值為實測所得。
 
 - **AC-1（真實頁面 HTML）** `/opinion-lazybag` 服務出的 HTML 不含 `114年憲判字第1號`，且含 `113年憲判字第9號` 3 次、`國會職權修法` 3 次。
-  `Verified by:` `curl -s http://localhost:<port>/opinion-lazybag | grep -o '114年憲判字第1號' | wc -l` ＝ `0`；同法數 `113年憲判字第9號` ＝ `3`、`國會職權修法` ＝ `3`。
+  `Verified by:`（2026-09-24 改寫：固定字串 → 容許空白 regex，`grep -o` → `grep -oE`）
+  `curl -s http://localhost:<port>/opinion-lazybag | grep -oE '114[[:space:]]*年[[:space:]]*憲判字第[[:space:]]*1[[:space:]]*號' | wc -l` ＝ `0`；
+  同法數 `113[[:space:]]*年[[:space:]]*憲判字第[[:space:]]*9[[:space:]]*號` ＝ `3`、`國會職權修法` ＝ `3`（後者無數字、無空白變體，維持固定字串）。
+  **為什麼要改**：第一項是不存在斷言。若有人把號次寫成 `114 年憲判字第 1 號`，原本的固定字串 grep 仍回 `0`，AC-1 會誤判通過。
   **會失敗的改動**：A1 或 A2 任一未改 → 第一項 ≠ 0；誤改 `page.tsx:6` 或 `:19` 的「國會職權修法」→ 第三項 ≠ 3。
   **改動前實測基準**：`114年憲判字第1號` ＝ 3、`113年憲判字第9號` ＝ 0、`國會職權修法` ＝ 3。
 
 - **AC-2（真實頁面 HTML）** 首頁 `/` 服務出的 HTML 不含 `114年憲判字第1號`，且含 `113年憲判字第9號` 1 次。
-  `Verified by:` `curl -s http://localhost:<port>/ | grep -o '114年憲判字第1號' | wc -l` ＝ `0`；`113年憲判字第9號` ＝ `1`。
+  `Verified by:`（2026-09-24 改寫，理由同 AC-1）
+  `curl -s http://localhost:<port>/ | grep -oE '114[[:space:]]*年[[:space:]]*憲判字第[[:space:]]*1[[:space:]]*號' | wc -l` ＝ `0`；同法數 `113[[:space:]]*年[[:space:]]*憲判字第[[:space:]]*9[[:space:]]*號` ＝ `1`。
   **會失敗的改動**：A4 未改 → 第一項 ＝ 1。
   **改動前實測基準**：`114年憲判字第1號` ＝ 1、`113年憲判字第9號` ＝ 0。
 
 - **AC-3（原始碼，理由見第五節第 5 點）** `DecisionFlowchart.tsx` 的資料區註解指向 113憲判9。
-  `Verified by:` `grep -c '5 contested provisions from 113年憲判字第9號' src/components/opinion-lazybag/DecisionFlowchart.tsx` ＝ `1` 且 `grep -c '114年憲判字第1號' src/components/opinion-lazybag/DecisionFlowchart.tsx` ＝ `0`。
+  `Verified by:`（2026-09-24 改寫，理由同 AC-1；第二項同為不存在斷言）
+  `grep -cE '5 contested provisions from 113[[:space:]]*年[[:space:]]*憲判字第[[:space:]]*9[[:space:]]*號' src/components/opinion-lazybag/DecisionFlowchart.tsx` ＝ `1`
+  且 `grep -cE '114[[:space:]]*年[[:space:]]*憲判字第[[:space:]]*1[[:space:]]*號' src/components/opinion-lazybag/DecisionFlowchart.tsx` ＝ `0`。
   **會失敗的改動**：A3 未改，或把 `:188` 的「國會職權修法案」一併誤改（第二項仍為 0，但第一項不受影響——故本 AC 須與 AC-5 併用）。
 
 - **AC-4（build 產物）** `/present` 的時間表筆順與內容正確。`/present` 是全 client 頁，服務出的 HTML 不含時間表文字，故驗證對象為 build 出的 client chunk。
-  `Verified by:` 在 `.next/static/chunks/` 中找出含 `憲法法庭正式揭牌` 的檔，其內容含最小化後的相鄰字串 `status:"blocked"},{year:"2024.10",label:"113年憲判字第9號",detail:"關於國會職權修法之重大判決`。
+  `Verified by:`（2026-09-24 改寫：補上檔數斷言與定點的不存在斷言）
+  1. `grep -rl '憲法法庭正式揭牌' .next/static/chunks/ | wc -l` ＝ `1`——**先確認只有一個 chunk 命中**，原寫法用 `head -1` 取第一個檔，若命中多個則其餘不受檢。
+  2. 該檔內容含最小化後的相鄰字串 `status:"blocked"},{year:"2024.10",label:"113年憲判字第9號",detail:"關於國會職權修法之重大判決`。
+  3. `grep -rl 'year:"2024",label:"114' .next/static/chunks/ | wc -l` ＝ `0`——舊筆已無殘留。
+  **這裡不可以用全域的「不含 114憲判1」當斷言**：`.next/static/chunks/` 有 3 個 chunk 合法含有 114憲判1（B4／B6／B9／B10／B11 的內容被打包進 timeline、quiz、discussions 的 chunk），全域斷言會恆為紅。故第 3 項限定在 `year:"2024",label:"114` 這個定點前綴。
   **會失敗的改動**：只改 `label` 不改 `year` → `year:"2024.10"` 不成立；未重排 → 前綴 `status:"blocked"},` 不成立（原位置前一筆是 `status:"present"},`）；誤改 `detail` → 後綴不成立。
   **改動前實測基準**：同一位置為 `status:"present"},{year:"2024",label:"114年憲判字第1號",detail:"關於國會職權修法之重大判決`。
 
 - **AC-5（全站回歸）** 全站仍存在的 `114年憲判字第1號` 恰好落在第二節 B4、B6、B8、B9、B10、B11 所列位置，一處不多一處不少。
-  `Verified by:` `grep -rn '114年憲判字第1號' src/` 的輸出行號集合等於 `{controversy-timeline/page.tsx:70, data/controversy-timeline.ts:222, data/controversy-timeline.ts:224, data/history.json:638, data/discussions.json:5, data/discussions.json:8, data/discussions.json:46, data/discussions.json:53, data/discussions.json:58, data/quizzes/perspectives.ts:89, data/quizzes/controversy.ts:115}`（11 行；行號可因編輯位移，內容須逐行比對）。
-  **會失敗的改動**：做了全站替換 → 集合變空或缺行；漏改 A1／A2／A4／A5 → 集合多出行。
+  `Verified by:`（2026-09-24 改寫：**本次授權的核心**。固定字串 → 容許空白 regex，基準行數 9 → 11）
+  `grep -rnE '114[[:space:]]*年[[:space:]]*憲判字第[[:space:]]*1[[:space:]]*號' src/` 的輸出行號集合等於 `{controversy-timeline/page.tsx:70, data/controversy-timeline.ts:222, data/controversy-timeline.ts:224, data/history.json:638, data/discussions.json:5, data/discussions.json:8, data/discussions.json:46, data/discussions.json:53, data/discussions.json:58, data/quizzes/perspectives.ts:89, data/quizzes/controversy.ts:115}`（**11 行**；行號可因編輯位移，內容須逐行比對）。
+  **為什麼要改**：B10（`quizzes/perspectives.ts:89`）與 B11（`quizzes/controversy.ts:115`）寫的是加空格的 `114 年憲判字第 1 號`。
+  原本的固定字串 `grep -rn '114年憲判字第1號' src/` **在任何情況下都掃不到這兩行**，所以它宣稱的 11 行永遠回 9 行——
+  AC-5 要求的集合含 B10／B11，驗證指令卻涵蓋不到它們。改用容許空白 regex 後實測回 11 行，集合與要求一致。
+  **AC-5 要求什麼未變**：仍是「全站仍存在的正確引用恰好落在 B 清單所列位置，一處不多一處不少」。
+  **會失敗的改動**：做了全站替換 → 集合變空或缺行；漏改 A1／A2／A4／A5 → 集合多出行；**改壞 B10 或 B11 任一處 → 集合少一行**（第三種情境是 2026-09-24 新增涵蓋的，原寫法對它是盲的，已實跑證明，見 cycle 2 報告）。
 
 - **AC-6（需 captain 於 gate 核可，語意變更）** `/opinion-lazybag` 不再渲染 `StanceSpectrum`，首頁 CTA 文案不再承諾「大法官意見的光譜分佈」。
   `Verified by:` `curl -s http://localhost:<port>/opinion-lazybag | grep -o '大法官怎麼想的\|意見光譜' | wc -l` ＝ `0`；`curl -s http://localhost:<port>/ | grep -c '光譜'` ＝ `0`；且 `npx next build` 退出碼 `0`（證明 `page.tsx:3` 的 import 與 `:48-54` 的分隔線一併清掉、無未使用變數的 lint 失敗）。
@@ -279,3 +305,26 @@ A5 採「保留敘述、改正號次」而非「保留號次、改寫敘述」�
 ### Summary
 
 A1–A5 五處號次更正與 AC-6 的意見光譜段移除全部落地，AC-1、AC-2、AC-4、AC-6、AC-7 皆在副本的真實 build／HTTP 回應上實測通過，數值與設計的預期基準完全相符。AC-3 依設計在原始碼層級驗過。唯一的 FAILED 是 AC-5 的行數寫錯：B10、B11 用的是 `114 年憲判字第 1 號`（帶空格），緊接寫法的 grep 掃不到它們，故正確基準是 9 行而非 11 行——這是 design 第六節的筆誤，不是施工缺漏，B10／B11 經另一條 grep 確認未被動到。另外，`page.tsx:7` 的 metadata description 同時承載 AC-1 的號次與 AC-6 要清掉的「意見光譜」，改寫時須兩者兼顧，這一點設計未明講，已在上方記錄實際採用的句子。
+
+## Stage Report: implement (cycle 2)
+
+- DONE: 依 captain 2026-09-24 授權修正 AC-5 的 `Verified by:`，同時涵蓋兩種寫法，基準行數改為正確值
+  固定字串 `grep -rn '114年憲判字第1號' src/` → 容許空白 regex `grep -rnE '114[[:space:]]*年[[:space:]]*憲判字第[[:space:]]*1[[:space:]]*號' src/`，基準 11 → **實測 11**。輸出的 file:line 集合與 AC-5 原本就列出的 11 筆逐筆相同（B4、B6×2、B8、B9×5、B10、B11）。**AC-5 的要求逐字未動**。
+- DONE: 可失敗性實跑——故意改壞 B10／B11 其一，AC-5 應轉紅；還原後回復通過
+  在 `src/` 的暫存副本上把 B11（`quizzes/controversy.ts:115`）的 `114 年憲判字第 1 號` 改成 `113 年憲判字第 9 號`：**新寫法 11 → 10 行，轉紅**；**舊寫法 9 → 9 行，仍然通過，證實原寫法對此情境全盲**。還原副本後新寫法回到 11 行。候選檔全程未參與此測試：`git rev-parse HEAD:src` 在測試前後皆為 `6a7bad6`。
+- DONE: 檢查其他 AC 有無同型問題，逐項列出改了哪些、為什麼
+  四項有、全部已改。**AC-1／AC-2／AC-3**：其「不含 114憲判1」是**不存在斷言**，固定字串 grep 對加空格寫法全盲——有人寫成 `114 年憲判字第 1 號` 仍會回 `0` 而誤判通過，故三項一律改用容許空白 regex（`grep -o`／`-c` → `-oE`／`-cE`）。**AC-4**：原寫法用 `head -1` 取第一個命中 chunk，命中多個時其餘不受檢，且只有存在斷言、無不存在斷言；補上「命中 chunk 數 ＝ 1」與定點殘留檢查 `grep -rl 'year:"2024",label:"114' … ＝ 0`。**AC-6／AC-7 未改**——其斷言字串（`大法官怎麼想的`、`意見光譜`、`光譜`、退出碼）無數字、無空白變體，不存在同型問題。
+- DONE: AC-4 的不存在斷言不可用全域寫法（施工時發現，已寫入 AC-4）
+  `.next/static/chunks/` 有 **3 個 chunk 合法含有 114憲判1**（B4／B6／B9／B10／B11 的內容被打包進 timeline、quiz、discussions 的 chunk）。若把 AC-4 第 3 項寫成全域「不含 114憲判1」會恆為紅。故限定在 `year:"2024",label:"114` 這個定點前綴，實測 ＝ `0`。
+- DONE: 七項 AC 以改寫後的指令逐字重跑，全部通過
+  副本重建（`rsync` ＋ `cp -Rc node_modules`，`diff -r` 確認 `src/` 與候選檔逐位元相同）後 `npx next build` 退出碼 **0**（AC-7），`npx next start -p 3267`。AC-1：`114` ＝ **0**、`113` ＝ **3**、`國會職權修法` ＝ **3**。AC-2：`114` ＝ **0**、`113` ＝ **1**。AC-3：註解 ＝ **1**、`114` ＝ **0**。AC-4：命中 chunk ＝ **1**、相鄰字串 ＝ **1**、舊筆殘留 ＝ **0**。AC-5 ＝ **11 行**。AC-6：lazybag ＝ **0**、home ＝ **0**。
+- DONE: 本輪 `src/` 零變動、A1–A5 與 AC-6 的成果未被影響
+  `git rev-parse HEAD:src` ＝ `6a7bad6af38a7f28b7557a622169353549a9d231`，與 cycle 1 提交 `b294597` 後的值相同。`git status` 本輪只有 entity 檔一個 M。AC-1／AC-2／AC-4／AC-6 的實測值與 cycle 1 完全一致。
+- SKIPPED: 改動任何 AC 的**要求**
+  本次授權只及於 `Verified by:` 的涵蓋面。`git diff` 的刪除行共 6 行，全部是 `Verified by:` 行或 AC-5 的「會失敗的改動」行，**沒有一行 AC 要求被刪改**。
+- SKIPPED: 動 `src/data/opinions.ts`、`docs/design-assets/003`、執行 `npm run sync-content`
+  三者本輪皆未觸及，`git status` 可證。
+
+### Summary
+
+captain 授權的是「驗證涵蓋面」而不是「AC 要求」，因此本輪 `src/` 零變動，只改 entity 檔的五處 `Verified by:`。AC-5 的核心修正是固定字串換成容許空白的 regex，實測由 9 行變 11 行，與 AC-5 本來就列出的 11 筆集合對齊；可失敗性已實跑證明——改壞 B11 時新寫法轉紅、舊寫法仍綠。同型問題在 AC-1／AC-2／AC-3 也成立（三者的「不含 114憲判1」都是對加空格寫法全盲的不存在斷言），AC-4 則是另一種涵蓋面缺口（`head -1` 只檢第一個 chunk、且沒有不存在斷言），四項一併修正。施工中另有兩項發現寫進了規格：一是站上其實有**第三種**寫法 `111 年 憲判字第 17 號`（連 `年` 後也有空格），所以 regex 採每個接縫都容許空白而非只補一處；二是 AC-4 的不存在斷言不可寫成全域，因為有 3 個 chunk 合法含有 114憲判1。順帶一提，我自己在還原測試副本時用了一次盲目全域替換，把 `controversy.ts:69` 這行正確的 113憲判9 也一併改掉了——只發生在暫存副本上，但正好是 AC-5 要擋的那種事故的現場重演。
