@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:012:review:attempt-2:revision-1",
+  "question": "review 重審判 PASSED，F4／F5／F6／F7 四項 reviewer 全部自行重現。**但我建議再退回一輪**——因為 reviewer **用它自己加的對抗性探測打穿了這一輪剛建的守衛**，而且三項都便宜、都不涉 AC 變更。**F8（第十處，最該在收票前處理）**：`c3` 的守衛只渲染元件、不渲染 `page.tsx`——reviewer 把換算人數注進頁面外殼後，**25 條測試全綠**。這條守衛正是為了守住本票的核心承諾「站上不得出現換算後的人數」，而它的涵蓋面比它的名字窄。**F9**：反駁標記收了裸日期 `1993-02-03`，reviewer 的對抗性探測讓**一句沒有反駁的錯誤因果過關**。**F10**：它上一輪的 F7 被誤植，它當初指名的那條仍然恆真。三項都是這一輪守衛自己的洞，我認為不該帶著交付。另附：eslint 的 4 個 error reviewer 判定**不由本票處置**（既有、main 上同樣存在——它單獨 checkout main 實測、四個檔本分支從未觸碰、本票自身路徑 0/0，在此修是 scope creep），並更正 implement 少報了兩個檔。",
+  "artifacts": [
+    {
+      "id": "artifact:012:review:attempt-2:revision-1:item-1",
+      "uri": "git-root://main/9fd0454f860dc67e4de83197e4339bb9ead45afb/docs/constitution-features/012-threshold-case-analysis.md",
+      "rev": "sha256:dd02a0e6c18b86e011234b09aeab615f11a60bd27f6118104e5519354d44c15e",
+      "mediaType": "text/markdown",
+      "summary": "F4／F5／F6／F7 四項全部自行重現，不採信自我回報：四個可失敗性情境加上 reviewer 自己的兩個對抗性探測都在副本內實跑，紅綠與失敗原因逐一核對；獨立性以逐項命中計算證實（反駁子句對四個歸屬標記命中數為 0）。**F4 的設計判定為實質正確且是唯一解**，不只是「能跑」——純詞彙表在 F5 收斂後必然讓誠實文字變紅，把提問改成「歸屬＋反駁」才同時滿足兩個要求，而且解除了逼出迴避同義詞的壓力；F4 與 F5 是同一個病的兩面。未越界：**AC-1 的要求那一行在 design／上一輪／本輪三版逐字相同**，改動全在 `Verified by:` 之下且舊正規式原文保留；AC-2 至 AC-7 與 design 原始版逐字相同。未回歸：25 pass／0 fail／1 skip、`tsc` 與 `build` exit 0、產線兩檔建置後仍與 main 逐位元相同、渲染頁面的三項限制與三處標示與兩個 pcode 全在、全頁換算人數殘量 NONE。三項新 finding 的分類與上一輪對 F6 的標準一致（目前 0 處違反者列 Deferred risk、不阻擋）。"
+    }
+  ]
+}
