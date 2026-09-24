@@ -35,6 +35,14 @@ gates:
                 id: briefing:056:verify:attempt-2:revision-1
                 digest: sha256:97a577971ecbeedd09a905b5c8909ddc0a133f66115726fffdc7cb6a583ba5a2
                 room-ref: '@review/verify/briefing-2'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:056:verify:2
+                briefing: briefing:056:verify:attempt-2:revision-1
+                by: person:captain
+                at: "2026-09-24T00:29:47.898497Z"
+                decision: revise
+                reason: 'captain 2026-09-23 退回。F-9 是 fail-open：新的查核指令 grep 整份 entity 而非 ### Feedback Cycles 區段，檔案裡任何一行以該前綴加真實票號開頭都會回報 RECORDED，reviewer 在副本上重現兩次。gate 會因此宣稱一個沒有人簽過的核准。本票的主題就是「看起來對但執行時不成立的檢查」——F-6 是主條件不可達、F-7 是出口無法稽核、F-9 是檢查會說謊；前兩個都修了，第三個是本輪自己造出來的，不該帶著交付。修法一個子句（用 awk 限縮 grep 到該區段）。併同處理 F-10：G-8 註記把成因歸給 iCloud，但 FO 複核發現在本 sandbox 下 CloudDocs 與 brctl 兩項檢查都回 Operation not permitted，是被擋住不是不存在，reviewer 的證據本身可能是 sandbox 產物；處置改為不歸因，只描述症狀與解法。'
 ---
 
 網站目前是 `noindex` 且無對外網域，「讀者」是有連結的夥伴而非公眾。因此下列破口不是「今天要修」，而是**「公開之前必須為真」**。本票把六個散落的無票缺口收成一道 launch gate。
