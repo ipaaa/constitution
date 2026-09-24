@@ -10,7 +10,7 @@ score: 0.8
 worktree: .worktrees/spacedock-ensign-066-quiz-timeline-voided-quorum-present-tense
 issue:
 pr:
-mod-block:
+mod-block: merge:pr-merge
 gates:
     version: 1
     records:
