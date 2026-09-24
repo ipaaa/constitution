@@ -236,14 +236,18 @@ curl -s https://constitution-nine.vercel.app/past -o p.html
 - **誰能做**：法學協作者確認 → 工程師修正
 - **卡在**：需要一位法學背景的人拍板
 - **反向保護**（2026-09-21 加入，對應 `056` 的 `G-6`）：把 `h2` 重新標成 `Approved` 之前，必須先有法學背景者的確認記錄。
-  沒有記錄就重新標 `Approved`，下次同步會把錯誤內容送回線上。查驗指令如下，兩個輸出都必須是 `false`：
-
-  ```bash
-  node -e "const a=require('./src/data/history.json');const i=a.map(x=>x.id);console.log(i.includes('h2'),i.includes('h28'))"
-  ```
-
-  2026-09-21 實測輸出 `false false`。任一項翻為 `true`，表示有人把該列重新標成 `Approved`，
+  沒有記錄就重新標 `Approved`，下次同步會把錯誤內容送回線上。
+  **查驗指令以 `../constitution-features/056-pre-launch-checklist.md` 第三節標記 `# canonical: G-6` 的那一段為正本，本檔不另存副本**
+  （2026-09-25 改；原本此處自帶一份 `node -e` 指令，見下方補述）。通過條件為印出 `G-6 PASS` 且離開碼 `0`。
+  2026-09-21 曾實測 id 層輸出 `false false`。任一列回來、或 `272` 的內容以任何 id 出現，表示有人把該列重新標成 `Approved`，
   `../constitution-features/056-pre-launch-checklist.md` 的 gate 即不通過，不可移除 noindex（見 P3-8）
+
+> **2026-09-25 補述：本節原本自帶一份 G-6 查驗指令，已移除並改為指向正本。原指令逐字保留於此。**
+> 原句為：「沒有記錄就重新標 `Approved`，下次同步會把錯誤內容送回線上。查驗指令如下，兩個輸出都必須是 `false`：」，其後為一個 `bash` 區塊，內容逐字為 `node -e "const a=require('./src/data/history.json');const i=a.map(x=>x.id);console.log(i.includes('h2'),i.includes('h28'))"`。
+> **為什麼移除而不是留著**：`056` 的 G-6 判準已於 2026-09-25 補上內容層斷言（`JSON.stringify(a).includes('272')`），
+> 因為只看 id 會漏掉「同樣的錯誤內容換一個 id 重新核可」。本檔這一份是 id 層的舊形式，留著就是第二份會分岔的副本——
+> 事實上它在被移除時**已經**與正本不同形（`console.log` 對 `process.exit(1)`）。
+> `056` 的分岔偵測只掃該票一個檔案，看不到本檔，所以本檔的副本沒有任何機制保護。移除副本比再蓋一層偵測可靠。
 
 ---
 
@@ -346,15 +350,19 @@ curl -s https://constitution-nine.vercel.app/past -o p.html
   **這裡是試算表本身寫錯**，逐欄比對必然通過
 - **誰能做**：內容判斷。FO 不擬標題 —— 生一句「看起來對」的正是本專案在清的東西
 - **反向保護**（2026-09-21 加入，對應 `056` 的 `G-6`）：把 `h28` 重新標成 `Approved` 之前，必須先有確認記錄，
-  記明正確 `title` 已經由具法學背景者核對過。FO 不擬標題。查驗指令與 P0-2 的「反向保護」同一條，兩個輸出都必須是 `false`：
-
-  ```bash
-  node -e "const a=require('./src/data/history.json');const i=a.map(x=>x.id);console.log(i.includes('h2'),i.includes('h28'))"
-  ```
-
-  2026-09-21 實測輸出 `false false`。任一項翻為 `true`，表示有人把該列重新標成 `Approved`，
+  記明正確 `title` 已經由具法學背景者核對過。FO 不擬標題。
+  **查驗指令與 P0-2 的「反向保護」同一條，正本在 `../constitution-features/056-pre-launch-checklist.md` 的 `# canonical: G-6`，本檔不另存副本**
+  （2026-09-25 改；原本此處自帶一份 `node -e` 指令，見下方補述）。通過條件為印出 `G-6 PASS` 且離開碼 `0`。
+  2026-09-21 曾實測 id 層輸出 `false false`。任一列回來，表示有人把該列重新標成 `Approved`，
   `../constitution-features/056-pre-launch-checklist.md` 的 gate 即不通過，不可移除 noindex（見 P3-8）
 - **解除方式**：在 `SSOT_收集區` 補上正確 `title`，並把 `status` 改回 `Approved`。此步驟以上一條的確認記錄為前置
+
+> **2026-09-25 補述：本節原本自帶一份 G-6 查驗指令，已移除並改為指向正本。原指令逐字保留於此。**
+> 原句為：「記明正確 `title` 已經由具法學背景者核對過。FO 不擬標題。查驗指令與 P0-2 的「反向保護」同一條，兩個輸出都必須是 `false`：」，其後為一個 `bash` 區塊，內容逐字為 `node -e "const a=require('./src/data/history.json');const i=a.map(x=>x.id);console.log(i.includes('h2'),i.includes('h28'))"`。
+> **為什麼移除而不是留著**：`056` 的 G-6 判準已於 2026-09-25 補上內容層斷言（`JSON.stringify(a).includes('272')`），
+> 因為只看 id 會漏掉「同樣的錯誤內容換一個 id 重新核可」。本檔這一份是 id 層的舊形式，留著就是第二份會分岔的副本——
+> 事實上它在被移除時**已經**與正本不同形（`console.log` 對 `process.exit(1)`）。
+> `056` 的分岔偵測只掃該票一個檔案，看不到本檔，所以本檔的副本沒有任何機制保護。移除副本比再蓋一層偵測可靠。
 - **驗證**：
   ```bash
   # 同步後，兩筆的 title 不應相同
