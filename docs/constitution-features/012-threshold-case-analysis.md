@@ -45,6 +45,14 @@ gates:
               application:
                 target-stage: review
                 state: consumed
+        - id: gate:012:review
+          stage: review
+          attempts:
+            - id: gate-attempt:012-review-1
+              briefing:
+                id: briefing:012:review:attempt-1:revision-1
+                digest: sha256:50c63aa24c1ddb057dedcdc0b0a6f136f27fdccfa29b1e7b9949073da76d041a
+                room-ref: '@review/review/briefing-1'
 ---
 
 研究大法官會議時期通過舊案數量與提升門檻之間的關聯，製作時間軸 infographic。

@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:012:review:attempt-1:revision-1",
+  "question": "review 重審判 PASSED，上一輪的唯一阻擋項 F1 已修正——而且 reviewer 說「修得比我要求的更完整」，因為 implement 自行抓到它上一輪漏看的孿生問題。下一站是 complete（terminal）。**但我建議退回，把 F4／F5／F6／F7 一輪折進來**，理由是它們全部指向同一件事：這張票的核心紀律「對可斷言的講、對不可斷言的不講」目前**沒有任何自動守衛**。F6 是本 session 同型盲區的**第八處**——`c3` 明文承諾「不得出現換算後的人數」，但沒有任何測試守著它；目前 0 處違反（故 reviewer 判 Deferred risk），而**補這條測試不涉任何 AC 變更**。F4 需要你的 AC 授權（AC-1 的正規式詞彙表漏掉頁面上唯一真正的 1987 句子所用的「表決條件」「改低」），F5 與 F4 同源（同一概念五種用詞，違反 AGENTS.md，且 reviewer 指出若 AC-3 朗讀測試理解度不如預期這是第一個該查的原因），F7 是一條恆真斷言（Polish）。**若你給出那一句一次性授權，這四項可以在同一輪做完。** 三項未達成的驗證項無論如何都在你或法學背景者身上：AC-3 朗讀測試、D5 視覺檢查、`c3` 的法學解讀。",
+  "artifacts": [
+    {
+      "id": "artifact:012:review:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/96d7d8f7e732cf4f3d69d54b438f3e886da440b7/docs/constitution-features/012-threshold-case-analysis.md",
+      "rev": "sha256:cc1ff9359cbf3a29d635bbf8e5b5e739bd1a174362d379404d7703427b7ee8b7",
+      "mediaType": "text/markdown",
+      "summary": "上一輪阻擋項 F1 已修正：四列日期改對、**未替本票破例加列**（行數與 main 同為 179）、兩條做不到的 INDEX 指示原文都逐字保留在標日期補述內；reviewer 實讀 INDEX 第 96 列與 AGENTS.md:160 兩處證據核對無誤，並自陳 implement 抓到的孿生問題「是我上一輪漏看的」。F2 原句一字未刪並以補述更正。F3 的移除經判定理由成立——關鍵不在「沒人用」，而在它是一個名稱通用卻指向查不到規則期條文之處的現成常數，留著比拿掉更容易誤導；出處資訊沒有遺失，反因 A0030300 首次被登記而淨增。未越界：AC 全節與上一輪逐位元相同、AC-1 的正規式詞彙表原樣仍在、F4／F5 零變動。未回歸：測試 23 pass／0 fail／1 skip、型別與建置皆 exit 0、產線兩檔與 main 逐位元相同，且**重新渲染的頁面 HTML 與上一輪逐位元相同**——本輪只動註解與文件，使用者看到的輸出未變。"
+    }
+  ]
+}
