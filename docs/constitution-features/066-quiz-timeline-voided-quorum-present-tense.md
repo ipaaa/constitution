@@ -9,7 +9,7 @@ verdict:
 score: 0.8
 worktree: .worktrees/spacedock-ensign-066-quiz-timeline-voided-quorum-present-tense
 issue:
-pr: "#39"
+pr: pr-merge:39
 mod-block: merge:pr-merge
 gates:
     version: 1
