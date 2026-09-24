@@ -1,7 +1,7 @@
 ---
 id: 056
 title: 上線前檢查清單：公開之前每一項都必須有結論
-status: verify
+status: review
 source: captain 2026-09-07（把關機制體檢與任務地圖的綜合結論）
 started: 2026-09-21T18:56:47Z
 completed:
@@ -74,6 +74,17 @@ gates:
                 id: briefing:056:verify:attempt-5:revision-1
                 digest: sha256:1c986e0807bcaa00fd16c259362a3d988b9f70d602dd443e9a3f0bb7ffc5e120
                 room-ref: '@review/verify/briefing-5'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:056:verify:5
+                briefing: briefing:056:verify:attempt-5:revision-1
+                by: person:captain
+                at: "2026-09-24T19:13:24.330688Z"
+                decision: approve
+                reason: captain 2026-09-24 核准進入 review。verify cycle 7 判 PASSED，F-12 的根本修法經對抗性實證有效：reviewer 在三個不同區段各植入一份重複的 G 項清單，三份全部回報 STRAY 且區段標籤正確；反向測試（放在第三節內的清單正確地不被標記）排除了「什麼都報因而永遠不通過」的假檢查；真實候選零 STRAY，一筆 AC-OWNED 以已知例外的身分宣告而非藏起來。核准的判準是：本票七輪累積的**可執行**缺陷已全數清除（F-6 主條件不可達、F-9 與 F-11 fail-open、F-12 兩份可執行副本分岔），殘留的 F-13 是為表格儲存格轉義而存在的**不可執行**展示形式、F-14 是自我排除機制的邊界情形，兩者皆不使任何 AC 失敗且已完整記錄在票內供 gate 執行者閱讀。三項未達成的驗證項仍在 captain 身上：AC-2（依賴尚未核准動工的 feature 039）、C1 的真實信箱覆寫點、G-3 的 Vercel dashboard 人工項。
+              application:
+                target-stage: review
+                state: consumed
 ---
 
 網站目前是 `noindex` 且無對外網域，「讀者」是有連結的夥伴而非公眾。因此下列破口不是「今天要修」，而是**「公開之前必須為真」**。本票把六個散落的無票缺口收成一道 launch gate。
