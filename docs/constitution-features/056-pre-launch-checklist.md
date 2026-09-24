@@ -912,7 +912,7 @@ F-7 與 F-8 都修好，且都通過了我當初抓它們時的同一套標準�
 
 ## Stage Report: implement (cycle 5)
 
-本輪即 captain 2026-09-23 退回後授權的那一輪。只處理 F-9 與 F-10，未動 `src/`、build 產物、`layout.tsx`、Next.js 設定、`PresentDetail.tsx`，未跑 `sync-content`。
+本輪即 captain 2026-09-23 退回後授權的那一輪，全部改動在 commit `a3c1e06`。只處理 F-9 與 F-10，未動 `src/`、build 產物、`layout.tsx`、Next.js 設定、`PresentDetail.tsx`，未跑 `sync-content`。
 
 - DONE: F-9：用 `awk` 把 G-1／G-2 的查核指令限縮到 `### Feedback Cycles` 區段，修掉「檔案任何一處的前綴＋真實票號都會被算成 RECORDED」這個 fail-open。**兩個方向都要驗**：把 `- gate-exception 058：…` 放進 stage report 或 out of scope 段，確認修法後**不再**算成 RECORDED；把同一行放進 `### Feedback Cycles`，確認**仍然**算到。並照你先前的紀律把指令抽出成獨立腳本執行，貼出輸出與離開碼。
   `:189` 的查核指令換成 `awk` 限縮版；`:193-198` 追加更正補述，原指令逐字保留於補述內。兩個方向皆已驗，輸出見下節。**F-9 是本票 cycle 4 自己造出來的，不是既有問題**，補述與本節都如此記載。
