@@ -38,6 +38,10 @@ gates:
                 id: briefing:065:verify:attempt-2:revision-1
                 digest: sha256:cfc93b5b4d501cf17c15d6f802b575a5c9776f109ecd0ba610e79775e931f1de
                 room-ref: '@review/verify/briefing-2'
+              withdrawal:
+                by: agent:first-officer
+                at: "2026-09-24T19:25:29.589014Z"
+                reason: FO 誤開：branch->main 的 entity mirror 把 status 由 review 蓋回 verify（dispatch build --stamp 寫的是 main 那份、分支那份仍停在 verify），致本次 prepare 錯誤地開出 verify attempt-2。captain 已於 2026-09-24 核准並 consume 過 verify gate，本票應在 review。撤回此 attempt，修正 status 後改開 review gate。
 ---
 
 站上把「國會職權修法」判決的內容標成 114 年憲判字第 1 號，但那是憲法訴訟法修正案；國會職權修法是 113 年憲判字第 9 號。這是公開頁面上的事實錯誤，且涉及具名大法官。
