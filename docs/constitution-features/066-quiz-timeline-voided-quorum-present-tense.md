@@ -822,3 +822,39 @@ FO 同時加了一個條件：**explanation 必須明確承載失效事實，判
 合起來讀：題幹問的是現在的出席人數（與站上 `ATTENDING_JUSTICES` 的 5 位一致，本來就對），explanation 用「曾是」把 10 人下限限定為過去，並補上現行門檻是什麼。這一對同樣自足。
 
 **AC5 的兩條 grep 以正確基準重跑**（`git log` 顯示 FO 已推進 entity 至 verify，`HEAD~2` 不再是改動前；改動前基準為 `cb341af`）：`correctIndex`／`label:` 的改動數 = **0**；題幹原文出現在 `git diff -U0 cb341af -- src/data/quizzes/controversy.ts` 的 +／- 行次數 = **0**；題幹逐字比對（改動前 `:74` == 現行 `:78`，位移來自檔頭新增的 4 行 import）相同。本補述未改動任何程式碼。
+
+## Stage Report: verify
+
+- DONE: 獨立重跑 AC1–AC7 全部七項，**不採信 implement 的自我回報**。AC2 須自行用副本作法起 dev server 重跑六條路由的三項檢查，確認改動後全部 PASS、離開碼 0；implement 同時起了改動前與改動後兩台 server 做對照，請至少重現「改動後」那一側，並判定它給的改動前基準是否可信。特別確認 `scripts/check-voided-floor.mjs` 與票內第 8.3 小節**逐字相同**（它稱 `VERBATIM MATCH`，5073 bytes）——**AC 只引用不複製**這個設計成立與否，取決於這一點。
+  自建兩份副本（`git archive HEAD` 與 `git archive cb341af` + `cp -Rc node_modules`，只在副本內讓 `LaunchGate` 直接放行），起 port 3241／3242。改動後六條路由十八項全 PASS、`exit 0`；改動前 `exit 1`，`/controversy-timeline` 檢查 1 FAIL(4)／檢查 2 FAIL(0)／檢查 3 FAIL(2)，四筆命中與第 8.4 小節逐字相同——**implement 給的改動前基準可信**。腳本逐字比對：以程式自 8.3 小節抽出 js 圍籬（該節僅一個圍籬），`cmp` 與 `scripts/check-voided-floor.mjs` 相同，兩邊皆 5073 bytes；腳本的 regex 組僅存在於這兩處，票內無第二份可執行檢查。AC1 `起失其效力` 4 筆全落在 `ruling-threshold.ts`；AC6 兩條 grep 皆 0 筆、`TODO.md` 已有 P1-9；AC7 兩個 json 的 sha256 與基線逐字相同、`robots: { index: false, follow: false }` 仍在、乾淨副本 `tsc --noEmit` `exit 0`（無 `.next/`）、`063-required-for-ruling` 3 筆、`/future` 門檻片段改動前後各 14 筆 `IDENTICAL: true`。
+- DONE: **逐處查核 14 處清單的施工是否與 design 的分級處置一致**，特別是 D 級三項：`:152` 是否只改「持續凍結」→「當時已凍結」而未加豁免清單；`:164` 的後見之明寫法是否真的解決了時序錯置（節點日期 2024-10-31 早於三讀 2024-12-20）；`:151`／`:187` 是否**逐字未動**。並確認 B1／B2 沿用 `063` 的處置是整句刪除而非改寫，`/quiz` 的 `correctIndex` 與 `options` 一律未動。
+  14 處全部落地且與分級處置一致。`:152` 以最長共同前後綴演算法取字元級差異：前綴 100 字、後綴 38 字，唯一差異為「持續」→「當時已」，腳本內無豁免清單（`本檔不設豁免清單` 且逐字比對已證未改）。`:164` 時序錯置已解——新文把修正案講成節點日期之後才三讀，並把停擺錨到 2025-01-23 生效日（但「兩個月後」實為 50 天，見 F-3）。`:151`／`:187` 以 `cb341af` 對應行逐字比對現行 `:155`／`:191`，**完全相同**。B1／B2 為整句刪除無替代文字。四個 quiz 檔的 `correctIndex`／`label:`／`text:` 行集合與 `cb341af` **逐字相同**。
+- DONE: **四處沒有自動涵蓋的人工驗證**（B3、D-chrono、題幹、`page.tsx:201`）各自的證據是否真的可失敗，逐項判定。並特別查 AC5 的處置：FO 裁示題幹 `controversy.ts:74` 維持不動，但要求**題幹＋explanation 合起來讀不會讓人以為那個門檻還在**——請以真實渲染的題目頁判定這一對是否自足。最後給出 PASSED 或 REJECTED。
+  四項證據皆可失敗，且我以「跑出來」而非「讀回報」確認。另做三項負面對照：在 `after` 副本上分別還原「持續凍結」、移除 `${VOIDED_FLOOR_SHORT}`、補回「違憲審查持續停擺」，三項檢查**各自且僅各自**翻成 FAIL(1)／FAIL(0)／FAIL(1)，`exit 1`；還原後 `exit 0`，副本檔案與候選逐字相同，候選 worktree `git status --porcelain` 全程為空。AC5：讀 `QuizQuestion.tsx:60-78`，選答後 explanation **無條件**渲染在題幹 `<h2>` 下方同一畫面，且「下一題」按鈕在揭曉後才出現——題幹與 explanation 必然同時在場。自真實頁面取出 q2 這一對，explanation 末句為「該下限已由 114 年憲判字第 1 號宣告違憲，自 2025-12-19 起失其效力，本題問的是當時的規定」。**這一對自足。**
+- DONE: Placeholder scan（verify 階段具名輸出）
+  改動的 10 個檔與六條真實渲染頁面全數掃過 `某學者`／`某大學法律系`／`test`／`lorem ipsum`／`快速了解最新判決的5個重點`：渲染頁 0 命中。原始碼命中僅為腳本的 `.test()` 方法呼叫，以及 `TODO.md`／`INDEX.md` 中**記述 2026-04-30 事故本身**的既有段落。`src/data/*.json` 不在 diff 內，sha256 未變。
+
+### 事實查核（改動引入的每一項事實主張）
+
+`2025-12-19` 失效日、`114 年憲判字第 1 號`、`憲法訴訟法第 30 條第 2 項`：全部由 `RULING_THRESHOLD.voidedFloor` 推導，與 `063` 結論一致，未重查（design 第一小節指定沿用）。`2025-01-23` 生效日與 `2024-12-24`／`2025-07-25` 否決日：與同檔 `evt-12`／`evt-11` 的 `date` 欄位一致。「大法官法定員額 15 人」為現行事實。「現行門檻回到憲法訴訟法第 30 條第 1 項的比例計算」：與 `RULING_THRESHOLD.statute` 及 `rule` 一致。**唯一對不上的是 F-3。**
+
+### Findings（依 README 的 Review-finding disposition，未變動任何候選位元組）
+
+- **F-1　AC1 第二條 Verified-by 命令字面不成立。** `grep -rn "from '@/data/ruling-threshold'" src/` 實測 **2 筆** < 門檻 4；quiz 兩檔用雙引號。引號無關寫法為 4 檔，加 `future.ts` 的 `from './ruling-threshold'` re-export 共 5 檔，**語意通過**。implement 報告寫「5 個 ⋯ ≥ 4 的門檻」卻未揭露它換掉了命令。Polish；無使用者可見損失。
+- **F-2　AC3 的 `sed -n '55,56p'` 行號已漂移。** 檔頭新增 2 行後 B3 落在 `:57-58`；該命令現在印出 `],` 與 `correctIndex: 3,`。實質通過（時間錨在位），implement 已主動揭露位移。Polish。
+- **F-3　`controversy-timeline.ts:168` 的「兩個月後」與實際相差 10 天。** 2024-10-31 → 2024-12-20 為 **50 天**（1 月 20 天）；「兩個月後」指向 12-31。渲染於 `/controversy-timeline`（在 `PUBLIC_PAGES` 內），而精確日期就在同檔相鄰的 `evt-09`（`dateLabel: '2024年12月20日'`）。建議改為「同年 12 月 20 日三讀通過的」。**任務歸屬不在 implement**：此措辭由 design 第 144 行以「例如」給出、AC4 未訂精確度要求，implement 忠實執行了核准的 design。**Needs decision**——由 FO 決定是否授權一行修正。
+- **F-4　新增的兩筆註解指向不存在的路徑。** `src/data/future.ts:462` 與 `src/data/ruling-threshold.ts` 寫 `docs/constitution-features/063-required-for-ruling-legal-accuracy.md`，該檔實際在 `_archive/` 下；design 第 292 行明指要寫 `_archive/` 版本。另有 5 筆同型為 `063` 時期既存（當時尚未封存）。只修新增 2 筆會讓同檔前後不一致。Polish；僅開發者可見。
+- **F-5　失效視窗的日期未收斂到單一來源。** `2025-01-23` 與 `12月19日` 在三處**新字串**中手寫（`controversy-timeline.ts:180`／`:184`、`pending.ts:58`），不由 `RULING_THRESHOLD.voidedFloor` 推導；AC1 只守「起失其效力」故未命中。今日三處皆正確，且 design 的 AC3 本來就要求把區間寫成字面時間錨。**Deferred risk**；promote-to-material 條件：`voidedOn` 或生效日任一被修正時，這三處不會跟著變。附註：`RulingThresholdNote.tsx:57` 以民國年寫同一區間，站上因此有兩種紀年並存。
+- **F-6　AC6 第 2 條 grep 在票內與 `TODO.md` P1-9 各有一份。** 非三項自動檢查的副本（那三項的唯一定義在腳本，已證逐字相同），且 P1-9 的驗證區塊是 design 指定「格式比照 P0-2」的產物。Polish。
+- **觀察（本票未引入，不是候選改動）** `:156` 的「立法院當時已凍結大法官人事同意權（不審查新提名人）」置於 2024-12-20 節點，但同檔 `evt-11` 記載立法院於 2024-12-24 就提名人選**投票否決**。「不審查」與「投票否決」在同一份時間軸上互相牴觸。括號文字為既存原文，本票只改了「持續」→「當時已」。
+
+### Summary
+
+七項 AC 全部獨立重跑並實質通過；AC2 我自建副本、自起 server、自跑腳本，改動後六路由十八項全 PASS `exit 0`，改動前基準與 design 第 8.4 小節逐項相同，因此 implement 給的對照基準可信。
+`scripts/check-voided-floor.mjs` 與票內 8.3 小節 `cmp` 逐字相同（5073 bytes），腳本 regex 僅存在於這兩處——「AC 只引用不複製」名副其實，票內沒有第二份可執行的檢查清單。
+三項負面對照證明改動後的 PASS 不是套套邏輯：逐一還原三處錯誤，對應的那一項檢查各自且僅各自 FAIL。
+14 處施工與 design 的分級處置一致：`:152` 字元級差異僅「持續」→「當時已」且未加豁免，`:151`／`:187` 逐字未動，B1／B2 整句刪除，四個 quiz 檔的答案與選項逐字未動。
+AC5 的判準以真實渲染頁與 `QuizQuestion.tsx` 的揭曉邏輯驗證：explanation 必然與題幹同畫面，且末句明講下限已失效、本題問的是當時規定——**這一對自足**。
+六筆 findings 全為 Polish／Deferred risk／Needs decision，沒有一筆構成對 value AC 或保護邊界的實質損害；最值得 FO 一看的是 F-3（一行措辭，歸屬在 design 而非 implement）。
+
+**VERDICT: PASSED**
