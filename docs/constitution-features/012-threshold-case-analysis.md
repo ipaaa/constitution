@@ -1,7 +1,7 @@
 ---
 id: "012"
 title: 解釋門檻與案件數量關聯視覺化
-status: verify
+status: review
 source: meetup-20260416
 started: 2026-09-21T19:21:11Z
 completed:
@@ -34,6 +34,17 @@ gates:
                 id: briefing:012:verify:attempt-2:revision-1
                 digest: sha256:01e0b39f90da3c685c997fd4fd92ff7d1da0e5c4d20d7b2c49d174b17fb26497
                 room-ref: '@review/verify/briefing-2'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:012:verify:2
+                briefing: briefing:012:verify:attempt-2:revision-1
+                by: person:captain
+                at: "2026-09-24T00:28:57.215033Z"
+                decision: approve
+                reason: captain 2026-09-23 核准進入 review。verify cycle 2 零新 finding：V1 的採納由提出它的同一位 reviewer 以同一標準複驗，三個一手端點自行重抓、77/79 切分自 813 筆原始日期獨立重算、三項限制與三處標示改用真實渲染 HTML（57815 bytes）確認、兩條新測試以突變實測確認可失敗。AC 變更經七塊逐字比對確認只動 AC-1（三期→四期，保留原文並追加授權註記）。全頁無任何換算後的人數，c3 的未拍板限制被遵守。三項未達成的驗證項維持在 captain 與法學背景者身上：AC-3 朗讀測試、D5 視覺檢查、c3 的法學解讀（未拍板前不得斷言 1958 那次的門檻變動方向）。
+              application:
+                target-stage: review
+                state: consumed
 ---
 
 研究大法官會議時期通過舊案數量與提升門檻之間的關聯，製作時間軸 infographic。
