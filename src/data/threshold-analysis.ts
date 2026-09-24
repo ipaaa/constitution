@@ -12,6 +12,17 @@
  *   1. 門檻時期的起訖日一律用法規公布日，不用會議記錄的口述年份。
  *   2. 不寫因果。本檔只放可查證的計數、可查證的條文，以及明寫不確定性的候選因素。
  *   3. 規則期的門檻數字沒有第一手依據，不得填。見 D1。
+ *
+ * ⚠️ 2026-09-23 更正：**上面第 3 條的前提已不成立，該條不再適用。**
+ * 當時只查了 pcode A0030159，它的歷史條文只回溯到 1958-07-21。
+ * 《司法院大法官會議規則》在全國法規資料庫另有獨立的廢止法規紀錄 **pcode A0030300**，
+ * 全文 21 條可取得，第 12 條已逐字核對並填入 ERAS，evidence 為 'primary-source'。
+ * 原句保留，避免看起來一直都對。
+ *
+ * 第 3 條由下面這條取代：
+ *   3'. 規則期的條文取自 A0030300 的 1952-04-16 修正版，帶三項限制（RULES_ERA_CAVEATS），
+ *       **三項都必須顯示在站上**。仍然不得寫出「1/2」—— 實際條文是
+ *       「三分之二以上出席＋過半數之同意」，寫 1/2 會是錯的。
  */
 
 /** 一年的案件計數。series 標明是哪個序列，兩個序列不可相加。 */
@@ -88,9 +99,6 @@ export interface FactorNote {
 
 const LAW_OLD_VER = (lnndate: string) =>
   `https://law.moj.gov.tw/LawClass/LawOldVer.aspx?pcode=A0030159&lnndate=${lnndate}&lser=001`;
-
-/** 法規沿革頁。規則期唯一能查到的一手記載（只有制定日，沒有條文）。 */
-export const LAW_HISTORY_URL = 'https://law.moj.gov.tw/LawClass/LawHistory.aspx?pcode=A0030159';
 
 /** 現行憲法訴訟法全文。 */
 export const LAW_CURRENT_URL = 'https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=A0030159';
@@ -247,7 +255,14 @@ export const RULES_ERA_CAVEATS: readonly StatuteCaveat[] = [
 /**
  * 四條門檻時期。
  *
- * effectiveFrom 一律為法規公布日，取自 law.moj.gov.tw 的沿革頁。
+ * effectiveFrom 一律為法規公布日，取自 law.moj.gov.tw 的沿革頁。**兩個 pcode 各管一段：**
+ *   - `LawHistory.aspx?pcode=A0030159` —— 1958-07-21、1993-02-03、2025-01-23 三個公布日。
+ *   - `LawHistory.aspx?pcode=A0030300` —— 規則期的 1948-09-16 制定公布日。
+ * 查規則期要用 A0030300。**A0030159 對規則期是錯的 pcode**，它的歷史條文不含這一份。
+ *
+ * （這兩個網址原本各有一個 export。`LAW_HISTORY_URL` 只指 A0030159、沒有任何地方引用，
+ * 註解還寫「規則期唯一能查到的一手記載」—— 該敘述已被 A0030300 推翻，pcode 對規則期也是錯的。
+ * 留著等於給下一個維護者一個會指向錯法規的現成常數，因此移除，出處改記在這裡。）
  *
  * 規則期的條文一度標為 'unverified'：A0030159（現行憲法訴訟法）的歷史條文只回溯到
  * 1958-07-21，查不到《司法院大法官會議規則》。2026-09-23 於**另一個 pcode**

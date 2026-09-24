@@ -36,7 +36,7 @@ docs/
 
 | 路徑 | 用途 | 狀態 | 負責人 | 最後查核 |
 |---|---|---|---|---|
-| `AGENTS.md` | agent 與協作者的工作規範。禁止事項、溝通方式、寫作與文件規則 | evergreen | captain | 2026-09-01 |
+| `AGENTS.md` | agent 與協作者的工作規範。禁止事項、溝通方式、寫作與文件規則 | evergreen | captain | 2026-09-23 |
 | `docs/INDEX.md` | 本檔。全部文件的索引與 workflow 現況 | evergreen | captain | 2026-09-03 |
 
 ### 專案定位
@@ -44,9 +44,9 @@ docs/
 | 路徑 | 用途 | 狀態 | 負責人 | 最後查核 |
 |---|---|---|---|---|
 | `docs/project/about.md` | 專案定位、三圈目標受眾、溝通策略 | evergreen | captain | 2026-09-01 |
-| `docs/project/architecture.md` | 過去／現在／未來三軌的資訊架構 | evergreen | captain | 2026-09-01 |
-| `docs/project/design-system.md` | 視覺美學、色彩、排版、吉祥物語言 | evergreen | captain | 2026-09-01 |
-| `docs/project/tech-stack.md` | ⚠️ 技術選型正確，**資料流章節已過時**，檔頭有警告 | evergreen | captain | 2026-09-01 |
+| `docs/project/architecture.md` | 過去／現在／未來三軌的資訊架構 | evergreen | captain | 2026-09-23 |
+| `docs/project/design-system.md` | 視覺美學、色彩、排版、吉祥物語言 | evergreen | captain | 2026-09-23 |
+| `docs/project/tech-stack.md` | ⚠️ 技術選型正確，**資料流章節已過時**，檔頭有警告 | evergreen | captain | 2026-09-23 |
 | `docs/project/contributing.md` | ⚠️ 角色分工正確，**任務認領流程已過時** | evergreen | captain | 2026-09-01 |
 
 ### 內容產線

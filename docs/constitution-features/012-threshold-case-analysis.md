@@ -1,7 +1,7 @@
 ---
 id: "012"
 title: 解釋門檻與案件數量關聯視覺化
-status: verify
+status: implement
 source: meetup-20260416
 started: 2026-09-21T19:21:11Z
 completed:
@@ -698,11 +698,20 @@ Verified by: 施工前後比對 `src/data/discussions.json` 與 `src/data/histor
 
 ## Documentation impact
 
+> **2026-09-23 更正（review F1，FO 授權）：下面兩條關於 `docs/INDEX.md` 的原文照字面做不到，已改寫。**
+> 原文為「`docs/INDEX.md`：本 feature 由裸種子票變為有規格的計畫。狀態為 `plan`，不得寫成已上線。」
+> 與「`docs/INDEX.md`：更新本 feature 狀態與最後查核日，並收錄新增文件。」
+> 兩條都假設 INDEX 有一列屬於本票，實際上沒有：INDEX 對 workflow entity 是目錄層級索引。
+> 原文寫於 design 階段，當時未核對 INDEX 的實際粒度。原文引在此處，不另外保留於正文，
+> 避免正文同時留著兩套互相矛盾的指示。
+
 ### 現在更新
 
 - `docs/constitution-features/012-threshold-case-analysis.md`（本檔）：記錄已定方向、R1–R7 實跑證據、
   D1–D4 待拍板項。全部尚未實作，不得讀成已上線。
-- `docs/INDEX.md`：本 feature 由裸種子票變為有規格的計畫。狀態為 `plan`，不得寫成已上線。
+- `docs/INDEX.md`：本票無列可改。INDEX 對 workflow entity 是**目錄層級**索引
+  （第 96 列「33 個封存 entity、7 個進行中、6 份 debrief」），沒有逐票的列可以填狀態。
+  本票的狀態在自己的 frontmatter `status:`，查詢方式見 `AGENTS.md` 的那條 `for f in ...` 指令。
 
 ### 實作後更新
 
@@ -713,7 +722,10 @@ Verified by: 施工前後比對 `src/data/discussions.json` 與 `src/data/histor
 - `AGENTS.md`：在「不要手改 `src/data/*.json`」一節補一句，說明
   `src/data/threshold-analysis.ts` 是手寫資料模組、來源為 `cons.judicial.gov.tw` 與 `law.moj.gov.tw`，
   與試算表同步無關。否則下一個 agent 會分不清哪個資料檔可以改。
-- `docs/INDEX.md`：更新本 feature 狀態與最後查核日，並收錄新增文件。
+- `docs/INDEX.md`：把本分支改動過的 `evergreen` 文件的「最後查核」更新為施工日期
+  —— 即 `AGENTS.md`、`docs/project/architecture.md`、`design-system.md`、`tech-stack.md` 四列。
+  本票沒有新增任何 `.md` 文件，因此不收錄新列；也沒有逐票的列可以更新狀態。
+  **不得為本票破例在 INDEX 加一列**，那會讓其餘四十幾個 entity 的索引方式不一致。
 
 ### 不更新
 
@@ -1175,3 +1187,52 @@ F4 是我這輪新提的，值得 captain 看一眼：**規格內部矛盾**（�
 判 **REJECTED**，阻擋項只有 F1——`docs/INDEX.md` 的必要更新未執行（四列「最後查核」仍停在 `2026-09-01`，而四份 evergreen 文件本分支都改過）。F1 不涉 AC、不觸犯 `AGENTS.md` 索引硬規則，且該條 Documentation impact 有一半照字面做不到（INDEX 是目錄層級索引，沒有逐票的列），gate 可以便宜地推翻我。
 
 另記四項不阻擋的發現：F2／F3 資料模組檔頭與 `LAW_HISTORY_URL` 的陳述已被 cycle 2 推翻但未更新（Polish）；**F4 —— 規格自身矛盾使 AC-1 的正規式守衛對頁面上唯一的 1987 門檻句失效**，現況文字正確但無測試保護，要修必須由 captain 擴充 AC-1（Deferred risk）；F5 用詞不固定，若 AC-3 理解度不如預期應優先查此（Polish）。AC-3、D5、`c3` 法學解讀三項維持未達成，原樣留存。
+
+## Stage Report: implement (cycle 3)
+
+本輪處理 review 的 F1（Material，阻擋）與 F2／F3（Polish）。F4／F5 依 FO 指示不動。
+
+- DONE: F1 修法一 —— `docs/INDEX.md` 四列「最後查核」由 `2026-09-01` 改為 `2026-09-23`
+  `AGENTS.md`、`docs/project/architecture.md`、`design-system.md`、`tech-stack.md` 四列。本分支確實為這四份 `evergreen` 文件各加了新章節，索引原本低報了它們的更新時間。修改以腳本逐列斷言「列首檔名相符」且「列尾恰為 `| 2026-09-01 |`」後才置換，不符即中止。`git diff --numstat docs/INDEX.md` 為 `4 4`，四加四減，**沒有新增任何列**。
+- DONE: F1 修法二 —— 改寫 `## Documentation impact` 中兩條做不到的 `docs/INDEX.md` 指示
+  reviewer 指出的是 `現在更新` 那條。實際上 `實作後更新` 也有一條同病（「更新本 feature 狀態與最後查核日，並收錄新增文件」），同樣假設 INDEX 有一列屬於本票，**一併改寫**。改寫後：`現在更新` 寫明本票無列可改、狀態在 frontmatter、查詢方式見 `AGENTS.md` 的 `for f in ...` 指令；`實作後更新` 寫明實際可做的是更新四份 evergreen 文件的最後查核日、本票未新增 `.md` 故不收錄新列、並明文禁止為本票破例加列。
+- DONE: F1 的原文保留
+  依 `AGENTS.md`「不要悄悄改寫原文」，在 `## Documentation impact` 開頭加一則 2026-09-23 補述，把兩條原文逐字引在裡面，並說明它們寫於 design 階段、當時未核對 INDEX 的實際粒度。原文不另外留在正文，避免正文同時掛著兩套互相矛盾的指示。
+- DONE: F1 的引用已核對
+  補述與正文都引用 INDEX 第 96 列作為「目錄層級索引」的證據。實際讀出該列確認為
+  `| `docs/constitution-features/` | 33 個封存 entity、7 個進行中、6 份 debrief | record | — | 2026-09-03 |`，引用正確。
+- DONE: **未為本票在 `docs/INDEX.md` 破例加列**
+  INDEX 的 diff 只有四個日期字串，無新增列。其餘四十幾個 entity 的索引方式不受影響。
+- DONE: F2 —— 資料模組檔頭第 3 條以追加補述更正，原句保留
+  檔頭「三條不可違反的規則」第 3 條「規則期的門檻數字沒有第一手依據，不得填」寫於 cycle 2 之前。追加 ⚠️ 補述，寫明該條的前提已不成立、原因（當時只查 pcode A0030159，其歷史條文只回溯到 1958-07-21）、以及取代它的 `3'.`（條文取自 A0030300 的 1952-04-16 修正版、帶三項限制且三項必須顯示、仍不得寫出 1/2）。原句一字未刪。
+- DONE: F3 —— 移除 `LAW_HISTORY_URL`，出處改記在 `ERAS` 的說明
+  **先實跑確認無引用**：以 `grep -rn` 掃 `src`／`tests`／`scripts` 全部 `.ts`／`.tsx`／`.mjs`／`.js`，除宣告本身外 0 處引用；對照組 `LAW_CURRENT_URL` 在同一次掃描命中第 318 行（`current` 期的 `sourceUrl`），證明掃描本身有效、不是掃法錯誤。移除後 `npx tsc --noEmit` 與 `npm run build` 皆 exit 0。
+- DONE: F3 的判斷理由
+  **選擇移除而非修正註解保留。** 三個理由：(1) 零引用，留著不會有人讀到它的註解，只會在有人搜尋 `LawHistory` 時被撈出來；(2) 它指的 `pcode=A0030159` 對規則期是**錯的 pcode**，留一個現成常數等於給下一個維護者一條指向錯法規的捷徑——這比沒有常數更糟；(3) 它原本承載的資訊（effectiveFrom 的出處）本來就該寫在 `ERAS` 旁邊而不是一個沒人用的 export。**資訊沒有遺失**：`ERAS` 的說明改為明列兩個 pcode 各管哪幾個公布日（A0030159 管 1958-07-21／1993-02-03／2025-01-23，A0030300 管規則期的 1948-09-16），並明寫「查規則期要用 A0030300，A0030159 對規則期是錯的 pcode」。移除的理由也寫在該處註解裡，供日後追溯。
+- SKIPPED: F4 —— AC-1 正規式詞彙表的擴充
+  屬 captain 權限，FO 已上呈，本輪不動。已驗證 AC 全節逐字未變，兩條正規式原樣仍在。
+- SKIPPED: F5 —— 用詞不固定
+  與 F4 同源，等 F4 的決定，本輪不動。`git diff --stat -- src/components` 為空，元件一字未改。
+- SKIPPED: AC-3 朗讀測試（D4）、D5 視覺檢查、`c3` 的法學解讀
+  三項維持未達成，本輪未代為宣稱達成，也未代為拍板。
+
+### 未越界與未回歸的驗證
+
+- **AC 全節逐字未變**：以 `git show HEAD:<entity>` 取本輪改動前版本，切出 `## Acceptance criteria` 至 `## Test plan` 之間整段字串比對，相同。另單獨確認 AC-1 的兩條正規式原樣仍在。
+- **F5 未動**：`git diff --stat -- src/components` 為空。
+- **產線檔與 main 逐位元相同**：`discussions.json` = `4071978a…3162`、`history.json` = `4d1992e3…cea3b`，與 `git show main:<path>` 的 sha256 相同。未執行 `npm run sync-content`。
+- **測試無回歸**：`node --test` 為 `tests 24 / pass 23 / fail 0 / skipped 1`，與 cycle 2 相同（skip 者為 AC-6）。
+- **建置無回歸**：`npm run build` exit 0；`npx tsc --noEmit` exit 0；`npx eslint` 0 error。
+- **未暫改候選檔**：本輪的修改都不影響渲染輸出，測試本身即以 `renderToStaticMarkup` 渲染四個元件並通過，無需另起 dev server。
+
+### Summary
+
+三項授權修正全部完成。F1 補了索引的四個日期，並把票內兩條「照字面做不到」的 INDEX 指示改寫成
+與實際粒度一致的說法——reviewer 只點名一條，實際上兩條同病，一併處理；原文以補述逐字保留。
+F2 的檔頭補述、F3 的 dead export 移除都已落地。
+
+F3 選擇移除而非保留，關鍵理由不是「沒人用」，是**它指向規則期的錯 pcode**：
+留一個零引用但會把人導向錯法規的常數，比沒有常數更危險。它原本承載的出處資訊沒有遺失，
+改記在 `ERAS` 旁邊，並明列兩個 pcode 各管哪幾個公布日。
+
+F4／F5 依 FO 指示原樣不動，AC 全節經比對逐字未變。AC-3、D5、`c3` 三項仍為未達成項。
