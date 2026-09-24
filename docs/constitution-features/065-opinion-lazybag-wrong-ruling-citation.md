@@ -33,6 +33,11 @@ gates:
               application:
                 target-stage: review
                 state: consumed
+            - id: gate-attempt:065-verify-2
+              briefing:
+                id: briefing:065:verify:attempt-2:revision-1
+                digest: sha256:cfc93b5b4d501cf17c15d6f802b575a5c9776f109ecd0ba610e79775e931f1de
+                room-ref: '@review/verify/briefing-2'
 ---
 
 站上把「國會職權修法」判決的內容標成 114 年憲判字第 1 號，但那是憲法訴訟法修正案；國會職權修法是 113 年憲判字第 9 號。這是公開頁面上的事實錯誤，且涉及具名大法官。
