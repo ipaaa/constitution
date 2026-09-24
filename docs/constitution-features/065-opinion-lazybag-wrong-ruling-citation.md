@@ -10,7 +10,7 @@ score: 0.95
 worktree: .worktrees/spacedock-ensign-065-opinion-lazybag-wrong-ruling-citation
 issue:
 pr:
-mod-block:
+mod-block: merge:pr-merge
 gates:
     version: 1
     records:
@@ -50,6 +50,17 @@ gates:
                 id: briefing:065:review:attempt-1:revision-1
                 digest: sha256:4975bcc41baf5274e1ef547bfa8d598fafc4e8cf0a63e4df2c929aec03c45bda
                 room-ref: '@review/review/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:065:review:1
+                briefing: briefing:065:review:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-24T19:57:44.465309Z"
+                decision: approve
+                reason: Captain 核准：引錯釋字號已修正並經 reviewer 逐條複驗，AC 全數以可重跑的 Verified by 證據通過。
+              application:
+                target-stage: complete
+                state: pending
 ---
 
 站上把「國會職權修法」判決的內容標成 114 年憲判字第 1 號，但那是憲法訴訟法修正案；國會職權修法是 113 年憲判字第 9 號。這是公開頁面上的事實錯誤，且涉及具名大法官。
