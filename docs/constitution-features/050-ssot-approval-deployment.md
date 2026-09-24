@@ -1,7 +1,7 @@
 ---
 id: 050
 title: 正式 SSOT 部署 feature 040 的審核欄位（040 合併的硬前置）
-status: implement
+status: verify
 source: captain 2026-09-04（把關機制體檢最高風險項：無票、無人負責）
 started: 2026-09-07T23:15:17Z
 completed:
@@ -1089,3 +1089,310 @@ Track 2 序號陷阱：15 個已核可列中只有第 4 列（`d3`）一列草�
 且輸出與 baseline 逐字相同、main 同步 exit 1（窗口確實打開）、12 個保護範圍與 6 個核可連續段
 都由程式算出。時間估算 75-120 分鐘是依動作次數推算，**不是量測的牆鐘時間**——
 本輪沒有寫入試算表，無法量測 captain 在 Google UI 上的實際速度。
+
+## verify stage 獨立複驗（2026-09-24）
+
+本節是**獨立複驗**，不採信 implement 的任何 fixture 或結論。
+自己抓標題列、自己建 fixture、自己跑兩支 sync、自己數列數。
+指令與 fixture 全在 session 暫存目錄，未寫入 repo。
+
+**未越界**：對正式試算表只做 3 次唯讀 HTTP GET（`status=200`，17704／10584／589 bytes），
+零寫入、未建欄、未改標題、未裝 Apps Script、未設保護、未核可任何一列。
+未執行 `npm run sync-content`。複驗前後 `src/data/*.json` 的 sha256 均為
+`4d1992e3…cea3b`／`4071978a…3162`；主 checkout 與 040 worktree 的 `git status` 全程為空。
+兩支 sync 都在暫存沙箱執行（main 版以 `git show main:` 取出後複製；040 版複製兩個檔並設
+`CONTENT_OUTPUT_DIR`），未動 040 的 worktree。
+
+### 一、最高風險宣稱：9 欄安全前綴 — **成立**
+
+自建 fixture，main 版 sync 在暫存沙箱跑（沙箱手法與 AC-6 相同）。
+
+**方向 (a)　9 欄全建後 main 同步 exit 0 且輸出逐字不變**
+
+| 我的 fixture | 內容 | main 同步 | `history.json` | `discussions.json` |
+|---|---|---|---|---|
+| `fixRaw` | 今日抓下的原始位元組 | ✅ exit 0 | ✅ 逐字相同 | ✅ 逐字相同 |
+| `fixA` | CSV round-trip，不加欄 | ✅ exit 0 | ✅ 逐字相同 | ✅ 逐字相同 |
+| `fixRename` | 只做 S1 改名 | ✅ exit 0 | ✅ 逐字相同 | ✅ 逐字相同 |
+| `fixSafe9` | **安全前綴 9 欄全建 ＋ 改名** | ✅ exit 0 | ✅ 逐字相同 | ✅ 逐字相同 |
+
+「逐字」是**位元組比對**，不是筆數：`fixSafe9` 的兩份輸出與 repo 現況
+`Buffer.equals` 為真（26057 bytes／11788 bytes）。
+
+**方向 (b)　再多建任一窗口內欄位就 exit 1 — 15 欄全數驗過**
+
+以 `fixSafe9` 為底，逐一多建**一**個窗口內欄位，共 15 組。**15 組全部 exit 1**，
+錯誤一律是 `第 N 欄的標題「…」對不到任何預期欄位。`：
+
+| 分頁 | 多建這一欄就中止 |
+|---|---|
+| `Track 1_history` | `review_decision`（第 15 欄）、`review_fingerprint`、`approved_fingerprint`、`current_fingerprint` |
+| `Track 2_discussion` | 同上 4 欄（第 18 欄起） |
+| `site_tldr` | 全部 7 欄（第 6 欄起）——**一欄都不安全** |
+
+**界線正好在宣稱的位置**：不早也不晚。implement 自附的 falsifying change
+（`fixB2` 多加一個 `review_decision` 由 exit 0 轉 exit 1）**已跑，確實轉為 exit 1**。
+
+**9／15／24 三個數字不是手數的，是從原始碼推出來的。** 直接解析
+`git show main:scripts/sync-content.mjs` 的 `TRACK_1_COLUMNS`／`TRACK_2_COLUMNS`／
+`SITE_TLDR_COLUMNS`，與 040 的 `APPROVAL_COLUMNS`（8 欄，全為 `required`）、
+`.gs` 的 `APPROVAL_FIELDS` 交集運算：
+
+| 分頁 | 現況欄 | 要新建 | 安全前綴（main 認得） | 窗口內（main 不認得） | 建完 |
+|---|---|---|---|---|---|
+| `Track 1_history` | 10 | 8 | 4 | 4 | 18 |
+| `Track 2_discussion` | 12 | 9 | 5 | 4 | 21 |
+| `site_tldr` | 5 | 7 | 0 | 7 | 12 |
+| **合計** | | **24** ✅ | **9** ✅ | **15** ✅ | |
+
+機制根因複讀確認：main 的 `SITE_TLDR_COLUMNS`（第 123-129 行）**完全沒有**
+`approved_by`／`approved_at`／`reject_reason`，所以 `site_tldr` 的安全前綴是 0；
+`TRACK_1_COLUMNS`／`TRACK_2_COLUMNS` 有這三欄（第 97-99、117-119 行，皆 `optional`），
+且 main 也認得 `chapter`（第 94 行）、`owl_depth_comment`（第 113 行）、`full_content`（第 116 行）。
+
+**獨立佐證**：把 24 欄全建的 fixture 餵給 main，它印出「**共 15 項錯誤**」——
+錯誤項數自己等於窗口內欄數。
+
+### 二、D1／D2／D3／D5 — **四項全部成立**
+
+**D1 成立。** 用今日抓下的位元組跑票內原指令的 `split(/\r?\n/)[0]`，輸出逐字為：
+
+```
+Track 1: id(給系統看的編號),…,image_url（現有為AI生成）,"status
+Track 2: id,category,title,author,year,link,abstract,views,status,"owl comment
+site_tldr: order,label,text,status,link
+```
+
+**exit 0、無任何警告。「它不報錯，它少印」成立。** Track 2 的 `vibe` 與 `sticky`
+完全不出現。`site_tldr` 不受影響（標題無換行）。
+自寫 CSV 狀態機重解，得 10／12／5 欄，與 implement 貼的 JSON **逐字相同**。
+
+**D2 成立。** 三個分頁的標題列中，八個審核欄位**只有 `status` 存在**；
+`approved_by`、`approved_at`、`reject_reason` 三個分頁皆無。票內算 17 欄，實際 24 欄。
+
+**D3 成立。** 以**我自己抓的標題列**、`node:vm` 載入 `.gs` 原始碼、stub 掉
+`SpreadsheetApp`／`Session`／`Utilities` 後重跑 `resolveApprovalHeaders_`：
+
+| 階段 | `Track 1_history` | `Track 2_discussion` | `site_tldr` |
+|---|---|---|---|
+| A　現況 | ⛔ `缺少欄位「chapter」。` | ⛔ `缺少欄位「owl_comment」。` | ⛔ `缺少欄位「review_decision」。` |
+| B　套用票內步驟 1、2 | ⛔ `缺少欄位「review_decision」。` | ⛔ `缺少欄位「owl_depth_comment」。` | ⛔ 同 A |
+| C　再加票內步驟 3 的七欄 | ✅ 18 欄 | ⛔ `缺少欄位「owl_depth_comment」。` | ✅ 12 欄 |
+| D　Track 2 再補兩個內容欄 | — | ✅ 21 欄 | — |
+
+**與 implement 的表逐格相同。照票內步驟 1-3 做完，步驟 4 在 Track 2 必定失敗。**
+`captain` 若少建這兩欄，會在窗口內卡在「安裝／更新公式」。
+
+**D5 成立，且比票內描述更精確。** 實際標題是
+`owl comment` ＋ **LF（`\n`，不是 CRLF）** ＋ `(允鍾如果有靈感可以寫一句短評)`。
+票內「改前」字串 `owl comment (允鍾…)`（空格接括號）**不出現在實際標題中**——
+用「尋找並取代」搜它會找不到。改名後（`owl_comment` ＋ LF ＋ 括號）
+`resolveApprovalHeaders_` 解析成功（上表階段 D），main 同步也照樣 exit 0 且輸出逐字不變
+（另跑一組「不改名」fixture 亦 exit 0，證實 alias 兩種都收）。
+
+### 三、數字 — **全部自行數出，全部相符**
+
+**59 列（40／15／4）成立，我是第三個獨立來源。** 從我抓的 CSV 讀 `status` 欄，
+以 Node `Map` 計數（未用 `sort`／`uniq`）：
+
+| 分頁 | 非空白資料列 | `Approved` | 空白 |
+|---|---|---|---|
+| `Track 1_history` | 42 | **40** | 2（`h2` 第 3 列、`h28` 第 25 列）|
+| `Track 2_discussion` | 43 | **15** | 28（`d3` 第 4 列、`d18`–`d44`）|
+| `site_tldr` | 4 | **4** | 0 |
+| **合計** | 89 | **59** | 30 |
+
+第三來源交叉驗算：`history.json` 40 筆 ＋ `discussions.json` 16 筆去掉 `tldr` 得 15
+＋ `site_tldr` 分頁 4 列 ＝ **59**。
+
+**保護範圍 12／15 成立，A1 位置逐格相符。** 以 `WRITABLE_REVIEW_FIELDS`（實讀 `.gs`，
+確為 6 欄）與 A 類兩欄的解析欄號算連續段：
+
+| 排序 | `Track 1_history` | `Track 2_discussion` | `site_tldr` | 合計 |
+|---|---|---|---|---|
+| 建議排序 | J2:J、R2:R／L2:Q／A1:R1 ＝ 4 | I2:I、U2:U／O2:T／A1:U1 ＝ 4 | D2:D、L2:L／F2:K／A1:L1 ＝ 4 | **12** ✅ |
+| 票內 `APPROVAL_COLUMNS` 排序 | 5 | 5 | 5 | **15** ✅ |
+
+S7 表中的 12 個 A1 範圍**逐格與我算的相同**。另確認：S2／S4 的**分階段**建欄順序
+與第三節「建議排序」雖然物理欄序不同，算出的保護範圍**完全一樣**，S7 的表對兩者都成立。
+
+**Track 2 夾在已核可列中的草稿確實只有 1 列。** 依 `.gs` 第 79 行與
+`sync-content.mjs:392` 的同語意實算序號（「任一發布欄位非空」的累計計數）：
+15 個 `Approved` 列在第 2-17 列，序號分別是 `1,2,4,5,…,16`（範圍 1-16，缺 3）。
+序號 3 由 `d3`（第 4 列，有發布內容）占用。
+**第 2-17 列之間只有 `d3` 一列非 `Approved`**；其餘 27 列草稿（`d18`–`d44`）全在第 17 列之後。
+**captain 的窗口內禁令是完整的：只有 `d3` 一個風險點。**
+
+**6 個連續選取段成立。** 由 `status` 欄算出：`Track 1` 第 2 列／第 4-24 列（21）／
+第 26-43 列（18）；`Track 2` 第 2-3 列（2）／第 5-17 列（13）；`site_tldr` 第 2-5 列（4）。
+共 6 段、59 列，與 S8 的表逐格相同。
+
+### 四、證據 3 與 alias 表 — **成立**
+
+**六組 fixture 兩份 JSON sha256 全同且等於 repo 現況，成立。** 我自己跑了六組
+（`fixRaw`／`fixA`／`fixRename`／`fixSafe9` 走 main；「建議排序」與「票內排序」的
+24 欄完整部署 fixture 走 040），**六組的兩份輸出 sha256 全部是
+`4d1992e3…cea3b` 與 `4071978a…3162`**。
+
+完整部署 fixture 的 59 列指紋**由我自己算**（040 的 `fingerprintPublishedRow`，
+Track 2 序號自行重算），040 新版 sync 全部接受並 exit 0，逐字印出
+`✅ 檢查通過，已寫入 src/data/history.json（40 筆）` 與
+`✅ 檢查通過，已寫入 src/data/discussions.json（16 筆，含 tldr）`。
+**AC-1／AC-2 的驗收手法在真實資料上可執行。**
+
+另建「S2／S4 實際建欄順序」的 fixture：040 sync exit 0、輸出逐字相同；
+同一份餵 main 得 exit 1，首個錯誤指向 **第 15 欄 `review_decision`**——
+與第八節的宣稱相符。
+
+**否證測試（證明這些比對真的會失敗）：**
+
+| 改動 | 結果 |
+|---|---|
+| `chapter` 填入非空值 | main 仍 exit 0，但 `history.json` 變成 `38e662f6…` ≠ baseline ✅ |
+| `owl_depth_comment` 填入非空值 | main 仍 exit 0，但 `discussions.json` 變成 `6895ef6b…` ≠ baseline ✅ |
+
+**「新欄全部留白」是承重條件，而且沒有任何程式會擋它** —— 填了值 main 照樣 exit 0，
+只有 sha256 會不同。AC-1 已寫明這一點。
+
+**alias 表實讀成立。** `git show main:scripts/sync-content.mjs` 第 112 行逐字為
+`  { field: 'owl_comment', aliases: ['owl comment', 'owl_comment'], column: 'optional', value: 'optional' },`。
+
+**其餘被引用的行號全部實讀核對通過**：`.gs` 第 5-6（`APPROVAL_FIELDS`）、
+12-14（`WRITABLE_REVIEW_FIELDS`）、127-144（`resolveApprovalHeaders_`）、
+159（`這個分頁不支援核可公式。`）、219（`不可核可標題列。`）、220（`Session.getActiveUser()`）；
+040 `sync-content.mjs` 第 84-93（`APPROVAL_COLUMNS`）、392（`publishedRowSequences`）。
+**唯一一筆對不上的是 `TODO.md:127`** —— 見下方 F3。
+
+### 五、時間估算的誠實度 — **揭露足夠**
+
+「75-120 分鐘是推算、非量測」在票內**三處**揭露，captain 不會誤讀成實測值：
+
+1. 第六節「窗口時間估算」開頭粗體：「**這是依動作次數推算的估計值，不是實測的牆鐘時間。**
+   本輪沒有對試算表做任何寫入，所以無法量測 captain 在 Google 試算表 UI 上的實際速度。」
+2. 表格欄位標籤本身：「單位時間（**假設**）」，並註「captain 可自行替換」。
+3. implement 的 Stage Report Summary 再次明寫。
+
+**動作次數已逐項查證，全部正確**：窗口內 15 欄 ✅、保護範圍 12 個 ✅、
+連續選取 6 段 ✅、核可 59 列 ✅、3 個分頁各執行一次「安裝／更新公式」＝3 次 ✅。
+只有「單位時間」是假設，這一點標示清楚。
+
+### 六、Placeholder scan（verify stage 指名輸出）
+
+| 掃的字串 | `src/data/*.json` | 本輪新增的 540 行票內文字 |
+|---|---|---|
+| `某學者` | 0 | 0 |
+| `某大學法律系` | 0 | 0 |
+| `lorem ipsum`／`Lorem` | 0 | 0 |
+| `test` | 0 | — |
+| `placeholder`／`TODO`／`FIXME`／`XXX` | 0 | 0 |
+| `example.com`／`sample` | 0 | — |
+| `YOUR_`／`TBD`／`xxx` | — | 0 |
+
+**另掃「試算表網址外洩」**（本票明令 URL 不得入票）：
+`docs.google`／`spreadsheets/d/`／`/pub?`／`gviz`／`https://` 在新增內容中**均為 0 次**。✅
+本輪未改動任何資料檔，`src/data/*.json` 逐位元組未變。
+
+### 七、verify stage 的獨立發現
+
+四項都不改變 captain 要輸入的任何欄名、欄數或列號；**24／9／15／59／12／6 全部正確**。
+
+**F1（數字自相矛盾，非承重）第六節說刪 `d3` 會讓「其後 **14** 列」指紋全變，實算是 **13** 列。**
+`d3` 在第 4 列（序號 3），其後的 `Approved` 列是第 5-17 列，共 **13** 列。
+同一份文件的 S8 寫的是「第 5-17 列的指紋全變，那 **13** 列要重做」——**S8 正確，第六節的 14 錯。**
+- 已釋出使用者與正常流程：captain 讀第六節理解 `d3` 風險。
+- 可觀察到的損害：無行為差異——兩處的可執行指令都是「`d3` 不可刪除或搬移」。只是列數印錯。
+- 影響的 AC 或不可協商邊界：無。
+- 觸發證據：本節第三小節實算，`Approved` 序號 `1,2,4..16`，`d3` 占序號 3。
+- 提議：**Polish**／任務內／`fix`（把 14 改成 13）。
+
+**F2（會讓工程誤判驗收失敗）AC-6 要求逐字出現的錯誤字串，在照票建欄後不會出現。**
+AC-6 寫「必須 exit 1 並輸出 `第 N 欄的標題「review_decision」對不到任何預期欄位。`」。
+但票內建議的標題字串含中文說明，程式實際印的是
+`第 15 欄的標題「review_decision （由 Review 選單寫入）」對不到任何預期欄位。`
+——**引號內多了中文說明**。逐字比對或 `grep '「review_decision」'` 會找不到。
+- 已釋出使用者與正常流程：工程在 S3／AC-6／步驟 9 前執行 sandbox 驗證。
+- 可觀察到的損害：驗證「看起來失敗」而系統其實正常，或反過來被當成通過而不再細看。
+  發生在窗口內，會吃掉 captain 的時間。
+- 影響的 AC 或不可協商邊界：**AC-6 的 `Verified by:`**。
+- 觸發證據：本節第一、四小節實跑，三個分頁 15 條錯誤全部是
+  `「<欄名> （<中文說明>）」` 的形式；且欄號隨建欄順序變動（S2／S4 順序為第 15 欄，
+  第三節「建議排序」為第 12 欄）。
+- 提議：**Material**／任務內／`fix`（AC-6 改成比對 `對不到任何預期欄位` 與
+  `review_decision` 兩個子串，不綁完整引號內容；欄號改寫成「依實際建欄順序」）。
+
+**F3（引用行號錯）`TODO.md:127` 指不到東西。** 票內步驟 3 的表與第三節都寫
+「`TODO.md:127` 記錄現況為 `order｜label｜text｜status｜link`」。
+`TODO.md` 第 127 行是**空行**；該記錄實際在**第 156 行**
+（原文用半形 `|`：`現行欄位為 order | label | text | status | link（已直接讀 SSOT 確認）`）。
+- 已釋出使用者與正常流程：任何人想回溯 `site_tldr` 欄位記錄的來源。
+- 可觀察到的損害：追不到出處。**記載的內容本身正確**（我直接讀 SSOT 得同樣 5 欄）。
+- 影響的 AC 或不可協商邊界：無。
+- 觸發證據：`sed -n '127p'` 為空；`sed -n '156p'` 為該句。
+- 提議：**Polish**／任務內／`fix`（127 改 156）。
+
+**F4（D4 自己帶出來的新缺口）AC-1 綁死一個 sha256，但 D4 把單一窗口改成跨日計畫，票內沒有 re-baseline 條文。**
+D4 是對的、也是好消息，但它把部署從「一段 2 小時窗口」改成「階段一可分幾天 ＋ 階段二窗口」。
+階段一要 captain 先建 `chapter`／`owl_depth_comment`／`full_content` **三個內容欄**，
+而保護範圍要到階段二的 S7 才設——**這三欄在階段一期間是編輯台可寫的**。
+我實測：把它們填入非空值，main 同步**仍 exit 0**，只有輸出 sha256 改變
+（`38e662f6…`／`6895ef6b…`）。AC-1 綁的是 2026-09-07 量到的固定值。
+- 已釋出使用者與正常流程：責任編輯在階段一期間照常使用試算表
+  （`editor-onboarding.md:430` 明記「編輯權限已經開出去」）。
+- 可觀察到的損害：S3 會攔下來（它同時檢查 exit 0 **與**兩個 sha256，這一關寫得很好），
+  但票內只寫「這一關沒過就不要進階段二」，**沒寫沒過要怎麼辦**。
+  若是編輯合法填入內容，正解是重新量 baseline 而不是永久停住；
+  若在 S3 之後、窗口內才被填，AC-1 會在步驟 8 失敗，而 captain 會以為是部署弄壞了內容。
+- 影響的 AC 或不可協商邊界：**AC-1**（逐字 sha256 比對）。
+- 觸發證據：上方否證測試兩列；S7 在階段二才設保護；階段一明寫「產線照常，可分次做」。
+  今日重量 baseline 仍為 `4d1992e3…cea3b`／`4071978a…3162`，**目前尚未發生漂移**。
+- 提議：**Deferred risk**（觸發尚未發生）／任務內／`fix`：在 S2 補一句
+  「這三個內容欄在 S9 完成前必須保持全欄留白」，並在 S3 補 re-baseline 條文
+  （sha256 不符時，先確認是編輯合法填值還是部署副作用；若是前者，重新量並更新 AC-1 綁定值）。
+  升級為 Material 的條件：任何人在階段一對這三欄或那 59 列的發布內容寫入任何值。
+
+### 八、裁決
+
+**PASSED。**
+
+本輪要複驗的每一項承重宣稱都獨立成立：9 欄安全前綴（兩個方向都驗，15 個窗口欄逐一驗，
+falsifying change 已跑）、D1／D2／D3／D5、24／9／15 欄、59 列、12／15 個保護範圍、
+6 個連續段、只有 `d3` 一個序號風險點、證據 3 的六組 sha256、alias 表。
+**captain 可以依這份校正結果操作正式試算表。**
+
+四項發現沒有一項會讓 captain 輸入錯的欄名、建錯的欄數或核可錯的列。
+F2 是唯一會在窗口內浪費時間的（工程端的驗收字串），F4 是 D4 帶出來的計畫缺口
+而 S3 已經攔得住，只差「攔下來之後怎麼辦」。F1／F3 是印錯的數字與行號。
+
+## Stage Report: verify
+
+- DONE: 獨立複驗「9 欄安全前綴」——自建 fixture、自跑 main 現行版與 040 版兩支 sync，不採信 `fixB1`–`fixB4`。兩個方向都驗；跑 implement 自附的 falsifying change。
+  **成立。** 方向 (a)：`fixSafe9`（9 欄全建＋改名）main 同步 exit 0，兩份輸出與 repo 現況**位元組完全相同**（`Buffer.equals` 為真，26057／11788 bytes），不是筆數相同。方向 (b)：以 `fixSafe9` 為底逐一多建**一**個窗口內欄位，**15 組全部 exit 1**——界線不早也不晚。falsifying change（多加一個 `review_decision`）已跑，確實由 exit 0 轉 exit 1。9／15／24 三個數字改由直接解析 main 的三張 `*_COLUMNS` 與 040 的 `APPROVAL_COLUMNS`、`.gs` 的 `APPROVAL_FIELDS` 推出，非手數；main 對 24 欄 fixture 印出「共 15 項錯誤」自成佐證。根因複讀確認：`SITE_TLDR_COLUMNS`（第 123-129 行）無 `approved_by`／`approved_at`／`reject_reason`，故 `site_tldr` 安全前綴為 0。
+- DONE: 複驗 D1、D2、D3、D5，並以自己抓的標題列重跑 `resolveApprovalHeaders_`。
+  **四項全部成立。** D1：跑原指令得 exit 0、無警告的截斷輸出，Track 2 的 `vibe`／`sticky` 完全不出現——「它不報錯，它少印」成立；自寫 CSV 狀態機重解得 10／12／5 欄，與 implement 貼的 JSON 逐字相同。D2：三個分頁八個審核欄位只有 `status` 存在，17→24 成立。D3：以 `node:vm` 載入 `.gs`、stub 掉 Google 全域物件、餵**我自己抓的標題**重跑，四個階段的結果與 implement 的表**逐格相同**——階段 C 的 Track 2 仍 ⛔ `缺少欄位「owl_depth_comment」。`，照票做完步驟 1-3 步驟 4 必定失敗。D5：實際是 `owl comment` ＋ **LF**（非 CRLF）＋ 括號；票內「改前」字串**不出現在實際標題中**，尋找取代確實會找不到。
+- DONE: 自行數證 24／9／15 欄、59 列、12／15 個保護範圍、Track 2 只有 `d3` 一個風險點；複驗證據 3 與 alias 表。
+  **全部相符。** 59 列自己數（讀 `status` 欄、Node `Map`、未用 `sort`／`uniq`）得 40／15／4，並以 repo JSON 產物（40＋15＋4）交叉驗算——我是第三個獨立來源。保護範圍以 `WRITABLE_REVIEW_FIELDS`（實讀確為 6 欄）算連續段，建議排序 12、票內排序 15，**S7 的 12 個 A1 範圍逐格相符**；另確認 S2／S4 的分階段欄序與第三節建議排序雖物理順序不同，保護範圍完全一樣。`d3`：依 `.gs:79`／`sync-content.mjs:392` 同語意實算序號，`Approved` 為 `1,2,4..16`，`d3` 占序號 3，第 2-17 列之間**只有它**一列非 `Approved`，其餘 27 列全在第 17 列之後——**窗口內禁令完整**。6 個連續段與 S8 逐格相同。證據 3：我自己跑六組 fixture，兩份輸出 sha256 全部等於 `4d1992e3…cea3b`／`4071978a…3162`；完整部署 fixture 的 59 列指紋由我自己用 `fingerprintPublishedRow` 算，040 sync 全部接受並逐字印出 `（40 筆）`／`（16 筆，含 tldr）`。alias 表第 112 行實讀逐字相符；其餘 8 處被引用的行號全部實讀通過。
+  falsifying change：`chapter` 或 `owl_depth_comment` 填入非空值，main 仍 exit 0 但 sha256 變為 `38e662f6…`／`6895ef6b…`——證明這些比對真的會失敗，且「全部留白」是承重條件而無程式會擋它。
+- DONE: 確認時間估算的揭露、動作次數可查，並確認未越界；未報告的同類問題獨立列出。
+  時間估算在**三處**明確揭露為「依動作次數推算、非量測牆鐘」（第六節開頭粗體、表格欄標籤「單位時間（假設）」、Stage Report Summary），captain 不會誤讀成實測值。動作次數逐項查證全部正確：15 欄／12 範圍／6 段／59 列／3 次安裝公式。未越界：正式試算表**零寫入**（只有 3 次唯讀 GET），未跑 `sync-content`，`src/data/*.json` 前後 sha256 未變且 `git status` 全程為空，未動 040 worktree（兩支 sync 皆在暫存沙箱執行）。Placeholder scan 與「試算表網址外洩」掃描全部 0 次。獨立發現 F1-F4 列於第七節，各附四項證據欄位與提議分類。
+
+### Summary
+
+不採信 implement 的任何 fixture，全部自己重做：自己抓標題列、自己寫 CSV 狀態機、
+自己建 fixture、自己在暫存沙箱跑 main 與 040 兩支 sync、自己數列數與序號。
+**每一項承重宣稱都成立，captain 可以依這份校正結果操作正式試算表。**
+
+最高風險的「9 欄安全前綴」驗得最細：不只驗「9 欄全建後 exit 0」，還逐一驗了 15 個窗口內欄位
+——**每一欄單獨多建都會讓 main exit 1**，界線正好在宣稱的位置。而且「逐字相同」是
+`Buffer.equals` 的位元組比對，不是筆數。9／15／24 改由原始碼推導而非手數，
+main 自己對完整部署 fixture 印出「共 15 項錯誤」，項數等於窗口欄數。
+
+D3 是對 captain 最要緊的一條，也確認了：照票內步驟 1-3 做完，Track 2 的「安裝／更新公式」
+必定報 `缺少欄位「owl_depth_comment」。`。`d3` 的序號風險點確實只有一個，
+所以窗口內禁令是完整的。59 列有三個獨立來源。
+
+四項獨立發現都不影響 captain 要輸入的欄名／欄數／列號。最值得處理的是兩項：
+**F2**——AC-6 要求逐字出現的錯誤字串，在照票用含中文說明的標題建欄後不會出現
+（程式印的是 `「review_decision （由 Review 選單寫入）」`），工程會在窗口內誤判驗收失敗；
+**F4**——D4 把單一窗口改成跨日計畫，而 AC-1 綁死一個 2026-09-07 的 sha256，
+階段一要先建三個**編輯台可寫**的內容欄而保護要到階段二才設。S3 攔得住（它同時檢查
+exit 0 與兩個 sha256），但票內沒寫攔下來之後怎麼辦。今日重量 baseline 未漂移。
