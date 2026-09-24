@@ -1,7 +1,7 @@
 ---
 id: 056
 title: 上線前檢查清單：公開之前每一項都必須有結論
-status: verify
+status: implement
 source: captain 2026-09-07（把關機制體檢與任務地圖的綜合結論）
 started: 2026-09-21T18:56:47Z
 completed:
@@ -269,15 +269,10 @@ Verified by: `G-1`–`G-8` 八項中，六個 `機械` 項逐條執行並貼出�
 
 ## Test plan
 
-設計階段不改動渲染邏輯，故不需回歸測試。下列為 gate 執行時要跑的完整指令，也是 implement／verify 的驗收依據。
+設計階段不改動渲染邏輯，故不需回歸測試。
 
-```bash
-npx tsc --noEmit                       # G-8
-npm run build                          # G-8；不會觸發同步，PR #32 已把 sync 移出 build
-grep -rn '056-pre-launch-checklist' src/app/layout.tsx docs/health-check/TODO.md AGENTS.md   # AC-3 / G-7
-grep -rniE '某[學学]者|某大[學学]|lorem ipsum|前端工程師[ 　]?[ABＡＢ]|volunteer@addcourt\.tw' src/   # G-5（涵蓋面見第三節補述。注意：此列的字串集合比第三節的 G-5 少 `快速了解最新判決的5個重點` 一項，屬既有分歧，本輪未擅自補上，見 implement cycle 6 報告）
-node -e "const a=require('./src/data/history.json');const i=a.map(x=>x.id);console.log(i.includes('h2'),i.includes('h28'))"   # G-6
-```
+**gate 執行時要跑的完整指令在第三節的「Gate 執行清單」（`G-1`–`G-8`），以那一份為唯一正本。本節不再複述。**
+本節只保留第三節沒有的東西：2026-09-21 的實測記錄，以及下方兩條規定。
 
 **2026-09-21 實測結果**（這是現況，不是通過狀態）：
 
@@ -291,6 +286,29 @@ node -e "const a=require('./src/data/history.json');const i=a.map(x=>x.id);conso
 `npm run build` 本階段未跑——本票 design 未改動任何程式碼，`npx tsc --noEmit` 已足以確認型別基準線。`build` 列在 `G-8`，於 gate 執行時跑。
 
 A 類四項需在 `npm run dev` 的實際渲染上驗證，方式見 AC-2。**不執行 `npm run sync-content`。**
+
+> **2026-09-24 更正：本節原本複述了一份 gate 指令清單，那份副本已經跟第三節的正本分岔，整份移除並改為指向第三節。原內容逐字保留於下。**
+> 原句為：「設計階段不改動渲染邏輯，故不需回歸測試。下列為 gate 執行時要跑的完整指令，也是 implement／verify 的驗收依據。」，其後為一個 `bash` 區塊，逐字如下（每列一條）：
+> 1. `npx tsc --noEmit` — 註記 `# G-8`
+> 2. `npm run build` — 註記 `# G-8；不會觸發同步，PR #32 已把 sync 移出 build`
+> 3. `grep -rn '056-pre-launch-checklist' src/app/layout.tsx docs/health-check/TODO.md AGENTS.md` — 註記 `# AC-3 / G-7`
+> 4. `grep -rniE '某[學学]者|某大[學学]|lorem ipsum|前端工程師[ 　]?[ABＡＢ]|volunteer@addcourt\.tw' src/` — 註記 `# G-5`
+> 5. `node -e "const a=require('./src/data/history.json');const i=a.map(x=>x.id);console.log(i.includes('h2'),i.includes('h28'))"` — 註記 `# G-6`
+> **它與第三節分岔在兩處，兩處都是 fail-open：**
+> **分岔一（第 1、2 列，G-8 的順序）**：本副本把 `npx tsc --noEmit` 列在 `npm run build` **之前**。照它做會直接走進 F-8 記載的假性失敗——`.next/types/` 的殘留重複檔會讓 `tsc` 印 `TS2300`、離開碼 `2`，而執行者可能因此去改根本沒問題的原始碼。這個分岔是 cycle 4 只修了第三節那一列造成的，之後沒有人比對過兩份。
+> **分岔二（第 4 列，G-5 的字串集合）**：本副本只有五個 alternation，少了 `快速了解最新判決的5個重點`。跑這一份會**整個漏掉一個佔位值**——而 G-5 以零命中為通過，漏掉就等於通過。
+> **為什麼不是「把兩份對齊」而是「讓副本消失」**：本票前六輪，每一輪 reviewer 都找到同一類缺陷的新實例。前八處都是「檢查只認一種寫法」，這一處不同——**是同一個檢查有兩份副本，而副本會分岔。**只要兩份還在，就會有第三次分岔。對齊只修掉今天這兩處，移除副本才修掉產生分岔的機制。
+> **本則保留的是記錄，不是指令**：本票的慣例是「fenced ```bash 區塊＝可執行的指令」、「blockquote 內的行內程式碼＝逐字保留的原文」。上面五列寫成 blockquote 而非 fenced 區塊，就是為了讓它不被當成第二份可執行副本——下面那條查核指令正是依這個區分在判斷。
+
+**查核：本票內不得再有第二份可執行的 G 項指令清單。**
+下列指令掃描本票的「活的」部分（第一個 `## Stage Report:` 之前），找出所有 fenced 區塊內的 G 項指令字串，並依所在區段分類——查核指令自己的區塊以首行 `# divergence-check (self)` 標記排除（只排除帶標記的那一個區塊，任何**新**放進來的區塊都沒有這個標記，照樣會被抓到），落在第三節的是正本，`## Acceptance criteria` 內的一筆屬 captain 所有（AC 文字非本票可改，已知與 G-7 重疊，列為已知例外而非隱藏），其餘一律報 `STRAY`：
+
+```bash
+# divergence-check (self) —— 本區塊是查核指令本身，依下行的 self 規則排除，不計入 STRAY
+awk '/^## Stage Report:/{exit} /^## /{h2=$0; sec=$0} /^### /{sec=$0} /^```/{inb=!inb; self=0; next} inb && /divergence-check/{self=1; next} inb && !self && /npx tsc --noEmit|npm run build|grep -rn |grep -rniE |node -e |for n in 0/ {if (sec ~ /^### 三、/) next; else if (h2 ~ /^## Acceptance criteria/) print "AC-OWNED[" h2 "] " substr($0,1,44); else print "STRAY[" sec "] " substr($0,1,44)}' docs/constitution-features/056-pre-launch-checklist.md
+```
+
+**通過條件：`STRAY` 零筆。** 2026-09-24 實測——修法前五筆 `STRAY`（全在 `## Test plan`），修法後零筆，`AC-OWNED` 一筆不變。任何人日後在第三節之外再放一份可執行的 G 項指令，這條檢查就會印出 `STRAY`。
 
 ## Documentation impact
 
@@ -1239,3 +1257,63 @@ F-11 修好，兩個方向都驗過。涵蓋面：十一個字串從舊 pattern 
 **授權邊界嚴守。** 字串集合以兩種方法確認未動：六個交替項去除變體括號後逐項字面相同，且新 pattern 是舊 pattern 的超集。沒有新增任何要掃的字串——動的只有「每個既有字串認得幾種寫法」。其他七列 G 項整列位元組未變。未越界、未回歸，AC 全節六輪位元組不變。
 
 **依指示提報第九處：F-12。** 根因與 `063` reviewer 指出的一致——**規格自身不一致**，只是本票的面貌是「同一道檢查有兩份拷貝」：`## Test plan` 的指令區塊與第三節已在兩處分歧。G-8 仍是舊的執行順序（`tsc` 在 `build` 之前），照它跑就會踩進 F-8 記錄的假失敗；G-5 的 pattern 少一個字串（5 vs 6），照它跑會漏掉 `快速了解最新判決的5個重點`，**方向是 fail-open**。G-5 的分歧早於本輪且 implement 已主動揭露並刻意不補（補上會改變要求，超出授權，我認同這個克制）；G-8 的分歧則是 cycle 4 修 F-8 時只改了一份拷貝留下的，本輪由我查出。**建議治根**：讓 Test plan 指向第三節而不是重抄——兩份拷貝還在，就還會有第三次分歧。
+
+## Stage Report: implement (cycle 7)
+
+本輪即 captain 2026-09-24 第二次退回後授權的那一輪。只處理 F-12，修的是根不是兩處分岔。未動 `src/`、build 產物、`layout.tsx`、Next.js 設定、`PresentDetail.tsx`，未跑 `sync-content`。
+
+- DONE: F-12：讓 `## Test plan` 指向第三節而不再複述指令清單，消除「同一檢查兩份副本」這個分岔源頭。保留 Test plan 中**不在第三節**的規定（如「不執行 `npm run sync-content`」），只把重複的指令清單換成引用。**不得把 Test plan 副本缺的那個字串補進去**——正確作法是讓副本消失，不是讓兩份副本一致。
+  `## Test plan` 的導言改為「以第三節那一份為唯一正本，本節不再複述」，整個 `bash` 區塊移除。保留的非重複內容：2026-09-21 實測記錄表、`npm run build` 本階段未跑的說明、A 類需實際渲染驗證、**`不執行 npm run sync-content`**（程式比對確認仍在）。**沒有把缺的字串補進去**——副本整份消失了，沒有第二份可以不一致。
+- DONE: 原本 Test plan 的指令內容以追加補述**逐字保留**，並寫明它們曾與第三節分岔於哪兩處（G-8 的 `tsc`／`build` 順序、G-5 少一個變體）以及各自的後果（前者走進 F-8 的假性失敗、後者整個漏掉一個佔位值）。這段記錄說明為什麼不再保留第二份副本。
+  補述逐字保留原導言句與五條指令（含各自的 `#` 註記），並逐項寫明兩處分岔與後果，以及「為什麼是讓副本消失而不是把兩份對齊」。
+- DONE: 給出一個**可重跑的檢查**證明本票內不再存在第二份可執行的 G 項指令清單（例如確認第三節之外沒有其他區段含有 G 項的指令字串），並貼出輸出。並確認未越界未回歸：G-1／G-2 指令主體、F-6 通過條件、F-7 記錄格式、F-9 的 `awk` 限縮、F-11 的 pattern、AC 全節皆逐字未變；`git diff` 只有本票一個檔案。
+  查核指令寫入 `## Test plan`，雙向驗過，輸出見下節。十項比對全部 `True`，`git diff` 只有本票一檔。
+
+### 查核指令：怎麼判、以及它自己怎麼被排除
+
+指令掃本票的「活的」部分（第一個 `## Stage Report:` 之前），抓 fenced 區塊內的 G 項指令字串，依區段分類：
+
+| 分類 | 意義 |
+|---|---|
+| 落在 `### 三、` | 正本，不報 |
+| `AC-OWNED` | `## Acceptance criteria` 內那一筆。AC 文字非本票可改，它與 G-7 重疊是**已知例外**，**印出來而不是靜默略過** |
+| `STRAY` | 其餘任何一筆，即第二份可執行副本 |
+
+**通過條件：`STRAY` 零筆。**
+
+查核指令自己也在 fenced 區塊裡，會抓到自己。處理方式是首行標記 `# divergence-check (self)`，awk 見到該標記就跳過**那一個區塊**——**只排除帶標記的區塊，任何新放進來的區塊都沒有標記，照樣被抓**。這一點下面驗過。
+
+### 雙向驗證
+
+**方向 (a)：修法前後。** 修法前 `STRAY` **五筆**，全在 `## Test plan`（`npx tsc --noEmit`、`npm run build`、AC-3 的 `grep`、G-5 的 `grep`、G-6 的 `node`）。修法後 `STRAY` **零筆**，`AC-OWNED` 一筆不變。指令**從文件內抽出成獨立腳本執行**（444 字元），離開碼 `0`，無 `illegal byte sequence`。
+
+**方向 (b)：這條檢查不是空的。** 只驗 (a) 會放過一個永遠印零筆的假檢查——例如把 self 標記寫成「跳過所有區塊」。所以在副本的 `## Documentation impact` 段植入**第三份**可執行副本（`npx tsc --noEmit` ＋ 一條 `node -e`），用**同一條抽出的指令**跑：印出 `STRAY[## Documentation impact]` **兩筆**，位置正確。
+
+**沒有 (b)，這一輪的交付就只是一句宣稱。** 這與 F-9 的第三列、F-11 的九個合法近似字串是同一個道理：證明檢查會通過，不等於證明檢查會失敗。
+
+### 這一處和前八處不同在哪
+
+前八處都是**檢查只認一種寫法**——`archived` 不存在、出口無法稽核、grep 掃錯範圍、pattern 少認變體。F-12 不是，它是**同一個檢查有兩份副本，而副本已經分岔**，而且分岔是漸進的：cycle 4 只改了第三節的 G-8 順序，Test plan 那份沒跟上；cycle 6 只加寬了第三節的 G-5，Test plan 那份少一個字串。**兩次分岔都是我造成的，兩次都沒有比對另一份。**
+
+把兩份對齊只修掉今天這兩處。移除副本才修掉產生分岔的機制——本票跑了七輪，這是第一個能讓同型缺陷停止再生的修法。
+
+### 驗證與可否證性
+
+- **F-12 的可否證點是方向 (b)**：若查核指令被寫成永遠印零筆，(a) 照樣「通過」，(b) 會立刻暴露。實測 (b) 印出兩筆且區段正確。
+- **self 排除不是萬用豁免**：植入的第三份副本沒有 `# divergence-check` 標記，照樣被抓到——證明排除的是那一個標記過的區塊，不是「所有區塊」。
+- **未回歸、未越界**（皆程式比對，非目視）：`G-1 指令主體逐字未變: True`、`G-2 指令主體逐字未變: True`、`AC 全節逐字未變: True`、`F-11 的 G-5 pattern 逐字未變: True`、`G-8 列逐字未變: True`、F-6 兩個判準片段 `True`、`F-7 記錄位置與固定格式逐字未變: True`、`F-9 awk 限縮逐字未變: True`、`sync-content 禁令仍在 Test plan: True`。
+- **既有指令重跑無回歸**：G-5 仍印三筆；F-9 查核指令八張票全 `NO-RECORD`。
+- **AC-3 無回歸**：三檔命中數仍為 `1／5／1`；相鄰性仍為 `binding at line 8; next line 9 =   robots: { index: false, follow: false },`。
+- **改動範圍**：`git diff --name-only` 只有本票一檔；修法本身 `+27／-9`，連同本節 stage report 一併提交後為 `+87／-9`。九筆刪除為 `status: verify`（**FO 推進階段改的 frontmatter**，本 ensign 開工前就在工作區）、Test plan 導言一行、以及被移除的七行 `bash` 區塊（含前後圍欄）——五條指令全部逐字保留在更正補述內。**無以刪改掩蓋。**
+
+### Summary
+
+F-12 修根：`## Test plan` 不再自己抄一份 gate 指令，改為指向第三節的唯一正本。Test plan 裡不在第三節的東西全部留著（實測記錄表、`不執行 npm run sync-content` 等），五條被移除的指令逐字保留在更正補述裡，並寫明兩處分岔與各自的後果。
+
+**沒有把 Test plan 缺的那個字串補進去。** 依授權，正確作法是讓副本消失，不是讓兩份副本一致——對齊只修今天這兩處，移除才修掉分岔機制。
+
+新增一條可重跑的分岔偵測，並雙向驗過：修法前印五筆 `STRAY`、修法後零筆；在副本植入第三份副本後，同一條指令印出兩筆 `STRAY`。第二個方向是關鍵——**證明檢查會通過，不等於證明檢查會失敗。**
+
+**一件我要誠實記下的事**：F-12 的兩處分岔都是我造成的。cycle 4 改 G-8 順序、cycle 6 加寬 G-5，兩次都只改第三節，兩次都沒去比對 Test plan 那一份。我每一輪都在驗「我改的那一處對不對」，沒有驗「這份文件裡還有沒有第二個地方講同一件事」。
+
+**AC-2 維持未達成**，仍綁在未獲核准動工的 feature `039`。gate 整體仍不通過（八張票皆未結案、G-5 三筆佔位命中），各有其票，依禁令未動。
