@@ -1,7 +1,7 @@
 ---
 id: 050
 title: 正式 SSOT 部署 feature 040 的審核欄位（040 合併的硬前置）
-status: verify
+status: implement
 source: captain 2026-09-04（把關機制體檢最高風險項：無票、無人負責）
 started: 2026-09-07T23:15:17Z
 completed:
@@ -34,7 +34,7 @@ feature 040 把八個審核欄位全部改為必填。正式試算表尚未建�
 
 1. **正式試算表三個發布分頁各建八個審核欄位。**
 2. **裝上 `CONTENT_FINGERPRINT` 與 `APPROVAL_STATUS` 公式，以及 Review 選單。** 程式碼在 `scripts/apps-script/approval-workflow.gs`，部署方式見 `docs/content-pipeline/operations.md`（該檔目前只存在於 040 的 worktree，隨 040 合併才會進 main）。
-3. **逐列重新核可。** `docs/content-pipeline/design.md` 明訂舊列不能批次補造指紋——部署新欄位後既有的 `Approved` 會**全部先顯示 `Needs review`**。
+3. **逐列重新核可。** `docs/health-check/2026-09-03-editor-onboarding.md:432-433` 明訂舊列不能批次補造指紋——部署新欄位後既有的 `Approved` 會**全部先顯示 `Needs review`**。
 4. **確認保護範圍。** 八個審核欄位需設為投稿者不可編輯。與 `status` 欄的保護是分開設定的。
 
 `editor-onboarding.md:434` 特別註明：**編輯權限已經開出去，這一輪重新核可的工作量比原設計預估的大。**
@@ -206,7 +206,7 @@ reject_reason
 |---|---|---|
 | `Track 1_history` | `status`、`approved_by`、`approved_at` | `review_decision`、`review_fingerprint`、`approved_fingerprint`、`current_fingerprint`、`reject_reason` |
 | `Track 2_discussion` | `status`、`approved_by`、`approved_at` | 同上五欄 |
-| `site_tldr` | `status`（`TODO.md:156` 記錄現況為 `order｜label｜text｜status｜link`） | `review_decision`、`review_fingerprint`、`approved_by`、`approved_at`、`approved_fingerprint`、`current_fingerprint`、`reject_reason` |
+| `site_tldr` | `status`（`TODO.md` 的 P1-5「附帶問題已解決」記錄現況為 `order｜label｜text｜status｜link`） | `review_decision`、`review_fingerprint`、`approved_by`、`approved_at`、`approved_fingerprint`、`current_fingerprint`、`reject_reason` |
 
 **三條硬規則：**
 
@@ -286,7 +286,10 @@ reject_reason
 4. `status` 應變成 `Approved`。沒變就是有問題，程式會**自動復原整批審核欄位**並報錯。
 
 **「逐列」的意思是逐列判斷，不是逐列點按。** 可以多列一起核可，因為程式對每一列各自重算指紋。
-`design.md` 禁止的是**批次補造指紋**（手動貼上或用公式填 `approved_fingerprint`），那會讓核可不再綁定內容。
+被禁止的是**批次補造指紋**——`editor-onboarding.md:432` 的原句是「舊列不能批次補造指紋」，
+040 worktree 的 `operations.md:13` 寫「不要批次替舊列補造指紋。部署後要逐列重新核可。」
+「手動貼上或用公式填 `approved_fingerprint`」是本票對那條禁令的舉例，不是原文。
+那樣做會讓核可不再綁定內容。
 
 **⚠️ Track 2 有一個順序陷阱：** `Track 2_discussion` 的指紋含「已發布列序號」
 （`approval-workflow.gs:76-80` 的 `__sequence`）。**在 Track 2 插入或刪除任何一列，
@@ -486,7 +489,7 @@ node --env-file=.env.local /tmp/hdr.mjs
 `review_fingerprint`、`approved_by`、`approved_at`、`approved_fingerprint`、
 `reject_reason`、`current_fingerprint`。
 
-**`site_tldr`** — 現況 5 欄（`order`／`label`／`text`／`status`／`link`，與 `TODO.md:156` 的記錄相符），
+**`site_tldr`** — 現況 5 欄（`order`／`label`／`text`／`status`／`link`，與 `TODO.md` 的 P1-5「附帶問題已解決」的記錄相符），
 要新建 7 欄：`review_decision`、`review_fingerprint`、`approved_by`、`approved_at`、
 `approved_fingerprint`、`reject_reason`、`current_fingerprint`。
 
@@ -787,19 +790,56 @@ diff "$REPO/src/data/history.json" "$SANDBOX/src/data/history.json"
 diff "$REPO/src/data/discussions.json" "$SANDBOX/src/data/discussions.json"
 ```
 
-**sha256 不符時怎麼辦。** 先看上面兩個 `diff` 印出什麼，分辨是哪一種，不要直接停住：
+**sha256 不符時怎麼辦。** 先跑下面兩項**機器可判**的檢查，再看 `diff`。
+
+**⚠️ 不要只看 `diff` 落在哪裡就決定重量 baseline。** 部署時誤刪一列已核可的列，
+`diff` 也會完全落在「那 59 列的發布內容」之內，main 還是 exit 0——
+光看 exit code 與 diff 位置，**誤刪與合法填值長得一樣**（實測見第十節）。
+
+**檢查①　筆數。** main 印出的兩行必須逐字仍是：
+
+```
+✅ 檢查通過，已寫入 src/data/history.json（40 筆）
+✅ 檢查通過，已寫入 src/data/discussions.json（16 筆，含 tldr）
+```
+
+**檢查②　id 清單。** 把 AC-3 的比對指令提前跑一次，`OUT` 指向沙箱：
+
+```bash
+REPO="$REPO" OUT="$SANDBOX/src/data" node -e '
+const fs=require("fs");
+const ids=p=>JSON.parse(fs.readFileSync(p,"utf8")).map(r=>r.id);
+for (const f of ["history.json","discussions.json"]) {
+  const a=ids(`${process.env.REPO}/src/data/${f}`), b=ids(`${process.env.OUT}/${f}`);
+  console.log(f, JSON.stringify(a)===JSON.stringify(b) ? "✅ id 清單一致"
+    : "⛔ 少了:"+JSON.stringify(a.filter(x=>!b.includes(x)))+" 多了:"+JSON.stringify(b.filter(x=>!a.includes(x))));
+}'
+```
+
+兩行都必須是 `✅ id 清單一致`。**這是 AC-3 的指令原樣提前跑，不是另一套判準。**
+
+分辨表：
 
 | 分辨方式 | 判定 | 處置 |
 |---|---|---|
-| main 同步 exit 0，`diff` 只落在那三個內容欄或那 59 列的發布內容，且編輯台確認是有人正常填稿 | **編輯合法填值** | **重新量 baseline。** 把新的兩個 sha256 更新進 AC-1 的綁定值，在 AC-1 旁註明新值、量測日期與換基準的原因，然後繼續階段二 |
+| main 同步 exit 0、**檢查①與②都通過**，且 `diff` 只落在那三個內容欄或那 59 列的發布內容，且編輯台確認是有人正常填稿 | **編輯合法填值** | **重新量 baseline。** 把新的兩個 sha256 更新進 AC-1 的綁定值，在 AC-1 旁註明新值、量測日期與換基準的原因，然後繼續階段二 |
+| main 同步 exit 0，但**檢查①或②沒通過**（筆數不是 40／16，或 id 比對印出「少了」「多了」） | **有列掉了或被換掉** | 停住。**絕對不要重量 baseline**——那會把掉掉的那一列一起烤進新基準，之後 AC-1 反而會通過，最壞情況是少一筆內容靜默上線。先照 id 比對印出的那個 `id` 把列找回來（Google 試算表的版本記錄） |
 | main 同步轉為 exit 1，或 `diff` 落在沒人動過的欄位 | **部署副作用** | 停住。回頭查 S1／S2 是否改到欄位位置、刪到列、或在新欄填了值。**不要重量 baseline** |
+
+**為什麼兩項要一起看。** 只看筆數擋不住「刪一列又新增一列」——筆數仍是 40，
+但 id 比對會印出 `⛔ 少了:["h1"] 多了:["h99"]`。兩項合起來在四個實測情境下全部判對（第十節）。
 
 **重量 baseline 不等於放寬 AC-1。** AC-1 的判準不變（部署前後逐字相同），
 變的只是「部署前」那個基準的量測時點。重量之後，S9 仍然必須逐字相同。
 **只有 captain 能改 AC 的要求**；工程在這裡做的是更新一個量測值，不是改判準。
 
-**這一段何時升級為 Material**：任何人在階段一對 `chapter`、`owl_depth_comment`、`full_content`
-或那 59 列的發布內容寫入任何值。在那之前它是 deferred risk——2026-09-24 重量 baseline 仍未漂移。
+**這一段何時升級為 Material**：兩個條件各自獨立，任一成立就升級。
+
+1. 任何人在階段一對 `chapter`、`owl_depth_comment`、`full_content`
+   或那 59 列的發布內容寫入任何值。在那之前它是 deferred risk——2026-09-24 重量 baseline 仍未漂移。
+2. **S3 真的出現 sha256 不符，而工程在未跑檢查①②的情況下重量 baseline。**
+   這一條需要「先誤刪、再誤判」兩步才成立，所以現在仍是 deferred risk；
+   但它一旦發生就直接打穿 AC-1 與 AC-2，因為新基準會把錯誤內容當成正確。
 
 #### 階段二：窗口（`captain` + `工程`，一氣呵成，預留 2 小時）
 
@@ -881,7 +921,7 @@ verify stage 判 **PASSED**，並提出 F1-F4 四筆 finding。FO 授權**四筆
 | **F2** | Material | AC-6 的 `Verified by:` | 判準改為「同一行同時含 `對不到任何預期欄位` 與 `review_decision` 兩個子串」，並在 sandbox 指令裡附上該 `grep`。不再逐字比對引號內容，不再綁欄號 |
 | **F4** | Deferred risk | S2、S3 | S2 加「三個內容欄在 S9 完成前必須全欄留白」；S3 加 sha256 不符時的分辨表與 re-baseline 條文，並記下升級為 Material 的條件。順帶補上 S3 的 `diff` 指令——原本只寫「比 sha256」，沒寫怎麼看出差在哪 |
 | **F1** | Polish | 第六節「Track 2 的序號暴露面」 | 「其後 14 列」改為「其後 13 列（第 5-17 列）」 |
-| **F3** | Polish | 步驟 3 的表、第三節 | `TODO.md:127` 改為 `TODO.md:156` |
+| **F3** | Polish | 步驟 3 的表、第三節 | `TODO.md:127` 改為 `TODO.md:156`。**cycle 3 再改一次，改為名稱引用 `TODO.md` 的 P1-5「附帶問題已解決」**——`TODO.md` 是票內唯一兩個 checkout 不同的被引用檔，理由見第十節 |
 
 **AC 的要求文字一字未動。** F2 只改 AC-6 的 `Verified by:`（改「怎麼認出那一行」），
 AC-6 的標題與「必須 exit 1 並輸出一行指出 `review_decision` 這一欄對不到任何預期欄位」
@@ -907,17 +947,29 @@ AC-6 的標題與「必須 exit 1 並輸出一行指出 `review_decision` 這一
 
 #### 引用複核：票內每一處 `檔名:行號`
 
-verify 說它實讀通過 8 處。本輪把範圍擴到**全票**：31 個被引用的位置
-（含以「第 N 行」「第 N 節第 M 點」形式寫的；同一個引用出現多次的合併成一列）。
-**四處指不到宣稱的內容，全部已修；其餘 27 處實讀通過。**
-四處之中 `TODO.md:127` 是 verify 點名的 F3，另外三處是本輪新查出的同類。
+verify 說它實讀通過 8 處。cycle 2 把範圍擴到全票的 `檔名:行號` 一族（31 處），
+cycle 3 再補一族與一處漏掉的，共 **36 個被引用的位置**。
+**五處指不到宣稱的內容，全部已修；其餘 31 處實讀通過。**
+另有一列（`TODO.md` P3-7）宣稱正確、但本表當初拿來當證據的行號記錯，已改為名稱引用。
+
+> ⚠️ **這張表的三個邊界，先寫清楚，因為它們是這張表唯一會騙人的地方。**
+>
+> 1. **它是「掃描當下」的快照。** 同一輪之後才新增的引用不會出現在裡面。
+>    cycle 2 的 `sync-content.mjs:294` 正是這樣漏的——它是 cycle 2 自己為了 F2 加進票內的，
+>    加在掃描之後，所以掃描結果「零漏」與「這張表涵蓋全票」**不是同一件事**。
+>    本表已把它補上，並在第三輪重掃一次。
+> 2. **它原本只掃 `檔名:行號` 一族。** `檔名 第 N 條／第 N 節` 是另一族，
+>    原本整族不在範圍內。第三輪已把這一族的 5 處補進表尾。
+> 3. **行號只在「那個檔在兩個 checkout 相同」時才有唯一答案。**
+>    被引用的檔裡只有 `TODO.md` 在 main 與本 branch 之間不同（見 P3-7 那一列），
+>    其餘七個檔兩邊是同一個 blob，所以行號無歧義。
 
 | 引用 | 宣稱的內容 | 結果 |
 |---|---|---|
 | `editor-onboarding.md:430`（4 處） | 「編輯權限已經開出去，這一輪重新核可的工作量比原設計預估的大」 | ⛔ 該句在**第 434 行**。第 430 行是「正確順序是：試算表建欄 → …」。**已改為 `:434`** |
 | `040-…md:221` | 040 的 Out of scope「不上線正式 SSOT 設定，直到隔離測試表完成驗證並由 captain 確認」 | ⛔ 該句在**第 290 行**，第 221 行是空行（main、040 worktree、本 worktree 三份皆同）。**已改為 `040-approval-content-version-binding.md:290`**（並補全檔名，原本寫成 `040-…md`） |
-| 本票「第 50 行」 | 「spike 的形式是在隔離測試表上先跑一次（即 feature 044）」 | ⛔ 該句在**第 53 行**。**已改為第 53 行，並補上 `## Risk evidence` 首句** 當錨點 |
-| `TODO.md:127` | `site_tldr` 現況為 `order｜label｜text｜status｜link` | ⛔ 第 127 行是空行，該記錄在**第 156 行**。**已改**（即 F3） |
+| 本票「第 50 行」 | 「spike 的形式是在隔離測試表上先跑一次（即 feature 044）」 | ⛔ 該句在第 53 行。cycle 2 改為「第 53 行（`## Risk evidence` 首句）」；**cycle 3 把行號整個拿掉、只留錨點** |
+| `TODO.md:127` | `site_tldr` 現況為 `order｜label｜text｜status｜link` | ⛔ 第 127 行是空行，該記錄在第 156 行（即 F3）。cycle 2 改為 `:156`；**cycle 3 再改為名稱引用 `TODO.md` 的 P1-5「附帶問題已解決」**，因為 `TODO.md` 兩個 checkout 的行號不同 |
 | `editor-onboarding.md:425-430` | 「一旦先合併而試算表還沒建那八欄…」＋「正確順序是…」兩句 | ✅ 兩句分別在第 428、430 行，都落在區間內 |
 | `editor-onboarding.md:261` | `reject_reason` 欄在試算表上不存在 | ✅ 逐字相符 |
 | `editor-onboarding.md:104-111` | 風險 5（改到欄位標題，整條產線停擺） | ✅ 標題在第 104 行，整段落在區間內 |
@@ -925,7 +977,7 @@ verify 說它實讀通過 8 處。本輪把範圍擴到**全票**：31 個被引
 | `editor-onboarding.md:58` | 「整列刪除」保護尚未確認 | ✅ 逐字相符 |
 | `editor-onboarding.md:344-345` | `h28` 掛了 `h14` 的標題，以清空 `status` 擋住 | ✅ 逐字相符 |
 | `2026-08-31-content-pipeline.md:174` | `收集區` 的 Track 1 為 9 欄、不含 `chapter` | ✅ 逐字相符 |
-| `TODO.md` P3-7 | `chapter` 欄位設計已被放棄 | ✅ 標題在第 865 行，存在 |
+| `TODO.md` P3-7（以名稱引用） | `chapter` 欄位設計已被放棄 | ✅ 標題存在，內容相符。**本欄原寫「第 865 行」，那是錯的記法而非錯的行號**——`TODO.md` 是票內唯一在 main 與本 branch 之間有差異的被引用檔（main 多 40 行，插在第 596-635 行），所以 P3-7 在 main 是第 **905** 行、在本 worktree 是第 865 行，**同一個名稱有兩個合法行號**。票內三處都以名稱引用、不帶行號，所以沒有任何載重引用被打壞。詳見 G1 的處置 |
 | `approval-workflow.gs:5` | `APPROVAL_FIELDS['Track 1_history']` 含 `chapter` | ✅ |
 | `approval-workflow.gs:6` | `APPROVAL_FIELDS['Track 2_discussion']` 是 13 個欄位 | ✅ 實數 13 個 |
 | `approval-workflow.gs:12-14` | `WRITABLE_REVIEW_FIELDS` 排除 `status` 與 `current_fingerprint` | ✅ |
@@ -944,7 +996,12 @@ verify 說它實讀通過 8 處。本輪把範圍擴到**全票**：31 個被引
 | main 第 123-129 行 | `SITE_TLDR_COLUMNS` 無 `approved_by`／`approved_at`／`reject_reason` | ✅ 七行實讀，確實沒有 |
 | `operations.md:12` ／ 第 15-25 行 | probe 但書；「隔離表部署」一節 | ✅ 第 12 行逐字相符；該節內容為第 15-25 行（第 26 行空白、第 27 行是下一節） |
 | `design.md` 第二節第 4 點 | 找不到標題就中止並指名 | ✅ 第二節在第 135 行，第 4 點為「找不到就中止，並指名是哪個標題看不懂」 |
-| 本票「第 45 行」 | 「兩者不互為前置」 | ✅ 仍指到該句；已補上 `## 相依關係` 第二個項目符號當錨點 |
+| 本票 `## 相依關係` 第二個項目符號 | 「兩者不互為前置」 | ✅ 指到該句。cycle 2 寫成「第 45 行（錨點）」，cycle 3 **把行號整個拿掉、只留錨點**——理由見下方「錨點不等於修好」 |
+| main `sync-content.mjs:294` | `第 N 欄的標題「…」對不到任何預期欄位。檢查是否打錯字。` 的 `addError` 樣板 | ✅ 逐字相符。**cycle 2 自己新增的引用，當輪掃描沒有涵蓋到**（見上方邊界 1） |
+| `AGENTS.md` 第 1 條 | 不要自己執行內容同步 | ✅ 第 12 行 `### 1. 不要自己執行內容同步`；票內「main 的程式成功時會直接覆寫 `src/data/`，違反 `AGENTS.md` 第 1 條」成立 |
+| `design.md` 第二節的欄位表 | 欄位表是設計意圖、不是現況快照 | ✅ 第二節內三個分頁各有欄位表（第 182／193／204 行） |
+| `design.md` 第五節施工順序表 | Documentation impact 要追加本票為新項目 | ✅ `## 五、更新流程與施工順序`（第 349 行）內有 `### 施工順序` 表 |
+| `design.md` 明訂舊列不能批次補造指紋（第 37 行、步驟 7） | 舊列不能批次補造指紋 | ⛔ **`design.md` 完全沒有這一條**（全檔 `grep 補造` 零命中，`指紋` 只出現在修訂紀錄）。該規則實際在 `editor-onboarding.md:432-433`，`040-…md:173` 與 040 worktree 的 `operations.md:13` 也各有一份。**引錯的是檔名，不是行號。已改指 `editor-onboarding.md:432-433`** |
 
 **F3、`editor-onboarding.md:430`、`040-…md:221`、本票「第 50 行」是同一種錯**：
 引用的行號在寫下之後就沒有再被驗證過。修法一致——實讀一次，改成對的行號，
@@ -986,6 +1043,159 @@ verify 說它實讀通過 8 處。本輪把範圍擴到**全票**：31 個被引
 - 未動 040 的 worktree（只以 `git show main:` 與唯讀 `sed` 取內容）。
 - 判定中文字串時未使用 `sort`／`uniq`；欄名與訊息比對一律用 `grep -o … | wc -l` 或 Python 的字串計數。
 
+### 十、G1-G3 的處置與 S3 前置的實測（2026-09-24 第三輪）
+
+verify 第二輪判 **PASSED**，並提出 G1-G4。FO 授權 **G1／G2／G3 fix**；
+**G4 由 FO 自己補**（`### Feedback Cycles` 的 Cycle 行是 FO 負責的記錄，worker 不代寫）。
+本輪**對正式試算表零寫入、零讀取**：所需標題第一節已逐字記載，重跑只需本機 fixture。
+`src/data/*.json` 零改動。diff 基準自算：`git merge-base main HEAD` ＝ `384ca7a3cd670c436b4903e9ba63703140f63455`。
+
+#### G3：S3 的分辨表加了兩項機器可判的前置
+
+**問題**：原表第 1 列的前兩個條件（main exit 0、`diff` 落在那 59 列之內）
+**誤刪一列已核可的列也會同時滿足**。擋住它的只有第三個條件「編輯台確認是有人正常填稿」，
+那是人工判斷。若有人把 `diff` 位置當成充分條件就會重量 baseline，
+**把掉掉的那一列一起烤進新基準，之後 AC-1 反而會通過。**
+
+**修法**：第 1 列再加**檢查①筆數**（`（40 筆）`／`（16 筆，含 tldr）`）
+與**檢查②id 清單**（AC-3 的比對指令提前跑一次，兩行都要 `✅ id 清單一致`）。
+另加一列專門處理「檢查①或②沒通過」，明寫**絕對不要重量 baseline**。
+
+**兩個方向都驗過。** 手法：用第一節記載的真實標題造一個階段一完成後的本機 fixture
+（Track 1 十四欄、Track 2 十七欄、`site_tldr` 五欄，即 S1／S2 做完的狀態），
+內容列是合成的，但**列數與已核可數刻意造成與正式表相同**——
+42／43／4 列資料、40／15／4 列 `Approved`，所以 main 印出的筆數就是 `（40 筆）` 與 `（16 筆，含 tldr）`。
+main 的同步取自 `git show main:scripts/sync-content.mjs`，在 `mktemp -d` 沙箱執行。
+baseline ＝ 未改動的那份 fixture 的輸出。
+
+| 情境 | 做了什麼 | main | 筆數 | AC-3 id 比對 | sha256 | 舊前置 | **新前置** |
+|---|---|---|---|---|---|---|---|
+| **A** | 編輯合法填 `chapter`（`h1`） | exit 0 | 40／16 ✅ | ✅ 一致 | history 變 | 放行 | **放行** ✅ |
+| **A2** | 編輯合法填 `owl_depth_comment`（`d1`） | exit 0 | 40／16 ✅ | ✅ 一致 | discussions 變 | 放行 | **放行** ✅ |
+| **B** | 誤刪一列已核可的 `h1` | exit 0 | **39**／16 ⛔ | ⛔ `少了:["h1"]` | history 變 | **放行（誤判）** | **擋住** ✅ |
+| **B2** | 誤刪一列已核可的 `d1` | exit 0 | 40／**15** ⛔ | ⛔ `少了:["d1"]` | discussions 變 | **放行（誤判）** | **擋住** ✅ |
+| **B3** | 刪掉 `h1`、同時新增一列已核可的 `h99` | exit 0 | 40／16 ✅ | ⛔ `少了:["h1"] 多了:["h99"]` | history 變 | **放行（誤判）** | **擋住** ✅ |
+
+四項結論：
+
+1. **(a) 方向成立**：B／B2／B3 三種掉列情形，新前置全部擋住。
+   verify 實測的情境 B 我獨立重現，**筆數逐字印出 `（39 筆）`、id 比對逐字印出 `⛔ 少了:["h1"]`**。
+2. **(b) 方向成立**：A／A2 兩種編輯合法填值，新前置**全部放行**。
+   加了前置之後仍然走得到「重新量 baseline」那一格，**不是把誤判的路換成永遠停住的路。**
+3. **舊前置在五個情境下全部放行**——包含三種掉列。這證實 G3 的前提：
+   光看 exit code 與 `diff` 位置，**誤刪與合法填值長得一樣**。
+4. **兩項檢查缺一不可。** 情境 B3（刪一列又補一列）筆數仍是 40，只有 id 比對抓得到。
+   所以表裡寫的是「檢查①**與**②都通過」。
+
+**沒有碰 AC-1 或 AC-2 的條文。** 修改全部落在 S3。
+檢查②用的是 AC-3 的指令原樣提前跑，只把 `OUT` 指到沙箱，判準沒有另立一套。
+
+#### G1：P3-7 的行號——這不是錯的行號，是錯的記法
+
+verify 說 P3-7 在第 905 行、第 865 行是 P3-4 的 `opposing_views`。**這在 main 上完全正確。**
+但我實讀本 worktree 得到的是 **865**。兩邊都不是筆誤：
+
+| checkout | `TODO.md` 行數 | P3-7 的行號 |
+|---|---|---|
+| main（`main` 分支） | 1046 | **905** |
+| 本 worktree（`spacedock-ensign/050-…`） | 1006 | **865** |
+
+`git diff` 兩個 blob：**main 多 40 行，插在第 596-635 行**（features 065／066／049 加的兩筆 P1-9）。
+第 596 行之前兩邊逐字相同，之後一律差 40 行。
+`905 － 865 ＝ 40`，與插入行數相符。
+
+**所以「`TODO.md:行號`」這種引用在本票沒有唯一答案。**
+這比「行號寫錯」嚴重一級：它不是查一次就能修好的，它會隨著讀者站在哪個 checkout 而改變。
+
+**處置**：第九節那一列改為名稱引用，並把這個成因寫進該列。
+**同時把票內最後一處 `TODO.md:行號` 也改掉**——步驟 3 的表與第三節原本寫 `TODO.md:156`
+（cycle 2 對 F3 的修正），改為 `TODO.md` 的 P1-5「附帶問題已解決」。
+`:156` 目前在兩個 checkout 都正確（因為差異從第 596 行才開始），
+**但那是運氣，不是保證**：只要有人在 main 的第 156 行之前插入內容，它就會失準。
+
+**另外查了票內其他被引用的檔在兩個 checkout 是否相同。**
+`editor-onboarding.md`、`2026-08-31-content-pipeline.md`、`design.md`、
+`040-approval-content-version-binding.md`、`AGENTS.md`、`CLAUDE.md`、`scripts/sync-content.mjs`
+**七個檔兩邊都是同一個 blob**，所以那些行號無歧義，本輪不動它們。
+`approval-workflow.gs` 與 `operations.md` 只存在於 040 的 worktree，票內已註明。
+
+#### G2：把掃描的邊界寫進票內，並把範圍擴到第二族
+
+verify 確認「掃描當下的 `檔名:行號` 一處都沒漏」，要修的不是結果而是**清單沒有寫明自己的涵蓋面**。
+第九節的表頭已補上三條邊界（快照時點／只掃一族／行號的 checkout 前提），
+並補進 5 列。其中 4 列實讀通過：
+
+| 補進來的引用 | 結果 |
+|---|---|
+| main `sync-content.mjs:294` | ✅ `addError` 樣板逐字相符。**它是 cycle 2 自己為 F2 新增的引用，加在該輪掃描之後** |
+| `AGENTS.md` 第 1 條 | ✅ 第 12 行 `### 1. 不要自己執行內容同步` |
+| `design.md` 第二節的欄位表 | ✅ 第二節內三個分頁各有欄位表 |
+| `design.md` 第五節施工順序表 | ✅ `## 五、更新流程與施工順序` 內有 `### 施工順序` 表 |
+
+**第 5 列是本輪新查出的錯，而且它比 G1 嚴重：引錯的是檔名。**
+
+票內兩處（`## 已知的工作內容` 第 3 點、步驟 7）寫
+「`design.md` 明訂舊列不能批次補造指紋」「`design.md` 禁止的是批次補造指紋」。
+**`design.md` 沒有這一條。** 全檔 `grep 補造` 零命中；`指紋` 只出現 5 次，
+全在修訂紀錄與一條 041 的實測註記裡，沒有任何禁令。
+
+該規則實際在三個地方：
+
+| 出處 | 原句 |
+|---|---|
+| `editor-onboarding.md:432-433` | 「另外舊列不能批次補造指紋。／部署新欄位後既有的 `Approved` 會全部先顯示 `Needs review`，需要編輯台重新核可一輪。」 |
+| `040-approval-content-version-binding.md:173` | 「舊列不能批次補造指紋。部署新欄位後，既有 `Approved` 全部先顯示 `Needs review`。編輯台重新核可後才能同步。」 |
+| 040 worktree 的 `operations.md:13` | 「不要批次替舊列補造指紋。部署後要逐列重新核可。」 |
+
+**票內那句的措辭與 `editor-onboarding.md:432-433` 逐字最接近**，所以兩處都改指它。
+步驟 7 另外把「手動貼上或用公式填 `approved_fingerprint`」標明為**本票的舉例，不是原文**。
+
+**實質規則沒有變，captain 要做的事一個字都沒變**——舊列仍然不能批次補造指紋，
+仍然要逐列重新核可。改的只是「這條規則寫在哪裡」。
+這一筆是靠 G2 擴大範圍才浮出來的：`design.md` 的兩處引用**不帶行號也不帶節號**，
+所以它們既不在 `檔名:行號` 一族、也不在 `檔名 第 N 節` 一族，兩輪掃描都掃不到。
+**第三族是「只寫檔名、不寫位置」的引用**，本表已把這兩處納入。
+
+#### 錨點不等於修好：採納 verify 的評價
+
+verify 判定 cycle 2 補章節錨點是「**部分改善不是修好**」。**這個評價是對的，我採納。**
+
+- 行號 45／53 **仍然寫在文字裡**。上方一插入內容，那兩個數字就再次失準。
+- 錨點買到的是「**可復原**」——讀者發現行號不對時，還有辦法找到那句話。
+- 它買不到「**不漂移**」。要不漂移，行號就不能留。
+
+**判斷：那兩處自我引用的行號，拿掉。只留錨點。** 四個理由：
+
+1. **自我引用是最會漂移的一種。** 本票每一輪都在後面追加章節；
+   cycle 2 光是插入第九節就把 `## 相依關係釐清` 以下全部往下推了 100 多行。
+   對同一份文件的行號引用，等於保證會失準。
+2. **錨點已經夠精確。** `## 相依關係` 的第二個項目符號、`## Risk evidence` 的首句，
+   兩者各自只對應一句話。加上行號**沒有增加任何精確度**。
+3. **票內已有正確示範。** 三處 P3-7 都以名稱引用、不帶行號，
+   所以 G1 那個錯行號**沒有打壞任何一處載重引用**——這正是名稱引用的價值。
+4. **G1 又補了一個更強的理由。** 行號在兩個 checkout 可以有兩個合法答案，
+   名稱引用不會。
+
+**沒有一併拿掉的是跨檔引用的行號**，理由要說清楚，因為這是不對稱的處置：
+那些檔（七個）在兩個 checkout 是同一個 blob，而且本票不會去改它們——
+它們的行號本輪已全部實讀通過，**留著行號比只寫章節名好查**。
+`TODO.md` 是唯一的例外，已改為名稱引用。
+**判準是「這個檔會不會在我引用它之後變動」**，不是「行號一律不好」。
+
+#### 未越界
+
+- **正式 Google 試算表零寫入、零讀取。** 本輪沒有發出任何 HTTP 請求到試算表。
+  fixture 的標題取自第一節已逐字記載的實測標題；內容列是合成的。
+- 未執行 `npm run sync-content`。main 的同步跑了七次（baseline 兩次與五個情境各一次），
+  七次都在 `mktemp -d` 沙箱、餵本機 fixture，輸出寫進沙箱自己的 `src/data/`。
+- `src/data/*.json` 逐位元組未變，sha256 仍為 `4d1992e3…cea3b`／`4071978a…3162`。
+- **AC 的要求文字一字未動。** G3 的修改全部落在 S3，未碰 AC-1、AC-2、AC-3 的條文。
+- **承重數字原值保留**：24／9／15 欄、59 列、12／15 個保護範圍、6 個連續段。
+  **S7 與 S8 兩個區塊逐字未動。**
+- `src/`、`scripts/` 零變動。未動 040 的 worktree（只以 `git show`、唯讀 `sed`／`grep` 取內容）。
+- **未代 FO 補寫 `### Feedback Cycles`**，也未改動 FO 已寫的 Cycle 1 那一行。
+- 判定中文字串未使用 `sort`／`uniq`；計數用 Python 字串計數與 `grep -c`。未使用 `awk` 做任何判斷。
+
 ## 相依關係釐清（design stage）
 
 ### 相依一：`docs/content-pipeline/operations.md` 只存在於 040 的 worktree
@@ -1009,12 +1219,12 @@ verify 說它實讀通過 8 處。本輪把範圍擴到**全票**：31 個被引
 
 ### 相依二：票內自相矛盾——044 到底是不是前置
 
-**矛盾確認**。本票第 45 行（`## 相依關係` 第二個項目符號）寫
+**矛盾確認**。本票 `## 相依關係` 的第二個項目符號寫
 「044 的結果可降低本票的風險，但兩者不互為前置」；
-第 53 行（`## Risk evidence` 首句）寫「spike 的形式是在隔離測試表上先跑一次（即 feature 044）」。
+`## Risk evidence` 的首句寫「spike 的形式是在隔離測試表上先跑一次（即 feature 044）」。
 既然 `no spike needed` 不成立、而 spike 就是 044，044 就是前置。兩句不能同時成立。
 
-**我的判定：第 45 行（`## 相依關係` 第二個項目符號）錯，044 是步驟 4 起的硬前置。三項外部證據都指向同一邊：**
+**我的判定：`## 相依關係` 第二個項目符號錯，044 是步驟 4 起的硬前置。三項外部證據都指向同一邊：**
 
 1. `docs/content-pipeline/operations.md:12`（040 worktree）：
    「兩帳號隔離 probe 完成前，不要把 Apps Script 套到正式 SSOT。」
@@ -1204,7 +1414,7 @@ verify 說它實讀通過 8 處。本輪把範圍擴到**全票**：31 個被引
 - DONE: 補齊 acceptance criteria，每一項都要有可失敗的 `Verified by:`。
   AC-1 至 AC-6。AC-1 綁定部署前實測 sha256（`4d1992e3…cea3b`／`4071978a…3162`）；AC-2 綁定筆數字串 40／16；AC-3 的 id 比對指令實測會真的印出差異（餵 1 筆 fixture，正確列出少掉的 39 個 `h*` 與 14 個 `d*`）；AC-4／AC-5 為兩帳號人工測試；AC-6 讓停擺窗口變成可觀測事實。
 - DONE: 釐清並在票內明確記錄兩項相依。
-  「相依關係釐清（design stage）」。相依一判定本票不依賴 `operations.md`、改為自帶 runbook（`git ls-tree main docs/content-pipeline/` 只有兩個檔）；相依二判定第 45 行「不互為前置」為錯，並附三項外部證據，同時標記 🔴 需 captain 裁決並給出 A/B/C 三個選項。
+  「相依關係釐清（design stage）」。相依一判定本票不依賴 `operations.md`、改為自帶 runbook（`git ls-tree main docs/content-pipeline/` 只有兩個檔）；相依二判定 `## 相依關係` 第二個項目符號的「不互為前置」為錯，並附三項外部證據，同時標記 🔴 需 captain 裁決並給出 A/B/C 三個選項。
 - DONE: Documentation impact 三分類，每節列出文件或寫「無」。
   「現在更新」僅本票並說明為何不動 `docs/`；「實作後更新」六筆各附觸發條件；「不更新」五筆各附理由。
 - DONE: 元件階層／響應行為／資料需求。
@@ -1869,3 +2079,51 @@ AC-1 之後反而會通過。補一項機器可判的前置（筆數仍是 40／
 但同一輪新增的引用不會出現在該輪清單裡——`sync-content.mjs:294` 正是這樣漏的；
 `AGENTS.md 第 1 條`／`design.md 第五節` 則整族不在掃描範圍（三處實讀內容都正確）。
 **G4** 是 FO 事項：`### Feedback Cycles` 有 heading 但沒有 `- Cycle 1` 行。
+
+## Stage Report: implement (cycle 3)
+
+- DONE: G3（最優先，captain 很快會跑 S3）S3 判定表第 1 列再加一項機器可判的前置——「main 印出的筆數仍是 40／16，且 AC-3 的 id 比對仍為一致」。兩個方向都驗：(a) 情境 B（誤刪 `h1`）必須擋住；(b) 情境 A（編輯合法填 `chapter`）必須放行。promote-to-material 條件一併記入。修改落在 S3，不得碰 AC-1／AC-2 條文。
+  第十節第一小節。S3 現在先跑兩項機器檢查再看 `diff`：**檢查①筆數**（`（40 筆）`／`（16 筆，含 tldr）`）、**檢查②id 清單**（AC-3 的指令原樣提前跑，`OUT` 指向沙箱）。分辨表由兩列變三列，中間新增一列專門處理「檢查①或②沒通過」→ 判「有列掉了或被換掉」→ **絕對不要重量 baseline**，並寫明後果（把掉掉的那一列烤進新基準、AC-1 之後反而會通過、最壞情況少一筆內容靜默上線）。表頭上方另加 ⚠️ 明寫「光看 exit code 與 diff 位置，誤刪與合法填值長得一樣」。promote-to-material 改為兩條並列，第 2 條即 verify 寫的「S3 真的出現 sha256 不符，而工程在未跑檢查①②的情況下重量 baseline」。
+  **五個情境實測，兩個方向都成立。** 用第一節記載的真實標題造階段一完成後的 fixture（Track 1 十四欄、Track 2 十七欄、`site_tldr` 五欄），列數刻意造成與正式表相同（42／43／4 列資料、40／15／4 列 `Approved`），所以 main 印出的就是 `（40 筆）` 與 `（16 筆，含 tldr）`。**(b) 放行**：情境 A（填 `chapter`）與 A2（填 `owl_depth_comment`）筆數與 id 都通過，仍走得到「重新量 baseline」那一格。**(a) 擋住**：情境 B（刪 `h1`）印 `（39 筆）`＋`⛔ 少了:["h1"]`；B2（刪 `d1`）印 `（15 筆，含 tldr）`＋`⛔ 少了:["d1"]`。**舊前置在五個情境全部放行**，證實 G3 的前提。
+  falsifying change：情境 B3（刪 `h1` 又新增已核可的 `h99`）**筆數仍是 40 筆**，只有 id 比對抓到（`⛔ 少了:["h1"] 多了:["h99"]`）——證明兩項檢查缺一不可，表裡寫「檢查①**與**②都通過」不是冗贅。
+- DONE: G1（Polish）`TODO.md` 的 P3-7 在第 905 行不在 865。
+  第十節第二小節。**這一筆比「行號寫錯」複雜，實測結果與 verify 不同但兩邊都對**：`TODO.md` 是票內唯一在 main 與本 branch 之間有差異的被引用檔——main 多 40 行，插在第 596-635 行（features 065／066／049 的兩筆 P1-9）。所以 P3-7 在 **main 是 905**（verify 讀的）、**在本 worktree 是 865**（cycle 2 讀的），`905－865＝40` 與插入行數相符。**處置不是把 865 改成 905，而是改成名稱引用**，並把成因寫進該列。順帶把票內最後一處 `TODO.md:行號` 也改掉：步驟 3 的表與第三節的 `TODO.md:156`（cycle 2 對 F3 的修正）改為 `TODO.md` 的 P1-5「附帶問題已解決」——`:156` 目前兩邊都對，但那是因為差異從第 596 行才開始，是運氣不是保證。另查了其他七個被引用的檔（`editor-onboarding.md`、`2026-08-31-content-pipeline.md`、`design.md`、`040-…md`、`AGENTS.md`、`CLAUDE.md`、`scripts/sync-content.mjs`），**兩個 checkout 都是同一個 blob**，行號無歧義，本輪不動。
+- DONE: G2（方法）把兩個範圍外缺口寫進票內掃描說明並把範圍擴到第二族。不必追求「掃描當下零漏」，要修的是清單沒有寫明自己的涵蓋邊界。
+  第九節表頭補上**三條邊界**：①它是掃描當下的快照，同一輪之後新增的引用不會出現在裡面（`sync-content.mjs:294` 正是這樣漏的——cycle 2 自己為 F2 新增、加在掃描之後，所以「零漏」與「涵蓋全票」不是同一件事）；②它原本只掃 `檔名:行號` 一族；③行號只在「那個檔在兩個 checkout 相同」時才有唯一答案。表補 5 列，合計 36 列。`AGENTS.md` 第 1 條、`design.md` 第二節的欄位表、`design.md` 第五節施工順序表、`sync-content.mjs:294` **四處實讀通過**。
+  **第 5 列是本輪新查出的錯，而且比 G1 嚴重：引錯的是檔名。** 票內兩處寫「`design.md` 明訂／禁止舊列不能批次補造指紋」，但 `design.md` **完全沒有這一條**（全檔 `grep 補造` 零命中；`指紋` 只出現 5 次，全在修訂紀錄與一條 041 的註記裡）。該規則實際在 `editor-onboarding.md:432-433`、`040-…md:173`、040 worktree 的 `operations.md:13`。措辭與 `editor-onboarding.md:432-433` 逐字最接近，兩處都改指它；步驟 7 另把「手動貼上或用公式填 `approved_fingerprint`」標明為本票的舉例而非原文。**實質規則與 captain 要做的事一個字都沒變**，改的只是「這條規則寫在哪裡」。這一筆是靠 G2 擴大範圍才浮出來的：那兩處引用**不帶行號也不帶節號**，所以既不在第一族也不在第二族——**第三族是「只寫檔名、不寫位置」的引用**，已納入表中。
+- DONE: 採納 verify 對錨點的評價並寫進票內，並判斷那兩處自我引用要不要索性拿掉行號、說明理由。
+  第十節第四小節。**採納**：補章節錨點是部分改善不是修好——行號仍寫在文字裡，上方一插入內容就再失準；**錨點買到的是「可復原」而非「不漂移」**。**判斷：那兩處自我引用的行號拿掉，只留錨點**（改為「本票 `## 相依關係` 的第二個項目符號」與「`## Risk evidence` 的首句」，另同步改了 Stage Report: design 裡的同一處引用）。四個理由：①自我引用最會漂移——cycle 2 光插入第九節就把 `## 相依關係釐清` 以下推了 117 行；②錨點已經夠精確，那兩個錨點各自只對應一句話，行號沒有增加精確度；③票內已有正確示範，三處 P3-7 以名稱引用，所以 G1 的錯行號沒打壞任何載重引用；④G1 又補了更強的理由——行號在兩個 checkout 可以有兩個合法答案。**不對稱處置已說明理由**：跨檔引用的行號保留，因為那七個檔兩邊同 blob、本票不會改它們、行號比章節名好查；`TODO.md` 是唯一例外已改名稱引用。**判準是「這個檔會不會在我引用它之後變動」，不是「行號一律不好」。**
+- DONE: 未越界。
+  **正式試算表零寫入零讀取**（本輪未發出任何 HTTP 請求；fixture 標題取自第一節已記載的實測值，內容列為合成）。**AC 區塊逐位元組未動**（`## Acceptance criteria` 整段與本輪之前比對逐字相同），G3 的修改全部落在 S3。**S7 與 S8 兩個區塊逐字未動**——與 S7／S8 誕生的那一版（`2e83adf`）以及本輪之前（`beb9b15`）**兩個基準都比過，373／535 bytes 逐字相同**。承重數字 24／9／15／59／12／6 原值保留。`Documentation impact` 與 `Out of scope` 逐字未動。**未代 FO 補寫 `### Feedback Cycles`**：該區塊逐位元組未動，Cycle 行數仍為 1。整條 branch 只動 `docs/constitution-features/050-ssot-approval-deployment.md` 一個檔；`git diff --stat $(git merge-base main HEAD) -- src/ scripts/` 無輸出；`src/data/*.json` sha256 仍為 `4d1992e3…cea3b`／`4071978a…3162`；未跑 `sync-content`（七次 main 同步全在 `mktemp -d` 沙箱、餵本機 fixture）；040 worktree 與主 checkout 的 `git status` 全程為空。diff 基準自算 `git merge-base main HEAD` ＝ `384ca7a3cd670c436b4903e9ba63703140f63455`。未用 `sort`／`uniq` 判定中文字串，未用 `awk` 做任何判斷。
+
+### Summary
+
+三筆按 FO 授權修完，**G4 未動**——`### Feedback Cycles` 逐位元組未改，Cycle 行仍是 FO 寫的那一行。
+
+**G3 是本輪的重點，因為 captain 正在建那 9 欄安全前綴、很快會跑 S3。**
+原表的前兩個條件（main exit 0、`diff` 落在那 59 列之內）擋不住誤刪列——
+我造了五個情境實測，**舊前置在五個情境全部放行，包含三種掉列**。
+補上「筆數仍是 40／16」與「AC-3 的 id 比對仍一致」兩項機器檢查之後：
+誤刪 `h1` 印 `（39 筆）`＋`少了:["h1"]`、誤刪 `d1` 印 `（15 筆）`＋`少了:["d1"]`，**都擋住**；
+而編輯合法填 `chapter` 或 `owl_depth_comment` 兩種情形**都放行**，
+仍然走得到「重新量 baseline」那一格——**不是把會誤判的路換成永遠停住的路**。
+另外造了「刪一列又補一列」的情境：筆數仍是 40，只有 id 比對抓得到，
+所以兩項檢查缺一不可。
+
+**G1 的實測結果與 verify 不同，但兩邊都對，而這件事比原本那筆 finding 重要。**
+`TODO.md` 是票內唯一在 main 與本 branch 之間有差異的被引用檔（main 多 40 行，插在第 596-635 行）。
+P3-7 在 main 是第 905 行，在本 worktree 是第 865 行，差值正好等於插入的行數。
+**所以「`TODO.md:行號`」在本票沒有唯一答案**——這不是查一次就能修好的錯，
+它會隨讀者站在哪個 checkout 而改變。處置因此不是把 865 改成 905，而是改成名稱引用。
+
+這也讓錨點那個判斷題有了明確答案：**那兩處自我引用的行號拿掉，只留錨點。**
+verify 的評價是對的——錨點買到「可復原」，買不到「不漂移」，要不漂移就不能留行號。
+但**跨檔引用的行號我保留**，理由寫進票內：那七個檔兩邊同 blob、本票不會改它們，
+行號比章節名好查。判準是「這個檔會不會在我引用它之後變動」，不是「行號一律不好」。
+
+**G2 擴大範圍又撈出一筆，而且比 G1 嚴重：`design.md` 引錯的是檔名不是行號。**
+票內兩處說「`design.md` 明訂舊列不能批次補造指紋」，`design.md` 沒有這一條——
+該規則在 `editor-onboarding.md:432-433`（另有兩份副本）。
+實質規則與 captain 要做的事一個字都沒變，但讀者照票去 `design.md` 找會找不到。
+這兩處**不帶行號也不帶節號**，所以前兩輪掃描都掃不到——
+第九節現在明寫第三族是「只寫檔名、不寫位置」的引用，並已納入。
