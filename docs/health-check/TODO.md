@@ -96,35 +96,6 @@ curl -s https://constitution-nine.vercel.app/past -o p.html
 # 內容為 client-render，資料在 JS bundle 而非 HTML，需抓 /_next/static/*.js 比對
 ```
 
-> 📌 **2026-09-21 補充：要拿「渲染後的真 HTML」時的安全作法。**
->
-> 為什麼 `curl` 只拿得到外框：`src/components/LaunchGate.tsx` 的
-> `if (!ready) return null;` 中，`ready` 只在 `useEffect` 裡設為 true，
-> 而 `useEffect` 不在伺服器端執行。所以任何被 `LaunchGate` 包住的頁面，
-> 伺服器端渲染出來都是 `null`，`curl` 只會拿到導覽列與頁尾。
->
-> **正確作法：把已 commit 的狀態複製到暫存目錄，只在副本裡改那一行。**
-> 候選檔（工作目錄裡真正要交付的檔案）一個位元都不動。
->
-> ```bash
-> git archive HEAD | tar -x -C "$SCRATCH/repo"
-> cp -Rc <repo-root>/node_modules "$SCRATCH/repo/node_modules"   # -Rc 走 APFS clone，不佔空間
-> # 只在副本裡把 LaunchGate.tsx 那一行改成：
-> #   if (!ready && typeof window !== 'undefined') return null;
-> cd "$SCRATCH/repo" && ./node_modules/.bin/next dev -p <port>
-> curl -s "http://localhost:<port>/future" -o real.html
-> ```
->
-> **限制：`git archive HEAD` 取的是「已 commit」的狀態。**
-> verify 階段正確（候選已 commit）。implement 階段邊改邊驗時它看不到未 commit 的修改，
-> 要改用 `git stash create` 產生暫時 commit 再 archive，或用
-> `rsync -a --exclude node_modules --exclude .next <repo-root>/ "$SCRATCH/repo/"`。
->
-> ⛔ **不要用「暫時改候選檔、抓完再還原」的作法。**
-> 它的安全性取決於「改」與「還原」之間不被打斷。本專案常有多個 agent 同時作業，
-> 一旦那個狀態被 commit 出去，尚未發布的站台就會在**伺服器端**吐出完整內容，
-> 而 `noindex` 只擋遵守規則的爬蟲。
-
 ### ~~2. 回填 SSOT 的 10 格~~ 🟡 **大部分已完成（2026-09-01 查核）**
 
 → [`../content-rescue/ssot-backfill.md`](../content-rescue/ssot-backfill.md)
@@ -360,48 +331,6 @@ curl -s https://constitution-nine.vercel.app/past -o p.html
   t={r['id']:r['reality']['title'] for r in h if r['id'] in ('h14','h28')}
   print(t); print('相同' if len(set(t.values()))==1 else '已區分 ✅')"
   ```
-
-### P0-7　判決門檻的具體人數待法學確認（法律判斷）　🔺 與 P0-2 同級
-
-- **狀態**：**待法學確認** — 程式碼已停止顯示任何人數，確認前不要填回數字
-- **背景**：站上原本寫「判決門檻 10 名大法官同意」。這句錯兩層：
-  10 是「參與評議人數下限」，不是同意人數；而訂下它的條文已經失效
-- **一手來源**：
-
-| 項目 | 內容 | 出處 |
-|---|---|---|
-| 現行有效門檻 | 「應經大法官現有總額三分之二以上參與評議，大法官現有總額過半數同意」 | 憲法訴訟法第 30 條第 1 項 |
-| 已失效的固定下限 | 參與評議不得低於 10 人；同意違憲宣告不得低於 9 人 | 同法第 30 條第 2 項 |
-| 失效依據 | 114 年憲判字第 1 號，114-12-19（2025-12-19）公告日起失其效力 | https://cons.judicial.gov.tw/docdata.aspx?fid=38&id=355485 |
-
-- **⚠️ 查證陷阱**：全國法規資料庫至今仍原樣顯示已失效的第 30 條第 2 至 6 項，
-  不加任何失效標註。**只查該站會得到「10 是對的」這個錯誤結論。**
-  條文是否有效，權威在憲判主文，不在法規資料庫的顯示
-- **待拍板的四項**（編號沿用
-  `docs/constitution-features/063-required-for-ruling-legal-accuracy.md` 第五小節）：
-
-| 代號 | 待拍板問題 |
-|---|---|
-| L1 | **（2026-09-23 更新問法）法庭已連續七則判決都採「拒絕參與評議者不計入現有總額」，站上要不要照法庭的算法寫？**<br>證據：115 憲判 6 理由【30】已實跑自一手來源確認：「本庭現任大法官8人，因其中3人持續拒絕參與評議……應由實際參與評議之大法官5人作成本判決，合先敘明（本庭114年憲判字第1號、115年憲判字第1號至第5號判決參照）。」該括號把 114憲判1 與 115憲判1 至 5 全部列為先例，加上 115憲判6 本身即七則。<br>原問法（保留原句）：「「現有總額」現在是 8（在職人數）還是 5（扣除持續拒絕參與評議者）？114 憲判 1 理由【50】的認定是否及於其他案件」——該問法問的是「是否及於其他案件」，七則判決已回答了法庭自己怎麼做；仍待拍板的是**站上要不要照寫**，那是編輯決定，不是法律解釋 |
-| L2 | 依 L1 的答案，「三分之二以上」遇到非整數時如何進位 |
-| L3 | 114 憲判 1 該描述為「全部違憲」還是「部分違憲」。第 30 條第 1 項未被聲請、未受審查、仍有效 |
-| L4 | 站上還能不能說憲法法庭「實質上無法做出任何判決」。民國 115 年已有六則判決，最近一則 115-08-14 |
-
-- **目前的擋法**：`src/data/future.ts` 的 `RULING_THRESHOLD.headcount` 為 `null`。
-  渲染端 `src/components/future/RulingThresholdNote.tsx` 在 `null` 時完全不顯示人數，
-  改敘述條文給的比例。站上寫「換算成具體人數須經法學確認，本站不列。」
-- **誰能做**：法學協作者拍板 L1 到 L4 → 工程師填 `headcount` 並改文案
-- **卡在**：需要一位法學背景的人拍板
-- **解除方式**：拍板後把結論寫進本節，再把 `headcount` 從 `null` 改為拍定的數字
-- **驗證**：
-  ```bash
-  # headcount 仍為 null 時，站上不得出現任何推算人數
-  grep -n 'headcount' src/data/future.ts
-  grep -rnE '需 *[0-9]+ *(人|名).*(判決|同意)|[0-9]+ *名大法官同意' src/ ; echo "exit=$? （1 = 0 筆，正確）"
-  ```
-  `headcount` 不是 `null` 而本節沒有對應的已拍板記錄，即為失敗
-
----
 
 ---
 
@@ -941,16 +870,15 @@ git log -1 --format='%ad %s' --date=short -- src/data/discussions.json
 ### 卡在人，越早問越好
 
 4. **P0-2** 找法學協作者確認 `h2` 釋字第 272 號
-5. **P0-7** 找法學協作者拍板判決門檻的具體人數（L1 到 L4）—— 目前站上不顯示人數擋住
-6. **P1-6** 確認網站版貓頭鷹短評是否為 AI 生成
+5. **P1-6** 確認網站版貓頭鷹短評是否為 AI 生成
 
 ### 之後
 
-7. **[feature 040](../constitution-features/040-approval-content-version-binding.md)** 核可綁定內容版本（score 0.95，全 workflow 最高）。這是 P3-1 與下次正式同步的前置
-8. **P1-8** 盤點全站無 SSOT 來源的內容 —— 建議先處理 `opinion-lazybag` 那兩個檔
-9. **`docs/constitution-features/039`** 常設渲染檢查工具（機械檢查，非 AI 內容偵測）
-10. **P2-10** `dangerouslySetInnerHTML` 淨化 —— **必須在 P3-1 分享試算表之前處理**
-11. **P3-8** 發布前移除 `noindex`
+6. **[feature 040](../constitution-features/040-approval-content-version-binding.md)** 核可綁定內容版本（score 0.95，全 workflow 最高）。這是 P3-1 與下次正式同步的前置
+7. **P1-8** 盤點全站無 SSOT 來源的內容 —— 建議先處理 `opinion-lazybag` 那兩個檔
+8. **`docs/constitution-features/039`** 常設渲染檢查工具（機械檢查，非 AI 內容偵測）
+9. **P2-10** `dangerouslySetInnerHTML` 淨化 —— **必須在 P3-1 分享試算表之前處理**
+10. **P3-8** 發布前移除 `noindex`
 
 不擋任何事：P3-9 的內容品質雜項、`vibe` 下拉選單、
 文件整併第 2／4 階段、`design-assets` refit、`019` 票。
