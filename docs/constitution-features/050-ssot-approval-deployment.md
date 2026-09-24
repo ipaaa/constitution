@@ -1,7 +1,7 @@
 ---
 id: 050
 title: 正式 SSOT 部署 feature 040 的審核欄位（040 合併的硬前置）
-status: verify
+status: review
 source: captain 2026-09-04（把關機制體檢最高風險項：無票、無人負責）
 started: 2026-09-07T23:15:17Z
 completed:
@@ -22,6 +22,17 @@ gates:
                 id: briefing:050:verify:attempt-1:revision-1
                 digest: sha256:e57202b091ba96ecc437ef7e4d20ad5949a12d8c642d05aed86415c583a761ae
                 room-ref: '@review/verify/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:050:verify:1
+                briefing: briefing:050:verify:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-24T22:51:04.870988Z"
+                decision: approve
+                reason: Captain 核准：runbook 經五輪 verify 收斂，全程對正式試算表零寫入零讀取，承重數字三個獨立來源確認，S3 補上機器可判前置後誤刪列擋得住而合法填值仍放行。進入獨立審查。
+              application:
+                target-stage: review
+                state: consumed
 ---
 
 feature 040 把八個審核欄位全部改為必填。正式試算表尚未建立這些欄位。**順序做錯會讓整條產線停擺。**
