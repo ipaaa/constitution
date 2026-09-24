@@ -56,6 +56,11 @@ gates:
                 at: "2026-09-24T17:29:46.109515Z"
                 decision: revise
                 reason: 'captain 2026-09-24 退回，修 F-11，並同日給出一次性授權：「授權修正 Verified by: 涵蓋既有寫法變體，不改 AC 要求本身」。F-11 與 F-9 同類但更尖銳——它落在 G-5，正是本票為了防止 015 事故（某學者，某大學法律系 公開顯示四個月）而加的那道檢查。G-5 的掃描寫 前端工程師 [AB]，其中半形空格是必要的，因此無空格寫法、全形空格、簡體 某学者／某大学、全形 ５個重點 全部掃不到（reviewer 逐行測了十一個字串）。G-5 以零命中為通過，故這是 fail-open。目前三個既有佔位值仍抓得到，但若 052 改寫 contributors.ts 時把那個空格拿掉，立刻變成抓不到。'
+            - id: gate-attempt:056-verify-4
+              briefing:
+                id: briefing:056:verify:attempt-4:revision-1
+                digest: sha256:b68e2452142b89fadd69c25916907b2f9f1192fc2adc5281b9a4404ad674e97e
+                room-ref: '@review/verify/briefing-4'
 ---
 
 網站目前是 `noindex` 且無對外網域，「讀者」是有連結的夥伴而非公眾。因此下列破口不是「今天要修」，而是**「公開之前必須為真」**。本票把六個散落的無票缺口收成一道 launch gate。
