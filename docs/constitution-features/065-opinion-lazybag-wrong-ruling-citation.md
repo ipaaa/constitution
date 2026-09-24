@@ -252,3 +252,30 @@ A5 採「保留敘述、改正號次」而非「保留號次、改寫敘述」�
 ### Summary
 
 一手來源核對推翻了票內兩項前提：`page.tsx:6` 的「國會職權修法判決解析」是對的（改了就是新錯誤），而 `opinions.ts` 的 12 筆 `rulingRef` 並非對的（內容講的是 114憲判1 的題目，號次卻寫 113憲判9）。最重要的判定是 `StanceSpectrum.tsx` 不是標籤錯而是內容錯：14 位中有 4 位不在任一合議庭、漏列包含主筆蔡宗珍在內的 5 位、意見類型與判決書牴觸，因此單改號次會產生比現況更具體的不實敘述。設計據此把施工切成兩層：A1–A5 的號次更正（無爭議），與 AC-6 的 `StanceSpectrum` 段落移除（語意變更，需 captain 於 gate 核可，元件檔保留給 `049` 重建）。另查出兩項 `DecisionFlowchart` 的實質法律錯誤（人事同意權標為程序違憲、總統國情報告標為全部違憲），本票不修，須另開票並經法學背景者複核。
+
+## Stage Report: implement
+
+- DONE: A1–A5 五處號次更正落地，且以真實頁面 HTML 驗 AC-1／AC-2
+  副本（`rsync` 排除 `node_modules`／`.next`／`.git`／`.worktrees` ＋ `cp -Rc node_modules`）`npx next build` 後 `npx next start -p 3265`。AC-1 實測：`/opinion-lazybag` 的 `114年憲判字第1號` ＝ **0**（基準 3）、`113年憲判字第9號` ＝ **3**（基準 0）、`國會職權修法` ＝ **3**（維持）。AC-2 實測：`/` 的 `114年憲判字第1號` ＝ **0**（基準 1）、`113年憲判字第9號` ＝ **1**。commit `b294597`。
+- DONE: A3 依 AC-3 在原始碼層級驗
+  `grep -c '5 contested provisions from 113年憲判字第9號' src/components/opinion-lazybag/DecisionFlowchart.tsx` ＝ `1`；同檔 `grep -c '114年憲判字第1號'` ＝ `0`。`:188` 的「國會職權修法案」未動——若誤改，AC-1 的第三項會由 3 掉到 2。
+- DONE: A5 必須同時改 `year` 與 `label`，否則時間表順序錯亂
+  AC-4 實測：`.next/static/chunks/efd3eef351a4d8c3.js` 含 `status:"blocked"},{year:"2024.10",label:"113年憲判字第9號",detail:"關於國會職權修法之重大判決`。前綴 `status:"blocked"},` 證明已重排到 `2024.08` 之後（原位置前一筆為 `status:"present"},`）；`year:"2024.10"` 證明 `year` 一併改；`detail` 後綴證明敘述未動。只改 `label` 或未重排都會讓這一行對不上。
+- DONE: AC-6（captain 已於 2026-09-23 核可）三項驗證
+  `curl /opinion-lazybag | grep -o '大法官怎麼想的\|意見光譜' | wc -l` ＝ **0**（基準 3：`意見光譜` 2 ＋ `大法官怎麼想的` 1）；`curl / | grep -c '光譜'` ＝ **0**（基準 1）；`npx next build` 退出碼 **0**。`page.tsx:3` 的 import 與 `:48-54` 分隔線已一併清掉——未清會讓 build 以未使用變數失敗、或頁尾留孤立分隔線。`意見光譜` 的來源是 `page.tsx:7` 的 metadata description（在 HTML 中出現 2 次），已改寫為「以決策流程圖呈現憲法法庭如何審理113年憲判字第9號——理解合議制的論理過程。」，該句同時貢獻 AC-1 的 3 次中的 2 次。
+- DONE: `src/components/opinion-lazybag/StanceSpectrum.tsx` 檔案保留不刪
+  `grep -rn 'StanceSpectrum' src/` 只剩 `StanceSpectrum.tsx:47` 元件自身的 export，無任何 import。
+- DONE: AC-7 副本上 `npx next build` 退出碼 0
+  退出碼 0，16 頁全部產生。未遇到 `.next/` 帶「 2」重複檔的假性失敗（副本是新建的，`.next` 由該次 build 產生）。`diff -r` 確認副本 `src/` 與候選檔逐位元相同，故此 build 驗的就是本次提交的原始碼。
+- DONE: 依第八節在 `049` 檔末追加標日期的補述節（不動 `:39` 與第三節原文）
+  `git diff --numstat` ＝ `39 0`（39 行新增、**0 行刪除**），`:39` 逐字未變。補述含設計指定的四點（a）～（d）。開工時 `049` 仍為 `status: design`、`started:` 為空，main 與 worktree 的檔案 md5 相同，第八節的退路條件未觸發。
+- DONE: 文件影響——`docs/health-check/TODO.md` 記一筆待辦
+  新增 `P1-9`（`:525`），記錄意見光譜已移除、由 `049` 補回、一手來源 PDF 位置。`git diff --numstat` ＝ `11 0`，無刪除。`docs/INDEX.md` 未動（無新增或刪除文件，依第八節）。
+- DONE: 不執行 `npm run sync-content`；不動 `src/data/opinions.ts` 與 `src/data/*.json`
+  本次 commit 只含 4 個 `src/` 檔與 2 個 `docs/` 檔（`git show --stat b294597`）。
+- FAILED: AC-5 全站回歸：`grep -rn '114年憲判字第1號' src/` 的結果必須恰好落在第二節所列的 **11 行**
+  **AC-5 的實質要求成立，但它寫的 11 行數字有誤，實測為 9 行。** 實測輸出恰為 B4（`controversy-timeline/page.tsx:70`）、B6（`controversy-timeline.ts:222`、`:224`）、B8（`history.json:638`）、B9（`discussions.json:5,8,46,53,58`）＝ 9 行，無多無少。缺的 2 行是 B10（`quizzes/perspectives.ts:89`）與 B11（`quizzes/controversy.ts:115`）——**這兩處用的是加空格的寫法 `114 年憲判字第 1 號`，AC-5 指定的緊接寫法 grep 本來就掃不到**，改動前即如此（基準亦為 9 行，非 11 行）。以 `grep -rn '114 年憲判字第 1 號' src/` 另驗，B10／B11 兩行原封不動。因此「沒有做全站替換、也沒有漏改」這件事已證成，失敗的只是 design 第六節寫錯的行數。
+
+### Summary
+
+A1–A5 五處號次更正與 AC-6 的意見光譜段移除全部落地，AC-1、AC-2、AC-4、AC-6、AC-7 皆在副本的真實 build／HTTP 回應上實測通過，數值與設計的預期基準完全相符。AC-3 依設計在原始碼層級驗過。唯一的 FAILED 是 AC-5 的行數寫錯：B10、B11 用的是 `114 年憲判字第 1 號`（帶空格），緊接寫法的 grep 掃不到它們，故正確基準是 9 行而非 11 行——這是 design 第六節的筆誤，不是施工缺漏，B10／B11 經另一條 grep 確認未被動到。另外，`page.tsx:7` 的 metadata description 同時承載 AC-1 的號次與 AC-6 要清掉的「意見光譜」，改寫時須兩者兼顧，這一點設計未明講，已在上方記錄實際採用的句子。
