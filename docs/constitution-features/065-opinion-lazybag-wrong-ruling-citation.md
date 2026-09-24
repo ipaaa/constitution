@@ -1,7 +1,7 @@
 ---
 id: 065
 title: opinion-lazybag 與 present 頁誤引判決號：113憲判9 被寫成 114憲判1
-status: implement
+status: verify
 source: constitution-features/063 第六節 V8（captain 2026-09-23 核准開票）
 started: 2026-09-23T17:51:45Z
 completed:
