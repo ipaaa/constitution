@@ -1260,7 +1260,7 @@ F-11 修好，兩個方向都驗過。涵蓋面：十一個字串從舊 pattern 
 
 ## Stage Report: implement (cycle 7)
 
-本輪即 captain 2026-09-24 第二次退回後授權的那一輪。只處理 F-12，修的是根不是兩處分岔。未動 `src/`、build 產物、`layout.tsx`、Next.js 設定、`PresentDetail.tsx`，未跑 `sync-content`。
+本輪即 captain 2026-09-24 第二次退回後授權的那一輪。只處理 F-12，修的是根不是兩處分岔，全部改動在 commit `c97e749`。未動 `src/`、build 產物、`layout.tsx`、Next.js 設定、`PresentDetail.tsx`，未跑 `sync-content`。
 
 - DONE: F-12：讓 `## Test plan` 指向第三節而不再複述指令清單，消除「同一檢查兩份副本」這個分岔源頭。保留 Test plan 中**不在第三節**的規定（如「不執行 `npm run sync-content`」），只把重複的指令清單換成引用。**不得把 Test plan 副本缺的那個字串補進去**——正確作法是讓副本消失，不是讓兩份副本一致。
   `## Test plan` 的導言改為「以第三節那一份為唯一正本，本節不再複述」，整個 `bash` 區塊移除。保留的非重複內容：2026-09-21 實測記錄表、`npm run build` 本階段未跑的說明、A 類需實際渲染驗證、**`不執行 npm run sync-content`**（程式比對確認仍在）。**沒有把缺的字串補進去**——副本整份消失了，沒有第二份可以不一致。
