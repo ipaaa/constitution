@@ -1,7 +1,7 @@
 ---
 id: 066
 title: quiz 與 controversy-timeline 把已失效的 10 人門檻當現行法
-status: verify
+status: review
 source: constitution-features/063 V7（captain 2026-09-23 核准開票）
 started: 2026-09-24T17:51:27Z
 completed:
@@ -22,6 +22,17 @@ gates:
                 id: briefing:066:verify:attempt-1:revision-1
                 digest: sha256:e60854d3d1d3ba67ee5d69c02e159fcb97fb21e0afef5ea83876f49a6b2a9ef9
                 room-ref: '@review/verify/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:066:verify:1
+                briefing: briefing:066:verify:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-24T19:13:24.546731Z"
+                decision: approve
+                reason: captain 2026-09-24 核准進入 review。verify cycle 2 判 PASSED、零新 finding：五項授權修法全部落實且經獨立重跑（F-2 的定位改為錨定 id 後，reviewer 自造 +10／-2 行兩個反例，新命令兩次都抓得到、舊命令失準；F-3 的無空格寫法有全檔 20:0 的證據支持）。未越界：腳本自 24465d2 起 0 diff、F-5 的三處字面時間錨與 :156 的括號文字逐字未動。F-7 依 captain 裁示維持 hold——檢查 2 是頁級粒度而判準是題級，修法屬檢查語意變更、超出 2026-09-24 的 Verified-by 授權範圍；今日無實害，promote 條件為任何後續改動縮短或移除 q2 explanation 末句，已記錄在票內。F-5 同樣維持 hold（design 的 AC3 本來就要求字面時間錨，改成推導會與 AC3 衝突）。附註記錄：RulingThresholdNote.tsx:57 以民國年寫同一失效區間，站上因此有兩種紀年並存，FO 另行處置。
+              application:
+                target-stage: review
+                state: consumed
 ---
 
 `/quiz/*` 與 `/controversy-timeline` 以現在式把已被宣告違憲失效的 10 人參與評議下限當成現行法，是 feature `063` 修完 `/future` 之後同一個法律錯誤的最大殘餘面。
