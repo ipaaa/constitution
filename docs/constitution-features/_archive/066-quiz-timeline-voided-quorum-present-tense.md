@@ -1,16 +1,16 @@
 ---
 id: 066
 title: quiz 與 controversy-timeline 把已失效的 10 人門檻當現行法
-status: review
+status: complete
 source: constitution-features/063 V7（captain 2026-09-23 核准開票）
 started: 2026-09-24T17:51:27Z
-completed:
-verdict:
+completed: 2026-09-24T20:30:38Z
+verdict: PASSED
 score: 0.8
 worktree: .worktrees/spacedock-ensign-066-quiz-timeline-voided-quorum-present-tense
 issue:
 pr: pr-merge:39
-mod-block: merge:pr-merge
+mod-block:
 gates:
     version: 1
     records:
@@ -51,7 +51,8 @@ gates:
                 reason: Captain 核准：已失效門檻的時態問題已修正，三項檢查收斂於 scripts/check-voided-floor.mjs 單一可執行定義，AC 引用而不複製。
               application:
                 target-stage: complete
-                state: pending
+                state: consumed
+archived: 2026-09-24T20:30:38Z
 ---
 
 `/quiz/*` 與 `/controversy-timeline` 以現在式把已被宣告違憲失效的 10 人參與評議下限當成現行法，是 feature `063` 修完 `/future` 之後同一個法律錯誤的最大殘餘面。
