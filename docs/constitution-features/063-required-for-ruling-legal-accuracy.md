@@ -58,6 +58,11 @@ gates:
                 at: "2026-09-24T00:30:35.48207Z"
                 decision: revise
                 reason: captain 2026-09-23 退回，先補 R1 與 R2 再交付。review 判 PASSED 且明說這份 diff 可以交付，退回的是兩項各一行、且都留在比這張票活得久的文件裡的東西。R1：本票第 22 行把不存在的「114 年憲判字第 9 號」當成事實陳述、未加更正標記；本票封存後即為永久紀錄，一張以誤引為主題的票不該自己留一處未標記的誤引。reviewer 的附帶觀察更要緊——AC7 的 Verified by 只寫了緊寫法的 grep，所以前三輪依該 grep 回報 PASS 並沒有錯，是 AC 規格不足。R2：docs/health-check/TODO.md 的 P0-7 的 L1 列仍是被取代前的問法、缺 V9 補進的七則判決證據，而 P0-7 正是要交給法學協作者的東西，交付後他讀到的會是舊問題。R3（版面）與 R4（設計層 aria-label，implement 照規格執行無誤）decline。R5 經 FO 查證為計數器誤會，本票只有兩個修正輪，Feedback Cycles 兩行齊備。
+            - id: gate-attempt:063-review-2
+              briefing:
+                id: briefing:063:review:attempt-2:revision-1
+                digest: sha256:83a9db0a0d6a6ded874b3d8a6f11676638aa53413c51372d97a47f2df5852291
+                room-ref: '@review/review/briefing-2'
 ---
 
 確認 `requiredForRuling` 這項法律內容的正確性，並讓它有明確的負責人。
