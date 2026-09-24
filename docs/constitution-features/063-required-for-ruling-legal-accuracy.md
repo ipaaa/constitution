@@ -68,6 +68,19 @@ gates:
 
 內容涉及 114 年憲判字第 9 號，需要法學判斷才能拍板。
 
+> ⚠️ **2026-09-23 更正：上句的「114 年憲判字第 9 號」不存在。**
+> 正確號次是 **114 年憲判字第 1 號【憲法訴訟法修正案】**（114-12-19，
+> `cons.judicial.gov.tw/docdata.aspx?fid=38&id=355485`）。
+> 上句寫於開票時，沿用了 `056` 傳進來的誤引，**原句保留**。
+> 誤引的源頭與擴散路徑見第六小節。
+>
+> **這一行為什麼到 review gate 才被抓到：** AC7 的 `Verified by:` 只寫了緊寫法的
+> `grep -n '114憲判9'`，而本行用的是空格寫法「114 年憲判字第 9 號」。
+> 前三輪 verify 依該 grep 回報 AC7 PASS **並沒有錯，是 AC 的 grep 沒涵蓋這個寫法**，
+> 不是誰失職。**AC7 的文字本輪未修改**——AC 變更只有 captain 能做。
+> 這一點比這一行本身更值得記下：驗收用的 grep 若只涵蓋一種寫法，
+> 就會在另一種寫法上出現穩定的盲區。
+
 ## Proposed approach
 
 design stage 先界定：要確認的具體命題是什麼、以什麼為權威來源（憲判原文而非轉述）、以及錯誤若成立時站上哪些位置會受影響。
@@ -78,6 +91,7 @@ design stage 先界定：要確認的具體命題是什麼、以什麼為權威�
 
 - Cycle 1: REJECTED — verify；surface 9 檔／+557 淨行（+605/-48；不含本票流程記錄則 +224）vs estimate 無（本票 design 未產出 `## Expected surface and tolerance` 段，記為缺口，本輪不因此退回）；AC unchanged。V1 fix（Material，本票擁有：`future.tsx:202`「5 名大法官無法達到判決門檻」與本票自己新加的「失效後已作成 6 則判決」在同一 grid 相鄰兩格直接互相否證；第五小節 L4 指示「不可原樣留下」的兩條分支都沒走到；「法庭做不出判決」是經驗事實非法學解釋——七則判決加 115憲判6【30】的援引先例）；V2 fix（Material：card 首句「生效期間／全年」矛盾，且 114 年唯一一則判決就是 114憲判1 本身，而它以【41】【43】明文拒絕適用該下限，原句語意恰好相反）；V3 fix（Material，FO 裁量最小修法：只更新 `LAST_UPDATED`，不動 `REFERENCE_DATE`——既有過期問題被本票新增內容升級為同頁自相矛盾，故責任歸屬改變）；V4／V5／V6 fix（Polish：多餘空格與「判決違憲」改「宣告違憲」、破句補字、`rule` 補回「除本法別有規定外」）；V7 Needs decision 維持不動（Material 但本票 AC3／AC4 範圍明文限於 `/future`，不得擴張範圍；建議另開票）；V8 不處置（屬 `049`／`design-assets`）；V9 併入 L1（115憲判6【30】證據，L1 問法改寫，原句保留）。reviewer 對 cycle 1 的 AC1–AC7 七項全部獨立重跑通過（真頁面 HTML 123,621 bytes、AC2 自 main 獨立重製 tsc 三筆、還原以三種互不相依方法比對）；cycle 2 中 implement 自我修正一次（V1 首版改寫會引入無來源敘述，改為整句刪除），並另抓到兩處同類空格問題。L5（375px 六行量測）維持未達成——環境無可用無頭瀏覽器，八種旗標組合全部 `SEGV_ACCERR`。
 - Cycle 2: PASSED-with-finding — verify cycle 2；surface 3 檔／+194 淨行（+197/-3；不含本票流程記錄則 +17/-3）；AC unchanged（AC 全節自 `7f1f44e` 以來逐字相同，2425 bytes 程式比對）。cycle 1 的 V1／V2 經 reviewer 獨立重驗確認真的修好且無副作用——最有力證據是跨輪渲染文字 `diff`：整頁可見文字只有四處變動且全在授權範圍內；V1 確為整句刪除而非換成無來源敘述（`新進案量`／`能結案的量` 實際 HTML 皆 0 筆）。V10 fix（Material，本票擁有：**成因是 FO 在 cycle 1 的 V3 處置**——裁定只更新 `LAST_UPDATED` 不動 `REFERENCE_DATE`，使標頭由低報翻為高報：標頭印 2026-09-21，而案件年齡、席次圖 TODAY 線與倒數仍以 2026-04-29 計算、落後 145 天；低報被本票新增內容當場戳破讀者看得見，高報則讓案件清單默默過期讀者沒有線索）。implement 採 FO 兩選項中的第二種（維持原字樣＋加一行「待審案件統計截至 <REFERENCE_DATE>」），理由是第一種靠省略避免高估、讀者仍不知案件清單的日期，而正下方就印著 473 件；並以直接讀 `REFERENCE_DATE` 常數而非寫死字串實作，避免日後再漂移成第二個 V10。同輪修正 `future.ts` Refresh procedure 第 1 步（原寫兩個日期應一起動，拆開後該行已錯）。V7／V8 依授權零變動並維持 Needs decision；`page.tsx:201`「每年處理量約 30~40 件」為既有無來源量化敘述，reviewer 記為非本輪 finding，FO 併入 V7 新票建議。L5（375px 六行量測）維持未達成——環境八種旗標組合全部 `SEGV_ACCERR`。round record 依 captain 明確授權跳過（原話：「跳過 round record，直接重跑 reviewer」）——room 已轉錄並 commit 在 main，但未記錄。
+- Cycle 3: REVISE — review gate（captain 2026-09-23 親自裁決；本輪的 Cycle 3 升級即由該裁決本身滿足）；surface 2 檔／+75 淨行（+76/-2；本票 +75/-1、`TODO.md` +1/-1）；AC unchanged（AC 全節自 `7f1f44e` 起逐字相同，2425 bytes 程式比對）。review 判 PASSED 且明說「這份 diff 可以交付」——七項 AC 由新的獨立 reviewer 全部自己重跑（AC2 自 merge-base 獨立重製到恰好三筆型別錯誤、AC3／AC4 以副本作法取真 HTML 124,318 bytes、AC4 的 19 個「10」逐處列印上下文判讀），站上每一條法律敘述於當天重新取證逐字對回一手來源，含「增訂」（靠 112-06-21 舊版第 30 條全條只有一項證成）與「該期間內只作成一則判決」（靠判決清單逐年去重並確認 114 年未被分頁截斷證成）。退回的兩項都留在比本票活得久的文件裡。R1 fix（Polish：本票第 22 行把不存在的「114 年憲判字第 9 號」當成事實陳述未加更正標記；發布面無損害，但本票封存後即為永久紀錄，一張以誤引為主題的票不該自己留一處未標記的誤引）——原句保留並加 2026-09-23 更正框。**R1 暴露的盲區比那一行更要緊**：AC7 的失敗條件寫的是語意，但其 `Verified by:` 只給了緊寫法 `114憲判9` 的 grep，而第 22 行用的是空格寫法「114 年憲判字第 9 號」——同一號次兩種寫法，grep 只涵蓋一種，於是另一種形成**穩定**的盲區；前三輪依該 grep 回報 AC7 PASS 並無錯誤，是 AC 規格不足而非失職。此點已記入票內，**AC7 文字未改**（AC 變更只有 captain 能做，本輪未授權）。R2 fix（Polish：`docs/health-check/TODO.md` 的 P0-7 的 L1 列停在被取代前的問法、缺 V9 的七則判決證據，而 P0-7 正是要交給法學協作者的文件）——已與本票第五小節對齊，附 115憲判6【30】原文，原問法原句保留。R3（版面兩條 `---`）／R4（`compact` 的 aria-label，屬設計層且 implement 照規格執行無誤）依授權 decline，零變動。R5（缺 `- Cycle 3:`）經 FO 查證為計數器誤會——本票當時只有兩個修正輪，reviewer 數的是 stage report 序號；未補憑空記錄。V7／V8／V11 與 `page.tsx:201` 維持 Needs decision 零變動；`headcount` 仍為 `null`；L5 未宣稱量測。round record 依 captain 先前授權跳過（原話：「跳過 round record，直接重跑 reviewer」）。
 
 ## Out of scope
 
@@ -1209,3 +1223,64 @@ V10 修好了，而且修法比我建議的好。我給的第一案是把標頭�
 五項 finding 沒有一項 Material。R1 是本票內部的一行未標記誤引，**站上真 HTML 0 筆**、`title` 已改、第六小節整節追溯，損害不及任何發布面；它之所以漏掉，是 AC7 的 `Verified by:` 只寫了緊寫法的 grep，前三輪依該 grep 回報 PASS 並沒有錯——這一點我認為比那一行本身更值得 FO 記下。R2 是 P0-7 的 L1 列停在舊問法，而 P0-7 正是要交給法學協作者的東西，成本一行、值得順手補。R3 版面、R4 屬設計層且 implement 照規格執行無誤、R5 是 FO 的 ledger 簿記。
 
 **這份 diff 可以交付。** 但交付不等於這件事做完了——`headcount` 還是 `null`，L1 到 L4 仍待法學背景者拍板，L5 在本環境無法量測，而 V7 指出的 `/quiz/*` 與 `/controversy-timeline` 仍以現在式把已失效的 10 人門檻當現行法，那是同一個法律錯誤的最大殘餘面，且 `/controversy-timeline` 在 `PUBLIC_PAGES` 內。這些都正確地留在票內等 captain，不是被這張票解決掉了。
+
+## Stage Report: implement (cycle 4)
+
+處理 captain 於 2026-09-23 在 review gate 的 revise。授權範圍只有 R1 與 R2，兩項都只動文件。
+`src/` 零變動。
+
+- DONE: R1：本票第 22 行把不存在的「114 年憲判字第 9 號」當成事實陳述，補一行標日期的更正補述（號次不存在、正確為 114 年憲判字第 1 號、指向第六小節），**原句保留**。並在票內記明 reviewer 的附帶觀察⋯⋯**但不得因此修改 AC7 的文字**。
+  原句第 22 行原樣保留，其後加一則 2026-09-23 更正框：號次不存在、正確為 114 年憲判字第 1 號【憲法訴訟法修正案】（114-12-19，附 `docdata` 連結）、指向第六小節。同框內記明 reviewer 的附帶觀察：AC7 的 `Verified by:` 只寫緊寫法 `grep -n '114憲判9'`，而第 22 行是空格寫法，故前三輪依該 grep 回報 AC7 PASS 並無錯誤，是 AC 規格不足而非失職。**AC7 文字未改**——AC 全節自 `7f1f44e` 以來逐字相同（2425 bytes，程式比對，見下方越界檢查）。
+- DONE: R2：把 `docs/health-check/TODO.md` 的 P0-7 的 L1 列更新為與本票第五小節一致的問法，補上 V9 的證據。
+  P0-7 的 L1 列改為與第五小節同一問法（「法庭已連續七則判決都採『拒絕參與評議者不計入現有總額』，站上要不要照法庭的算法寫？」），附 115憲判6【30】原文引述與七則判決的算法，並保留原問法原句。兩份文件的 L1 現在一致。
+- DONE: 確認未越界。
+  `git status --porcelain` 只有本票與 `docs/health-check/TODO.md` 兩個檔案；`src/` 零變動。R3（P0-7 結尾兩條 `---`）未動，仍為 2；R4（`compact` 的 `aria-label`）未動，仍在 `RulingThresholdNote.tsx:43`；R5 未補第三行，`### Feedback Cycles` 仍為 Cycle 1／Cycle 2 兩行。V7／V8／V11 與 `page.tsx:201` 相對 `HEAD` 零變動。`headcount` 仍為 `null`。未宣稱 L5 已量測。未執行 `sync-content`。
+- SKIPPED: R3（純版面）／R4（設計層）／R5（計數器誤會）。
+  依授權 decline，三項零變動。R5 已由 FO 查證：本票只有兩個修正輪（Cycle 1＝V1–V9、Cycle 2＝V10），`### Feedback Cycles` 兩行齊備；reviewer 數的是 stage report 序號（implement cycle 3），兩個計數器不同。補第三行會是憑空記錄，故不補。
+
+### 為什麼 R1 值得記在票內，而不只是改掉
+
+這一行的價值不在它本身，在它暴露的驗收盲區。
+
+AC7 的失敗條件寫的是語意（「把誤引當成正確引註繼續往下傳」），
+但它的 `Verified by:` 只給了一個寫法的 grep（`114憲判9`）。
+同一個號次在本專案至少有兩種寫法：緊寫法 `114憲判9` 與空格寫法「114 年憲判字第 9 號」。
+grep 只涵蓋前者，於是後者形成一個**穩定**的盲區——
+不是偶爾漏，是每一輪都會漏，而且每一輪都會正確地回報 PASS。
+
+三輪 verify 依該 grep 回報 AC7 PASS 並沒有錯。抓到它的是 review gate 的人眼。
+**本輪不修改 AC7 的文字**（AC 變更只有 captain 能做，且本輪未授權）；
+記在此處供 captain 日後決定要不要把 `Verified by:` 的 grep 補成涵蓋兩種寫法。
+
+### 越界檢查實跑輸出
+
+```
+git status --porcelain
+  M docs/constitution-features/063-required-for-ruling-legal-accuracy.md
+  M docs/health-check/TODO.md          ← 只有這兩個檔
+git status --porcelain -- src/          → 空（src/ 零變動）
+AC 全節（十、Acceptance criteria）      → 2425 bytes → 2425 bytes，逐字相同
+grep -n '^- Cycle' 本票                 → 第 45、46 行兩筆（未補第三行）
+P0-7 區段 '^---' 計數                   → 2（R3 未動）
+RulingThresholdNote.tsx aria-label      → :43 仍在（R4 未動）
+headcount: null                         → future.ts:495
+```
+
+### Summary
+
+R1 與 R2 兩項完成，都只動文件，`src/` 零變動。
+
+R1：第 22 行原句保留，其後加 2026-09-23 更正框，標明「114 年憲判字第 9 號」不存在、
+正確為 114 年憲判字第 1 號、並指向第六小節。作法與本票先前各輪處理原句的方式一致
+（不悄悄改寫原文，追加補述）。同框記下 reviewer 的附帶觀察：這一行漏掉的原因是
+AC7 的 `Verified by:` 只涵蓋緊寫法 grep，空格寫法形成穩定盲區——
+**這是 AC 規格不足，不是前三輪 verify 失職**，它們依該 grep 回報 PASS 並沒有錯。
+AC7 文字未動。
+
+R2：`docs/health-check/TODO.md` 的 P0-7 的 L1 問法與本票第五小節對齊，
+補上 115憲判6【30】的七則判決證據，原問法保留原句。P0-7 是要交給法學協作者的文件，
+先前它停在被 V9 取代前的問法，交付後對方會讀到舊問題；現在兩份一致。
+
+R3／R4／R5 依授權零變動。R5 特別註明不補第三行 Cycle，因為那會是憑空記錄——
+本票只有兩個修正輪，reviewer 數的是 stage report 序號，兩個計數器不同。
+L1／L2／L3 仍未拍板，`headcount` 維持 `null`；L5 仍未量測，本輪未宣稱已量測。
