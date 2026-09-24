@@ -1,16 +1,16 @@
 ---
 id: 065
 title: opinion-lazybag 與 present 頁誤引判決號：113憲判9 被寫成 114憲判1
-status: review
+status: complete
 source: constitution-features/063 第六節 V8（captain 2026-09-23 核准開票）
 started: 2026-09-23T17:51:45Z
-completed:
-verdict:
+completed: 2026-09-24T20:19:51Z
+verdict: PASSED
 score: 0.95
 worktree: .worktrees/spacedock-ensign-065-opinion-lazybag-wrong-ruling-citation
 issue:
 pr: pr-merge:38
-mod-block: merge:pr-merge
+mod-block:
 gates:
     version: 1
     records:
@@ -60,7 +60,8 @@ gates:
                 reason: Captain 核准：引錯釋字號已修正並經 reviewer 逐條複驗，AC 全數以可重跑的 Verified by 證據通過。
               application:
                 target-stage: complete
-                state: pending
+                state: consumed
+archived: 2026-09-24T20:19:51Z
 ---
 
 站上把「國會職權修法」判決的內容標成 114 年憲判字第 1 號，但那是憲法訴訟法修正案；國會職權修法是 113 年憲判字第 9 號。這是公開頁面上的事實錯誤，且涉及具名大法官。
