@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:012:review:attempt-4:revision-1",
+  "question": "012 第七輪：review cycle 6 判 REJECTED。F13（Material）證明 implement 的 M5 分類錯了——它誠實說「做不出讓舊守衛放行的探測」，而 reviewer 做出來了。F14 回答了 FO 問的第四題並發現肯定式斷言的第三種死法（多重滿足者），但 reviewer 明示其授權範圍需 captain 裁定。是否退回，以及 F14 是否納入既有的 Verified by 授權？",
+  "artifacts": [
+    {
+      "id": "artifact:012:review:attempt-4:revision-1:item-1",
+      "uri": "git-root://main/a8c3df3f9f0118b9733eb57ee868520a1a9b3f64/docs/constitution-features/012-threshold-case-analysis.md",
+      "rev": "sha256:09f9b3bed9888b71e4e34c630ab8886a34fce02ac87fffcd577f221857e4fedb",
+      "mediaType": "text/markdown",
+      "summary": "六處修正中五處反證逐格重現（含兩個關鍵的：浮層人數四格矩陣兩份寫法表皆 0 違規、1987 探測以獨立掃描器確認該行不含 1987 也不含 20 個門檻詞）。狀態維度 reviewer 自行列舉而非採信 O3：恰好三個狀態、渲染全部 478 個可達狀態、檢查每個文字節點與每組相鄰文字節點對，守衛涵蓋面外零命中，無第二個實例。F13 Material：rules 有 18 個字串葉節點而 tile 只渲染 10，把「總額」寫進 sourceUrl 或 caveats[0].id 會讓舊守衛 25/25 全綠——M5 確實是洞，修法已落地且正確，要改的是分類與那句事實陳述。F14 Deferred risk（需 captain 裁定授權範圍）：肯定式斷言的第三種死法是多重滿足者；把圖上色帶標籤清空、或讓 current 期失去斜線網底（正是 AC-5 要求的東西）都會讓 AC-5 27/27 全綠，由 \u003cdesc\u003e 無障礙字串頂替，而 AC-5 的要求文字寫的是「在圖上看得出」；單調性論證本身成立但不給下界。F15 Polish：AC-4 條文寫「那六個檔」，程式與報告都是七。未越界未回歸全部自驗，含 AC-1 要求行在 29 個動過規格的 commit 上同一個 hash。"
+    }
+  ]
+}
