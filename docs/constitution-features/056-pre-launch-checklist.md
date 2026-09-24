@@ -218,14 +218,27 @@ grep -rn '056-pre-launch-checklist' src/app/layout.tsx docs/health-check/TODO.md
 > 原句為：「或 captain 逐票明確接受並記錄理由」。出口存在，但沒說理由寫在哪，也沒人查得到它到底有沒有被寫。
 > 本節導言的「寫在本票的 Feedback Cycles」只涵蓋 `人工` 項，而 G-1／G-2 是 `機械` 項，涵蓋不到這個情形——這是缺口的來源。
 > **記錄位置**：本票的 `### Feedback Cycles`，一張票一行，格式固定為 `- gate-exception {票號}：captain 明確接受。理由：{一句話}。{YYYY-MM-DD}`。
-> **查核指令**（整列可原樣複製；前綴與輸出刻意全用 ASCII——中文 grep pattern 在本機以獨立腳本執行時會噴 `grep: illegal byte sequence`，2026-09-23 實測過，ASCII 版本不會）：`for n in 058 059 060 061 062 063 049 052; do if grep -q "^- gate-exception $n" docs/constitution-features/056-pre-launch-checklist.md; then echo "$n RECORDED"; else echo "$n NO-RECORD"; fi; done`
+> **查核指令**（整列可原樣複製；前綴與輸出刻意全用 ASCII——中文 pattern 在本機以獨立腳本執行時會噴 `grep: illegal byte sequence`，2026-09-23 實測過，ASCII 版本不會）：`for n in 058 059 060 061 062 063 049 052; do if awk -v n="$n" '/^### Feedback Cycles/{s=1;next} /^#/{s=0} s && index($0, "- gate-exception " n)==1 {f=1} END{exit !f}' docs/constitution-features/056-pre-launch-checklist.md; then echo "$n RECORDED"; else echo "$n NO-RECORD"; fi; done`
 > **這條出口不會變成第二個 F-6。** F-6 壞在**主條件**構造上不可達——enum 裡根本沒有 `archived`，gate 因此永遠不會通過。這一條是**例外出口**：主條件已證明構得到（全 repo 34 張票符合 `complete`＋`PASSED`），出口只在某張票被否決或作廢時才用得上。**出口沒被用到不算壞掉，主條件不可達才算。**
 > 而且它現在查得到：上面那條指令對八張票逐張印 `RECORDED` 或 `NO-RECORD`。captain 有沒有簽字看得出來，不能只靠口頭宣稱。
 
+> **2026-09-23 更正：上面那條查核指令的掃描範圍原本寫錯了，是本票 cycle 4 自己造出來的 fail-open，已修。**
+> 原指令為：`for n in 058 059 060 061 062 063 049 052; do if grep -q "^- gate-exception $n" docs/constitution-features/056-pre-launch-checklist.md; then echo "$n RECORDED"; else echo "$n NO-RECORD"; fi; done`。
+> **它錯在哪**：`grep` 掃的是**整份本票**，不是 `### Feedback Cycles` 區段。所以本檔任何一處只要有一行以 `- gate-exception ` 加真實票號開頭——stage report 裡的舉例、`## Out of scope` 裡的說明——都會被算成 `RECORDED`。**這是 fail-open：gate 會宣稱一個沒有人簽過的核准。** 一道會說謊的檢查比沒有檢查更糟。
+> **修法**：改用 `awk`，只在 `### Feedback Cycles` 標題之後、下一個標題之前的範圍內比對，並以 `index(...)==1` 取代正規表示式錨點，避開跳脫與編碼問題。
+> **兩個方向都驗過**（2026-09-23，皆在副本上操作）：把 `- gate-exception 058：…` 放進 `## Out of scope` 段——舊指令印 `058 RECORDED`，新指令印 `058 NO-RECORD`；把 `- gate-exception 049：…` 放進 stage report 段——舊指令印 `049 RECORDED`，新指令印 `049 NO-RECORD`；再把 `- gate-exception 058：…` 放進 `### Feedback Cycles`（且 `## Out of scope` 的誘餌行仍在）——新指令印 `058 RECORDED`，其餘七張 `NO-RECORD`。**只驗「不再誤報」等於沒驗**，必須同時證明該算到的仍然算得到。
+> 原句保留於上，未刪。
+
 > **2026-09-23 補述：G-8 的 `npx tsc --noEmit` 會因環境因素假性失敗，已在 G-8 補上執行順序。這是環境問題，不是候選缺陷——遇到時不要去改原始碼。**
-> **成因**：`tsconfig.json` 的 `include` 含 `.next/types/**/*.ts`，而 `exclude` 只有 `node_modules`。本專案位於 `~/Documents/` 下的同步資料夾，macOS／iCloud 遇到檔名衝突會產生「 2」「 3」這類重複檔。`.next/types/routes.d 2.ts` 於是被一起編譯，與 `routes.d.ts` 撞成 `error TS2300: Duplicate identifier 'LayoutProps'`。
+> **症狀**：`.next/` 內可能出現檔名帶「 2」「 3」的重複檔，例如 `.next/types/routes.d 2.ts`。`tsconfig.json` 的 `include` 含 `.next/types/**/*.ts` 而 `exclude` 只有 `node_modules`，所以這些重複檔會被一起編譯，與 `routes.d.ts` 撞成 `error TS2300: Duplicate identifier 'LayoutProps'`，讓 `tsc` 假性失敗。
+> **成因未經證實，故不歸因。** 是哪個機制產生這些重複檔，本票沒有查證到可靠證據，因此不寫。遇到時**只要依下面的解法處理，不要去改原始碼**——判斷依據是「解法有效」與「`src/` 零變動」，不是「知道是誰造成的」。
 > **解法**：先跑 `npm run build`（會重建 `.next/types/`），或先 `rm -rf .next`，再跑 `npx tsc --noEmit`。
 > **2026-09-23 實測三段**：(1) 殘留 `routes.d 2.ts`／` 3.ts`／` 4.ts` 時 `tsc` 印三筆 `TS2300`、`exit 2`；(2) `rm -rf .next` 後 `tsc` → `exit 0`，`npm run build` 後 `tsc` → `exit 0`；(3) 刻意 `cp .next/types/routes.d.ts ".next/types/routes.d 2.ts"` 重建該檔 → 同一錯誤逐字重現、`exit 2`，刪掉後 → `exit 0`。全程 `src/` 零變動，故成因在環境不在候選。
+> **2026-09-23 更正：本則原本把成因指名為 macOS／iCloud 同步，該歸因查無實據，已改為只描述症狀。原「實測三段」與解法不變。**
+> 原句為：「本專案位於 `~/Documents/` 下的同步資料夾，macOS／iCloud 遇到檔名衝突會產生「 2」「 3」這類重複檔」。
+> 這個歸因源自 FO 寫進 scope notes 的內容，是另一張票的推測被當成事實傳了下來，implement 照抄未查證。
+> 後續查核在本 sandbox 下被擋住，不是查到「沒有」：`ls -d ~/Library/Mobile\ Documents` 回 `Operation not permitted`，`brctl status` 回 `brctl: Trying to invoke brctl from a sandboxed process`（2026-09-23 本階段獨立重跑，非轉述）。**被擋住不等於不存在。** 所以「是 iCloud」與「不是 iCloud」**兩個結論都沒有被證實**。
+> 因此本則不換成另一個同樣未證實的歸因，直接不歸因。症狀與解法本來就不依賴成因：重複檔在不在，`ls` 看得到；解法有沒有效，離開碼看得到。
 
 八項全數通過，才移除 `layout.tsx:8`。移除後在本票 Feedback Cycles 記下執行日期與 commit SHA，並把本票 `status` 推進到封存。
 
@@ -334,6 +347,7 @@ A 類四項需在 `npm run dev` 的實際渲染上驗證，方式見 AC-2。**�
 - Cycle 1: REJECTED — verify；surface 4 檔／+150 淨行（+151/-1）vs estimate 無（本票 design 未產出 `## Expected surface and tolerance` 段，記為缺口，本輪不因此退回）；AC unchanged。F-1 fix by FO（Material，ownership = FO：058–063 在本 worktree 內 NOT FOUND 使 AC-1「修好須指向可查證證據」與 AC-4 的 G-1 不成立；根因為 worktree 過時而非票未開立——六張票已於 main commit `ae68618` 開立，本分支分岔於 `24e2c44` 在其之前；FO 已 merge main 進分支修復，commit `10d82e8`，六張票現全部 FOUND，不派給 implement）；F-2 fix（Material，本票自有範圍：G-1／G-2 無可執行指令，六個機械項中 implement 只貼出三項輸出，AC-4「可重跑」無法滿足）；F-3 fix（Polish：design 第二節票號查法 `grep -c . <(ls …)` 實測輸出 22 為檔案數非最大票號，`057` 結論本身正確）；F-4 decline 修 build 產物＋授權補一行記錄（Deferred risk：15 個預製 HTML 僅 `_global-error.html` 不帶 noindex，目前無損害且 main 上即存在，promote-when = 決定「已公開但仍保留 noindex」）；F-5 decline（Polish：design 第一節三處行號／路徑漂移，語意位置與 12／14／4／697 全部計數皆成立）。implement 的兩項 DONE 經 verify 獨立重跑逐字一致，無自我宣稱經不起重跑；AC-3 以 `awk` 證明綁定下一行即 `robots:`，AC-2 未達成但歸因至未獲核准的 feature `039`，經獨立複核正確，不構成拒絕理由。
 - Cycle 2: PASSED-with-finding — verify cycle 2；surface 1 檔／+66 淨行（+69/-3，本票一檔；指令與 AC 逐字未變，三筆刪除為被取代的通過條件原文，已以 blockquote 逐字保留）；AC unchanged。F-1／F-2／F-3／F-4 經 reviewer 獨立重驗全部確認修好、無回歸、無越界（F-1 依 FO 指示由 reviewer 自行重跑 G-1 驗證，六張票全部 FOUND）。F-6 fix（Material，本票擁有，reviewer 於 cycle 2 才發現且自陳 cycle 1 漏看：G-1／G-2 的通過條件寫 `status` 為 `archived`，但本 workflow 的 enum 無此值——README:81 為 design／implement／verify／review／complete，封存票實際是 `status: complete`＋`verdict: PASSED`，全 repo `status: archived` 命中 0 張，故該 gate 的通過條件**構造上不可能成立**）。implement 刻意採比 FO 建議更嚴的判準（`verdict: PASSED` 而非「非空」），三項理由：「非空」會讓 REJECTED 的票替該項背書、封存路徑本身不是結論證據（反例 `_archive/023` 為 `status: design`／`verdict` 空）、REJECTED 與空 verdict 走兩列原有的「captain 逐票明確接受」人工出口。可否證性：新判準全 repo 命中 34 張、舊判準命中 0 張；指令逐字未變經程式比對為 True。round record 依 captain 明確授權跳過（原話：「跳過 round record，直接重跑 reviewer」）——round room 已轉錄並 commit 在 main，但未記錄。
 - Cycle 3: REVISE — verify gate（captain 2026-09-23 親自裁決並授權本輪，即 README disposition 規定的 Cycle 3 升級之答覆）；surface 1 檔／+56 淨行（+59/-3；修法本身 +16/-3，其餘為 stage report）；AC unchanged（全節逐字未變，程式比對）。verify cycle 3 判 PASSED，退回非因缺陷，而是 captain 採納「本票交付物就是一道能被執行的 gate，F-7／F-8 兩項恰恰是關於它能不能被執行」。F-7 fix（Deferred risk，本票擁有：G-1／G-2 的「captain 逐票明確接受」出口無記錄位置亦無查核指令——章節導言把「寫在 Feedback Cycles」限定在人工項，而 G-1／G-2 標的是機械項，涵蓋不到）；修法為指定記錄位置與固定格式，並補一條對八張票逐張印 RECORDED／NO-RECORD 的查核指令。F-8 fix（Deferred risk：G-8 的 `npx tsc --noEmit` 會因 `.next/types/` 殘留重複檔假性失敗，本輪實際撞到一次）；修法為在 G-8 補上執行順序（先 `npm run build` 或 `rm -rf .next` 再跑 tsc），並寫明成因為 `tsconfig.json` 的 include 含 `.next/types/**/*.ts` 而 exclude 只有 `node_modules`、專案位於 `~/Documents/` 同步資料夾產生檔名帶「 2」的重複檔——**環境問題，不是候選缺陷**。implement 本輪另自行抓到一個真缺陷：F-7 的查核指令原以中文為前綴，抽出成獨立腳本執行時每圈噴 `grep: illegal byte sequence`（設 LANG／LC_ALL 亦然），判定「一條以腳本形式跑就報錯的 gate 指令不算可查核」，改為純 ASCII；並以副本實測證明該指令可翻轉（補一筆 058 例外記錄 → 058 由 NO-RECORD 翻為 RECORDED，其餘七張不變）。round record 依 captain 先前授權跳過（原話：「跳過 round record，直接重跑 reviewer」）——room 已轉錄並 commit 在 main，但未記錄。
+- Cycle 4: REVISE — verify gate（captain 2026-09-23 親自裁決）；surface 1 檔（本票）；AC unchanged（全節逐字未變，程式比對）。verify cycle 4 判 PASSED——F-7／F-8 皆以 reviewer 提出時的同一標準驗過（查核指令抽出成 194 bytes 獨立腳本執行、翻轉測試在副本獨立重現、F-8 另加一段 implement 沒做的復原檢查證明 `npm run build` 確實會刪掉殘留檔），兩項判斷題也都判 implement 正確。退回的是 reviewer 在 cycle 4 抓到、且**由 cycle 4 自己造出來**的一項問題。F-9 fix（fail-open：新的查核指令 grep 整份 entity 而非 `### Feedback Cycles` 區段，檔案任何一行以該前綴加真實票號開頭都會回報 RECORDED，reviewer 在副本上重現兩次——**gate 會宣稱一個沒有人簽過的核准**）。captain 採納的論點：本票的主題就是「看起來對但執行時不成立的檢查」，F-6 是主條件不可達、F-7 是出口無法稽核、F-9 是檢查會說謊，前兩個都修了第三個不該帶著交付。implement 先在副本重現兩種誤報情境確認問題為真，再以 `awk` 限縮到該區段並改用 `index($0, ...)==1` 取代正規錨點（順便避開 cycle 4 被中文 pattern 咬過的跳脫與編碼問題），最後以**從文件抽出的指令**雙向驗證：誤報情境不再算 RECORDED、而放進 `### Feedback Cycles` 的那一行仍然算得到。F-10 fix（FO 裁量與 reviewer 建議不同）：reviewer 查 CloudDocs 不存在、`brctl` 無輸出而判「不是 iCloud」，但 FO 複核發現在本 sandbox 下兩項檢查皆回 `Operation not permitted`——**是被擋住不是不存在**，故 reviewer 的結論與原註記的結論都未經證實；處置改為**不歸因**，只留症狀與解法，並記明該歸因源自 FO 的 scope notes、implement 照抄未查證。round record 依 captain 先前授權跳過（原話：「跳過 round record，直接重跑 reviewer」）。
 
 ## Out of scope
 
@@ -928,3 +942,58 @@ F-7 與 F-8 都修好，且都通過了我當初抓它們時的同一套標準�
 **判定：PASSED。** 兩項授權處置都已交付並獨立驗證，未越界，指令與 AC 逐字未變，無 AC 失敗。兩筆新 finding 依 `## Review-finding disposition` 只記錄、未動位元組。
 
 **但我要把話講清楚，讓 FO 與 captain 能推翻我這個判定**：F-9 與先前幾筆不同——它是本輪新造物的性質，而且方向是 fail-open，一個會謊報簽字的查核比一個查不到的出口更糟。我仍判 PASSED，理由是候選現況安全（八張全 `NO-RECORD`，現行補述以 `{票號}` 佔位）、觸發需要一個特定的撰寫失誤、修法是一個子句、且八張票全在 `design`，距離 gate 實際執行還很遠。**若認為 fail-open 不該帶著走，這是合理的相反判斷，退回即可。** 無論如何，F-9 必須在 gate 實際執行之前處置。
+
+## Stage Report: implement (cycle 5)
+
+本輪即 captain 2026-09-23 退回後授權的那一輪，全部改動在 commit `a3c1e06`。只處理 F-9 與 F-10，未動 `src/`、build 產物、`layout.tsx`、Next.js 設定、`PresentDetail.tsx`，未跑 `sync-content`。
+
+- DONE: F-9：用 `awk` 把 G-1／G-2 的查核指令限縮到 `### Feedback Cycles` 區段，修掉「檔案任何一處的前綴＋真實票號都會被算成 RECORDED」這個 fail-open。**兩個方向都要驗**：把 `- gate-exception 058：…` 放進 stage report 或 out of scope 段，確認修法後**不再**算成 RECORDED；把同一行放進 `### Feedback Cycles`，確認**仍然**算到。並照你先前的紀律把指令抽出成獨立腳本執行，貼出輸出與離開碼。
+  `:189` 的查核指令換成 `awk` 限縮版；`:193-198` 追加更正補述，原指令逐字保留於補述內。兩個方向皆已驗，輸出見下節。**F-9 是本票 cycle 4 自己造出來的，不是既有問題**，補述與本節都如此記載。
+- DONE: F-10：把 G-8 註記改為**不歸因**——只描述症狀（`.next/` 內可能出現檔名帶「 2」的重複檔，因 `tsconfig.json` 的 include 含 `.next/types/**/*.ts` 而讓 `tsc` 假性失敗）與解法（先 `npm run build` 或 `rm -rf .next` 再跑），並寫明「成因未經證實，故不歸因」。不得換成另一個同樣未證實的歸因。
+  `:200` 的「成因」段改寫為「症狀」＋「成因未經證實，故不歸因」；`:204-209` 追加更正補述，原句逐字保留，並記明該歸因源自 FO 的 scope notes、implement 照抄未查證。解法與「實測三段」不變。未換上任何新歸因。
+- DONE: 確認未越界也未回歸：G-1／G-2 的**指令主體**、F-6 的通過條件、F-7 的記錄位置與固定格式、AC 全節皆逐字未變（自行抽出比對）；`git diff` 只有本票一個檔案；並重跑 AC-3 的三檔 `grep` 與 `awk` 相鄰性確認無回歸。
+  七項比對全部 `True`，AC-3 與相鄰性皆無回歸，輸出見下節。
+
+### F-9：fail-open 先重現，再修，再雙向驗
+
+**先確認它是真的。** 在副本的 `## Out of scope` 段放一行 `- gate-exception 058：舉例說明格式，不是核准。`，舊指令印 `058 RECORDED`；在 `## Stage Report: implement (cycle 4)` 段放一行 `- gate-exception 049：…`，舊指令印 `049 RECORDED`。**兩處都不是核准，gate 卻說有人簽了。**
+
+**修法**：`awk` 只在 `### Feedback Cycles` 標題之後、下一個標題之前比對，並用 `index($0, "- gate-exception " n)==1` 取代正規表示式錨點——順便避開跳脫與編碼問題（cycle 4 已被中文 pattern 咬過一次）。
+
+**雙向驗證，用的是從文件抽出的那一條指令，不是我手寫的版本**：
+
+| 情境 | 舊指令 | 新指令 |
+|---|---|---|
+| 誘餌在 `## Out of scope`（058） | `058 RECORDED` ← fail-open | `058 NO-RECORD` |
+| 誘餌在 stage report（049） | `049 RECORDED` ← fail-open | `049 NO-RECORD` |
+| 真實記錄在 `### Feedback Cycles`（058），且上面兩個誘餌**仍在** | — | `058 RECORDED`，其餘七張 `NO-RECORD` |
+
+第三列是關鍵：**只驗「不再誤報」等於沒驗。** 必須同時證明該算到的仍然算得到，否則把指令改成永遠印 `NO-RECORD` 也能「通過」第一、二列——那會從 fail-open 換成 fail-closed，一樣是假檢查。
+
+**抽出成獨立腳本執行**（真實本票，無誘餌）：八張全部 `NO-RECORD`、離開碼 `0`、無任何 `illegal byte sequence`。
+
+### F-10：不歸因，而不是換一個歸因
+
+G-8 補述原本寫「本專案位於 `~/Documents/` 下的同步資料夾，macOS／iCloud 遇到檔名衝突會產生「 2」這類重複檔」。**這個歸因源自 FO 寫進 scope notes 的內容，是另一張票的推測；implement 照抄，沒有查證。**
+
+reviewer 查 CloudDocs 不存在、`brctl` 無輸出，據此判「不是 iCloud」。**我本階段獨立重跑，結果是被擋住而非不存在**：`ls -d ~/Library/Mobile\ Documents` → `Operation not permitted`；`brctl status` → `brctl: Trying to invoke brctl from a sandboxed process`。**被擋住不等於不存在**，所以 reviewer 的結論與原註記的結論**都沒有被證實**。
+
+因此改為只寫症狀與解法，並明寫「成因未經證實，故不歸因」。**沒有換上另一個同樣未證實的歸因。** 這不影響註記的用途：它存在的理由是阻止執行者去改原始碼，而判斷依據是「解法有效」與「`src/` 零變動」，兩者都量得到，不需要知道是誰造成的。
+
+### 驗證與可否證性
+
+- **F-9 的可否證點是第三列**：若新指令改壞成永遠 `NO-RECORD`，第一、二列照樣「通過」，第三列會立刻露餡。實測第三列為 `058 RECORDED`＋其餘七張 `NO-RECORD`，且誘餌仍在檔案中未移除——證明限縮的是**區段**，不是把整條檢查關掉。
+- **F-10 的可否證點**：若日後有人拿到可靠證據（例如在非 sandbox 環境重跑 `brctl status` 得到明確輸出），這則補述就該被改成帶歸因的版本。現在不寫，是因為證據不足，不是因為不重要。
+- **未回歸、未越界**（皆為程式比對，非目視）：`G-1 指令主體逐字未變: True`、`G-2 指令主體逐字未變: True`、`AC 全節逐字未變: True`、F-6 兩個判準片段 `True`、`F-7 出口子句仍在: True`、`F-7 記錄位置與固定格式逐字未變: True`、`G-8 解法句仍在: True`。
+- **AC-3 無回歸**：三檔命中數仍為 `1／5／1`；`awk` 相鄰性仍為 `binding at line 8; next line 9 =   robots: { index: false, follow: false },`。
+- **改動範圍**：`git diff --name-only` 只有本票一檔。修法本身 `+16／-3`，連同本節 stage report 一併提交後為 `+71／-3`；三筆刪除為 `status: verify`（**FO 推進階段改的 frontmatter**，本 ensign 開工前就在工作區）、查核指令那一行、G-8「成因」那一行——後兩者的原句都逐字保留在各自的更正補述內。**無以刪改掩蓋。**
+
+### Summary
+
+F-9 是 cycle 4 我自己造出來的 fail-open：查核指令 `grep` 整份本票而非 `### Feedback Cycles` 區段，所以檔案裡任何一行舉例都會被算成核准。我先在副本上把它重現了兩次（`## Out of scope` 與 stage report 各一次），再用 `awk` 限縮區段，再用**文件裡那一條指令本身**雙向驗證：誘餌不再算數、真實記錄仍然算數，而且驗第三列時刻意把誘餌留在檔案裡。
+
+這張票到現在修掉的三個問題是同一族：F-6 是**主條件不可達**、F-7 是**出口無法稽核**、F-9 是**檢查會說謊**。三者都不是「寫錯字」，都是「看起來有檢查、執行時不成立」——正好是本票 Problem 一節在講的事。
+
+F-10 改成不歸因。原歸因來自 FO 的 scope notes，我照抄未查證；而 reviewer 用來推翻它的證據在本 sandbox 下是 `Operation not permitted` 與 `Trying to invoke brctl from a sandboxed process`（我獨立重跑過），屬於被擋住而非不存在。兩個方向都沒被證實，所以只留症狀與解法。
+
+**AC-2 維持未達成**，仍綁在未獲核准動工的 feature `039`。gate 整體仍不通過（八張票皆未結案、G-5 三筆佔位命中），各有其票，依禁令未動。
