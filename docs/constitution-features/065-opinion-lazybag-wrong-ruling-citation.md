@@ -1,7 +1,7 @@
 ---
 id: 065
 title: opinion-lazybag 與 present 頁誤引判決號：113憲判9 被寫成 114憲判1
-status: verify
+status: review
 source: constitution-features/063 第六節 V8（captain 2026-09-23 核准開票）
 started: 2026-09-23T17:51:45Z
 completed:
@@ -22,6 +22,17 @@ gates:
                 id: briefing:065:verify:attempt-1:revision-1
                 digest: sha256:c5d02d28d23ee8637ecbafe7870bccc5514748e3245dddd120a3a4125806ae91
                 room-ref: '@review/verify/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:065:verify:1
+                briefing: briefing:065:verify:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-24T19:12:21.376735Z"
+                decision: approve
+                reason: 'captain 2026-09-24 核准進入 review。verify 零 finding：七項 AC 全部獨立重跑通過；reviewer 自行重現兩種盲區情境驗證 implement 的核心主張（插入加空格寫法時舊固定字串 grep 回 0 誤判通過、新 regex 抓到；改壞 B11 時舊寫法 9→9 仍綠、新寫法 11→10 轉紅）；AC-5 的正確基準確為 11 而非 FO 先前記的 9；授權邊界未逾越（七項 AC 的要求句 diff 逐位元零差異、6 行刪除全落在 Verified by: 與「會失敗的改動」、本輪 src/ 零變動）；全 13 條路由回歸確認無外溢。AC-6 據以核可的四項事實全部實證成立：4 位不在任一合議庭、漏列含主筆蔡宗珍在內 5 人、2 位無意見書卻標不同意見、1 筆與主文一原文相反。StanceSpectrum.tsx 檔案保留不刪，留給 049 依 113憲判9 的判決主文立場表重建。'
+              application:
+                target-stage: review
+                state: consumed
 ---
 
 站上把「國會職權修法」判決的內容標成 114 年憲判字第 1 號，但那是憲法訴訟法修正案；國會職權修法是 113 年憲判字第 9 號。這是公開頁面上的事實錯誤，且涉及具名大法官。
