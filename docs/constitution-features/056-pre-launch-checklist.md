@@ -1,7 +1,7 @@
 ---
 id: 056
 title: 上線前檢查清單：公開之前每一項都必須有結論
-status: verify
+status: implement
 source: captain 2026-09-07（把關機制體檢與任務地圖的綜合結論）
 started: 2026-09-21T18:56:47Z
 completed:
@@ -168,7 +168,7 @@ grep -rn '056-pre-launch-checklist' src/app/layout.tsx docs/health-check/TODO.md
 | G-2 | 機械 | `052`、`049` 兩張既有票 | 指令（2026-09-21 補）與 G-1 同一條，只換票號：`for n in 049 052; do f=$(ls docs/constitution-features/$n-*.md docs/constitution-features/_archive/$n-*.md 2>/dev/null); if test -n "$f"; then echo "$n $(grep -m1 '^status:' $f) $(grep -m1 '^verdict:' $f)"; else echo "$n NOT FOUND"; fi; done`。通過條件同 G-1（含 2026-09-22 的更正）|
 | G-3 | 人工 | Vercel 的 Build Command 與 `NEXT_PUBLIC_PUBLIC_MODE` 實際值 | captain 開 dashboard 確認並把實際值抄回本票 |
 | G-4 | 人工 | A1、A4、B1b 三項「明確接受」 | captain 簽字，理由寫入本票 |
-| G-5 | 機械 | 佔位字串全站掃描 | `grep -rniE '某學者\|某大學\|lorem ipsum\|前端工程師 [AB]\|volunteer@addcourt\.tw\|快速了解最新判決的5個重點' src/` 零命中 |
+| G-5 | 機械 | 佔位字串全站掃描 | `grep -rniE '某[學学]者\|某大[學学]\|lorem ipsum\|前端工程師[ 　]?[ABＡＢ]\|volunteer@addcourt\.tw\|快速了解最新判[決决]的[5５][個个]重[點点]' src/` 零命中 |
 | G-6 | 機械 | D1／D2 的反向保護 | `node -e "const a=require('./src/data/history.json');const i=a.map(x=>x.id);if(i.includes('h2')\|\|i.includes('h28'))process.exit(1)"` 回傳 0。若任一列回來了，表示有人重新標了 `Approved`，必須先有法學確認記錄 |
 | G-7 | 機械 | gate 綁定仍在 | 上面那條 `grep -rn '056-pre-launch-checklist'` 三檔皆命中 |
 | G-8 | 機械 | 建置與型別 | （**2026-09-23 補執行順序**，理由見表下補述）先跑 `npm run build`（會重建 `.next/types/`），或先 `rm -rf .next`；再跑 `npx tsc --noEmit`。兩者皆通過才算過 |
@@ -207,6 +207,14 @@ grep -rn '056-pre-launch-checklist' src/app/layout.tsx docs/health-check/TODO.md
 > 這個歸因源自 FO 寫進 scope notes 的內容，是另一張票的推測被當成事實傳了下來，implement 照抄未查證。
 > 後續查核在本 sandbox 下被擋住，不是查到「沒有」：`ls -d ~/Library/Mobile\ Documents` 回 `Operation not permitted`，`brctl status` 回 `brctl: Trying to invoke brctl from a sandboxed process`（2026-09-23 本階段獨立重跑，非轉述）。**被擋住不等於不存在。** 所以「是 iCloud」與「不是 iCloud」**兩個結論都沒有被證實**。
 > 因此本則不換成另一個同樣未證實的歸因，直接不歸因。症狀與解法本來就不依賴成因：重複檔在不在，`ls` 看得到；解法有沒有效，離開碼看得到。
+
+> **2026-09-24 更正：G-5 的掃描 pattern 只認一種寫法，異寫法全部掃不到，已擴大涵蓋面。G-5 要求什麼沒有改。**
+> 本項**非本輪引入**——G-5 自 design 階段即如此寫。依 captain 2026-09-24 的一次性授權：「授權修正 `Verified by:` 涵蓋既有寫法變體，不改 AC 要求本身」。
+> 原 pattern 為：`某學者|某大學|lorem ipsum|前端工程師 [AB]|volunteer@addcourt\.tw|快速了解最新判決的5個重點`。
+> **它錯在哪**：`前端工程師 [AB]` 的半形空格是必要的，所以 `前端工程師A`（無空格）與 `前端工程師　B`（全形空格）掃不到；簡體 `某学者`／`某大学` 掃不到；全形數字 `快速了解最新判決的５個重點` 掃不到。**G-5 以零命中為通過，掃不到就等於通過**——方向是 fail-open，而 G-5 正是本票為了防 `015` 事故（`某學者，某大學法律系` 公開顯示四個月）而設的那一項。
+> **可原樣複製的完整指令**（表格列內的 `|` 依 markdown 需寫成 `\|`，這一行沒有）：`grep -rniE '某[學学]者|某大[學学]|lorem ipsum|前端工程師[ 　]?[ABＡＢ]|volunteer@addcourt\.tw|快速了解最新判[決决]的[5５][個个]重[點点]' src/`
+> **改的是哪幾個字元、為什麼**：`某[學学]者`／`某大[學学]`（簡繁）、`前端工程師[ 　]?[ABＡＢ]`（空格可有可無、半形或全形，A／B 半形或全形）、`快速了解最新判[決决]的[5５][個个]重[點点]`（簡繁與全形數字）。`lorem ipsum` 與 `volunteer@addcourt.tw` 靠 `-i` 已涵蓋大小寫，未動。**沒有新增任何字串**——字串集合與原本完全相同，只是每個字串多認了既有的寫法變體。
+> **雙向驗過**（2026-09-24，逐行實跑）：(a) 十一個字串新 pattern 全部 `HIT`，舊 pattern 為六 `HIT`／五 `MISS`；(b) 對 `src/` 實掃，新舊 pattern 的輸出 `diff` **完全相同**（同樣三筆：`PresentDetail.tsx:32`、`contributors.ts:16`、`:21`），未多抓任何一行；另以八個近似但合法的字串（`某些學者認為這個判決有爭議`、`台灣大學法律系`、`前端工程師的工作內容`、`這則判決的5個重點` 等）測試，全部 `MISS`。**過寬和過窄一樣壞**：過寬會讓 G-5 永遠不通過，所以 (b) 和 (a) 一樣必須驗。
 
 八項全數通過，才移除 `layout.tsx:8`。移除後在本票 Feedback Cycles 記下執行日期與 commit SHA，並把本票 `status` 推進到封存。
 
@@ -267,7 +275,7 @@ Verified by: `G-1`–`G-8` 八項中，六個 `機械` 項逐條執行並貼出�
 npx tsc --noEmit                       # G-8
 npm run build                          # G-8；不會觸發同步，PR #32 已把 sync 移出 build
 grep -rn '056-pre-launch-checklist' src/app/layout.tsx docs/health-check/TODO.md AGENTS.md   # AC-3 / G-7
-grep -rniE '某學者|某大學|lorem ipsum|前端工程師 [AB]|volunteer@addcourt\.tw' src/            # G-5
+grep -rniE '某[學学]者|某大[學学]|lorem ipsum|前端工程師[ 　]?[ABＡＢ]|volunteer@addcourt\.tw' src/   # G-5（涵蓋面見第三節補述。注意：此列的字串集合比第三節的 G-5 少 `快速了解最新判決的5個重點` 一項，屬既有分歧，本輪未擅自補上，見 implement cycle 6 報告）
 node -e "const a=require('./src/data/history.json');const i=a.map(x=>x.id);console.log(i.includes('h2'),i.includes('h28'))"   # G-6
 ```
 
@@ -1065,3 +1073,79 @@ F-10 修好，且處置比我建議的更正確：**不歸因，而不是換一�
 **判定：PASSED。** 兩項授權處置都交付並獨立雙向驗證，未越界（九項比對全 `True`，AC 全節五輪位元組不變），無 AC 失敗。
 
 依本輪指示另記一筆同型風險：**F-11——G-5 的佔位掃描有異寫法盲區**（`前端工程師A` 無空格、全形空格、簡體、全形數字皆掃不到），**方向是 fail-open**，而 G-5 正是本票為防 `015` 事件而設的那一項。現存三筆佔位都還掃得到，故列 Deferred risk；但 `052` 改寫 `contributors.ts` 時若拿掉那個空格，就會立刻變成掃不到。**依指示只提報，未自行修。**
+
+## Stage Report: implement (cycle 6)
+
+本輪即 captain 2026-09-24 退回後、依「授權修正 `Verified by:` 涵蓋既有寫法變體，不改 AC 要求本身」這句一次性授權執行的那一輪。只處理 F-11。未動 `src/`、build 產物、`layout.tsx`、Next.js 設定、`PresentDetail.tsx`，未跑 `sync-content`。
+
+- DONE: F-11：讓 G-5 的佔位掃描涵蓋既有的寫法變體（無空格 `前端工程師A`、全形空格、簡體 `某学者`／`某大学`、全形 `５個重點` 等，以你 cycle 5 逐行測過的十一個字串為基準），修掉「G-5 以零命中為通過故 fail-open」這個缺陷。依 captain 2026-09-24 的一次性授權，這是改 `Verified by:` 的涵蓋面，**不得改 G-5 要求什麼**。
+  `:171` 的 G-5 列與 `:270` 的 Test plan 該列各換上新 pattern；`:186-192` 追加更正補述，原 pattern 逐字保留其中。**字串集合完全沒有變動**——沒有新增任何一個要掃的字串，只是每個既有字串多認了寫法變體。**F-11 非本輪引入**，G-5 自 design 階段即如此，補述與本節都如此記載。
+- DONE: 照你驗 F-9 的同一套紀律**雙向驗證**並貼出兩組輸出：(a) 把指令抽出成獨立腳本執行，對十一個字串逐一確認現在都抓得到；(b) 確認不會誤抓正常內容——過寬的 pattern 會讓 G-5 永遠不通過，那和永遠通過一樣壞。同時確認三個既有佔位值（`PresentDetail.tsx:32`、`contributors.ts:16`、`:21`）仍被抓到。
+  兩組輸出見下方兩節。十一個字串新 pattern 全數 `HIT`；對 `src/` 的實掃與舊 pattern `diff` 完全相同，三個既有佔位值仍抓得到。
+- DONE: 確認未越界也未回歸：G-1／G-2 的指令主體、F-6 的通過條件、F-7 的記錄位置與固定格式、F-9 的 `awk` 限縮、AC 全節皆逐字未變（自行抽出比對）；`git diff` 只有本票一個檔案；並重跑 AC-3 的三檔 `grep` 與 `awk` 相鄰性確認無回歸。若你依授權另修了其他 G 項的涵蓋面，**逐項列出改了哪些、為什麼**。
+  八項比對全部 `True`，AC-3 與相鄰性無回歸。**其他 G 項的涵蓋面一項未改**——理由見下方「其他 G 項」一節。
+
+### 方向 (a)：十一個字串逐行實跑
+
+| 字串 | 舊 pattern | 新 pattern |
+|---|---|---|
+| `某學者` | HIT | HIT |
+| `某学者`（簡體） | **MISS** | HIT |
+| `某大學法律系` | HIT | HIT |
+| `某大学法律系`（簡體） | **MISS** | HIT |
+| `lorem ipsum` | HIT | HIT |
+| `前端工程師 A`（半形空格） | HIT | HIT |
+| `前端工程師A`（無空格） | **MISS** | HIT |
+| `前端工程師　B`（全形空格） | **MISS** | HIT |
+| `volunteer@addcourt.tw` | HIT | HIT |
+| `快速了解最新判決的5個重點` | HIT | HIT |
+| `快速了解最新判決的５個重點`（全形數字） | **MISS** | HIT |
+
+舊 pattern 六 `HIT`／**五 `MISS`**，與 verify cycle 5 的 F-11 觸發證據逐項相符；新 pattern 十一項全 `HIT`。
+
+**抽出成獨立腳本執行**（從補述那一行的反引號內抽出完整指令，寫入檔案交給 `bash`）：印出三筆、離開碼 `0`，**無 `illegal byte sequence`**——這是 cycle 4 咬過我一次的失敗模式，本輪先驗過才交付。
+
+### 方向 (b)：不誤抓
+
+**對 `src/` 實掃，新舊 pattern 的輸出 `diff` 完全相同**，都是三筆：`PresentDetail.tsx:32`（C1）、`contributors.ts:16`、`:21`（C2）。三個既有佔位值仍抓得到，一筆未漏。新 pattern **未多抓任何一行**。
+
+另以八個近似但合法的字串測試，全部 `MISS`：`某些學者認為這個判決有爭議`、`台灣大學法律系`、`前端工程師的工作內容`、`這則判決的5個重點`、`判決的重點`、`學者專家`、`大學法律系教授`、`前端工程`。
+
+**為什麼 (b) 和 (a) 一樣必須驗**：G-5 的通過條件是零命中。pattern 過寬會讓 G-5 永遠有命中、永遠不通過——那是 fail-closed，和 fail-open 一樣是假檢查，只是卡住而不是放行。只驗 (a) 會放過一個「把 pattern 寫成 `.` 」這種修法。
+
+### 其他 G 項：一項未改，逐項說明
+
+授權允許一併修正其他 G 項的涵蓋面，但實際檢查後**沒有一項需要改**：
+
+- **G-1／G-2**：比對的是 `status:`／`verdict:` 這兩個機器產生的欄位，寫法由 workflow 固定，無人工異寫法空間。
+- **G-6**：比對 `history.json` 的 `id` 欄（`h2`／`h28`），同樣是機器產生。
+- **G-7**：比對檔名字串 `056-pre-launch-checklist`，本票自己的檔名，無變體。
+- **G-8**：跑 `tsc` 與 `build`，判斷依據是離開碼，無 pattern。
+- **G-3／G-4**：人工項，captain 判斷，無 pattern。
+
+**F-7 的查核指令有同型盲區但方向相反**：它只認 `058` 而不認 `58`、不認縮排或 `*` 項目符號。verify cycle 5 已列出十種寫法漏掉八種，**但全部漏向 `NO-RECORD`**——gate 卡住而非放行，是 fail-safe。依「不得順手改其他 G 項的要求」，本輪未動。
+
+### 一件觀察，未改，供 FO 判斷
+
+**Test plan（`:270`）那一列的字串集合比第三節的 G-5 少一項**：它沒有 `快速了解最新判決的5個重點`。這是本輪之前就存在的分歧，**不是寫法變體問題，而是兩份副本要掃的字串集合不同**。
+
+補上那一項會改變該指令要求什麼，超出「只改涵蓋面」的授權範圍，**故本輪未補**，只在該列加了一行註記指出分歧。**若 FO 認為兩份應該對齊，請另行授權。** 我不自行擴張範圍——本票前六輪被退回的原因裡有一半是「看起來對但執行時不成立」，自己再造一個「未經授權的悄悄對齊」不是修它的方法。
+
+### 驗證與可否證性
+
+- **方向 (a) 的可否證點**：若新 pattern 沒有真的涵蓋變體，十一列裡會留下 `MISS`。實測零 `MISS`。
+- **方向 (b) 的可否證點**：若新 pattern 過寬，對 `src/` 的 `diff` 會出現舊 pattern 沒有的行。實測 `diff` 無輸出，兩者完全相同；另八個近似合法字串全 `MISS`。
+- **「沒有新增字串」可查證**：新舊 pattern 的 `|` 分隔項數相同（六項），每一項都是原項目的變體展開，無新項目。
+- **未回歸、未越界**（皆為程式比對，非目視）：`G-1 指令主體逐字未變: True`、`G-2 指令主體逐字未變: True`、`AC 全節逐字未變: True`、F-6 兩個判準片段 `True`、`F-7 記錄位置與固定格式逐字未變: True`、`F-9 awk 限縮逐字未變: True`、`G-8 解法句仍在: True`。F-9 的查核指令重跑仍印 `NO-RECORD`。
+- **AC-3 無回歸**：三檔命中數仍為 `1／5／1`；相鄰性仍為 `binding at line 8; next line 9 =   robots: { index: false, follow: false },`。
+- **改動範圍**：`git diff --name-only` 只有本票一檔；修法本身 `+11／-3`，連同本節 stage report 一併提交後為 `+87／-3`。三筆刪除為 `status: verify`（**FO 推進階段改的 frontmatter**，本 ensign 開工前就在工作區）、G-5 列、Test plan 該列——後兩者的原 pattern 逐字保留在更正補述內。**無以刪改掩蓋。**
+
+### Summary
+
+F-11 修好：G-5 的 pattern 從只認一種寫法，擴為涵蓋簡繁、全形半形空格、全形半形字母與數字。**字串集合一個沒加、一個沒減**，改的只是每個字串認得的寫法。十一個字串從六中五漏變成全中；對 `src/` 的實掃輸出與舊 pattern 逐字相同，三個既有佔位值仍抓得到，八個近似合法字串全部不誤抓。
+
+F-11 不是本輪引入的，G-5 自 design 階段就這樣寫。但它的方向值得記一筆：**G-5 以零命中為通過，所以掃不到就等於通過**——而 G-5 正是本票為了防 `015` 事故（`某學者，某大學法律系` 公開顯示四個月）而設的那一項。一道防事故的檢查，自己走在事故的重演路徑上。
+
+**一件我沒做、要請 FO 裁示的事**：Test plan 那一列比 G-5 少掃一個字串。補上它會改變該指令要求什麼，超出本次授權，所以我只加註記、沒有補。
+
+**AC-2 維持未達成**，仍綁在未獲核准動工的 feature `039`。gate 整體仍不通過（八張票皆未結案、G-5 三筆佔位命中），各有其票，依禁令未動。
