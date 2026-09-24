@@ -109,7 +109,7 @@ export default function ThresholdChart({
       aria-labelledby="threshold-chart-title threshold-chart-desc"
     >
       <title id="threshold-chart-title">
-        1949 至 2026 年憲法法庭解釋與判決的年度件數，底層色帶為各時期的表決門檻
+        1949 至 2026 年憲法法庭解釋與判決的年度件數，底層色帶為各時期的門檻
       </title>
       <desc id="threshold-chart-desc">
         {`${desc}。釋字序列 1949 至 2021 年共 813 件，2022-01-04 起改作成判決，兩個序列不可相加。`}

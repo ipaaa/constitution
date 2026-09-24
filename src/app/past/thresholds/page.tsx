@@ -4,7 +4,7 @@ import ThresholdCaseAnalysis from '@/components/threshold-analysis/ThresholdCase
 export const metadata = {
   title: '門檻與案件量 | Add C0urt 憲庭加好友',
   description:
-    '1949 至 2026 年憲法法庭解釋與判決的年度件數，對照四個時期的表決門檻。門檻時點取自法規公布日，案件計數取自司法院公開資料。',
+    '1949 至 2026 年憲法法庭解釋與判決的年度件數，對照四個時期的門檻。門檻時點取自法規公布日，案件計數取自司法院公開資料。',
   openGraph: {
     title: '門檻與案件量 | Add C0urt 憲庭加好友',
     description: '大法官通過一件解釋要多少人同意？門檻改過四次。案件量的曲線長這樣。',
@@ -23,7 +23,7 @@ export default function ThresholdsPage() {
           <span className="font-serif">通過一件解釋，要多少人同意？</span>
         </h1>
         <p className="text-gray-500 font-medium font-serif mt-2 text-lg">
-          四個時期的表決門檻，對上 1949 至 2026 年的案件量。
+          四個時期的門檻，對上 1949 至 2026 年的案件量。
         </p>
       </div>
 
@@ -35,7 +35,7 @@ export default function ThresholdsPage() {
             這個條件改過幾次，每次都寫在法條裡，有公布日可查。
           </p>
           <p>
-            下面這張圖把兩件事放在一起：底層色帶是各時期的表決門檻，長條是當年實際作成的件數。
+            下面這張圖把兩件事放在一起：底層色帶是各時期的門檻，長條是當年實際作成的件數。
             門檻的起訖日一律取自法規公布日，不取自任何人的口述年份。
           </p>
           <p>

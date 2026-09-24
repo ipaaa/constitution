@@ -121,17 +121,92 @@ test('AC-1 primary-source 的四期各有非空 article／quotedText／sourceUrl
   assert.equal(ERAS.filter((e) => e.evidence === 'unverified').length, 0);
 });
 
+/**
+ * AC-1 的 1987 守衛。
+ *
+ * 舊版是兩條「1987 與門檻詞彙相距 12 字以內」的正規式。它有兩個洞：
+ *   1. 詞彙表只有四個詞。站上唯一同時出現 1987 與門檻主張的那句話用的是
+ *      「表決條件」「改低」，剛好都在表外，於是全頁最該被看守的一句反而沒被看守。
+ *   2. 就算把詞彙補齊，正規式也只能問「這兩者有沒有靠在一起」，
+ *      不能問「靠在一起的時候，講法是不是誠實的」。
+ *
+ * 誠實的講法長這樣：**歸屬給會議記錄，並當場反駁**。
+ * 「會議記錄說 1987 年…；實際的公布日是 1993-02-03，會議的時間順序不成立。」
+ * 不誠實的講法是把前半留下、把後半刪掉。舊守衛看不出這個差別，新守衛看得出。
+ *
+ * 因此改成：把文字切成句段，句段裡同時出現 1987 與門檻詞彙時，
+ * **該句段必須同時帶歸屬標記與反駁標記**，否則失敗。
+ * 純粹當年份鍵用的 1987（YEARS 的 1987 年 9 件）句段裡沒有門檻詞彙，不受影響。
+ *
+ * 2026-09-24 captain 一次性授權：「授權修正 Verified by 涵蓋既有寫法變體，不改 AC 要求本身。」
+ * AC-1 的要求仍是「頁面沒有把門檻變動寫成 1987 年」，改的只是怎麼查。
+ */
+const THRESHOLD_TERMS = [
+  // 本票收斂後的唯一用詞
+  '門檻',
+  // 收斂前用過的變體。留著，避免有人改回舊寫法就繞過守衛。
+  '表決門檻', '通過條件', '表決條件', '法規變動', '表決標準', '通過標準',
+  // 門檻變動的動詞說法
+  '降', '放寬', '改低', '調降', '下修', '鬆綁', '提高', '調高', '收緊',
+  // 具體門檻數值的說法
+  '三分之二', '四分之三', '二分之一', '過半數',
+];
+/**
+ * 歸屬標記：這句話是在轉述誰的說法。
+ *
+ * 刻意不收「會議的」——反駁子句本身就寫著「會議的時間順序不成立」，
+ * 收了它會讓歸屬與反駁兩個條件不獨立：刪掉「會議記錄說」仍能靠反駁子句蒙混過關。
+ * 兩個條件必須各自獨立可失敗，否則守衛只剩一半。
+ */
+const ATTRIBUTION_MARKERS = ['會議記錄', '會議原文', '會議說', '投影片'];
+/** 反駁標記：這句話有沒有當場說清楚該說法不成立。 */
+const REBUTTAL_MARKERS = ['不成立', '1993-02-03', '時間順序'];
+
+/** 標籤換成分隔符而非空白——否則相鄰元素的文字會黏成一段，讓不相干的詞混進同一句。 */
+const SENTINEL = '\u0000';
+const htmlToText = (html) => html.replace(/<[^>]+>/g, SENTINEL);
+/** 句段邊界：句號、換行、標籤。 */
+const segmentsOf = (text) =>
+  text
+    .split(/[\u0000\n。]+/)
+    .map((seg) => seg.replace(/\s+/g, ' ').trim())
+    .filter(Boolean);
+
+/** 回傳所有「同時出現 1987 與門檻詞彙」的句段。 */
+function claimShapedSegments(text) {
+  return segmentsOf(text).filter(
+    (seg) => seg.includes('1987') && THRESHOLD_TERMS.some((t) => seg.includes(t)),
+  );
+}
+
 test('AC-1 沒有一處把門檻變動寫成 1987 年', () => {
   // 純字串 grep 1987 會恆真失敗：1987 必然是 YEARS 的年份鍵（1987 年 9 件）。
-  // 因此比對的是「1987 與門檻詞彙相鄰」這個形狀。
-  const forward = /1987[^0-9]{0,12}(門檻|三分之二|降|放寬)/;
-  const backward = /(門檻|三分之二|降|放寬)[^0-9]{0,12}1987/;
-  for (const [file, src] of SCANNED_SOURCES) {
-    assert.equal(forward.test(src), false, `${file} 把 1987 寫在門檻詞彙之前`);
-    assert.equal(backward.test(src), false, `${file} 把 1987 寫在門檻詞彙之後`);
+  // 因此查的是「1987 與門檻主張同句」這個形狀，再要求該句必須歸屬且反駁。
+  const pageHtml = renderToStaticMarkup(createElement(ThresholdCaseAnalysis));
+  const scanned = [...SCANNED_SOURCES, ['<rendered page>', htmlToText(pageHtml)]];
+
+  let claimShapedCount = 0;
+  for (const [file, body] of scanned) {
+    for (const seg of claimShapedSegments(body)) {
+      claimShapedCount++;
+      assert.ok(
+        ATTRIBUTION_MARKERS.some((m) => seg.includes(m)),
+        `${file} 把 1987 與門檻主張寫在同一句，卻沒有歸屬給會議記錄：「${seg}」`,
+      );
+      assert.ok(
+        REBUTTAL_MARKERS.some((m) => seg.includes(m)),
+        `${file} 把 1987 與門檻主張寫在同一句，卻沒有當場反駁：「${seg}」`,
+      );
+    }
   }
-  // 年份鍵本身必須還在，否則上面兩條就是空轉。
+
+  // 守衛必須真的掃到東西。掃到 0 段代表句段切法或詞彙表壞了，而不是頁面很乾淨。
+  assert.ok(claimShapedCount >= 2, `預期至少掃到 2 個受檢句段，實際 ${claimShapedCount}`);
+  // 年份鍵本身必須還在，否則上面整組就是空轉。
   assert.equal(YEARS.find((y) => y.year === 1987).count, 9);
+  // 年份鍵所在的句段不得被誤判成主張句。
+  const yearKeyOnly = segmentsOf(String(YEARS.find((y) => y.year === 1987).year));
+  assert.equal(claimShapedSegments(yearKeyOnly.join('\n')).length, 0);
 });
 
 test('AC-1 沒有任何時期的起訖日以 1987 開頭', () => {
@@ -184,7 +259,11 @@ test('AC-2 三期件數為 79／233／501，相加等於 813', () => {
   assert.equal(statOf('rules').totalCount, 79);
   assert.equal(statOf('three-quarters').totalCount, 233);
   assert.equal(statOf('two-thirds').totalCount, 501);
-  assert.equal(79 + 233 + 501, 813);
+  // 原本寫的是 `assert.equal(79 + 233 + 501, 813)` —— 三個字面值相加，不碰程式碼也不碰
+  // fixture，永遠成立，改壞任何東西它都不會紅。改成由 STATS 與 fixture 兩邊各自推導再比對。
+  const statsTotal = STATS.reduce((a, s) => a + s.totalCount, 0);
+  assert.equal(statsTotal, RAW.length);
+  assert.equal(statsTotal, Object.values(expected).reduce((a, n) => a + n, 0));
 });
 
 test('AC-2 三期年均為 8.3／6.7／17.3，current 期為 null', () => {
@@ -501,7 +580,13 @@ test('D1 規則期 79 筆中有 2 筆不在已引條文之下，且在圖下另�
   assert.equal(after.length, RULES_ERA_UNCOVERED.coveredCount);
   assert.deepEqual(before.map(([n]) => n), [...RULES_ERA_UNCOVERED.interpretationNumbers]);
   for (const [, , d] of before) assert.equal(d, RULES_ERA_UNCOVERED.date);
-  assert.equal(before.length + after.length, 79);
+  // 原本寫的是 `before.length + after.length === 79`。before 與 after 是同一個陣列切兩半，
+  // 相加必然等於原長度，而原長度上面已經斷言過了，等於斷言 79 === 79。
+  // 改成斷言切點之後的第一筆是誰 —— 這是 fixture 的事實，切點改錯就會紅。
+  const firstCovered = after[0];
+  assert.equal(firstCovered[0], 3);
+  assert.equal(firstCovered[2], '1952-05-21');
+  assert.ok(before.every(([, , d]) => d < RULES_ERA_UNCOVERED.amendedOn));
 
   // 圖下的固定註腳必須指名這兩筆，不能只放在 hover 才看得到的 tooltip。
   const html = renderToStaticMarkup(createElement(ThresholdCaseAnalysis));
@@ -522,6 +607,53 @@ test('D2 2022-01-04 至 2025-01-23 的條文已逐字核對，不標未確認', 
   assert.ok(interim.sourceUrl.includes('lnndate=20190104'));
   // 這一段不是 ThresholdEra，四期的 id 不變。
   assert.equal(ERAS.some((e) => e.id === interim.id), false);
+});
+
+/**
+ * 換算後的人數。c3 明文承諾「本頁不解釋這個限定語，也不把它換算成人數」，
+ * 但在此之前沒有任何測試守著這句承諾，只靠人記得。
+ *
+ * 唯一可以出現人數的地方是現行憲訴法那一期 —— 它的條文原文本來就寫「十人」「九人」。
+ * 把那一期自己的字串從頁面文字裡挖掉之後，**整頁不該再剩下任何人數**。
+ */
+const HEADCOUNT_RE = /(?:\d+|[一二三四五六七八九十]+)\s*人/g;
+
+test('c3 站上不得出現換算後的人數', () => {
+  const current = eraOf('current');
+  // 這三個字串是現行憲訴法自己的用語，人數來自條文原文，不是換算。
+  const allowed = [current.label, current.ruleSummary, current.quotedText];
+
+  const pageText = renderToStaticMarkup(createElement(ThresholdCaseAnalysis))
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ');
+  // 先確認允許清單真的有被用到，否則下面的挖除是空轉。
+  for (const a of allowed) assert.ok(pageText.includes(a), `頁面找不到允許字串：${a}`);
+
+  let residue = pageText;
+  for (const a of allowed) residue = residue.split(a).join(' ');
+  assert.deepEqual(
+    residue.match(HEADCOUNT_RE),
+    null,
+    `除了現行憲訴法的條文原文之外，頁面不得出現人數：${residue.match(HEADCOUNT_RE)}`,
+  );
+});
+
+test('c3 規則期的呈現完全沒有人數', () => {
+  // 規則期是 c3 真正要守的對象：「在中央政府所在地全體大法官」的解讀未經法學拍板，
+  // 不得換算成人數。這一條把範圍縮到規則期自己的 tile，改壞了會直接紅。
+  const rulesOnly = STATS.filter((s) => s.era.id === 'rules');
+  assert.equal(rulesOnly.length, 1);
+  const html = renderToStaticMarkup(
+    createElement(EraComparisonStrip, {
+      items: rulesOnly,
+      selectedEraId: null,
+      onSelectEra: () => {},
+    }),
+  );
+  const text = html.replace(/<[^>]+>/g, ' ');
+  assert.deepEqual(text.match(HEADCOUNT_RE), null);
+  // 挖除是有效的：規則期的條文原文確實渲染出來了，不是整塊都沒渲染。
+  assert.ok(text.includes('在中央政府所在地全體大法官三分之二以上出席'));
 });
 
 // ---------------------------------------------------------------------------
