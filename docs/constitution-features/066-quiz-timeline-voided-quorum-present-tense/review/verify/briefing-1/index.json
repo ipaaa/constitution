@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:066:verify:attempt-1:revision-1",
+  "question": "verify cycle 2 判 PASSED、零新 finding。**我建議核准**，但有兩項 hold 的項目需要你知道，其中一項要你決定。**F-7（需你決定）**：三項自動檢查中的檢查 2 是**頁級**粒度（`c2 = floorNumCount === 0 || clauseHits.length \u003e= 1`），但 FO 追加的判準「題幹＋explanation 那一對必須自足」是**題級**。`/quiz/controversy` 有 q2、q5 兩個子句載體，所以把 q2 的失效子句整句拿掉，檢查 2 **仍 PASS、exit 仍 0、無聲通過**（reviewer 已實跑重現）；`/quiz/pending` 只有一個載體故缺口不顯現。今日無實害（三題子句都在、合讀皆自足），promote 條件為任何後續改動縮短或移除 q2 explanation 末句。**修法是讓檢查 2 在 quiz 路由逐題判定——那是檢查語意變更，超出你 2026-09-24 的 `Verified by:` 授權範圍，所以我沒有動它。** 這是同一家族的又一次：**檢查的粒度比它宣稱保護的性質粗**。**F-5（僅告知）**：失效視窗日期在三處新字串手寫、不由 `RULING_THRESHOLD.voidedFloor` 推導，但 design 的 AC3 本來就要求**字面時間錨**，改成推導會與 AC3 衝突，故維持。附註：`RulingThresholdNote.tsx:57` 以民國年寫同一區間，**站上因此有兩種紀年並存**。",
+  "artifacts": [
+    {
+      "id": "artifact:066:verify:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/46f226920db2c0871b5dfe697af256c69b8ed54f/docs/constitution-features/066-quiz-timeline-voided-quorum-present-tense.md",
+      "rev": "sha256:849ee82618e636aa4c652c99221b76ccdccabf893d61754234d0809f6d86411c",
+      "mediaType": "text/markdown",
+      "summary": "五項授權修法全部落實且經獨立重跑：F-1 的命令改成引號與路徑皆無關（5 檔 ≥ 4）；F-2 的定位改成錨定 `id` 而非行號，reviewer **自造 +10／-2 行兩個反例**，新命令兩次都抓得到、舊命令失準；F-3 改為與同檔 `evt-09` 一致的精確日期，無空格寫法有**全檔 20:0** 的證據支持；F-4 六筆路徑全部指向實際存在的 `_archive/` 檔；F-6 讓票內只剩引用、定義單獨留在 P1-9。未越界：腳本自 `24465d2` 起 0 diff（F-7 held），F-5 的三處字面時間錨與 `:156` 的括號文字逐字未動，`src/data/*.json` 與 main 逐位元相同。**reviewer 兩次更正自己**：(1) 它本輪先用 `grep -cE` 數 AC4 的 diff 行得 15、與 implement 的 16 不符，逐項重算後**16 才對**——新增的空行在 `+` 之後沒有字元、被它的字元類排除；(2) 「7 筆」的重複計數**出自它自己 cycle 1 的 F-4 原文**，不是 FO 的算術，它記在票內以免下一輪誤判責任歸屬。它也拒絕寫「AC 全節逐字未變」——因為 AC3 的標題依 F-2 授權換掉了定位方式（義務子句不變），它照實記為「7 條中 6 條逐字未變」。"
+    }
+  ]
+}

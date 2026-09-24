@@ -11,6 +11,17 @@ worktree: .worktrees/spacedock-ensign-066-quiz-timeline-voided-quorum-present-te
 issue:
 pr:
 mod-block:
+gates:
+    version: 1
+    records:
+        - id: gate:066:verify
+          stage: verify
+          attempts:
+            - id: gate-attempt:066-verify-1
+              briefing:
+                id: briefing:066:verify:attempt-1:revision-1
+                digest: sha256:e60854d3d1d3ba67ee5d69c02e159fcb97fb21e0afef5ea83876f49a6b2a9ef9
+                room-ref: '@review/verify/briefing-1'
 ---
 
 `/quiz/*` 與 `/controversy-timeline` 以現在式把已被宣告違憲失效的 10 人參與評議下限當成現行法，是 feature `063` 修完 `/future` 之後同一個法律錯誤的最大殘餘面。
