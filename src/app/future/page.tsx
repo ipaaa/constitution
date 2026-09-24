@@ -2,11 +2,12 @@
 
 import React, { useState, useMemo } from 'react';
 import Image from 'next/image';
-import { PENDING_CASES, CRISIS_STATS, LAST_UPDATED, IdentityTag } from '@/data/future';
+import { PENDING_CASES, CRISIS_STATS, LAST_UPDATED, REFERENCE_DATE, IdentityTag } from '@/data/future';
 import RightsCalculator from '@/components/future/RightsCalculator';
 import BottleneckFunnel from '@/components/future/BottleneckFunnel';
 import CaseCard from '@/components/future/CaseCard';
 import JusticeTermTimeline from '@/components/future/JusticeTermTimeline';
+import RulingThresholdNote from '@/components/future/RulingThresholdNote';
 
 type SortMode = 'urgency' | 'recent';
 
@@ -68,16 +69,17 @@ export default function FutureTrack() {
               </span>
             </div>
             <div className="font-mono text-[10px] text-gray-500">
-              資料更新日期：{LAST_UPDATED}
+              <div>資料更新日期：{LAST_UPDATED}</div>
+              <div>待審案件統計截至 {REFERENCE_DATE}</div>
             </div>
           </div>
           <h2 className="font-serif text-2xl md:text-3xl font-bold leading-tight mb-3">
             {CRISIS_STATS.designatedTotal} 名大法官，僅存 {CRISIS_STATS.activeJustices} 名運作（三名不參與評議會）
           </h2>
           <p className="text-gray-400 max-w-2xl leading-relaxed">
-            由於立法院未行使新任大法官人事同意權，加上憲法法庭法修正將判決門檻提高至法定總額
-            2/3（{CRISIS_STATS.requiredForRuling} 名），目前僅存 {CRISIS_STATS.activeJustices} 名大法官的憲法法庭
-            <strong className="text-white">實質上無法做出任何判決</strong>。{CRISIS_STATS.totalPending} 件案件陷入無限等待。
+            立法院未行使新任大法官人事同意權，目前僅存 {CRISIS_STATS.activeJustices} 名大法官參與評議。
+            <RulingThresholdNote variant="lede" />
+            <strong className="text-white">{CRISIS_STATS.totalPending} 件案件仍在待審。</strong>
           </p>
         </div>
       </div>
@@ -187,14 +189,9 @@ export default function FutureTrack() {
           <div className="bg-white p-6 md:p-8 border border-gray-200 shadow-sm rounded-sm">
             <h3 className="text-lg font-serif font-bold mb-3 flex items-center gap-2">
               <div className="w-3 h-3 bg-gray-800 rounded-full" />
-              憲法法庭法修正
+              憲法訴訟法修正
             </h3>
-            <p className="text-gray-600 leading-relaxed font-serif text-sm">
-              同時，立法院通過修法，將憲法法庭判決門檻由「現有總額」改為「法定總額」的 2/3
-              （即至少需 {CRISIS_STATS.requiredForRuling} 名大法官同意）。
-              在目前僅存 {CRISIS_STATS.activeJustices} 人的現實下，
-              實質上<strong>凍結</strong>了所有正在排隊且需要判決的憲法訴訟案。
-            </p>
+            <RulingThresholdNote variant="card" />
           </div>
           <div className="bg-white p-6 md:p-8 border border-gray-200 shadow-sm rounded-sm">
             <h3 className="text-lg font-serif font-bold mb-3 flex items-center gap-2">
@@ -203,8 +200,7 @@ export default function FutureTrack() {
             </h3>
             <p className="text-gray-600 leading-relaxed font-serif text-sm">
               即使在正常編制下，憲法法庭每年處理量約 30~40 件。以目前 {CRISIS_STATS.totalPending} 件待審案件計算，
-              即使全員到位也需要數年時間消化。而在 {CRISIS_STATS.activeJustices} 名大法官無法達到判決門檻的情況下，
-              案件只進不出，每一天都在加劇人民權利的損害。
+              即使全員到位也需要數年時間消化。
             </p>
           </div>
           <div className="bg-white p-6 md:p-8 border border-gray-200 shadow-sm rounded-sm">
