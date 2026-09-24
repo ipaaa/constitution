@@ -963,3 +963,36 @@ implement 對 FO 的兩項更正皆屬實；「7 筆」的重複計數出自我 
 本輪沒有新增 finding。F-5 與 F-7 依授權維持 hold，待 captain。
 
 **VERDICT: PASSED**
+
+## Stage Report: review
+
+- DONE: 逐項重現七項 AC 的 `Verified by:`，**不採信 implement 或 verify 的自我回報**。AC2 須自建副本、自起 dev server、自跑 `scripts/check-voided-floor.mjs`，確認六條路由的三項檢查全部 PASS、離開碼 0；並確認腳本與票內第 8.3 小節**逐字相同**（`cmp`，5073 bytes）且該 regex **只存在於這兩處**——「AC 只引用不複製」成立與否取決於此。**diff 類查核基準用 `cb341af`**
+  七項全數自行重跑 PASS，基準一律 `cb341af`。**AC2**：自建 `after`（HEAD→3271）與 `before`（`cb341af`→3272）兩份副本，只在副本內停用 `LaunchGate`，六路由十八項全 PASS、`exit 0`；基線 `exit 1`，`/controversy-timeline` 4／0／2 FAIL 且檢查 1 的四筆命中與第 8.4 小節**逐字相同**——對照關係為真，非套套邏輯。**腳本單一性我用程式驗，不用人眼**：自 entity 依標題（非行號）切出 8.3 區段，該區段僅一個程式碼圍籬，抽出後 `cmp` 與 `scripts/check-voided-floor.mjs` 相同，兩邊 sha256 `31479dfd…0138ac`、皆 5073 bytes；再以五組 regex 原文（`10人|10位|10名`、`失效|失其效力|不再適用`、`持續|始終|至今|目前`、`停擺|癱瘓|無法運作`、`評議門檻|開庭門檻|判決門檻`）掃全樹，命中只有 entity 與腳本兩檔，entity 內第二筆（`:888`）是 verify 補述的敘述性引文、非可執行定義。**AC1** `起失其效力` 4 筆全在 `ruling-threshold.ts`、外部 0 筆；引號無關命令回 5 檔 ≥ 4。**AC3** `awk` 命令輸出含字面時間錨。**AC5** verbatim grep = 0。**AC6** 三條件全過，`/future` 全頁中文句差集證明只換掉 AC6 那一句、未填替代數字。**AC7** json sha256 與基線逐字相同且 `git diff main HEAD -- 'src/data/*.json'` 為空、`robots` 在 `layout.tsx:8`、**乾淨副本**（無 `.next/`）`tsc --noEmit` `exit 0`、`063-required-for-ruling` 於 `src/` 6 筆全指 `_archive/`（目標檔存在，161,819 bytes）、`/future` 門檻片段 before／after 各 14 筆 `IDENTICAL: true`。eslint：8 個改動檔 `exit 0`；全樹 4 errors 落在 `LaunchGate.tsx`／`Navbar.tsx`／`BottleneckFunnel.tsx`／`TrackCards.tsx`，四檔 `git diff --quiet cb341af HEAD` 皆無改動——揭露精確。
+- DONE: **逐處查核 14 處施工是否與 design 的分級處置一致**，特別是 D 級：`:152` 是否只改「持續」→「當時已」而未加豁免清單；`:168` 的日期是否與同檔 `evt-09` 的 `dateLabel: '2024年12月20日'` 一致；`:151`／`:187` 是否逐字未動；B1／B2 是否整句刪除而非改寫；四個 quiz 檔的 `correctIndex`／`options`／題幹是否逐字未動
+  14 處全部與分級處置一致。**`:152`**：最長共同前後綴演算法得前綴 100 字、後綴 38 字，唯一差異 `"持續"`→`"當時已"`；腳本無豁免清單（`本檔不設豁免清單`，且已證逐字未改，結構上不可能加）。**`:168`**：「兩個月後」全檔 0 命中，改為「同年12月20日三讀通過的」，與 `evt-09` 的 `dateLabel: '2024年12月20日'` 一致（`evt-10` 的 `date` 為 `2024-10-31`，「同年」＝2024，正確）；時序錯置確已解——修正案現被敘述為節點日期**之後**才三讀，停擺錨到 `evt-12` 的生效日 `2025-01-23`。無空格寫法的理由我自行複驗成立：該檔 in-prose 日期**無空格 20 筆、有空格 0 筆**。**`:151`／`:187`**：以 `cb341af` 原文逐字比對，各在現行檔內有且僅有 1 筆完全相同（`:155`／`:191`），未出現在 diff 的 +／- 行內。**B1／B2**：整句刪除，無替代文字。**四個 quiz 檔**：`question`／`correctIndex`／`label`／`text`／`id`／`options` 欄位行集合與 `cb341af` **逐字相同**（controversy 35 行、pending 26 行、perspectives 26 行、rights 26 行）；`perspectives.ts`／`rights.ts` 全檔零 diff。quiz 全部 +／- 行只有 import／註解與 `explanation:` 值，無一觸及題幹或答案。另自行複驗第七小節長度預算：`detail` 最長 258（預算 320）、`consequence` 最長 54（預算 80）、`summary` 43，全部在內。
+- DONE: **做三項負面對照**（不要只確認現況全綠）：逐一還原三處錯誤，確認對應的那一項檢查**各自且僅各自** FAIL；並自行重現 AC5 的合讀判準失敗情境。**注意 F-7：檢查 2 是頁級粒度，該情境下檢查仍會 PASS**，這是已知且經 captain 裁示維持的缺口。最後給出 PASSED 或 REJECTED
+  三項負面對照在 `after` 副本上逐一施加並還原（`cmp` 確認每次都回到候選狀態），**各自且僅各自** FAIL：還原 `:152`「持續凍結」→ 檢查 1 FAIL(1)、檢查 2／3 PASS；移除 `evt-15` 的 `${VOIDED_FLOOR_SHORT}` → 檢查 2 FAIL(0)、檢查 1／3 PASS；補回 B2「違憲審查持續停擺」→ 檢查 3 FAIL(1)、檢查 1／2 PASS；三次皆 `exit 1`，全數還原後回到 `exit 0`。**AC5 合讀失敗情境已重現**：拿掉 `/quiz/controversy` q2 explanation 末句後，自真實渲染頁取出該題「題幹＋explanation」這一對，程式判定**不含**失效語彙、**不含**依據（空白無關比對）、**不含**任何其他過去時態錨（`曾|當時|過去|期間`），題幹的「需要」確實成為全對唯一的時態訊號而它是現在式——判準可失敗。**F-7 仍如記載**：同一情境下 `/quiz/controversy` 三項仍全 PASS、`exit 0`（`clauseHits` 由 2 降為 1，但 `c2 = floorNumCount === 0 || clauseHits.length >= 1` 是頁級布林，q5 的載體撐住了整頁），非新缺陷。現況兩對（controversy q2、pending q5）四項訊號全齊、皆自足；`QuizQuestion.tsx` 的 `<h2>{question.question}</h2>` 與 `{question.explanation}` 是同一 `space-y-6` 容器的兄弟節點，且「下一題」按鈕在 `revealed` 區塊內，讀者無法在未見 explanation 的情況下離開該題——這一對結構上必然同時在場。
+- DONE: 依實際交付行為檢查 `## Documentation impact` 每一筆（review 階段具名要求）
+  `docs/health-check/TODO.md` 新增 P1-9 且「驗證」區塊自我標明為該檢查唯一定義處（票內 AC6 第 2 條只引用），該檔結案慣例為保留加刪除線故單一來源不會因結案消失；`docs/INDEX.md` 新增「驗證腳本」表列入 `scripts/check-voided-floor.mjs`（路徑／用途／狀態／負責人／最後查核五欄齊備）並把 `TODO.md` 的最後查核更新為 2026-09-24。`record` 文件未被改寫：`docs/constitution-features/_archive/`、`docs/health-check/2026-08-31-content-pipeline.md` 皆零 diff。`CLAUDE.md` 零 diff（第 5 條依 FO 裁示上呈 captain，規則先落在 `scripts/check-voided-floor.mjs` 檔頭）。`docs/` 內本票只動三檔，`056`／`065`／`012` 三張並行票零 diff。新增檔僅 `scripts/check-voided-floor.mjs` 與 `src/data/ruling-threshold.ts`，兩者皆為 design 明列。候選 worktree `git status --porcelain` 全程為空，`VERIFY-ONLY` 字樣只出現在 entity 的方法敘述、未進原始碼。
+
+### Findings（新增，依 README 的 Review-finding disposition；未變動任何候選位元組）
+
+我按派工單「若你發現第 N+1 處，記為 finding 提報，不要自行修」辦理。以票內腳本對**AC2 未涵蓋的六條路由**做溢出檢查，`/past` 與 `/present` 檢查 2 FAIL，逐一追源後結論如下。
+
+- **R-1　`/past` 仍缺「該下限已失效」的終點事實，但載體是 `sync-content` 產物，本票結構上碰不到。** 四項證據：（1）`/past` 在 `ALL_PAGES`、**不在 `PUBLIC_PAGES`**，正式發布時外部讀者到不了；（2）團隊模式讀者看到 114憲判1 的案件卡寫「憲法訴訟法十人開會門檻癱瘓憲法法庭，違憲」，有「違憲」而無「已失效」——正是票內 C 級的定義；（3）**未違反任何 AC**：AC2 的路由清單是那六條，且 design 第二小節與 `CLAUDE.md` 第 2 條都把 `src/data/*.json` 排除在掃描與改動之外；（4）觸發證據：`node scripts/check-voided-floor.mjs http://localhost:3271/past` → 檢查 2 FAIL(0)，命中 `十人`（`AUTHORITY=true`、`VOIDED=false`），追源為 `src/data/history.json:637`。**分類：Needs decision**（修它要改 Google 試算表再走 `sync-content` + PR，本票被明令禁止）。promote 條件：`/past` 被列入 `PUBLIC_PAGES`。
+- **R-2　`src/app/past/page.tsx:417`／`:519` 兩處現在式癱瘓敘述，三項檢查結構上都抓不到。** 原文為「現在，這道防線正因為政治僵局面臨癱瘓」與「過去捍衛我們權利的最後防線，正因為政治角力面臨癱瘓危機」，皆為 JSX 硬編。兩句帶持續語彙與停擺語彙，但**句中不含** `憲法法庭|大法官|憲法訴訟法|評議|判決`，故檢查 3 的 `COURT` 條件不成立；也不含門檻語彙或下限數字，故檢查 1／2 不成立。與 B 級同型，但 design 的掃描條件明訂為三組交集（含門檻語彙），故是**設計邊界之外，不是漏掃**。真值亦不像 B1／B2 那樣被一手來源否證——「卡人」那一半仍在（僅 8 位、兩輪提名皆遭否決），「面臨癱瘓危機」未被 115 年 6 則判決直接推翻。**分類：Deferred risk**。promote 條件：`/past` 進 `PUBLIC_PAGES`，或該兩句被收緊成「已停擺」的斷言。
+- **R-3　`/present` 的 3 筆下限數字是正確的，先排除誤報。** 三筆全落在 2025-10-13 錢建榮投書的引文視窗內（`VOIDED=false`、`AUTHORITY=false`），內容是判決前的評論「新修《憲訴法》當然違憲」。**引述一篇有日期的投書不等於主張該門檻是現行法**，不是本票要修的錯誤類型。design 第十一小節第 1 點對 `/present` 的 out-of-scope 判定針對的是 `:18` 的年份與主題錯誤，與這三筆無關。**無須處置**，記此一筆以免下一輪把檢查 2 在 `/past`／`/present` 的 FAIL 誤讀成新缺陷。
+- **R-4　`src/data/ruling-threshold.ts:62` 的註解已過時。** 該處寫「兩個版本共用同一組欄位」，但本檔現在 export 三個句子版本（`:81` 的 JSDoc 自己寫「三個版本」）。成因是這段 JSDoc 自 `RulingThresholdNote.tsx` **逐字搬移**，在原處「兩個版本」是對的。**分類：Polish**，僅開發者可見，且在全站唯一定義處的檔頭，改一個詞即可。
+
+### 方法上的一筆，值得記
+
+我一度自己重寫正規化函式去查 `/present`，得到 0 筆，與腳本回報的 3 筆不符；**錯的是我的複製品，不是腳本**——我手寫的空白字元類沒有等價於腳本的 `[\s  -​　]+`，於是「10 人」沒收斂成「10人」。改為從腳本檔**原樣切出定義區段**重用後，3 筆與腳本一致。這正是本票反覆在講的那件事：第二份實作會無聲分岔。本票把三項檢查收斂成單一可執行定義是對的，而我剛剛親自示範了為什麼。
+
+### Summary
+
+七項 AC 我全部自行重跑，未採信前兩輪的自我回報，基準一律 `cb341af`。AC2 自建 `before`／`after` 兩份副本與兩台 dev server：改動後六路由十八項全 PASS `exit 0`，基線 `exit 1` 且檢查 1 的四筆命中與 design 第 8.4 小節逐字相同，對照關係成立。腳本與票內 8.3 小節 `cmp` 逐字相同（5073 bytes，sha256 一致），五組 regex 原文掃全樹只命中 entity 與腳本兩處，entity 內另一筆是敘述性引文——**「AC 只引用不複製」名副其實**。
+14 處施工與分級處置逐處相符：`:152` 字元級差異只有「持續」→「當時已」、`:151`／`:187` 逐字未動、`:168` 的日期與 `evt-09` 一致且時序錯置已解、B1／B2 整句刪除、四個 quiz 檔的題幹與答案欄位行逐字未動。AC6 是刪除而非換數字，`/future` 全頁中文句差集證實只換了那一句。
+三項負面對照各自且僅各自 FAIL，AC5 的合讀判準亦經施加失敗情境證明可失敗；F-7 的頁級粒度缺口如記載重現（q2 失去子句而 `/quiz/controversy` 仍 `exit 0`），確認為既知、經裁示維持，非新缺陷。F-5、F-7 依授權未動，`:156` 括號文字未動。
+新增四筆 findings 皆在本票 AC 之外：R-1 的載體是 `sync-content` 產物（Needs decision）、R-2 在 design 的掃描邊界之外（Deferred risk）、R-3 是我主動排除的誤報、R-4 是一個詞的過時註解（Polish）。四筆都不構成對 value AC 或保護邊界的實質損害，`/past` 與 `/present` 皆不在 `PUBLIC_PAGES`。
+
+**VERDICT: PASSED**
