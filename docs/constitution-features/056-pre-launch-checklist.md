@@ -1076,7 +1076,7 @@ F-10 修好，且處置比我建議的更正確：**不歸因，而不是換一�
 
 ## Stage Report: implement (cycle 6)
 
-本輪即 captain 2026-09-24 退回後、依「授權修正 `Verified by:` 涵蓋既有寫法變體，不改 AC 要求本身」這句一次性授權執行的那一輪。只處理 F-11。未動 `src/`、build 產物、`layout.tsx`、Next.js 設定、`PresentDetail.tsx`，未跑 `sync-content`。
+本輪即 captain 2026-09-24 退回後、依「授權修正 `Verified by:` 涵蓋既有寫法變體，不改 AC 要求本身」這句一次性授權執行的那一輪。只處理 F-11，全部改動在 commit `9f5724c`。未動 `src/`、build 產物、`layout.tsx`、Next.js 設定、`PresentDetail.tsx`，未跑 `sync-content`。
 
 - DONE: F-11：讓 G-5 的佔位掃描涵蓋既有的寫法變體（無空格 `前端工程師A`、全形空格、簡體 `某学者`／`某大学`、全形 `５個重點` 等，以你 cycle 5 逐行測過的十一個字串為基準），修掉「G-5 以零命中為通過故 fail-open」這個缺陷。依 captain 2026-09-24 的一次性授權，這是改 `Verified by:` 的涵蓋面，**不得改 G-5 要求什麼**。
   `:171` 的 G-5 列與 `:270` 的 Test plan 該列各換上新 pattern；`:186-192` 追加更正補述，原 pattern 逐字保留其中。**字串集合完全沒有變動**——沒有新增任何一個要掃的字串，只是每個既有字串多認了寫法變體。**F-11 非本輪引入**，G-5 自 design 階段即如此，補述與本節都如此記載。
