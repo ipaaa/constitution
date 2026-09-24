@@ -1074,3 +1074,104 @@ AC 變更經逐塊比對確認**只動了 AC-1**，其餘六項逐字未變，�
 AC 變更經七塊逐字比對確認只動 AC-1（三期→四期，保留原文並追加授權註記），其餘六項未變；`node --test` 23 pass／0 fail／1 skip，兩條新測試以突變實測確認可失敗（`coveredCount` 77→79、刪 `c3` 各自轉紅），另加驗 `evidence` 改回 `unverified` 亦轉紅。全頁無任何換算後的人數，`c3` 的未拍板限制被遵守。無回歸。
 
 `f1-1958-drop` 未寫明 1958 是「提高」門檻，判定 implement 不補正確：除了未獲授權，實質上要斷言方向必須跨兩種不同分母比較，正是 `c3` 待拍板的問題，補了會違反頁面自己的克制。該缺漏不致讀者誤判——對照條已把兩段門檻並列，3/4 肉眼即為前三期最高，且頁面只對方向明確的 1993 那次講「放寬」。分類 Polish，升級條件為取得 `c3` 的法學拍板。**AC-3、D5 與 `c3` 法學解讀三項維持未達成。**
+
+## Stage Report: review
+
+我是新的 reviewer，前三輪的結論全部自己重現，不採信自我回報。
+
+- DONE: 逐項重現第十小節 AC1–AC7 的 `Verified by:` 子句
+  **AC-1**：`ERAS` 的四個 `effectiveFrom` 實讀為 `1948-09-16`／`1958-07-21`／`1993-02-03`／`2025-01-23`；四期 `evidence` 皆 `primary-source` 且 `article`／`quotedText`／`sourceUrl` 皆非空。五段條文（四期＋`INTERIM_SEGMENT`）我**自己 `curl` 一手來源逐字比對，五段全部 VERBATIM**（`A0030300` 第 12 條、`A0030159` 的 19580721／19930203／20190104 三個舊版、現行全文）。規格的兩條 1987 正規式我另寫一支掃 13 個檔：0 命中；**再掃真實渲染 HTML 的可見文字：也是 0 命中**。
+  **AC-2**：不讀測試檔，自 `tests/fixtures/interpretation-dates.json` 的 813 筆原始日期獨立重算，全部相符——逐年計數 0 筆不符、合計 813、尖峰 1994 年 37 件；三期 79／233／501 相加 813；年均 8.2843→`8.3`、6.7455→`6.7`、17.3414→`17.3`；倍率先除後進位得 `0.81×`、`2.57×`；邊界年 1993 為 1／20、1958 為 0／2。
+  **AC-3**：`PENDING-CAPTAIN`，未代為宣稱達成。
+  **AC-4**：五項 `FACTORS` 的 `basis`／`basisRef`／`uncertainty`（長度 40–128 字）／`needsRuling` 實讀齊備；真實 HTML 中四個待拍板項各帶「待確認」與拍板者，`f5` 無標記並寫明無須外部拍板；`ThresholdChart` 及其子元件 0 處 import `FACTORS`。
+  **AC-5**：`current` 期 `meanPerYear === null`、`totalCount 0`；真實 HTML 有 `<pattern id="threshold-hatch">` 定義與 `fill="url(#…hatch…)"` 引用與「無釋字資料」；`series === 'judgment'` 的 2022–2026 不進任何年均。
+  **AC-6**：未跑全量 250 秒版本，改抽三個端點實連比對——釋字第 1／80／813 號的 `發布日期` 與 fixture 全部 MATCH，第 813 號 `id` 仍為 `325335`（通式例外仍在）；fixture 自身 1–813 無缺號。
+  **AC-7**：`discussions.json` `4071978a…`、`history.json` `4d1992e3…` 與 main blob 相同，**`npm run build` 之後再測仍相同**且 `git status` 乾淨；`git diff main...HEAD -- package.json` 為空，`build` 仍是 `next build`；`rm -rf .next` 後 `npx tsc --noEmit` exit 0、`npm run build` exit 0（`/past/thresholds` 列為靜態預渲染），未遇 dispatch 提到的假性失敗。
+- DONE: 確認 AC-1 是唯一被授權的 AC 變更，其餘六項逐字未變
+  我用**design 階段的原始 commit `497da2b`**（不是 verify 用的 cycle-1 基線）切出七個 AC 區塊逐塊字串比對：AC-2（784 字元）／AC-3（614）／AC-4（473）／AC-5（321）／AC-6（360）／AC-7（246）**六項 IDENTICAL**，`changed == ['AC-1']`，且 AC-1 的差異只有「三期→四期」與四行授權註記，原文保留。
+- DONE: 以真實渲染 HTML 驗證，未暫改候選檔
+  以 `renderToStaticMarkup` 渲染 `src/app/past/thresholds/page.tsx` 整棵元件樹（`next/link` 以 stub 代換），得 **63496 bytes、可見文字 5937 字**。渲染腳本寫在 `tests/` 下、跑完即刪，**候選位元組與 git HEAD 全程未動**（`git status` 前後皆乾淨）。逐項比對：三項限制全部現身且未摺疊（`<details>`／`<summary>` 出現 0 次）、`c3` 帶「待確認·法學背景審閱者」；釋字第 1、2 號三處標示（圖下註腳／對照條 `c2` 但書／1949 tooltip）全部在；「資料來源」同列 `A0030159` 與 `A0030300` 並註明 1952-04-16 修正版；R7 三項邊界全部寫在頁上；`<desc id="threshold-chart-desc">` 含四期年均。
+- DONE: 全頁確無換算後的人數
+  掃可見文字的 `[0-9一二三四五六七八九十兩]{1,3}\s*人`，**8 處命中全部屬 `current` 期（10 人／9 人）或其條文原文**，規則期附近 0 命中。全頁不含「1/2」也不含「二分之一」（`-translate-x-1/2` 那類 class 不進可見文字）。`c3` 的未拍板限制被遵守。
+- DONE: 依實際交付行為查核 `## Documentation impact` 每一筆
+  `實作後更新` 四筆（`architecture.md`／`design-system.md`／`tech-stack.md`／`AGENTS.md`）全部完成且內容正確；`tech-stack.md` 以加註日期的補述追加、不改寫原文，符合 `AGENTS.md`。`AGENTS.md` 新增的「`.json` 不改、`.ts` 可改」判準我實查 `src/data/` 核對過：只有 `discussions.json`、`history.json` 兩個 `.json` 且都是同步產物，其餘皆手寫 `.ts`，判準成立。`不更新` 一節全部遵守——`health-check/`、`content-rescue/`、`_archive/`、`meetup-chats/`、`content-pipeline/`、`constitution-features/README.md` **0 個檔被動到**，無 `record` 文件被改寫。**唯一未達成的是 `docs/INDEX.md`：見下方 F1。**
+- DONE: 評估程式品質與回歸
+  ESLint 對本票全部檔案 0 error。元件品質良好：`matchMedia` 初值固定為 false 再於 effect 校正避開 hydration 警告、斷點切換用衍生值而非 effect 改 state、`useMemo`／`useCallback` 用得其所、`aria-expanded` 與 `role="img"`／`<title>`／`<desc>` 齊備、手寫 SVG 沿用 `JusticeTermTimeline.tsx` 的 `viewBox` 做法且未新增任何相依。無回歸：78 列逐年計數 0 筆不符、內容產線兩檔與 `package.json` 不動、建置與型別檢查皆 exit 0。`metadataBase` 建置警告為既有現象（多個既有頁面都有 openGraph images），非本票造成。surface 為 **+2806 淨行（不含本票流程記錄）vs 估算 +1380 ±40%（828–1932）**，超出上緣約 45%；我逐檔比對估算表，**18 個計畫內檔案全部各自小幅超出，另加 2 支小型支援檔**（`ChartText.tsx` 55 行、`tests/tsx-loader.mjs` 71 行，皆在報告中說明且不新增相依），無計畫外路由、無新相依——**判定為估算漏列，非 scope creep**，與 verify cycle 1 的結論一致。
+- DONE: 確認累積的未結項都正確留在票內
+  四項全部在，無一悄悄消失：AC-3 朗讀測試（`PENDING-CAPTAIN`，AC 原文未變）、D5 視覺檢查（`## 需外部拍板的項目` 含 2026-09-23 追記）、`c3` 法學解讀（D1 補述第 3 項＋`RULES_ERA_CAVEATS` 的 `needsRuling: 'legal-reviewer'`，且渲染得出來）、`f1-1958-drop` 未寫方向（implement 留裁量、verify 判 Polish 並寫明升級條件）。D3（會議「1987」原意）仍掛 captain。D2 已實質結案——我自行核對 2019-01-04 版第 30 條為 VERBATIM，站上照實顯示且未標「未確認」，處置正確。
+- DONE: 獨立複驗 cycle 2 的核心事實
+  `LawHistory.aspx?pcode=A0030300` 我自己抓到的沿革恰為三筆：民國 37/09/16 制定公布全文 21 條、**41/04/16 修正公布第 8、12、15 條**（第 12 條確為該次修正的三條之一）、107/07/31 廢止；`LawOldVerList.aspx?pcode=A0030300` 回「查無資料」且頁面註明只提供民國 90 年 4 月以後的舊條文，**1948 原始版確實取不到**。77／79 的切分自 813 筆原始日期獨立重算：規則期 79 筆中早於 `1952-04-16` 的恰為釋字第 1、2 號（皆 1949-01-06），其餘 77 筆自釋字第 3 號（1952-05-21）起算。三項限制全部有第一手根據。
+- DONE: `node --test` 實跑並確認測試非空轉
+  23 pass／0 fail／1 skip（skip 為未設 `THRESHOLD_LIVE` 的 AC-6）。AC-1 的 1987 測試帶非空轉守衛（斷言 `YEARS` 的 1987 仍為 9 件），AC-2 全部自 fixture 重算而非吃資料模組宣告值——**我另以完全獨立的腳本重算過同一批數字，與測試結論一致**，因此不是兩邊同源的恆真比對。
+- FAILED: `docs/INDEX.md` 的必要更新未完成（F1，見下節）
+  `git diff main...HEAD -- docs/INDEX.md` 為空，sha256 與 main 相同（`0eaa7cb4e60dfcb0`）。
+
+### F1 — `docs/INDEX.md` 未更新（Material／本票所有）
+
+`## Documentation impact` 把 `docs/INDEX.md` 列了**兩次**（`現在更新` 與 `實作後更新`），兩次都未執行。
+
+四項證據欄位：
+
+- **已發布使用者與正常流程**：協作者或下一個 agent 打開 `docs/INDEX.md`——`AGENTS.md` 明定「不確定去哪找就看這份」——查哪些文件是現況。
+- **可觀察的損害**：`docs/INDEX.md:39,47,48,49` 四列的「最後查核」都寫 `2026-09-01`，但本分支在 2026-09-21／23 為這四份 `evergreen` 文件各加了新章節。索引低報了它們的更新時間。`AGENTS.md` 自己寫「過時的 evergreen 文件是危險的」。
+- **受影響的價值 AC 或不可逾越邊界**：**不涉及任何 AC**，AC-1 至 AC-7 都不管文件索引。也**未觸犯 `AGENTS.md` 的索引硬規則**——該規則的觸發條件是「新增或刪除文件」，本票 0 個新增、0 個刪除。受影響的是本票**自己核可的交付範圍**，以及 `review` 階段定義明列的 Output。
+- **觸發證據**：`git diff main...HEAD -- docs/INDEX.md` 空；`docs/INDEX.md` 與 main sha256 相同；`AGENTS.md`、`docs/project/{architecture,design-system,tech-stack}.md` 四檔確在本分支 diffstat 內。
+
+分別提出（**本階段只做唯讀調查，未動任何候選位元組，未改 AC，未重跑 reviewer**）：
+
+- **Materiality：Material**，但幅度小——是「核可範圍內的交付項未交付」，不是正確性缺陷，且損害僅限協作者查文件，**與網站讀者無關**。
+- **Task ownership：本票所有。** 這是例行文件編輯，不需任何人拍板。
+- **Disposition 建議：fix，範圍極窄**——把上述四列的「最後查核」改為 `2026-09-23`。
+- **一項要請 captain 注意的設計缺口**：`現在更新` 那句「`docs/INDEX.md`：本 feature 狀態為 `plan`」**照字面做不到**。`docs/INDEX.md` 對 workflow entity 是**目錄層級**索引（第 96 列：「33 個封存 entity、7 個進行中、6 份 debrief」），沒有逐票的列可以填狀態。design 寫這句時沒有對過 INDEX 的實際結構。建議由 captain 決定：改 `## Documentation impact` 的措辭，或改 INDEX 的索引粒度——**不要為了滿足字面而替單一票破例加一列**，那會讓另外 40 個 entity 的索引方式不一致。
+
+### F2、F3 — 資料模組的兩處陳述已被 cycle 2 推翻但未更新（皆 Polish／本票所有）
+
+- **F2：`src/data/threshold-analysis.ts:14`** 檔頭「三條不可違反的規則」第 3 條仍寫「規則期的門檻數字沒有第一手依據，**不得填**」。cycle 2 已填入 `article`／`quotedText`／`sourceUrl` 並把 `evidence` 改為 `primary-source`。同檔第 252–259 行的 `ERAS` 說明有交代這次改變，**但檔頭沒有**——維護者讀檔頭會以為現行資料違反了自己宣告的不變量。
+- **F3：`src/data/threshold-analysis.ts:92-93`** `LAW_HISTORY_URL` 在 `src/`、`tests/`、`scripts/` **全域 0 處引用**（dead export），且其註解「規則期唯一能查到的一手記載（只有制定日，沒有條文）」已被 cycle 2 推翻（我實抓複驗：`A0030300` 的沿革頁＋全文頁就有條文），它指的 `pcode=A0030159` 對規則期也是錯的 pcode。
+
+兩項**都不進渲染輸出**，無當前使用者可見損失，無受保護邊界受威脅 → **Polish**。建議 disposition：與 F1 同一輪順手修掉，或 decline。
+
+### F4 — AC-1 的正規式守衛剛好漏掉頁面上唯一真正的 1987 門檻句（Deferred risk）
+
+`FACTORS` 的用詞被系統性改寫：規格表原文的「門檻」在站上變成「通過條件」「表決條件」「法規變動」。**這個改寫是被 AC-1 逼出來的，不是任意發揮**——規格 `## 土黃色區起伏因素的交付形式` 要求「照下表原文填入 `FACTORS`」，但表中 `f2` 原文「會議記錄的『1987 **降**門檻→暴增』」會命中 AC-1 的 `/1987[^0-9]{0,12}(門檻|三分之二|降|放寬)/`。**照原文填就會讓 AC-1 的測試變紅。規格自己互相矛盾，implement 選了讓 AC 過、把語意講對的那條路。**
+
+站上實際的句子是：「會議記錄說 1987 年那次修法把表決條件改低、並因此造成案件暴增；實際的修法公布日是 1993-02-03，且案件量自 1986 年起已在回升，會議的時間順序不成立。」——**歸屬清楚、當場反駁、事實正確，AC-1 的判準本身有達成**（頁面沒有「把門檻變動寫成 1987 年」）。
+
+風險在守衛而不在現況：這句用的「表決條件」「改低」都在正規式的詞彙之外，**全頁唯一讓 1987 與門檻變動主張同時出現的地方，正好是測試看不到的地方**。日後若有人刪掉後半的反駁子句，只留前半，AC-1 仍會全綠而頁面已經在斷言錯誤因果。
+
+- **升級為 Material 的條件**：任何削弱或移除 `f2-ramp-precedes` 的 `uncertainty` 中「實際的修法公布日是 1993-02-03，且案件量自 1986 年起已在回升，會議的時間順序不成立」這段反駁的編輯。
+- **要真正修好必須擴充 AC-1 的詞彙表**（加入「通過條件」「表決條件」「改低」），那是 **AC 變更，只有 captain 能決定**。本輪不動。
+
+### F5 — 用詞不固定，違反 `AGENTS.md` 的寫作規範（Polish）
+
+真實 HTML 可見文字中，同一個概念用了五種詞：門檻 13 次、表決門檻 3 次、通過條件 3 次、表決條件 1 次、法規變動 2 次。`f3-1994-peak` 甚至在同一張卡片裡「事實陳述」用通過條件、「不確定的是什麼」用門檻。`AGENTS.md` 的寫作規範明列「用詞固定 —— 同一個概念只用同一個詞」。
+
+成因與 F4 同源（AC-1 的正規式）。受眾是非法學背景讀者，**若 AC-3 朗讀測試在理解度上不如預期，這是第一個該查的候選原因**。無當前可證的使用者損失 → Polish。
+
+### 三項未達成的驗證項（原樣留存，gate 必須呈現）
+
+1. **AC-3 朗讀測試**（D4）—— `PENDING-CAPTAIN`。3 位非法學受測者、三道不提示的問題，worker 無法自證。本輪未代為宣稱達成。
+2. **D5 行動版／桌機視覺檢查** —— 本環境無可用無頭瀏覽器，依 dispatch 指示未再嘗試。規則期分界線標籤由約 10 字變 30 字後會不會與 1993-02-03 那條相撞，**只有推算，沒有人真的看過**。
+3. **`c3` 的法學解讀** —— 「在中央政府所在地全體大法官」與「總額」「現有總額」是否可比，未拍板。在此之前站上不得出現換算後的人數（我已實測 0 命中），也不得斷言 1958 那次門檻變動的方向。
+
+### Verdict
+
+**REJECTED。**
+
+**唯一的阻擋項是 F1**，而且它很窄：`## Documentation impact` 把 `docs/INDEX.md` 列為必要更新列了兩次，兩次都沒做；`review` 階段定義又明文要我逐筆查這一節。修法是四列日期。
+
+我必須同時把減輕情節講清楚，讓 gate 能便宜地推翻我：F1 **不涉及任何 AC**，**也沒有觸犯 `AGENTS.md` 的索引硬規則**（該規則的觸發條件是新增或刪除文件，本票兩者皆 0），損害只及於協作者查文件的正確性，**與網站讀者無關**。而且 `現在更新` 那句照字面做不到——INDEX 對 entity 是目錄層級索引，沒有逐票的列。**若 captain 認為不值得一輪，改 `## Documentation impact` 的措辭比改索引粒度乾淨，我不反對。**
+
+除 F1 之外，**這份 diff 的實質內容我全部重現、全部成立**。五段條文我自己 curl 逐字核對全部 VERBATIM；AC-2 的每個數字我不讀測試檔、自 813 筆原始日期獨立重算全部相符；三項限制、釋字第 1、2 號三處標示、兩個 pcode 的來源清單都在**真實渲染 HTML（63496 bytes）**裡而不是只在資料中；全頁無任何換算後的人數；無回歸、建置與型別檢查皆 exit 0、內容產線兩檔在建置後仍與 main 相同。AC 變更我拿**design 階段的原始 commit** 比對，確認只動 AC-1、其餘六項逐字未變。
+
+`f1-1958-drop` 我同意 verify 的裁量並補一個理由：要斷言 1958 那次的方向，得拿「在中央政府所在地全體大法官」的分母去比「總額」的分母，那正是 `c3` 待拍板的問題——補了會違反頁面自己剛宣告的克制。維持 Polish。
+
+F4 是我這輪新提的，值得 captain 看一眼：**規格內部矛盾**（「照原文填入 `FACTORS`」與 AC-1 的正規式無法同時滿足），implement 的解法正確，但代價是 AC-1 的守衛對頁面上唯一真正的 1987 句子失效。要修必須擴充 AC-1 詞彙表，那是 captain 的權限。
+
+### Summary
+
+七項 AC 的 `Verified by:` 全部自行重現，不採信前三輪的自我回報：五段條文自行 curl 逐字核對皆 VERBATIM、AC-2 的所有數字自 813 筆 fixture 獨立重算皆相符、AC-6 抽三個端點實連皆 MATCH、AC-7 在 `rm -rf .next` 後重跑建置與型別檢查皆 exit 0 且內容產線兩檔 sha256 不變。AC 變更以 **design 原始 commit** 為基線逐塊比對，確認 `changed == ['AC-1']`、其餘六項逐字未變。三項限制、釋字第 1、2 號三處標示、兩個 pcode 來源、R7 三項邊界，全部在自行渲染的 63496 bytes 真實 HTML 裡確認，且全頁無任何換算後的人數。候選位元組全程未動。
+
+判 **REJECTED**，阻擋項只有 F1——`docs/INDEX.md` 的必要更新未執行（四列「最後查核」仍停在 `2026-09-01`，而四份 evergreen 文件本分支都改過）。F1 不涉 AC、不觸犯 `AGENTS.md` 索引硬規則，且該條 Documentation impact 有一半照字面做不到（INDEX 是目錄層級索引，沒有逐票的列），gate 可以便宜地推翻我。
+
+另記四項不阻擋的發現：F2／F3 資料模組檔頭與 `LAW_HISTORY_URL` 的陳述已被 cycle 2 推翻但未更新（Polish）；**F4 —— 規格自身矛盾使 AC-1 的正規式守衛對頁面上唯一的 1987 門檻句失效**，現況文字正確但無測試保護，要修必須由 captain 擴充 AC-1（Deferred risk）；F5 用詞不固定，若 AC-3 理解度不如預期應優先查此（Polish）。AC-3、D5、`c3` 法學解讀三項維持未達成，原樣留存。
