@@ -1613,7 +1613,7 @@ T1 證明這條檢查會叫，不是空的。T2／T3 證明它叫的範圍比它
 
 ## Stage Report: implement (cycle 8)
 
-本輪處理 review 判 REJECTED 的四筆：F-15、F-16（含那筆觀察）、F-17、F-18。未動 `src/`、build 產物、`layout.tsx`、`next.config.ts`、`PresentDetail.tsx`（`git diff -- src/ next.config.ts package.json` 為空），未跑 `sync-content`。
+本輪處理 review 判 REJECTED 的四筆：F-15、F-16（含那筆觀察）、F-17、F-18，全部改動在 commit `952962d`。未動 `src/`、build 產物、`layout.tsx`、`next.config.ts`、`PresentDetail.tsx`（`git diff -- src/ next.config.ts package.json` 為空），未跑 `sync-content`。
 
 **先講一個範圍差異，不埋著。** dispatch 寫「本輪預期 `git diff` 只有本票一個檔案」，但那筆觀察授權處置 `TODO.md` 的兩份 G-6 副本，而我選的處置必須改 `TODO.md`。**本輪實際改了兩個檔案**：本票與 `docs/health-check/TODO.md`。理由見下方「那筆觀察」一節。
 
