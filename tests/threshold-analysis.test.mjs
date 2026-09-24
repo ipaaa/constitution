@@ -27,6 +27,7 @@ const { default: EraComparisonStrip } = await import('@/components/threshold-ana
 const { default: OchreBandFactors } = await import('@/components/threshold-analysis/OchreBandFactors');
 const { default: ChartAxes } = await import('@/components/threshold-analysis/ChartAxes');
 const { default: ThresholdBoundary } = await import('@/components/threshold-analysis/ThresholdBoundary');
+const { default: ThresholdTooltip } = await import('@/components/threshold-analysis/ThresholdTooltip');
 const { default: ThresholdsPage } = await import('@/app/past/thresholds/page');
 
 /**
@@ -36,8 +37,38 @@ const { default: ThresholdsPage } = await import('@/app/past/thresholds/page');
  * 25 條測試全綠。守衛宣稱保護的是「站上」，涵蓋面就必須是整頁。
  */
 const renderPage = () => renderToStaticMarkup(createElement(ThresholdsPage));
-const pageVisibleText = () =>
-  renderPage().replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+const visibleTextOf = (html) => html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+
+/**
+ * 只在互動後才出現的渲染狀態。
+ *
+ * `renderPage()` 的 `hoveredYear` 恆為 null，**`ThresholdTooltip` 因此完全不在它的輸出裡**。
+ * 「站上不得出現 X」的守衛若只看整頁渲染，浮層就是一塊永遠掃不到的盲區 ——
+ * 與 F8 同型，只是這次漏掉的是頁面的一個**狀態**而不是一塊子樹。
+ * 浮層渲染的是 `era.ruleSummary`、逐年件數與換法說明，正好是門檻用語最密集的地方。
+ *
+ * 歸期規則照抄 ThresholdCaseAnalysis 的 hoveredEras：憲判字年份不歸任何釋字門檻時期，
+ * 換法當年由兩期共用。照抄是刻意的 —— 守衛要掃的是讀者真的看得到的那些浮層，
+ * 不是每一期硬湊給每一年。
+ */
+const erasForYear = (year) => {
+  if (year.series !== 'interpretation') return [];
+  return ERAS.filter((era) => {
+    const from = Number(era.effectiveFrom.slice(0, 4));
+    const to = era.effectiveTo === null ? Infinity : Number(era.effectiveTo.slice(0, 4));
+    return year.year >= from && year.year <= to;
+  });
+};
+const renderTooltips = () =>
+  YEARS.map((y) =>
+    renderToStaticMarkup(
+      createElement(ThresholdTooltip, { year: y, eras: erasForYear(y), x: 50, y: 50 }),
+    ),
+  );
+
+/** 站上讀者看得到的全部 HTML：整頁外殼 ＋ 每一個年份的浮層狀態。 */
+const siteHtmlParts = () => [renderPage(), ...renderTooltips()];
+const siteVisibleText = () => siteHtmlParts().map(visibleTextOf).join(' ');
 
 const {
   ERAS,
@@ -104,6 +135,39 @@ const SCANNED_SOURCES = [
 /** 去掉註解，讓「不得 import FACTORS」這類說明文字不會被當成真的引用。 */
 const stripComments = (src) =>
   src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^[ \t]*\/\/.*$/gm, '');
+
+const SPEC_PATH = 'docs/constitution-features/012-threshold-case-analysis.md';
+const SPEC = fs.readFileSync(path.join(ROOT, SPEC_PATH), 'utf8');
+
+/**
+ * 取出規格檔裡某一條 AC 的區塊（自 `**AC-n —` 起，到下一條 AC 的粗體標題為止）。
+ *
+ * 切在 AC 邊界上是必要的：stage report 會大段引述 AC 的內容，
+ * 整檔搜尋會抓到歷史記錄而不是現行條文。
+ */
+function acBlock(id) {
+  const start = SPEC.indexOf(`**${id} — `);
+  assert.notEqual(start, -1, `${SPEC_PATH} 找不到 ${id}`);
+  const rest = SPEC.slice(start + 3);
+  const end = rest.search(/\n\*\*AC-\d+ — /);
+  return end === -1 ? rest : rest.slice(0, end);
+}
+
+/**
+ * 自 AC 區塊裡**行首**的 `前綴：…。` 定義行解析出一份清單。
+ *
+ * 只認行首是刻意的：AC-1 的括號補述裡另有「原條文記的是「不成立／…」」這種歷史引用，
+ * 前綴不同因此不會誤抓。並斷言定義行**恰為一行** —— 不唯一就代表條文有兩份互相矛盾的清單，
+ * 那本身就是缺陷，不該讓測試自己挑一份。
+ */
+function listFromSpec(block, prefix) {
+  const hits = [...block.matchAll(new RegExp(`^${prefix}([^。]*)。`, 'gm'))];
+  assert.equal(hits.length, 1, `${SPEC_PATH} 的「${prefix}」定義行應恰為 1 行，實際 ${hits.length} 行`);
+  return hits[0][1]
+    .split(/[／、\n]+/)
+    .map((s) => s.replace(/[`\s]/g, ''))
+    .filter(Boolean);
+}
 
 // ---------------------------------------------------------------------------
 // AC-1 — 四個門檻時點與法規公布日一致，且沒有一處把門檻變動寫成 1987 年
@@ -200,7 +264,13 @@ test('AC-1 沒有一處把門檻變動寫成 1987 年', () => {
   // 純字串 grep 1987 會恆真失敗：1987 必然是 YEARS 的年份鍵（1987 年 9 件）。
   // 因此查的是「1987 與門檻主張同句」這個形狀，再要求該句必須歸屬且反駁。
   // 掃整頁（含 page.tsx 外殼），不只元件子樹 —— AC-1 宣稱的是「頁面」。
-  const scanned = [...SCANNED_SOURCES, ['<rendered page>', htmlToText(renderPage())]];
+  // 並且掃浮層：整頁渲染的 hoveredYear 恆為 null，ThresholdTooltip 不在它的輸出裡，
+  // 而浮層正是門檻用語最密集的地方。字面字串本來就在 SCANNED_SOURCES 裡，
+  // 這一段補的是**渲染時才相鄰**的那種組合 —— 分開看都無害，湊在一句就成了主張。
+  const scanned = [
+    ...SCANNED_SOURCES,
+    ...siteHtmlParts().map((html, i) => [i === 0 ? '<rendered page>' : `<rendered tooltip ${i}>`, htmlToText(html)]),
+  ];
 
   let claimShapedCount = 0;
   for (const [file, body] of scanned) {
@@ -229,6 +299,44 @@ test('AC-1 沒有一處把門檻變動寫成 1987 年', () => {
   const yearKeySegments = segmentsOf(dataSource).filter((seg) => /year: 1987\b/.test(seg));
   assert.equal(yearKeySegments.length, 1);
   assert.equal(claimShapedSegments(yearKeySegments[0]).length, 0);
+});
+
+/**
+ * 三份清單的條文與程式碼不得分岔。
+ *
+ * F11 就是這條分岔：反駁清單在程式碼裡改掉了，AC-1 的條文沒跟著改。
+ * review 階段規定 reviewer 以**重現 `Verified by:`** 來驗 AC，照舊條文重現會重建剛關掉的洞。
+ * 那一次是靠 reviewer 手工比對三份清單抓到的，躺了一輪；在此之前沒有任何東西守著這件事。
+ *
+ * 守衛的涵蓋面必須對齊它宣稱的東西 —— 而 AC-1 的守衛宣稱的正是**條文寫的那份清單**。
+ * 因此把條文當成期望值、程式碼當成實際值來比。任何一邊單獨改動都會紅。
+ */
+test('AC-1 條文列的三份清單與程式碼逐項相同', () => {
+  const block = acBlock('AC-1');
+  const specTerms = listFromSpec(block, '詞彙表擴充為：');
+  const specAttribution = listFromSpec(block, '歸屬標記：');
+  const specRebuttal = listFromSpec(block, '反駁標記：');
+
+  // 先確認解析到的是真的清單而不是空陣列 —— 解析壞掉時兩邊都空會變成假綠。
+  assert.equal(specTerms.length, 20);
+  assert.equal(specAttribution.length, 4);
+  assert.equal(specRebuttal.length, 5);
+
+  // Set 比對，不依賴排序。（中文字串不得用 sort／uniq 判定：
+  // 本機預設 locale 下 BSD sort／uniq 會把不同的中文字串視為相等，而且不報錯。）
+  assert.deepEqual(new Set(specTerms), new Set(THRESHOLD_TERMS));
+  assert.deepEqual(new Set(specAttribution), new Set(ATTRIBUTION_MARKERS));
+  assert.deepEqual(new Set(specRebuttal), new Set(REBUTTAL_MARKERS));
+  // 清單內不得有重複項，否則 Set 比對會掩蓋掉數量差異。
+  assert.equal(new Set(THRESHOLD_TERMS).size, THRESHOLD_TERMS.length);
+  assert.equal(new Set(ATTRIBUTION_MARKERS).size, ATTRIBUTION_MARKERS.length);
+  assert.equal(new Set(REBUTTAL_MARKERS).size, REBUTTAL_MARKERS.length);
+
+  // 條文明文寫過「刻意不收」的兩項，不得又被收回去。
+  for (const excluded of ['1993-02-03', '時間順序']) {
+    assert.equal(REBUTTAL_MARKERS.includes(excluded), false, `反駁標記不得收「${excluded}」`);
+  }
+  assert.equal(ATTRIBUTION_MARKERS.includes('會議的'), false);
 });
 
 test('AC-1 沒有任何時期的起訖日以 1987 開頭', () => {
@@ -384,19 +492,86 @@ test('AC-4 OchreBandFactors 為每個待拍板項目渲染待確認標記與拍�
   assert.ok(html.includes('無須外部拍板'));
 });
 
+/** 一個元件檔以相對路徑 import 的本地元件。 */
+function localImportsOf(relFile) {
+  const code = stripComments(fs.readFileSync(path.join(ROOT, relFile), 'utf8'));
+  const dir = path.dirname(relFile);
+  return [...code.matchAll(/from '(\.\/[^']+)'/g)].map((m) => `${path.join(dir, m[1])}.tsx`);
+}
+
+/** 自 import 圖遞迴求出一個元件的子元件閉包（含自己）。 */
+function subtreeOf(entry) {
+  const seen = new Set();
+  const stack = [entry];
+  while (stack.length > 0) {
+    const file = stack.pop();
+    if (seen.has(file)) continue;
+    seen.add(file);
+    stack.push(...localImportsOf(file));
+  }
+  return seen;
+}
+
+/**
+ * AC-4 的「不得成為圖上註解」。
+ *
+ * 原本是一份**寫死的六個檔名清單**。它此刻是對的，但它不會跟著它宣稱的東西走：
+ * 宣稱是「ThresholdChart.tsx **及其子元件**」，實際是一份不會自己長大的名單。
+ * 新增一個圖的子元件，名單不會知道 —— 與 F4「詞彙表只認幾個寫法」同型，
+ * 只是這次被寫死的是檔名而不是詞彙。改為自 import 圖遞迴求閉包，涵蓋面就跟著宣稱走。
+ *
+ * 另外把 ThresholdTooltip 一併納入：它不是 ThresholdChart 的 import 子節點，
+ * 而是 ThresholdCaseAnalysis 疊在圖上的浮層（`absolute z-30`，錨在長條座標上）。
+ * 按檔案關係它在名單外，按 AC-4 真正要守的「不得成為圖上註解」它就是圖上註解。
+ */
 test('AC-4 圖元件與其子元件不 import FACTORS', () => {
-  const chartFiles = [
+  const chartFiles = new Set([
+    ...subtreeOf('src/components/threshold-analysis/ThresholdChart.tsx'),
+    // 疊在圖上的浮層，按語意屬於「圖上」。
+    ...subtreeOf('src/components/threshold-analysis/ThresholdTooltip.tsx'),
+  ]);
+
+  // 閉包求解必須真的走到東西。只剩進入點代表 import 解析壞了，而不是圖很乾淨。
+  for (const known of [
     'src/components/threshold-analysis/ThresholdChart.tsx',
     'src/components/threshold-analysis/ThresholdBand.tsx',
     'src/components/threshold-analysis/ThresholdBoundary.tsx',
     'src/components/threshold-analysis/SeriesBreakLine.tsx',
     'src/components/threshold-analysis/ChartAxes.tsx',
     'src/components/threshold-analysis/ChartText.tsx',
-  ];
+    'src/components/threshold-analysis/ThresholdTooltip.tsx',
+  ]) {
+    assert.ok(chartFiles.has(known), `import 閉包沒有走到 ${known}`);
+  }
+
   for (const file of chartFiles) {
     const code = stripComments(fs.readFileSync(path.join(ROOT, file), 'utf8'));
     assert.equal(/\bFACTORS\b/.test(code), false, `${file} 在程式碼裡提到 FACTORS`);
   }
+});
+
+/**
+ * 反向守：**哪些檔案可以碰 FACTORS**，指名列出。
+ *
+ * 上面那條是「這些檔案不准碰」，它的涵蓋面是一個集合，再怎麼推導都只是那個集合。
+ * 這一條把問題倒過來問 —— 全部被掃描的原始碼裡，提到 FACTORS 的檔案必須**恰為**這幾個。
+ * 新增任何一個檔案並在裡面引用 FACTORS，不論它在不在圖的子樹底下，這條都會紅。
+ */
+test('AC-4 只有資料模組與協調者可以引用 FACTORS', () => {
+  const referencing = SCANNED_SOURCES.filter(([, body]) => /\bFACTORS\b/.test(stripComments(body)))
+    .map(([file]) => file);
+  assert.deepEqual(
+    new Set(referencing),
+    new Set([
+      // 定義處。
+      'src/data/threshold-analysis.ts',
+      // 唯一的協調者，把 FACTORS 交給獨立段落 OchreBandFactors。
+      'src/components/threshold-analysis/ThresholdCaseAnalysis.tsx',
+    ]),
+  );
+  // 獨立段落自己不 import FACTORS，只收 props —— 這是刻意的，資料流只有一條。
+  const ochre = SCANNED_SOURCES.find(([f]) => f.endsWith('OchreBandFactors.tsx'))[1];
+  assert.equal(/\bFACTORS\b/.test(stripComments(ochre)), false);
 });
 
 // ---------------------------------------------------------------------------
@@ -561,12 +736,23 @@ test('D1 規則期已補上一手條文，且網站仍然不寫出 1/2', () => {
   );
   assert.ok(rules.sourceUrl.includes('pcode=A0030300'));
 
-  const html = renderToStaticMarkup(
-    createElement(EraComparisonStrip, { items: STATS, selectedEraId: null, onSelectEra: () => {} }),
-  );
   // 「不寫出 1/2」的決定仍然成立，而且已證明是對的：實際條文是三分之二出席＋過半數同意。
-  assert.equal(html.includes('1/2'), false);
-  assert.equal(html.includes('二分之一'), false);
+  //
+  // D1 的處置明文是「不得在**網站**上寫出「1/2」這個數字」。這裡原本只渲染 EraComparisonStrip
+  // 一個元件（F12）：把 `1/2` 與「二分之一」兩種寫法注進 page.tsx 的頁面外殼，25 條全綠。
+  // 宣稱是站級，涵蓋面就必須是站級 —— 整頁外殼加上只在 hover 才出現的浮層。
+  //
+  // 寫法也不只兩種。守的是「這個數字」而不是「這串字元」，因此連全形斜線與分數符號一起收。
+  // 「過半數」刻意不收：那是條文原文（「過半數之同意」），收了會把正確的引述判成違規。
+  const HALF_NOTATIONS = ['1/2', '1／2', '１/２', '１／２', '½', '二分之一'];
+  const siteText = siteVisibleText();
+  for (const notation of HALF_NOTATIONS) {
+    assert.equal(siteText.includes(notation), false, `站上不得寫出「${notation}」`);
+  }
+  // 掃到的必須是真的頁面文字。渲染壞掉會讓上面整組變成空轉。
+  assert.ok(siteText.includes(rules.quotedText), '站上文字裡找不到規則期條文原文');
+  assert.ok(siteText.includes('2/3'), '站上文字裡找不到正確的 2/3 寫法');
+
   // 也不得把限定語改寫成「總額」。
   // 原本這裡還有一條 `/規則期[\s\S]{0,200}總額/.test(rules.ruleSummary) === false`。
   // 那條永遠成立：正規式要求 ruleSummary 裡出現「規則期」，但「規則期」是 label 不是
@@ -576,6 +762,28 @@ test('D1 規則期已補上一手條文，且網站仍然不寫出 1/2', () => {
   // 那就不只 ruleSummary 一個欄位不能混用。
   assert.equal(rules.ruleSummary.includes('總額'), false);
   assert.ok(rules.ruleSummary.includes('在中央政府所在地全體大法官'));
+
+  // 上面那一行只管 ruleSummary 一個欄位，但它宣稱的是「不只 ruleSummary 一個欄位不能混用」。
+  // 規則期在站上呈現什麼，全部來自這個物件的字串欄位 —— label、statute、quotedText、
+  // 三項 caveats 的 text 都會渲染出去。因此改成遞迴取出**所有**字串葉節點再逐一檢查：
+  // 日後多一個欄位，涵蓋面自動跟上，不必回來補名單。
+  const stringLeaves = (value) => {
+    if (typeof value === 'string') return [value];
+    if (value && typeof value === 'object') return Object.values(value).flatMap(stringLeaves);
+    return [];
+  };
+  const rulesStrings = stringLeaves(rules);
+  assert.ok(rulesStrings.includes(rules.quotedText));
+  assert.ok(rulesStrings.some((s) => s.includes('不是同一個概念')), 'caveats 沒有被走到');
+  for (const s of rulesStrings) {
+    // 「總額」只准出現在 c3 那句「與後續法規的『總額』『現有總額』不是同一個概念」，
+    // 也就是被引號包住、當成別的法規的用語在講。當成規則期自己的門檻用語就是違規。
+    assert.equal(
+      /總額[^」]{0,6}(出席|同意|之)/.test(s),
+      false,
+      `規則期的欄位把「總額」當成自己的門檻用語：「${s}」`,
+    );
+  }
 
   const rulesTile = renderToStaticMarkup(
     createElement(EraComparisonStrip, {
@@ -661,24 +869,35 @@ test('D2 2022-01-04 至 2025-01-23 的條文已逐字核對，不標未確認', 
  * 唯一可以出現人數的地方是現行憲訴法那一期 —— 它的條文原文本來就寫「十人」「九人」。
  * 把那一期自己的字串從頁面文字裡挖掉之後，**整頁不該再剩下任何人數**。
  */
-const HEADCOUNT_RE = /(?:\d+|[一二三四五六七八九十]+)\s*人/g;
+/**
+ * 守的是「人數」這個語意，不是「阿拉伯數字接一個『人』字」這個字串形狀。
+ *
+ * 原本是 `/(?:\d+|[一二三四五六七八九十]+)\s*人/`。它漏掉的寫法都很平常：
+ * 「兩人」「廿人」「十位大法官」「九名」「１０人」—— 每一個都是換算後的人數，
+ * 每一個都繞得過去。與 F4 同型：宣稱是語意，涵蓋面卻是一份不完整的寫法表。
+ * 量詞補到人／位／名，數字補到全形、〇／零、兩、廿、卅。
+ */
+const HEADCOUNT_RE = /(?:[0-9０-９]+|[零〇一二兩三四五六七八九十廿卅]+)\s*[人位名]/g;
 
 test('c3 站上不得出現換算後的人數', () => {
   const current = eraOf('current');
   // 這三個字串是現行憲訴法自己的用語，人數來自條文原文，不是換算。
   const allowed = [current.label, current.ruleSummary, current.quotedText];
 
-  // 整頁，含 page.tsx 外殼。只渲染元件的版本被 reviewer 用外殼注入打穿過。
-  const pageText = pageVisibleText();
+  // 整站：整頁外殼（只渲染元件的版本被 reviewer 用外殼注入打穿過）
+  // ＋ 只在 hover 才出現的浮層（整頁渲染的 hoveredYear 恆為 null，浮層不在它的輸出裡）。
+  const siteText = siteVisibleText();
   // 先確認允許清單真的有被用到，否則下面的挖除是空轉。
-  for (const a of allowed) assert.ok(pageText.includes(a), `頁面找不到允許字串：${a}`);
+  for (const a of allowed) assert.ok(siteText.includes(a), `站上找不到允許字串：${a}`);
+  // 浮層也必須真的渲染出來，否則多掃的那一段是空的。
+  assert.ok(siteText.includes('換法，前後適用不同門檻'), '浮層的換法說明沒有渲染出來');
 
-  let residue = pageText;
+  let residue = siteText;
   for (const a of allowed) residue = residue.split(a).join(' ');
   assert.deepEqual(
     residue.match(HEADCOUNT_RE),
     null,
-    `除了現行憲訴法的條文原文之外，頁面不得出現人數：${residue.match(HEADCOUNT_RE)}`,
+    `除了現行憲訴法的條文原文之外，站上不得出現人數：${residue.match(HEADCOUNT_RE)}`,
   );
 });
 
