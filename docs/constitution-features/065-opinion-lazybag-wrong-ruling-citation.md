@@ -47,6 +47,10 @@ mod-block:
 
 `src/data/*.json` 為 `sync-content` 產物，依規範不得手改；若需更正須走 SSOT。
 
+### Feedback Cycles
+
+- Cycle 1: AC-defect repair — implement cycle 1 的唯一 FAILED 為 AC-5 本身不可滿足，非施工缺漏；captain 2026-09-24 給出一次性授權「授權修正 `Verified by:` 涵蓋既有寫法變體，不改 AC 要求本身」後修正。surface 1 檔（本票）；本輪 `src/` **零變動**（`git rev-parse HEAD:src` 與 cycle 1 提交後同為 `6a7bad6`）。**基準值更正**：FO 先前依緊接寫法的實測把基準記為 9，**那是錯的**——以容許空白的 regex 實測為 **11**，與 AC-5 原本列出的 11 筆（B4、B6×2、B8、B9×5、B10、B11）逐筆相同。design 寫的 11 是對的，錯的是那條 grep。可失敗性雙向實跑：在 `src/` 暫存副本把 B11（`quizzes/controversy.ts:115`）改成別的號次 → 新寫法 11→10 **轉紅**，舊寫法 9→9 **仍然通過**，證實原寫法對此情境全盲；還原後新寫法回到 11。**另四項 AC 有同型問題，依同一授權一併修正涵蓋面**：AC-1／AC-2／AC-3 的「不含 114憲判1」是**不存在斷言**，固定字串 grep 對加空格寫法全盲——有人寫成 `114 年憲判字第 1 號` 仍會回 0 而**誤判通過**，故三項改用容許空白 regex；AC-4 原用 `head -1` 取第一個命中 chunk、其餘不受檢且無不存在斷言，補上「命中 chunk 數 ＝ 1」與定點殘留檢查。施工時另發現：`.next/static/chunks/` 有 **3 個 chunk 合法含有 114憲判1**（B4／B6／B9／B10／B11 的內容被打包進 timeline、quiz、discussions），故 AC-4 的不存在斷言**不可用全域寫法**（會恆紅），已限定在 `year:"2024",label:"114` 這個定點前綴，實測 0。AC-6／AC-7 未改——其斷言字串無數字、無空白變體，不存在同型問題。**未越界**：`git diff` 的刪除行共 6 行全部是 `Verified by:` 行或 AC-5 的「會失敗的改動」行，**沒有一行 AC 要求被刪改**。七項 AC 以改寫後的指令逐字重跑全部通過；`npx next build` exit 0。
+
 ## Out of scope
 
 不修 `049` 的零出處問題（該票另有範圍，但其第 39 行把誤引當前提繼承，須一併更正）。不修 `docs/design-assets/003-comic-lazybag-114.md:28` 的同型誤引——屬 design-assets workflow，但**該票正在 review gate 上，其判決重點摘要整段建立在此誤引上**，須另行提醒。
