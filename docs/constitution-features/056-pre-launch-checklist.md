@@ -240,7 +240,7 @@ exit $((1-ok))
 
 通過條件：印出 `G-7 PASS` 且離開碼 `0`。三檔任一零命中即失敗；`layout.tsx` 的綁定註解**不在 `robots:` 正上方**也失敗。
 
-> **2026-09-25 更正：原本這裡只有一條 `grep`，它是位置無關的，而它保護的性質是位置相關的。已改為同時檢查相鄰性。原內容保留於下。**
+> **2026-09-24（cycle 8）更正：原本這裡只有一條 `grep`，它是位置無關的，而它保護的性質是位置相關的。已改為同時檢查相鄰性。原內容保留於下。**
 > 原句為：「綁定是否成立，用一條指令查：」，其後為一個 `bash` 區塊，內容逐字為
 > `grep -rn '056-pre-launch-checklist' src/app/layout.tsx docs/health-check/TODO.md AGENTS.md`，
 > 再接一句：「三個檔案各至少一筆命中，即綁定成立；任一檔零命中即為失敗。這條指令進 `## Test plan`，也是 AC-3 的驗收方式。」
@@ -259,11 +259,11 @@ exit $((1-ok))
 |---|---|---|---|
 | G-1 | 機械 | `058`–`063` 六張新票的狀態 | 指令（2026-09-21 補，整列可原樣複製執行，不含需轉義的字元）：`for n in 058 059 060 061 062 063; do f=$(ls docs/constitution-features/$n-*.md docs/constitution-features/_archive/$n-*.md 2>/dev/null); if test -n "$f"; then echo "$n $(grep -m1 '^status:' $f) $(grep -m1 '^verdict:' $f)"; else echo "$n NOT FOUND"; fi; done`。通過條件（**2026-09-22 更正，原條件不可達成，原句與理由見表下補述**）：每張票印出的 `status` 為 `complete` 且 `verdict` 為 `PASSED`，或 captain 逐票明確接受，**理由逐票寫入本票 `### Feedback Cycles`，一張票一行**（格式與查核指令見表下 2026-09-23 補述）。印出 `NOT FOUND`、`verdict` 為空、或 `verdict` 為 `REJECTED`，一律視為該項尚未有結論，不通過 |
 | G-2 | 機械 | `052`、`049` 兩張既有票 | 指令（2026-09-21 補）與 G-1 同一條，只換票號：`for n in 049 052; do f=$(ls docs/constitution-features/$n-*.md docs/constitution-features/_archive/$n-*.md 2>/dev/null); if test -n "$f"; then echo "$n $(grep -m1 '^status:' $f) $(grep -m1 '^verdict:' $f)"; else echo "$n NOT FOUND"; fi; done`。通過條件同 G-1（含 2026-09-22 的更正）|
-| G-3 | 人工 | Vercel 的 Build Command 與 `NEXT_PUBLIC_PUBLIC_MODE` 實際值 | captain 開 dashboard 確認並把實際值抄回本票 |
-| G-4 | 人工 | A1、A4、B1b 三項「明確接受」 | captain 簽字，理由寫入本票 |
+| G-3 | 人工 | Vercel 的 Build Command 與 `NEXT_PUBLIC_PUBLIC_MODE` 實際值 | captain 開 dashboard 確認並把實際值抄回本票（記錄格式與查核指令見表下 2026-09-24 cycle 9 補述）|
+| G-4 | 人工 | A1、A4、B1b 三項「明確接受」 | captain 簽字，理由寫入本票（記錄格式與查核指令見表下 2026-09-24 cycle 9 補述）|
 | G-5 | 機械 | 佔位字串全站掃描 | `grep -rniE '某[學学]者\|某大[學学]\|lorem ipsum\|前端工程師[ 　]?[ABＡＢ]\|volunteer@addcourt\.tw\|快速了解最新判[決决]的[5５][個个]重[點点]' src/` 零命中 |
-| G-6 | 機械 | D1／D2 的反向保護（id 層＋內容層） | （**2026-09-25 更正**，原判準只看 id，見表下更正）跑 Gate 執行清單下方標記 `# canonical: G-6` 的那一段，通過條件為印出 `G-6 PASS` 且離開碼 `0`。任一列回來、或 `272` 的內容以**任何 id** 出現，皆不通過，必須先有法學確認記錄 |
-| G-7 | 機械 | gate 綁定仍在，且位置仍在 `robots:` 正上方 | （**2026-09-25 更正**，原為「上面那條 `grep -rn '056-pre-launch-checklist'` 三檔皆命中」）跑本節「怎麼被查證排除」小節內標記 `# canonical: G-7` 的那一段，通過條件為印出 `G-7 PASS` 且離開碼 `0`。**只看 `grep` 命中不足**——理由見該小節的 2026-09-25 更正 |
+| G-6 | 機械 | D1／D2 的反向保護（id 層＋內容層） | （**2026-09-24 cycle 8 更正**原判準只看 id、**2026-09-24 cycle 9 更正**內容層原為裸子字串，兩則見表下）跑 Gate 執行清單下方標記 `# canonical: G-6` 的那一段，通過條件為印出 `G-6 PASS` 且離開碼 `0`。`h2`／`h28` 任一列回來、或**釋字第272號**（半形／全形數字、有無空格、簡繁皆算）出現在**任何欄位的任何字串**裡，皆不通過，必須先有法學確認記錄 |
+| G-7 | 機械 | gate 綁定仍在，且位置仍在 `robots:` 正上方 | （**2026-09-24 cycle 8 更正**，原為「上面那條 `grep -rn '056-pre-launch-checklist'` 三檔皆命中」）跑本節「怎麼被查證排除」小節內標記 `# canonical: G-7` 的那一段，通過條件為印出 `G-7 PASS` 且離開碼 `0`。**只看 `grep` 命中不足**——理由見該小節的 2026-09-24（cycle 8）更正 |
 | G-8 | 機械 | 建置與型別 | （**2026-09-23 補執行順序**，理由見表下補述）先跑 `npm run build`（會重建 `.next/types/`），或先 `rm -rf .next`；再跑 `npx tsc --noEmit`。兩者皆通過才算過 |
 
 > **2026-09-22 更正：G-1／G-2 的原通過條件寫錯了，永遠不可能成立，已換掉。兩列的指令本身不變。**
@@ -290,6 +290,22 @@ exit $((1-ok))
 > **兩個方向都驗過**（2026-09-23，皆在副本上操作）：把 `- gate-exception 058：…` 放進 `## Out of scope` 段——舊指令印 `058 RECORDED`，新指令印 `058 NO-RECORD`；把 `- gate-exception 049：…` 放進 stage report 段——舊指令印 `049 RECORDED`，新指令印 `049 NO-RECORD`；再把 `- gate-exception 058：…` 放進 `### Feedback Cycles`（且 `## Out of scope` 的誘餌行仍在）——新指令印 `058 RECORDED`，其餘七張 `NO-RECORD`。**只驗「不再誤報」等於沒驗**，必須同時證明該算到的仍然算得到。
 > 原句保留於上，未刪。
 
+> **2026-09-24（cycle 9）補述：G-3／G-4 的簽字有記錄要求但沒有查核方式，與 F-9 是同一個形狀，已補上格式與查核指令。兩項的「要查什麼」沒有改。**
+> **本項非本輪被點名**——是依本輪「逐條掃過每一個 G 項」的指示掃出來的。
+> **缺口**：G-3 寫「把實際值抄回本票」、G-4 寫「理由寫入本票」，本節導言寫「`人工` 項 captain 判斷並留下簽字（寫在本票的 Feedback Cycles）」。
+> 位置有了，但**沒有格式、也沒有任何人查得到它到底有沒有被寫**——這正是 F-9 在 G-1／G-2 例外出口上修掉的那個缺口，
+> 只是當時只修了 `機械` 兩項，`人工` 兩項留在原地。**一道只靠口頭宣稱的 gate 項等於沒有。**
+> **記錄位置**：本票的 `### Feedback Cycles`，一項一行，格式固定為
+> `- gate-signoff G-3：實際值 Build Command={值} / NEXT_PUBLIC_PUBLIC_MODE={值}。{YYYY-MM-DD}`、
+> `- gate-signoff G-4：captain 明確接受 A1／A4／B1b。理由：{一句話}。{YYYY-MM-DD}`。
+> **查核指令**（整列可原樣複製；前綴與輸出刻意全用 ASCII，理由同 F-9 那條）：`for g in G-3 G-4; do if awk -v g="$g" '/^### Feedback Cycles/{s=1;next} /^#/{s=0} s && index($0, "- gate-signoff " g)==1 {f=1} END{exit !f}' docs/constitution-features/056-pre-launch-checklist.md; then echo "$g RECORDED"; else echo "$g NO-RECORD"; fi; done`
+> **兩個方向都驗過**（2026-09-24 cycle 9，皆在副本上操作）：(a) 今日兩項皆印 `NO-RECORD`——沒簽就是沒簽，查得出來；
+> (b) 把 `- gate-signoff G-3：…` 放進 `### Feedback Cycles`、同時把 `- gate-signoff G-4：…` 當誘餌放進 `## Out of scope`——
+> 印 `G-3 RECORDED`／`G-4 NO-RECORD`，**該算到的算得到，區段外的誘餌不算**。只驗其中一個方向等於沒驗。
+> **這兩項仍是 `人工`，AC-4 的「六個 `機械` 項」數目不變**：查核指令查的是**簽字記錄在不在**，不是代替 captain 判斷，
+> 與 F-9 那條查 G-1／G-2 例外記錄的指令性質相同。
+> **格式由 captain 可否決**：若 captain 偏好自由書寫，刪掉本則的格式與查核指令即可，不影響 G-3／G-4 要查的內容。
+
 > **2026-09-23 補述：G-8 的 `npx tsc --noEmit` 會因環境因素假性失敗，已在 G-8 補上執行順序。這是環境問題，不是候選缺陷——遇到時不要去改原始碼。**
 > **症狀**：`.next/` 內可能出現檔名帶「 2」「 3」的重複檔，例如 `.next/types/routes.d 2.ts`。`tsconfig.json` 的 `include` 含 `.next/types/**/*.ts` 而 `exclude` 只有 `node_modules`，所以這些重複檔會被一起編譯，與 `routes.d.ts` 撞成 `error TS2300: Duplicate identifier 'LayoutProps'`，讓 `tsc` 假性失敗。
 > **成因未經證實，故不歸因。** 是哪個機制產生這些重複檔，本票沒有查證到可靠證據，因此不寫。遇到時**只要依下面的解法處理，不要去改原始碼**——判斷依據是「解法有效」與「`src/` 零變動」，不是「知道是誰造成的」。
@@ -301,22 +317,22 @@ exit $((1-ok))
 > 後續查核在本 sandbox 下被擋住，不是查到「沒有」：`ls -d ~/Library/Mobile\ Documents` 回 `Operation not permitted`，`brctl status` 回 `brctl: Trying to invoke brctl from a sandboxed process`（2026-09-23 本階段獨立重跑，非轉述）。**被擋住不等於不存在。** 所以「是 iCloud」與「不是 iCloud」**兩個結論都沒有被證實**。
 > 因此本則不換成另一個同樣未證實的歸因，直接不歸因。症狀與解法本來就不依賴成因：重複檔在不在，`ls` 看得到；解法有沒有效，離開碼看得到。
 
-> **2026-09-24 更正：G-5 的掃描 pattern 只認一種寫法，異寫法全部掃不到，已擴大涵蓋面。G-5 要求什麼沒有改。**
+> **2026-09-24（cycle 6）更正：G-5 的掃描 pattern 只認一種寫法，異寫法全部掃不到，已擴大涵蓋面。G-5 要求什麼沒有改。**
 > 本項**非本輪引入**——G-5 自 design 階段即如此寫。依 captain 2026-09-24 的一次性授權：「授權修正 `Verified by:` 涵蓋既有寫法變體，不改 AC 要求本身」。
 > 原 pattern 為：`某學者|某大學|lorem ipsum|前端工程師 [AB]|volunteer@addcourt\.tw|快速了解最新判決的5個重點`。
 > **它錯在哪**：`前端工程師 [AB]` 的半形空格是必要的，所以 `前端工程師A`（無空格）與 `前端工程師　B`（全形空格）掃不到；簡體 `某学者`／`某大学` 掃不到；全形數字 `快速了解最新判決的５個重點` 掃不到。**G-5 以零命中為通過，掃不到就等於通過**——方向是 fail-open，而 G-5 正是本票為了防 `015` 事故（`某學者，某大學法律系` 公開顯示四個月）而設的那一項。
 > **可原樣複製的完整指令**（表格列內的 `|` 依 markdown 需寫成 `\|`，這一行沒有）：`grep -rniE '某[學学]者|某大[學学]|lorem ipsum|前端工程師[ 　]?[ABＡＢ]|volunteer@addcourt\.tw|快速了解最新判[決决]的[5５][個个]重[點点]' src/`
 > **改的是哪幾個字元、為什麼**：`某[學学]者`／`某大[學学]`（簡繁）、`前端工程師[ 　]?[ABＡＢ]`（空格可有可無、半形或全形，A／B 半形或全形）、`快速了解最新判[決决]的[5５][個个]重[點点]`（簡繁與全形數字）。`lorem ipsum` 與 `volunteer@addcourt.tw` 靠 `-i` 已涵蓋大小寫，未動。**沒有新增任何字串**——字串集合與原本完全相同，只是每個字串多認了既有的寫法變體。
-> **雙向驗過**（2026-09-24，逐行實跑）：(a) 十一個字串新 pattern 全部 `HIT`，舊 pattern 為六 `HIT`／五 `MISS`；(b) 對 `src/` 實掃，新舊 pattern 的輸出 `diff` **完全相同**（同樣三筆：`PresentDetail.tsx:32`、`contributors.ts:16`、`:21`），未多抓任何一行；另以八個近似但合法的字串（`某些學者認為這個判決有爭議`、`台灣大學法律系`、`前端工程師的工作內容`、`這則判決的5個重點` 等）測試，全部 `MISS`。**過寬和過窄一樣壞**：過寬會讓 G-5 永遠不通過，所以 (b) 和 (a) 一樣必須驗。
+> **雙向驗過**（2026-09-24 cycle 6，逐行實跑）：(a) 十一個字串新 pattern 全部 `HIT`，舊 pattern 為六 `HIT`／五 `MISS`；(b) 對 `src/` 實掃，新舊 pattern 的輸出 `diff` **完全相同**（同樣三筆：`PresentDetail.tsx:32`、`contributors.ts:16`、`:21`），未多抓任何一行；另以八個近似但合法的字串（`某些學者認為這個判決有爭議`、`台灣大學法律系`、`前端工程師的工作內容`、`這則判決的5個重點` 等）測試，全部 `MISS`。**過寬和過窄一樣壞**：過寬會讓 G-5 永遠不通過，所以 (b) 和 (a) 一樣必須驗。
 
 **G-6 的正本**（表格列只引用，不複述）：
 
 ```bash
 # canonical: G-6 —— D1／D2 的反向保護：id 層與內容層都要成立
-node -e "const a=require('./src/data/history.json');const i=a.map(x=>x.id);const bad=[];if(i.includes('h2'))bad.push('id:h2');if(i.includes('h28'))bad.push('id:h28');if(JSON.stringify(a).includes('272'))bad.push('content:272');if(bad.length){console.error('G-6 FAIL: '+bad.join(','));process.exit(1)}console.log('G-6 PASS')"
+node -e "const a=require('./src/data/history.json');const i=a.map(x=>x.id);const bad=[];if(i.includes('h2'))bad.push('id:h2');if(i.includes('h28'))bad.push('id:h28');const RE=/[釋释]字第[ 　]*[2２][7７][2２][ 　]*[號号]/;const hit=[];(function w(o,p){if(typeof o==='string'){if(RE.test(o))hit.push(p)}else if(o&&typeof o==='object'){for(const k in o)w(o[k],p?p+'.'+k:k)}})(a,'');if(hit.length)bad.push('content:釋字第272號@'+hit.join('|'));if(bad.length){console.error('G-6 FAIL: '+bad.join(','));process.exit(1)}console.log('G-6 PASS')"
 ```
 
-> **2026-09-25 更正：G-6 原本只以 id 判定，而它保護的性質是內容。已補上內容層斷言。原判準保留於下。**
+> **2026-09-24（cycle 8）更正：G-6 原本只以 id 判定，而它保護的性質是內容。已補上內容層斷言。原判準保留於下。**
 > 原判準為：`node -e "const a=require('./src/data/history.json');const i=a.map(x=>x.id);if(i.includes('h2')||i.includes('h28'))process.exit(1)"` 回傳 0。
 > **它錯在哪**：把釋字第272號的內容以**另一個 id** 重新核可，id 層完全看不到。實測——在副本加一列 `h47`、
 > `reality.title` 帶「釋字第272號」：舊判準離開碼 `0`（回報通過），而同一份資料 `JSON.stringify(a).includes('272')` 為 `true`。
@@ -329,6 +345,39 @@ node -e "const a=require('./src/data/history.json');const i=a.map(x=>x.id);const
 > 本 gate 不宣稱涵蓋它。
 > `272` 這個字串若日後出現在其他合法內容上，G-6 會誤判為失敗——方向是 fail-closed（gate 卡住而非放行），
 > 與本票一貫的取捨一致：寧可多叫一次，不可漏叫一次。
+
+> **2026-09-24（cycle 9）更正：上一則補的內容層斷言在兩個方向同時錯，已改為「case-number 型樣 ＋ 容忍既有寫法變體」。原斷言保留於上。**
+> 原斷言為：`JSON.stringify(a).includes('272')`，即**整份 JSON 的裸子字串**。
+> **方向一，過窄（fail-open，且靜默）**：漏掉全形數字。副本加一列 `ruling_id` 為 `釋字第２７２號`——
+> id 層乾淨、裸子字串為 `false`、**`G-6 PASS`、exit 0**。D1 那筆需法學確認的錯誤內容在線上，而反向保護說通過。
+> **這正是 F-11（cycle 6）修過的同一個形狀**——那次修的是 `前端工程師 [AB]` 只認一種寫法，修法是加字元類；
+> 一個 cycle 後在 G-6 重新出現。可行性不是假設：`history.json` 現有 **163 個全形標點**，證明輸入端用的是會產生全形字元的中文 IME；
+> `ruling_id` 40 筆**已經有兩種寫法**（`釋字第242號` 與 `釋字第 261 號`），證明該欄位手打且格式不統一。
+> **方向二，過寬（fail-closed）**：`272` 是裸子字串，會打到圖片網址。副本加一列**完全合法**的 `h48`（`釋字第748號`）、
+> `bgImage` 為 `photo-1527200272341-...`：**`G-6 FAIL: content:272`、exit 1**，而訊息會讓執行者去找一個不存在的法律內容問題。
+> 現有 8 列有 `bgImage`，`TODO.md` P3-8 另記 17 列待補。
+> **上一則自己揭露過這個 fail-closed，但只寫在散文裡、沒有實測、也沒評估觸發面——揭露不等於驗證。**
+> 該句（「`272` 這個字串若日後出現在其他合法內容上，G-6 會誤判為失敗」）**自本則起不再成立**：新斷言要求 `釋字第…號` 的前後文，圖片網址沒有這個前後文。
+> **修法**：型樣為 `[釋释]字第[ 　]*[2２][7７][2２][ 　]*[號号]`——半形／全形數字、有無空格（半形或全形）、簡繁，全部容忍。
+> **收窄必須同時容忍變體**：直覺的「收窄成 `第272號`」會漏掉資料裡**已經存在**的 `釋字第 261 號` 那種空格寫法，**比原斷言還糟**。三者實測對照：
+>
+> | 情境 | 原 `includes('272')` | 只收窄成 `第272號` | 本則（型樣＋變體類） |
+> |---|---|---|---|
+> | `釋字第272號` | 攔下 ✓ | 攔下 ✓ | 攔下 ✓ |
+> | `釋字第 272 號`（**資料中真實存在的空格寫法**） | 攔下 ✓ | **放行 ✗** | 攔下 ✓ |
+> | `釋字第２７２號`（全形） | **放行 ✗** | **放行 ✗** | 攔下 ✓ |
+> | 合法列、圖片 id 帶 `272` | **攔下 ✗（誤攔）** | 放行 ✓ | 放行 ✓ |
+> | 乾淨語料 | 放行 ✓ | 放行 ✓ | 放行 ✓ |
+>
+> **為何掃「所有字串欄位」而不是只掃 `ruling_id`**：只掃 `ruling_id` 會**退回**——
+> 上一則自己的重現用的是 `reality.title`，收成單一欄位就抓不到它了。釋字號可以寫在 `title`、`ruling`、`textbook.content` 的任何一處，
+> **涵蓋面要對齊語意（釋字號出現在任何人寫的字裡），不要對齊某一次的指認**。
+> 而排除圖片網址**靠的是型樣不是欄位名**：點名 `bgImage` 是「點名單一實例」，日後任何新的網址欄位都會重新破功；
+> 型樣要求 `釋字第…號` 的前後文，對所有網址欄位一體有效。
+> **失敗訊息改為指出欄位路徑**（如 `content:釋字第272號@40.reality.ruling_id`），執行者不必再去猜是哪一列哪一欄。
+> **殘留，誠實記錄**：(1) 範圍寫法 `釋字第781~783號` 在資料中真實存在，若日後出現 `釋字第270~275號` 這類**涵蓋** 272 的範圍，型樣不會攔——
+> 它是另一個 `ruling_id`，不是 D1 那筆內容的還原，本 gate 不宣稱涵蓋；(2) 若某個網址**字面上**含 `釋字第272號`，會被攔下，方向是 fail-closed，可接受。
+> **id 層與 D2 的涵蓋面說明不變**，見上一則。
 
 八項全數通過，才移除 `layout.tsx:8`。移除後在本票 Feedback Cycles 記下執行日期與 commit SHA，並把本票 `status` 推進到封存。
 
@@ -401,7 +450,7 @@ Verified by: `G-1`–`G-8` 八項中，六個 `機械` 項逐條執行並貼出�
 
 A 類四項需在 `npm run dev` 的實際渲染上驗證，方式見 AC-2。**不執行 `npm run sync-content`。**
 
-> **2026-09-24 更正：本節原本複述了一份 gate 指令清單，那份副本已經跟第三節的正本分岔，整份移除並改為指向第三節。原內容逐字保留於下。**
+> **2026-09-24（cycle 7）更正：本節原本複述了一份 gate 指令清單，那份副本已經跟第三節的正本分岔，整份移除並改為指向第三節。原內容逐字保留於下。**
 > 原句為：「設計階段不改動渲染邏輯，故不需回歸測試。下列為 gate 執行時要跑的完整指令，也是 implement／verify 的驗收依據。」，其後為一個 `bash` 區塊，逐字如下（每列一條）：
 > 1. `npx tsc --noEmit` — 註記 `# G-8`
 > 2. `npm run build` — 註記 `# G-8；不會觸發同步，PR #32 已把 sync 移出 build`
@@ -420,6 +469,9 @@ A 類四項需在 `npm run dev` 的實際渲染上驗證，方式見 AC-2。**�
 **豁免是區塊性的，不是區段性的**：只有首行帶 `# canonical:` 或 `# divergence-check` 標記的那一個區塊被跳過；
 沒有標記的區塊一律照掃，**不論它在哪一節**。`## Acceptance criteria` 內那一筆印為 `AC-OWNED`——AC 文字非本票可改，
 它與 G-7 重疊是**已知例外，印出來而不是靜默略過**。其餘任何一筆一律報 `STRAY`。
+**標記本身也被計數**：每個標記（`G-6`、`G-7`、`divergence-check`）在活的部分只該出現一次，出現兩次以上即報 `DUP-MARKER`。
+理由見下方 2026-09-24（cycle 9）更正——`# canonical:` 是**貼在真實 gate 區塊上、本來就該被複製貼上**的標記，
+光靠「有標記就豁免」會讓整份複製的正本區塊無聲通過。
 
 ```bash
 # divergence-check (self) —— 本區塊是查核指令本身，依 self 規則排除
@@ -430,24 +482,34 @@ awk '
 /^#### /{sec=$0}
 $0 ~ "^[ \t]*\140\140\140" {inb=!inb; if(inb) self=0; next}
 !inb{next}
-/# canonical:|# divergence-check/{self=1; next}
+/# canonical:|# divergence-check/{
+  if (!self) {
+    if (match($0, /# canonical:[ \t]*G-[0-9]+/)) { lbl=substr($0,RSTART,RLENGTH); sub(/.*G-/,"G-",lbl); cnt[lbl]++ }
+    else cnt["divergence-check"]++
+  }
+  self=1; next
+}
 self{next}
 {
-  line=$0; gsub(/[ \t]+/," ",line); sub(/^ /,"",line); hit="";
-  if (line ~ /npx tsc --noEmit/) hit="tsc";
-  else if (line ~ /npm run build/) hit="build";
-  else if (line ~ /grep -/ && (line ~ /056-pre-launch-checklist/ || line ~ /lorem ipsum/ || line ~ /某/)) hit="grep";
-  else if (line ~ /node -e/ && line ~ /history\.json/) hit="node";
-  else if (line ~ /for [A-Za-z_][A-Za-z0-9_]* in 0/ && line ~ /docs\/constitution-features/) hit="loop";
+  line=$0; gsub(/[ \t]+/," ",line); sub(/^ /,"",line);
+  q=sprintf("%c",39); tgt=line; gsub(q,"",tgt); gsub(/"/,"",tgt); hit="";
+  isrc = (tgt ~ / src\/( |$)/ || tgt ~ /layout\.tsx/);
+  if (line ~ /tsc --noEmit/) hit="tsc";
+  else if (line ~ /(npm|pnpm|yarn) (run )?build/) hit="build";
+  else if (line ~ /grep -/ && (line ~ /056-pre-launch-checklist/ || line ~ /lorem ipsum/ || line ~ /某/) && isrc) hit="grep";
+  else if (line ~ /node .*-e/ && line ~ /history\.json/ && line ~ /h2|h28|272|釋字/) hit="node";
+  else if (line ~ /for [A-Za-z_][A-Za-z0-9_]* in [0-9]/ && line ~ /docs\/constitution-features/) hit="loop";
   if (hit=="") next;
   if (h2 ~ /^## Acceptance criteria/) print "AC-OWNED[" sec "] " hit;
   else print "STRAY[" sec "] " hit;
-}' docs/constitution-features/056-pre-launch-checklist.md
+}
+END{ for (k in cnt) if (cnt[k]>1) print "DUP-MARKER[" k "] " cnt[k] }
+' docs/constitution-features/056-pre-launch-checklist.md
 ```
 
-**通過條件：`STRAY` 零筆。** 2026-09-25 實測：`STRAY` 零筆、`AC-OWNED` 一筆。
+**通過條件：`STRAY` 零筆，且無任何 `DUP-MARKER`。** 2026-09-24（cycle 9）實測：`STRAY` 零筆、`DUP-MARKER` 零筆、`AC-OWNED` 一筆（三個標記各計一次）。
 
-> **2026-09-25 更正：本查核指令有兩個缺陷，已修。原內容保留於下。**
+> **2026-09-24（cycle 8）更正：本查核指令有兩個缺陷，已修。原內容保留於下。**
 > 原指令為（單行）：`awk '/^## Stage Report:/{exit} /^## /{h2=$0; sec=$0} /^### /{sec=$0} /^```/{inb=!inb; self=0; next} inb && /divergence-check/{self=1; next} inb && !self && /npx tsc --noEmit|npm run build|grep -rn |grep -rniE |node -e |for n in 0/ {if (sec ~ /^### 三、/) next; else if (h2 ~ /^## Acceptance criteria/) print "AC-OWNED[" h2 "] " substr($0,1,44); else print "STRAY[" sec "] " substr($0,1,44)}' docs/constitution-features/056-pre-launch-checklist.md`
 > 其前的說明句為：「下列指令掃描本票的「活的」部分（第一個 `## Stage Report:` 之前），找出所有 fenced 區塊內的 G 項指令字串，並依所在區段分類——查核指令自己的區塊以首行 `# divergence-check (self)` 標記排除（只排除帶標記的那一個區塊，任何**新**放進來的區塊都沒有這個標記，照樣會被抓到），落在第三節的是正本，`## Acceptance criteria` 內的一筆屬 captain 所有（AC 文字非本票可改，已知與 G-7 重疊，列為已知例外而非隱藏），其餘一律報 `STRAY`：」
 > 其後的通過條件句為：「**通過條件：`STRAY` 零筆。** 2026-09-24 實測——修法前五筆 `STRAY`（全在 `## Test plan`），修法後零筆，`AC-OWNED` 一筆不變。任何人日後在第三節之外再放一份可執行的 G 項指令，這條檢查就會印出 `STRAY`。」
@@ -461,6 +523,66 @@ self{next}
 > **這與 F-11 是同一個形狀，只是換到偵測指令自己身上。**
 > **修法不是列舉更多拼法**：先把空白正規化（`gsub(/[ \t]+/," ")`），再以「指令名 ＋ G 項專屬引數」配對判斷，
 > 對旗標順序與空白數量不敏感。`grep` 一律寫成 `grep -`，不指定旗標內容。
+
+> **2026-09-24（cycle 9）更正：偵測器有三類缺陷，已一併修。原指令保留於上一則。**
+> **缺陷三（過寬：不看掃描目標）**：`grep` 分支的條件是「含 `grep -`」且「含 `056-pre-launch-checklist` 或 `lorem ipsum` 或 `某`」，
+> **完全不看它在掃什麼**。自構十條合法驗證指令實測，**五條被誤報 `STRAY`**——
+> `grep -c "某學者" src/data/discussions.json`、`grep -n '某大學' docs/health-check/TODO.md`、
+> `grep -rn 'lorem ipsum' docs/content-pipeline/`、`grep -c '056-pre-launch-checklist' docs/INDEX.md`，
+> 以及 `node -e "console.log(require('./src/data/history.json').length)"`。
+> **這比 reviewer 點名的範圍大**：它報的是 `grep` 分支一條，實際是 `grep` 分支四條**加上 `node` 分支一條**——
+> `node` 分支只要求「`node -e` ＋ `history.json`」，任何對 `history.json` 的合法讀取都會被誤報。**同一類缺陷，兩個分支。**
+> **修法**：兩個分支都補上「G 項專屬的掃描目標／斷言」。`grep` 分支要求掃描目標是 ` src/`（G-5 的目錄）或 `layout.tsx`（G-7／AC-3 的三檔），
+> 比對前先去掉引號，對 `'src/'`／`"src/"` 這類寫法不敏感；`node` 分支要求指令內出現 `h2`／`h28`／`272`／`釋字` 其一，
+> 也就是**真的在做 G-6 的斷言**，而不只是碰到同一個檔案。
+> **缺陷四（過窄：三個分支仍只認一種拼法）**：F-18 修了 `grep`，但 `tsc` 分支寫死 `npx tsc --noEmit`、
+> `build` 分支寫死 `npm run build`、`loop` 分支寫死 `in 0`。**這是 F-11／F-18 的同一形狀，只是留在沒被點名的分支上。**
+> 實測：`tsc --noEmit`（不帶 `npx`）、`yarn build`、`for m in 049`（迴圈變數與票號不同）三種寫法舊偵測器**全部掃不到**。
+> **修法**：`tsc --noEmit`（不綁執行器）、`(npm|pnpm|yarn) (run )?build`、`in [0-9]`（對齊「票號是數字」的語意，而不是「058 開頭是 0」的巧合）。
+> **缺陷五（標記可被複製）＝ F-14**：豁免判準是「區塊首行帶標記」，而 `# canonical:` 是**貼在真實 gate 區塊上、本來就該被複製貼上**的標記。
+> 實測：把帶 `# canonical: G-6` 的區塊整份複製到 `## Out of scope`，`STRAY` 為 **0**；`G-7` 同；
+> 帶 `# divergence-check` 的區塊同樣可繞過（這是 F-14 最初的那個探測，已開三輪未收）。
+> **修法**：對每個標記計數，大於 1 即報 `DUP-MARKER`。**計數涵蓋整個標記類**（`G-N` 與 `divergence-check`），
+> 不只 `# canonical:`——只收 `# canonical:` 是「點名單一實例」，會把 F-14 原本的那個探測留在原地。
+> 計數只採**區塊的第一個標記行**，所以偵測器自己的區塊（首行是 `# divergence-check (self)`）計為一次，
+> 其內文出現的 `# canonical:` 字樣（本程式自己的比對式）不會被重複計入。
+> **上一則引述的原文裡那句「任何新放進來的區塊都沒有這個標記，照樣會被抓到」，自 2026-09-24（cycle 8）改成「只認標記」之後就不再成立**——
+> 原文逐字保留不動（那是記錄），但**該宣稱到此作廢**，取代它的是 `DUP-MARKER` 計數。
+> **雙向驗過**（2026-09-24 cycle 9，偵測器從本文件抽出後參數化執行，全部在副本上）：
+> (a) **會叫**——六行真副本放進 `#### 誰、在哪個時點執行`／`#### 與移除 noindex 的綁定`／`#### Gate 執行清單`／`### 三、Gate 機制`／`## Test plan`／`## Out of scope`，
+> **六個位置全部 `STRAY=6`**；七種拼法變體**全部抓到**（舊偵測器只抓到四種）；
+> 整份複製 `# canonical: G-6` → `DUP-MARKER[G-6] 2`，`G-7` → `DUP-MARKER[G-7] 2`，`# divergence-check` → `DUP-MARKER[divergence-check] 2`。
+> (b) **不誤叫**——十條合法指令 `STRAY` 由 **5 降為 0**；真實候選 `STRAY` 零筆、`DUP-MARKER` 零筆、`AC-OWNED` 一筆不變。
+> **只驗 (a) 或只驗 (b) 都等於沒驗**：(a) 漏了就是 fail-open，(b) 漏了則會讓這條檢查因為常態誤報而被習慣性忽略。
+
+> **2026-09-24（cycle 9）：F-21 記錄在案，決定不收（decline）。理由與日後要收的寫法一併寫在這裡，免得再推導一次。**
+> **F-21 是什麼**：G-7 的相鄰性判準是 `nxt ~ /robots:/`，只認「下一行含 `robots:` 這串字」，**不認它是不是真的 metadata**。
+> **觸發條件（兩件事必須同時發生）**：(1) 綁定註解被移出 `robots:` 正上方；(2) 註解新位置的下一行**剛好**含 `robots:` 這串字——
+> 例如檔尾補一行 `// robots: 這一行只是註解，不是真的 metadata`。實測此時 `G-7 PASS`、exit 0，而真正的 metadata 已無綁定看守。
+> **為何 decline**：這需要「註解被移走」與「新增一行剛好含 `robots:`」同時發生，想不出自然的工作流會產生它；
+> 相較之下 F-19 的觸發只需要輸入端打一個全形數字。依 `## Review-finding disposition` 判為 **Polish**，FO 2026-09-24（cycle 9）授權 decline。
+> **promote-to-material 條件**：`layout.tsx` 內出現第二處含 `robots:` 字樣的行（註解或字串皆算），此時判準的唯一性假設就沒了。
+> **日後要收的寫法**：把 `nxt ~ /robots:/` 換成錨定 metadata 屬性的形式——要求下一行是 `robots:` 後接 `{`（物件字面值），
+> 即 `nxt ~ /robots:[ \t]*\{/`，並同時斷言全檔符合該形式的行**恰好一行**（與 `DUP-MARKER` 同一個「唯一性要計數」的思路）。
+> **收之前必須兩個方向都驗**：真 metadata 在正上方要 `PASS`，假 `robots:` 註解要 `FAIL`，且註解形式若日後改成多行物件也不能誤擋。
+
+> **2026-09-24（cycle 9 補正）：本票的日期標示規則。先說為什麼需要一條規則——因為它壞過一次，而它壞的方式正是本票在修的形狀。**
+> **缺陷**：本票有 29 處、`docs/health-check/TODO.md` 有 12 處日期指向**還沒到來的日子**（09-25 與 09-26，**branch 上沒有任何 commit 落在這兩天**）。
+> 成因是最後四輪都發生在 2026-09-24，而日期被**按輪次遞增**而不是讀時鐘：cycle 6／7 標對了 09-24，cycle 8 標成 09-25，cycle 9 標成 09-26。
+> **為什麼這在本票不是小事**：本票的整套方法就是「標日期的補述，原句保留」。**日期是這條審計軌跡的排序機制**，日期錯了軌跡就無法複查——
+> 而「無法複查的記錄」正是 F-9、F-10、F-12 一路在修的東西。**同一個形狀，這次載體是日期而不是指令。**
+> **規則（日後每一輪都照這個寫）**：
+> 1. 日期一律取**實際 commit 的 author date**（`git log --format='%h %ad' --date=short`），**不得按輪次遞增、不得憑印象**。
+> 2. **同一天有多輪時，用 cycle 編號消歧**，寫成 `2026-09-24（cycle 8）`；已在括號內時寫成 `2026-09-24 cycle 8`，避免括號套括號。
+>    日期保持為真，排序資訊由 cycle 編號承載。
+> 3. 某則補述若被別處逐字引述，**原文與引述必須同步**。只改一邊就是 F-12／F-13 的分岔副本，只是換一個載體。
+> **可重跑的查核**（對每一行取 `git blame` 的 author date，逐一比對該行提到的每個日期，晚於 commit 日期即為不可能）——
+> 本票**刻意不把這條查核寫成 fenced 區塊**：活的部分只該有四個可執行區塊（G-6 正本、G-7 正本、AC-3 的 `grep`、偵測器自己），
+> 多放一個就是多一份會分岔的副本，而這條查核不屬於 G 項清單。判準以文字敘述，執行時照敘述寫一次性腳本即可。
+> 判準一句話：**任何一行提到的日期，都不得晚於引入該行的那個 commit 的 author date。** 反向（早於）是合法的歷史引用，不報。
+> cycle 9 補正實測：修正前 **41 筆**（本票 29、`TODO.md` 12），修正後 **0 筆**；另以刻意植入一個遠在未來的日期（`12-31`）的副本驗證該查核**會叫**，確認它不是一條永遠通過的死指令。
+> **本則刻意不寫出那兩個錯誤日期的完整 ISO 形式**（只寫 `09-25`／`09-26`）：寫全了會被上面那條查核判為「指向未來」，
+> 而為此加一個豁免標記，就是把 F-14 的錯誤再犯一次——**本票已經學過「標記會被複製，豁免會擴大」**。年份由本句上下文確定，不損失精確性。
 
 ## Documentation impact
 
@@ -497,7 +619,7 @@ self{next}
 - Cycle 5: REVISE — verify gate（captain 2026-09-24 親自裁決，並同日給出一次性授權「授權修正 `Verified by:` 涵蓋既有寫法變體，不改 AC 要求本身」）；surface 1 檔（本票）；AC unchanged。verify cycle 5 判 PASSED——F-9 雙向驗證以從文件抽出的指令完成（282B、純 ASCII、stderr 零位元組、exit 0），誘餌放進 Out of scope 與 stage report 兩處，舊指令兩次都報 RECORDED（fail-open 重現）、新指令報 NO-RECORD；而在同一次執行中真實記錄仍報 058 RECORDED、誘餌票 049 報 NO-RECORD——**這兩列正是用來排除「假修法」的**，一條永遠回 NO-RECORD 的指令會通過方向 (a) 卻悄悄殺掉那條出口。reviewer 並主動承認它在 F-10 上判斷錯誤（cycle-4 的檢查帶了 `2>/dev/null`，使 `Operation not permitted` 與「不存在」無法區分；不加抑制重跑後連 `~/Library` 本身都回 `Operation not permitted`），自陳「我對別人用了一個自己沒做到的標準」。F-11 fix（fail-open，**非本輪引入**，G-5 自 design 階段即如此：掃描寫 `前端工程師 [AB]`，其中半形空格是必要的，故無空格寫法、全形空格、簡體 `某学者`／`某大学`、全形 `５個重點` 全部掃不到；G-5 以零命中為通過故 fail-open。**而 G-5 正是本票為了防止 `015` 事故（`某學者，某大學法律系` 公開顯示四個月）而加的那道檢查——它自己就是該事故的重演路徑。**目前三個既有佔位值仍抓得到故為 Deferred risk，但若 `052` 改寫 `contributors.ts` 時把那個空格拿掉即刻失效）。修法嚴守授權邊界：**字串集合完全沒有變動**——沒有新增任何要掃的字串，只是每個既有字串多認了寫法變體。雙向驗證：十一個字串新 pattern 全數 HIT；對 `src/` 的實掃與舊 pattern `diff` 完全相同（無誤抓），三個既有佔位值仍抓得到。其他 G 項的涵蓋面一項未改，理由已列。round record 依 captain 先前授權跳過。
 - Cycle 6: REVISE — verify gate（captain 2026-09-24 第二次裁決）；surface 1 檔（本票）；AC unchanged。verify cycle 6 判 PASSED——F-11 涵蓋面由 6/11 提升為 11/11，未過寬（對真實 `src/` 實掃舊新輸出 `diff` 逐位元相同），reviewer 另加九個合法近似字串（`台灣大學法律系`、`前端工程師的工作內容`、`這則判決的5個重點` 等）測試全部 MISS——**過寬的 pattern 會讓 G-5 永遠不通過，那和永遠通過一樣是假檢查**；授權邊界以兩種互相獨立的方式確認嚴守（六個 alternation 摺疊變體括號後化約為逐字相同的字串、新 pattern 在舊 pattern 匹配過的每個字串上都是超集）。F-12 fix（**同型盲區第九處，但形狀不同：不是「只認一種寫法」，而是同一檢查有兩份副本且副本已分岔**——`## Test plan` 的 G-8 仍把 `tsc` 列在 `build` 之前，照它做會直接走進 F-8 記載的假性失敗，該分岔是 cycle 4 只修第三節那一列造成的；Test plan 的 G-5 pattern 只有 5 個變體而第三節有 6，少了 `快速了解最新判決的5個重點`，跑那一份會整個漏掉一個佔位值——又是 fail-open）。**採 reviewer 的建議修根而非補兩處**（原話：「只要兩份副本還在，就會有第三次分岔」）：整份重複的 `bash` 區塊移除、`## Test plan` 改為指向第三節作為唯一正本，保留該節不在第三節的規定（2026-09-21 實測記錄表、`npm run build` 本階段未跑的說明、A 類需實際渲染驗證、`不執行 npm run sync-content`）。**沒有把缺的字串補進副本**——副本整份消失，沒有第二份可以不一致。原導言與五條指令逐字保留於補述，並逐項寫明兩處分岔、各自後果、以及為什麼是讓副本消失而不是把兩份對齊。另寫入一條**可重跑的查核指令**偵測未來的重複清單（掃本票第一個 `## Stage Report:` 之前的活內容、抓 fenced 區塊內的 G 項指令字串依區段分類），並交代該指令自己如何被排除。本票至此已跑七輪，每輪 reviewer 都找到同一類缺陷的新實例；這是第一個針對成因而非症狀的修法。round record 依 captain 先前授權跳過。
 - Cycle 7: REJECTED — review（captain 2026-09-24 核准進入 review 後的首輪獨立審查）；surface 2 檔（本票與 `docs/health-check/TODO.md`——implement **主動揭露**此範圍差異：FO 的 dispatch 寫「預期只有本票一檔」，但那筆觀察的授權處置必須改 `TODO.md`）；AC 要求未變。**FO 記一筆自己的誤判**：FO 曾在 verify gate 向 captain 建議核准，理由是「可執行缺陷已全數清除，殘留只剩不可執行的展示形式」——**那是錯的**。前七輪的 verify 查的是票內部一致性；本輪 review 把每一條 G 項指令**從文件抽出後對抗性地執行**，找到三個 fail-open。F-15 fix（**四筆最嚴重**：G-7 是位置無關的，而它保護的性質是位置相關的——第三節自己寫著綁定放在 `robots:` 正上方的理由是「唯一繞不過的位置」，但把註解移到**檔尾**（AC-3 明文禁止的位置）G-7 仍 exit 0、印出三檔命中、回報綁定完好；**觸發情境不假設惡意**——要刪 `robots:` 的人把註解挪開而非刪掉是最自然的操作，而那正是 gate 該叫的瞬間）。修法：G-7 正本標記 `# canonical: G-7`，**同時檢查三檔命中與 AC-3 已有的 `awk` 相鄰性**，表格列改為指向正本。F-16 fix ＋ 那筆觀察（awk 只在 `^### `／`^## ` 更新 `sec`、`####` 不更新，致豁免區實際是 95 行四個子節；把分岔副本放進 `#### 誰、在哪個時點執行` 則 STRAY=0，且 **F-13 的建議處置會因此失效**——`:215` 就在第三節內；**前七輪無人指出**。另 `TODO.md` 有兩份 G-6 可執行副本、形式已與正本不同，而 gate 的指令橫跨三檔、防分岔機制只覆蓋一檔）。修法**比 FO 建議的更好**：豁免改為**只認標記**（`# canonical:` 或 `# divergence-check`），區段性豁免整段移除、`sec` 也在 `####` 更新；`TODO.md` 兩份副本移除並指向正本。F-17 fix（G-6 以 **id** 判定而它保護的性質是**內容**：以另一個 id 重新核可釋字第272號的內容，G-6 仍 exit 0，**而那筆需法學確認的錯誤內容在線上、反向保護說通過**；最諷刺的是**本票 design 第一節自己用的就是內容層斷言**——較強的寫法當時已知已用，gate 卻採了較弱的）。修法：G-6 正本標記 `# canonical: G-6`，**id 層保留並補上內容層斷言**；implement **未把 `TODO.md` P0-2 的宣稱降級**，它補的是較強的判準而非保留弱檢查。F-18 fix（Polish：偵測指令逐字比對旗標順序與單一空白，`grep -rinE`／`grep -nr `／`node  -e` 等變體全部掃不到；**與 F-11 同一形狀，只是換到偵測指令自己身上**）。修法：先正規化空白，再以「指令名 ＋ G 項專屬引數」配對，`grep` 只寫 `grep -` 不指定旗標內容；六種變體全抓到、八條合法指令零誤抓。reviewer 的方法紀律值得記：**每一條指令都從文件抽出後執行而非照著讀**，抽取過程本身抓到它第一版的 bug（`^\| G-[1-8] \|` 掃全檔會命中 stage report 的表格列並覆寫抽出檔，那會讓「G-5 指令」被換成 stage report 的文字而悄悄跑錯）；反向也驗（證明偵測指令會叫、不誤報正本，G-5 的 17 個合法字串全 MISS，F-9 的 `058 RECORDED` 證明不是死指令）——它的原話是「**只驗通過等於沒驗**」。
-
+- Cycle 8: REJECTED — review (cycle 2)（**本行 Cycle 8 對應 stage report 的 implement cycle 9**；兩套編號自始相差 1——Feedback Cycles 記 FO 授權的修正輪、stage report 記 implement 的執行輪，首次 implement 不是修正輪。**請 review 判斷此並存需不需要消歧**：它不是分岔重複副本，但票內日期標籤用的是 stage report 編號，讀者可能混用）；surface 2 檔（本票、`docs/health-check/TODO.md`）；AC 全節仍 **1622B／sha256 `93e5bf6a95f16592`**；`src/` 本輪零變動、`src/data/*.json` 與 main 相同、未跑 `sync-content`；三條正本重跑 `G-6 PASS`／`G-7 PASS`／偵測器 `STRAY 0`・`DUP-MARKER 0`・`AC-OWNED 1`。**F-19／F-20 fix，而 implement 沒有照 FO 的字面做，且它是對的**：FO 授權寫「case-number **欄位** ＋ 容忍既有寫法變體」，implement 指出收窄到 `ruling_id` 會**重開 F-17**（F-17 自己的探測就是把 `272` 放在 `reality.title`），改為 `[釋释]字第[ 　]*[2２][7７][2２][ 　]*[號号]` 掃**所有字串欄位**並回報命中的欄位路徑——**排除圖片網址的是 pattern 的形狀，不是欄位的名字**；FO 當時把這兩件事當成同一件，等於在同一份授權裡一邊要求「兩個方向都要驗」一邊給了只驗一個方向的指示（FO 已認錯，revert 條件留在票內）。五個授權情境外另跑七個；三向對照表以真實輸出重現並完全證實 reviewer：舊寫法放行 `釋字第２７２號` 且誤抓圖片 id，**而直覺的「收窄成 `第272號`」比現行更糟**。**F-22 比 reviewer 報的寬**：同一缺陷在 node 分支也有，十條合法指令誤報的是 **5 條不是 1 條**，兩分支都修、`STRAY` 5→0 而六個注入點的真重複仍報 6。**F-14 強化擴及整個標記類**（`G-N` 與 divergence-check），順帶關掉 F-14 自己開了三個 cycle 的原始探測；另掃出三條未被點名、與 F-11／F-18 同型的拼寫敏感分支（tsc／build／loop），舊偵測器 7 個變體只抓 4 個、新的抓 7 個。**F-21 依授權 decline**，觸發條件、promote-to-material 條件、錨定 metadata 屬性的收斂寫法全部寫進票內。**掃全類掃出一項本輪沒人點名的**：G-3／G-4 的簽核項**有規定記錄位置卻沒有檢查**——F-9 的同一形狀，而 F-9 當初只修了兩個機械項；依 F-9 的模式補上，AC-4 的「六個機械項」計數未變、格式標為 captain 可撤。**日期缺陷（FO 於本輪查出，判為同型第十二處，載體是日期而非指令）**：本票的方法就是「標日期的補述、原句保留」，**日期是它自己審計軌跡的排序機制**，錯了軌跡就無法複查。FO 報 29 筆，**implement 獨立複驗後實際 41 筆**（本票 29 ＋ `TODO.md` 12），全部以 `git blame` 確認歸屬且映射一致（每個 09-25 由 cycle 8 引入、每個 09-26 由 cycle 9 引入，author date 皆 2026-09-24）；成因是**最後四輪同一天、日期被按輪次遞增而不是讀時鐘**。**它沒有整批盲改**：先建立可否證判準（任一行提到的日期不得晚於引入該行的 commit author date；反向早於是合法歷史引用，不報），`git blame --line-porcelain` 逐行比對，修正前 41 筆、修正後 0 筆，**並植入一個遠未來日期證明判準會叫、不是死指令**；替換腳本逐條斷言預期筆數、不符即中止；**日期輪 diff 為本票 28／28、`TODO.md` 10／10——增刪行數相等，代表全是原地換字、未夾帶任何實質改動**。逐字引述同步已實測（本票引述 `TODO.md` 的那句以程式斷言逐字出現於 `TODO.md` → true），標籤空白一併正規化 26 處。**implement 記下一筆自己的 fail-open，比修好的那 41 筆更值得留**：第一版查核用 `awk` 呼叫 `strftime`，**BSD awk 沒有這個函式**——錯誤印到 stderr，然後回報 `TOTAL forward-pointing refs = 0`，**「0 筆」看起來就是「乾淨」**；若它只看最後一行，就會回報「日期沒問題」並把 FO 正確的發現駁回。**與 G-8 的 `tsc` 假性失敗剛好相反：那個是假失敗，這個是假通過，而假通過危險得多。**兩項刻意決定經 FO 確認：(a) 提到那兩個錯誤日期時一律省略年份，**因為寫全了會被自己的查核判為指向未來，而為此加豁免標記就是重犯 F-14**（本票已學過「標記會被複製、豁免會擴大」）；(b) 日期規則刻意不寫成 fenced 區塊，活的部分只該有四個可執行區塊。**一處殘留經 FO 確認不修**：commit `ba48f25` 的 subject 寫「FO `09-26` 授權」，真實為 2026-09-24——改它要 rebase、會換掉該 SHA，而票內多處以該 SHA 引用它、下游三個 commit 也會一起變，**為修一行訊息讓票內所有 SHA 引用失效，代價大於缺陷**；依「`record` 不改寫、要修正就追加補述」已在票內記錄更正。`TODO.md` 247／362 兩處（仍描述已不存在的裸子字串形狀）經 FO 授權後修，各追加一則標日期補述、原句一字未改（`10 0`），並以偵測器單掃確認兩檔的可執行 G-6 副本仍皆為 0 筆。FO 另明確答覆：那句已作廢的宣稱**不直接改字**——本票分層為「活的說明必須準確、歷史記錄必須完整」，改寫逐字引述會讓「原句保留於下」的慣例失效，而那慣例是本票九輪還能被複查的原因。AC-2 維持未達成（依賴尚未核准動工的 feature `039`）；`PresentDetail.tsx` 零改動（C1 的真實信箱覆寫點仍待 captain 回答）。
 ## Out of scope
 
 不施工任何一項——每項該修的另循其票。不處理 SSOT 產線把關（features 040／042／043／050）。不建立防止文件過時的機制（feature 054）。
@@ -1758,7 +1880,7 @@ FO 給了兩個選項。**我選移除 `TODO.md` 的兩份副本，並把偵測�
 
 偵測器的前提是「fenced 區塊裡的 G 項指令＝gate 清單的副本」。**這個前提只在本票內成立**——`TODO.md` 合法地為自己的目的使用這些指令。擴大涵蓋面會讓這條檢查長期報 5 筆假 `STRAY`，那就變成一條會被習慣性忽略的檢查，也就是另一種假檢查。
 
-所以：**在前提成立的範圍內偵測，在前提不成立的範圍內直接移除副本。** `TODO.md` 兩節的原指令逐字保留在各自的 2026-09-25 補述內（blockquote 記錄，非 fenced 可執行），並寫明為什麼移除。移除後 `TODO.md` 已無 fenced 的 G-6 可執行副本（以偵測器邏輯單掃該檔，輸出為空）。
+所以：**在前提成立的範圍內偵測，在前提不成立的範圍內直接移除副本。** `TODO.md` 兩節的原指令逐字保留在各自的 2026-09-24（cycle 8）補述內（blockquote 記錄，非 fenced 可執行），並寫明為什麼移除。移除後 `TODO.md` 已無 fenced 的 G-6 可執行副本（以偵測器邏輯單掃該檔，輸出為空）。
 
 這也順帶證明了移除是對的：G-6 的判準本輪剛補上內容層，`TODO.md` 那兩份是 id 層舊形式——**它們在被移除時已經與正本不同形。**
 
@@ -1785,3 +1907,439 @@ FO 給了兩個選項。**我選移除 `TODO.md` 的兩份副本，並把偵測�
 **那筆觀察我選了移除副本而非擴大偵測**，因為實測擴大版在 `TODO.md` 產生 5 筆誤抓——偵測器的前提只在本票內成立。理由與實測數字都寫進報告了。
 
 **AC-2 維持未達成**，仍綁在未獲核准動工的 feature `039`。gate 整體仍不通過（八張票皆未結案、G-5 三筆佔位命中），各有其票，依禁令未動。
+
+## Stage Report: review (cycle 2)
+
+我是上一輪判 REJECTED 的同一個 reviewer。**我抓到的四筆全部真的修好了**——每一筆都用我當初用來證明 fail-open 的**同一個探測**重跑，現在都會叫。但我照同樣的標準往下追時，在**本輪新寫的 G-6 內容層**上找到同一類缺陷的兩個新實例，而且是**一條斷言同時過窄又過寬**。判定 **REJECTED**。
+
+- DONE: 獨立重驗 F-15（移到檔尾必須不通過、移回必須通過，兩個方向都貼輸出）
+  四個方向實跑，見下節。正上方 `G-7 PASS` exit 0；**移到檔尾 `G-7 FAIL ... [matched/adjacent=1/0]` exit 1**；整行刪除 exit 1；還原 exit 0。**我上一輪用來證明 fail-open 的那個探測，現在會叫。**
+- DONE: 獨立重驗 F-16（重現 T2、確認 `:215` 是否被涵蓋、判定多檔涵蓋面）
+  T2 現在報 **3 筆 `STRAY` 並指出精確子節 `#### 誰、在哪個時點執行`**。另測第三節其餘兩個子節，皆抓到。`sec` 確實在 `####` 更新，區段性豁免已整段移除。F-13 殘留與多檔問題見下節。
+- DONE: 獨立重驗 F-17（以另一個 id 帶入 272 內容，確認 G-6 現在不通過）
+  **確認不通過**：`h47` 帶「釋字第272號」→ `G-6 FAIL: content:272` exit 1；`h2` id 回來 → `G-6 FAIL: id:h2`；乾淨資料 → `G-6 PASS`。**但這條新斷言本身有兩個方向的缺陷，見 F-19／F-20。**
+- DONE: 獨立重驗 F-18（六種拼法逐一確認、並自行構造合法指令確認不誤抓）
+  六種拼法**全部抓到**（含只有中文字串、不含 `lorem ipsum` 的那一條，證明 `某` 的字元修正有效）。自構十條合法指令，**九條乾淨、一條誤抓**，見 F-22。
+- DONE: 判定 implement 的兩個選擇
+  F-16 的「只認標記」**比 FO 建議的區塊性判準更好，但代價是 F-14 的觸發面擴大**；F-17 的「補強判準而非降級宣稱」**方向正確，執行有缺陷**。兩項實質評估見下節。
+- DONE: 確認 AC 要求文字逐字未變、`src/` 零變動
+  AC 全節 **1622B**，與 merge-base、與我上一輪的 commit `37b4ac5`、與 HEAD **三者位元組相同**。`src/` 自 merge-base 起只有 `layout.tsx` `+1`。
+- FAILED: 給出 PASSED 或 REJECTED
+  **REJECTED**，理由是 F-19（fail-open）。
+
+### F-15 四個方向（G-7 正本從文件抽出，580B）
+
+| 情境（皆在副本上） | 輸出 | exit |
+|---|---|---|
+| 註解在 `robots:` 正上方 | `G-7 PASS` | 0 |
+| **註解移到檔尾**（AC-3 明文禁止） | `G-7 FAIL: layout.tsx binding not directly above robots: [matched/adjacent=1/0]` | **1** |
+| 註解整行刪除 | `G-7 FAIL: zero hit in src/app/layout.tsx` ＋ `[matched/adjacent=/0]` | **1** |
+| 還原至正上方 | `G-7 PASS` | 0 |
+
+第二列就是我上一輪的探測。**舊判準對它回 exit 0，新判準回 exit 1。修好了。**
+
+### F-16 五個情境（偵測器從文件抽出，參數化目標檔）
+
+| 情境 | `STRAY` | 判定 |
+|---|---|---|
+| 真實候選 | **0**（`AC-OWNED` 1） | 乾淨 |
+| T2：副本放進 `#### 誰、在哪個時點執行` | **3** | **抓到**，標出精確子節 |
+| T2b：放進 `#### 與移除 noindex 的綁定` | **3** | 抓到 |
+| T2c：放進 `#### Gate 執行清單`（正本子節內，未帶標記） | **3** | 抓到 |
+| T6：放進 `## Out of scope`，但**帶 `# canonical: G-6` 標記** | **0** | 漏抓 → F-14 觸發面擴大 |
+
+T2c 值得記：連正本子節內的未標記區塊都會被報。豁免確實已從「區段」收到「標記」。
+
+**`:215` 的殘留（F-13）現在在 `:234`，仍未被涵蓋**——它是 blockquote，偵測器的圍欄判準要求行首（可含空白）為三連反引號，`>` 開頭的行永遠不會進入區塊狀態。實測 `:190`（表格正本）與 `:234` 去轉義後**仍逐字相同**。**但我上一輪對 F-13 的反對意見已經消失**：我當時說「F-13 的建議處置 (a) 會失效，因為 `:234` 在第三節內、會被整段豁免吞掉」——第三節豁免現在沒了，所以擴大掃描到 blockquote 這條路**現在真的可行**。F-13 本身仍為 Deferred risk，未授權本輪處理。
+
+**多檔涵蓋面：我判定真的解決了，不是只解決兩檔。** 以偵測器邏輯單掃另外兩檔：`AGENTS.md` **零命中**；`TODO.md` 報 4 筆，**全部是合法用途、零真副本**（`## ⛔ 動工前必讀` 的兩筆 `npm run build`、P0-5 自己的 `grep`、P3-8 自己的 `npm run build`）。兩份真副本確實已移除且原文逐字保留於 blockquote 補述。**implement 的推理我實測複核為正確**：偵測器的前提（fenced G 項指令＝gate 清單副本）只在本票內成立，擴大涵蓋面會長期產生假 `STRAY`。**一處數字更正**：implement 寫「7 筆 `STRAY` 其中 5 筆誤抓」，但它自己的表格只列出 6 筆（2 真＋4 假），我移除後實測為 4 筆全假。**結論不受影響**，但數字請以 4 為準。
+
+### 對 implement 兩個選擇的實質評估
+
+**(1) F-16 改成「只認標記」——比 FO 建議的區塊性判準更好，我同意，但要記下代價。**
+FO 建議「豁免改成區塊性判準」，implement 改成「只豁免帶 `# canonical:` 或 `# divergence-check` 標記的區塊」。這更好的理由是實測出來的：T2c 顯示連正本子節內的未標記區塊都會被報，也就是**正本的身分來自標記而不是位置**，文件重排、子節改名、內容搬家都不會讓豁免範圍悄悄變大。位置性判準做不到這件事。
+**代價**：`# canonical:` 現在是一個**貼在真實 gate 區塊上**的標記，而 F-14 的機制是「任何含該字樣的區塊都被豁免」。T6 實測：把帶 `# canonical: G-6` 的區塊整份複製到 `## Out of scope`，`STRAY` 為 **0**。F-14 原本的標記是 `divergence-check`（只會出現在偵測器自己身上，幾乎不會被複製），現在多了一個**本來就該被複製貼上的**標記。F-14 仍是 Polish，但**觸發機率明顯上升**，值得在補述裡把「任何新放進來的區塊都沒有這個標記」這句改掉——那句現在更不準了。**可用的強化**：偵測器對每個 `# canonical: G-N` 計數，大於 1 即報。
+
+**(2) F-17 補強判準而非降級宣稱——方向正確，執行有缺陷。**
+方向我同意，而且理由比 implement 寫的更強：降級 `TODO.md` P0-2 的宣稱等於承認「反向保護保護不了它宣稱保護的東西」，那是把缺陷寫進文件而不是修掉。補強判準才是正解。
+**但補上去的那一條斷言本身在兩個方向都錯**，見 F-19／F-20。
+
+### 新 finding
+
+**F-19 — G-6 的內容層漏掉全形數字。這是 fail-open，而且是本票一個 cycle 前才剛修過的同一個形狀。**
+- released user 與 normal workflow：內容由人在 Google 試算表輸入，經 `sync-content` 上線。`ruling_id` 是人手打的欄位。
+- observable harm：副本加一列 `h47`、`ruling_id` 為 `釋字第２７２號`（全形數字）：id 層乾淨、`JSON.stringify(a).includes('272')` 為 **false**，**`G-6 PASS`、exit 0**。D1 那筆需法學確認的錯誤內容在線上，反向保護說通過。**方向是 fail-open，而且靜默。**
+- 受影響的 AC 或邊界：G-6 的通過條件；D1「加一道反向保護」的結論。**更直接的是本票自己的判例**：F-11（cycle 6）修的就是「`前端工程師 [AB]` 只認一種寫法」，修法是加字元類 `[5５]`／`[ABＡＢ]`／`[ 　]`。**同一個形狀，一個 cycle 後在 G-6 重新出現。**
+- trigger evidence：副本實跑（repo 資料零改動）。可行性佐證：`history.json` 現有 **163 個全形標點**（`，；！：（）`），證明輸入端用的是會產生全形字元的中文 IME；`ruling_id` 40 筆**已經有兩種寫法**（`釋字第242號` 與 `釋字第 261 號`，空格不一致），證明該欄位是手打且格式不統一。今日全形數字為 0 筆，故觸發尚未發生。
+- 建議：materiality = **Deferred risk**（觸發未觀察到）。promote-to-material 條件：任一 `ruling_id` 或內文出現全形數字。task ownership = 本票自有範圍。disposition 建議 = 見 F-20 下方合併建議。**未自行修。**
+
+**F-20 — 同一條斷言又過寬：`272` 是裸子字串，會打到圖片網址。這是 fail-closed。**
+- released user 與 normal workflow：新增內容列時附一張 Unsplash 圖，是既有慣例——40 列中 **8 列**有 `bgImage`，網址帶 13 位數字 id。
+- observable harm：副本加一列**完全合法**的 `h48`（`ruling_id` 為 `釋字第748號`），`bgImage` 為 `photo-1527200272341-...`：全檔無「釋字第272號」，**`G-6 FAIL: content:272`、exit 1**。gate 永遠不通過，而訊息 `content:272` 會讓執行者去找一個不存在的法律內容問題。隨機 13 位 id 含 `272` 的機率實測約 **1.08%**，現有 8 個、`docs/health-check/TODO.md` P3-8 另記 17 列待補。
+- 受影響的 AC 或邊界：本票自己的判例——cycle 6 寫進文件的「**過寬和過窄一樣壞**」「(b) 和 (a) 一樣必須驗」。implement 對 G-6 驗了 (a) 沒驗 (b)。**而且 implement 自己用「誤抓會讓檢查被習慣性忽略」當理由拒絕擴大偵測器涵蓋面，同一個標準沒有套用到 G-6。**
+- trigger evidence：副本實跑。implement 在補述裡已誠實揭露「`272` 若日後出現在其他合法內容上，G-6 會誤判失敗，方向是 fail-closed」——**揭露屬實，但只寫在散文裡、沒有實測，也沒評估觸發面有多大。**
+- 建議：materiality = **Deferred risk**。task ownership = 本票自有範圍。
+- **F-19／F-20 合併 disposition 建議**：把內容層從「整份 JSON 的裸子字串」改成「**case-number 欄位 ＋ 容忍既有寫法變體**」。五個情境實測比較如下，**正確解存在且不是取捨**：
+
+| 情境 | 現行 `includes('272')` | 只收窄成 `第272號` | 欄位範圍＋變體類 |
+|---|---|---|---|
+| `釋字第272號` | true ✓ | true ✓ | true ✓ |
+| `釋字第 272 號`（**資料中真實存在的空格寫法**） | true ✓ | **false ✗** | true ✓ |
+| `釋字第２７２號`（全形） | **false ✗** | **false ✗** | true ✓ |
+| 合法列，圖片 id 帶 272 | **true ✗** | false ✓ | false ✓ |
+| 乾淨語料 | false ✓ | false ✓ | false ✓ |
+
+**注意第二列**：直覺的「收窄成 `第272號`」會漏掉資料裡**已經存在**的空格寫法，比現行還糟。收窄必須同時容忍變體，就是 F-11 的作法。
+
+**F-21 — G-7 的相鄰性只認「下一行含 `robots:` 這串字」，不認它是不是真的 metadata。fail-open，但觸發情境牽強。**
+- observable harm：副本把綁定註解移到檔尾，並在其後補一行 `// robots: 這一行只是註解，不是真的 metadata`：**`G-7 PASS`、exit 0**，而真正的 `robots:` metadata 仍在第 8 行、已無綁定看守。
+- 受影響的 AC 或邊界：G-7 保護的性質是「綁定緊貼**真的**那一行」，判準是文字層。
+- trigger evidence：副本實跑。**但要說準：這需要同時發生「註解被移走」與「新增一行剛好含 `robots:`」**，我想不出自然的工作流會產生它。比起 F-19，這一筆弱得多。
+- 建議：materiality = **Polish**。disposition 建議 = 可接受現狀；若要收，把 `nxt ~ /robots:/` 改成錨定 metadata 屬性的寫法。**未自行修。**
+
+**F-22 — 偵測器會誤抓一條合法的 `grep`。fail-closed，小。**
+- observable harm：`grep` 分支的條件是「含 `grep -`」且「含 `056-pre-launch-checklist` 或 `lorem ipsum` 或 `某`」，**不看掃描目標**。我自構的十條合法指令中，`grep -c "某學者" src/data/discussions.json` 被報成 `STRAY`——那是掃 `discussions.json` 的驗證指令，不是 G-5 的 `src/` 掃描副本。其餘九條乾淨。
+- 佐證這不是我編出來的形狀：`TODO.md` 的 P0-5 就有一條同型指令，implement 自己在擴大涵蓋面的實測裡把它列為誤抓。**同樣的形狀寫進本票就會誤報。**
+- 建議：materiality = **Polish**。disposition 建議 = `grep` 分支加上目標條件（例如同時要求 ` src/` 結尾）。**未自行修。**
+
+### 未越界、未回歸（皆以位元組或實跑證明）
+
+`## Acceptance criteria` 全節 **1622B**，與 merge-base／`37b4ac5`／HEAD 三者位元組相同——**AC 的要求文字逐字未變，七輪至今九輪維持同值**。`src/` 自 merge-base 起只有 `layout.tsx` `+1`；`PresentDetail.tsx` 零 commit（C1 禁令遵守，覆寫點仍待 captain）；`src/data/*.json` 與 `main` sha256 相同，未跑 `sync-content`。
+從（行號已位移的）表格重新抽出並實跑：G-1 六張票皆 `status: design`／`verdict` 空、G-2 兩張同；G-5 三筆命中（`061`／`052`，預期）；F-9 八張全 `NO-RECORD`；AC-3 三檔 `1／7／1`（`TODO.md` 由 5 增為 7，因新增兩處指向正本的引用）；G-8 先 `rm -rf .next` 再 build → exit 0、`16/16` 靜態頁，`tsc` → exit 0 無輸出。
+`## Documentation impact` 逐筆：「現在更新」三筆仍成立（P3-8 解除條件、P0-2／P0-6 反向保護現指向 `# canonical: G-6` 正本、`AGENTS.md` 指標）；`TODO.md` 兩處移除的指令**逐字保留於各自的 2026-09-24（cycle 8）補述**（blockquote，非可執行）；未改寫任何 `record` 文件、`_archive/` 零命中；本 diff 未新增或刪除檔案，`docs/INDEX.md` 未動且一致。`TODO.md` 在 INDEX 為 `plan`、`AGENTS.md` 為 `evergreen`，改動適當。
+**我的所有重現都在副本上做**：`git status --porcelain` 空、HEAD 仍 `0776796`、`history.json` sha256 未變。未動任何候選位元組。
+
+### 驗證與可否證性
+
+- **四筆修法都用我當初找出缺陷的同一個探測重驗**，不是換一組較寬鬆的測試：F-15 是「移到檔尾」、F-16 是 T2 的同一個子節、F-17 是 `h47` 帶 272、F-18 是我上一輪逐字點名的五種拼法加一種。四個探測現在全部會叫。
+- **反向也驗了**：T2c 證明偵測器不會只靠位置放行；十條合法指令證明它沒有過寬到不能用；G-6 在乾淨資料上 `PASS` 證明它不是一條永遠 FAIL 的死指令；G-7 還原後 `PASS` 證明它不是永遠 FAIL。
+- **F-19／F-20 的可否證點是那張五情境表**：若我說錯了，只需證明現行斷言在全形寫法上為 `true`、或在圖片 id 情境上為 `false`——實測分別是 `false` 與 `true`，兩個方向都與宣稱相反。且第二列證明**我自己直覺的修法（收窄成 `第272號`）也是錯的**，如實列出。
+- **我對觸發機率沒有誇大**：F-19 今日全形數字 0 筆、F-20 今日 `272` 零命中，兩筆都是 Deferred risk 不是 Material。支撐的是可行性證據（163 個全形標點證明 IME、`ruling_id` 兩種空格寫法證明手打、8 個圖片 id 與 1.08% 實測機率），不是「有可能」三個字。
+- **locale 陷阱已避開**：全程未用 `sort`／`uniq`／`sort -u` 判定中文字串；計數用 `grep -c`／`wc -l`，去重用 JS `Set`。
+- **G-8 依指示先 `rm -rf .next` 再跑 tsc，未改原始碼、未對重複檔成因作任何斷言。**
+
+### Summary
+
+**我上一輪抓的四筆全部真的修好了，而且是用我當初的探測驗的**：G-7 現在對「註解移到檔尾」回 exit 1；偵測器現在對第三節任一子節內的未標記副本回 3 筆 `STRAY` 並標出精確子節；G-6 現在對「272 內容換 id」回 exit 1；六種拼法變體現在全抓得到。`TODO.md` 的兩份 G-6 副本已移除並指向正本，`AGENTS.md` 與 `TODO.md` 皆已無真副本。AC 要求文字 1622B 三點位元組相同，`src/` 零變動，無回歸。
+
+**implement 的兩個選擇我都同意方向。** F-16 的「只認標記」確實比位置性判準好——T2c 證明正本的身分來自標記而非位置；代價是 F-14 的觸發面擴大（T6：帶標記的整份複製 `STRAY` 為 0），該補述裡「任何新放進來的區塊都沒有這個標記」那句現在更不準了。F-17 選擇補強判準而非降級 `TODO.md` 的宣稱，方向正確——降級等於把缺陷寫進文件。
+
+**但判定 REJECTED，理由是 F-19。** 本輪新寫的 G-6 內容層 `JSON.stringify(a).includes('272')` **在兩個方向同時錯**：漏掉全形 `釋字第２７２號`（**fail-open、靜默**，D1 的錯誤內容回到線上而 gate 說通過），又打到合法圖片網址裡的 `272`（fail-closed，gate 永遠不通過且訊息誤導）。
+
+**這一筆之所以是 REJECTED 而不是記錄了事**：它不是一個沒想到的邊角，而是**本票一個 cycle 前才剛診斷並修好的同一個形狀**——F-11 修的就是「檢查只認一種寫法」，修法就是加字元類容忍全形與空白變體。G-6 的內容層在一個 cycle 後把那個形狀原樣重建了一次。而且本票自己寫著「過寬和過窄一樣壞、(b) 和 (a) 一樣必須驗」，implement 對 G-6 只驗了 (a)。**同一個標準，implement 用它拒絕擴大偵測器涵蓋面，卻沒有用在自己新寫的斷言上。**
+
+**修法不是取捨**：五情境實測顯示「欄位範圍＋變體字元類」五個情境全對。要特別注意的是，直覺的「收窄成 `第272號`」會漏掉資料裡**已經存在**的 `釋字第 261 號` 那種空格寫法，比現行還糟——收窄必須同時容忍變體。另記 F-21（G-7 相鄰性認的是文字不是 metadata，觸發牽強，Polish）與 F-22（偵測器誤抓一條合法 `grep`，Polish）。
+
+## Stage Report: implement (cycle 9)
+
+本輪處理 review (cycle 2) 判 REJECTED 的四筆：F-19／F-20（合併處置）、F-22、F-14 強化，F-21 依授權 decline。全部改動在 commit `41bfb34`。**改了兩個檔案**：本票，以及 `docs/health-check/TODO.md` 兩處補述（**後者是我先揭露、FO 於 2026-09-24 cycle 9 授權後才改的**，十行新增、零行刪除，詳見下方「一筆我先揭露、後經 FO 授權才改的東西」）。`git diff --numstat` 為本票與 `TODO.md` 各一筆；`git diff -- src/` 為空；`src/data/*.json` 與 `main` sha256 相同（`history.json` `4d1992e3a5fbb21e`、`discussions.json` `4071978a7ad0b3d0`），未跑 `sync-content`；`PresentDetail.tsx` 零改動。
+
+**reviewer 這一輪說對了一件難堪的事，我照實接下**：F-19／F-20 是我上一輪**自己新寫**的斷言，而它違反的是這張票**自己一個 cycle 前寫下的原則**——「兩個方向都要驗」「過寬和過窄一樣壞」。我對 G-6 的內容層驗了 (a) 沒驗 (b)，而且我在補述裡確實揭露了 fail-closed 的風險卻沒有實測、沒評估觸發面。**揭露不等於驗證**，這一點我沒有話說。本輪每一條改動都兩個方向實跑並貼輸出。
+
+- DONE: F-19／F-20：把 G-6 內容層從「整份 JSON 的裸子字串 `includes('272')`」改成「case-number 型樣 ＋ 容忍既有寫法變體」，**五個情境全部實跑**。
+  型樣為 `[釋释]字第[ 　]*[2２][7７][2２][ 　]*[號号]`，掃**所有字串欄位**並回報欄位路徑。五情境全對，另加七個情境，見下節。
+- DONE: F-22：讓偵測器的 `grep` 分支把**掃描目標**納入判準。
+  已修，**而且實測範圍比 reviewer 點名的大**——同一類缺陷在 `node` 分支上也有一份，共五條合法指令被誤報，不是一條。見下節。
+- DONE: F-14 強化：偵測器對每個 `# canonical: G-N` 計數，大於 1 即報；並改掉補述裡「任何新放進來的區塊都沒有這個標記」那句。
+  已修，**計數擴及整個標記類**（含 `divergence-check`），因此 F-14 最初那個探測也一併關掉了。那句的處置方式見下節。
+- DONE: F-21 decline，但把觸發條件與可用的收斂寫法寫進票內。
+  已寫入第三節，含 promote-to-material 條件與錨定 metadata 屬性的具體寫法。
+- DONE: 逐條掃過每一個 G 項與偵測器，逐條說明驗了哪兩個方向。
+  八項 ＋ 偵測器 ＋ 兩條查核指令全部逐條列出，見「逐條雙向驗證」一節。**掃出一筆本輪未被點名的同類問題（G-3／G-4），依同一原則一併修**。
+
+### F-19／F-20：三者對照，實跑輸出
+
+G-6 正本**從文件抽出後執行**（fence-state 感知的抽取，不是 `grep` 標記字樣——標記字樣在表格列裡也出現，直接 `grep` 會抽到表格列，我第一次就踩到這個坑，見「我自己的兩個錯誤」）。全部在 `history.json` 的**副本**上跑，repo 資料零改動。
+
+| 情境 | 原 `includes('272')` | 只收窄成 `第272號` | 本輪（型樣＋變體類） |
+|---|---|---|---|
+| `釋字第272號` | 攔下 ✓ | 攔下 ✓ | 攔下 ✓ |
+| `釋字第 272 號`（**資料中真實存在的空格寫法**） | 攔下 ✓ | **放行 ✗** | 攔下 ✓ |
+| `釋字第２７２號`（全形） | **放行 ✗** | **放行 ✗** | 攔下 ✓ |
+| 合法列、圖片 id 帶 `272` | **攔下 ✗（誤攔）** | 放行 ✓ | 放行 ✓ |
+| 乾淨語料 | 放行 ✓ | 放行 ✓ | 放行 ✓ |
+
+**第二列是重點**：直覺的「收窄成 `第272號`」會漏掉資料裡**已經存在**的空格寫法，比原斷言還糟。收窄必須同時容忍變體——就是 F-11 的作法。
+
+新斷言逐情境輸出（`exit` 與訊息逐字）：
+
+| 副本 | exit | 輸出 |
+|---|---|---|
+| `釋字第272號` | 1 | `G-6 FAIL: content:釋字第272號@40.reality.ruling_id` |
+| `釋字第 272 號` | 1 | `G-6 FAIL: content:釋字第272號@40.reality.ruling_id` |
+| `釋字第２７２號`（全形） | 1 | `G-6 FAIL: content:釋字第272號@40.reality.ruling_id` |
+| 合法 `h48`＋`bgImage` 帶 `photo-1527200272341-` | **0** | `G-6 PASS` |
+| 乾淨語料（repo 現狀 40 列） | **0** | `G-6 PASS` |
+| `reality.title` 帶「釋字第272號」 | 1 | `G-6 FAIL: content:釋字第272號@40.reality.title` |
+| `h2` 那一列本身回來 | 1 | `G-6 FAIL: id:h2` |
+| `釋字第2720號`（**不同號次**） | **0** | `G-6 PASS` |
+| 簡體 `释字第272号` | 1 | `G-6 FAIL: content:釋字第272號@40.reality.ruling_id` |
+| 全形空格 `釋字第　２７２　號` | 1 | `G-6 FAIL: content:釋字第272號@40.reality.ruling_id` |
+| 半全形混寫 `釋字第２7２號` | 1 | `G-6 FAIL: content:釋字第272號@40.reality.ruling_id` |
+| `textbook.content` 內文提到「釋字第 272 號」 | 1 | `G-6 FAIL: content:釋字第272號@40.textbook.content` |
+
+**方向 (a)（會叫）**：七種寫法變體全部攔下，含全形、簡體、全形空格、半全形混寫，以及寫在 `title`／`textbook.content` 而不是 `ruling_id` 的情形。
+**方向 (b)（不誤叫）**：圖片 id 帶 `272` 放行、`釋字第2720號`（另一個號次）放行、乾淨語料放行。**`G-6 PASS` 在乾淨資料上出得來，證明它不是一條永遠 FAIL 的死指令**（F-6 的教訓）。
+
+**一個我主動偏離授權字面的決定，理由寫在這裡。** FO 授權寫的是「case-number **欄位** ＋ 容忍既有寫法變體」。我實作成「**所有字串欄位** ＋ 型樣」，沒有收成單一欄位，理由是**收成 `ruling_id` 會退回**：reviewer 自己 F-17 的重現用的是 `reality.title`，只掃 `ruling_id` 就抓不到那個探測了——**那會是用修 F-20 的代價重新打開 F-17**。實測佐證：`釋字` 今日只出現在 `reality.ruling_id`（30／40 筆），但釋字號可以寫在 `title`、`ruling`、`textbook.content` 任何一處，**涵蓋面要對齊語意，不要對齊今天的分布**。
+而排除圖片網址**靠型樣不靠欄位名**：點名 `bgImage` 是「點名單一實例」，日後任何新的網址欄位都會重新破功；型樣要求 `釋字第…號` 的前後文，對所有網址欄位一體有效——這也是為什麼 `photo-1527200272341-` 那一列放行。**若 FO 認為必須嚴格照字面收成單一欄位，這個決定可以退回，但請一併接受 F-17 的探測會重新變成漏抓。**
+
+**觸發面我沒有誇大，也沒有縮小**：今日 `ruling_id` 全形數字 0 筆、全檔裸 `272` 零命中，所以 F-19／F-20 都是 Deferred risk 不是 Material。支撐的是可行性證據——`history.json` 現有 163 個全形標點（證明 IME 會產生全形字元）、`ruling_id` 40 筆已有 `釋字第242號` 與 `釋字第 261 號` 兩種空格寫法（證明手打且格式不統一）、8 列有 `bgImage` 且 P3-8 另記 17 列待補。
+**殘留誠實記錄**：範圍寫法 `釋字第781~783號` 在資料中真實存在，若日後出現 `釋字第270~275號` 這類**涵蓋** 272 的範圍，型樣不會攔；它是另一個 `ruling_id`、不是 D1 那筆內容的還原，本 gate 不宣稱涵蓋，已寫入票內。
+
+### F-22：實際範圍比點名的大——兩個分支，不是一個
+
+自構十條合法驗證指令放進 `## Out of scope` 的 fenced 區塊實測。**舊偵測器誤報五條，不是一條**：
+
+| 合法指令 | 舊 | 新 |
+|---|---|---|
+| `grep -c "某學者" src/data/discussions.json`（reviewer 點名的那條） | **STRAY** | 乾淨 |
+| `grep -n '某大學' docs/health-check/TODO.md` | **STRAY** | 乾淨 |
+| `grep -rn 'lorem ipsum' docs/content-pipeline/` | **STRAY** | 乾淨 |
+| `grep -c '056-pre-launch-checklist' docs/INDEX.md` | **STRAY** | 乾淨 |
+| `node -e "console.log(require('./src/data/history.json').length)"` | **STRAY** | 乾淨 |
+| 其餘五條（`node -e` 讀 `package.json`、`for x in a b c`、`npm run dev`、`npx next lint`、`git diff --stat`） | 乾淨 | 乾淨 |
+
+**第五列是本輪自己掃出來的**：reviewer 報的是 `grep` 分支，但 `node` 分支的條件只有「`node -e` ＋ `history.json`」，**任何對 `history.json` 的合法讀取都會被誤報**。同一類缺陷、兩個分支，依本輪指示一併修。
+**修法**：`grep` 分支要求掃描目標是 ` src/`（G-5 的目錄）或 `layout.tsx`（G-7／AC-3 的三檔），比對前先去引號，對 `'src/'`／`"src/"` 不敏感；`node` 分支要求指令真的在做 G-6 的斷言（出現 `h2`／`h28`／`272`／`釋字` 其一），而不只是碰到同一個檔案。
+
+### F-14 強化：計數擴及整個標記類
+
+**修法**：對每個標記計數，大於 1 即報 `DUP-MARKER`。**沒有只收 `# canonical:`**——只收它就是「點名單一實例」，會把 F-14 最初那個用 `# divergence-check` 的探測留在原地。實測：
+
+| 情境（皆放進 `## Out of scope`） | 舊 | 新 |
+|---|---|---|
+| 整份複製帶 `# canonical: G-6` 的正本區塊（T6） | `STRAY` **0**，漏抓 | `DUP-MARKER[G-6] 2` |
+| 整份複製帶 `# canonical: G-7` 的正本區塊 | `STRAY` **0**，漏抓 | `DUP-MARKER[G-7] 2` |
+| 帶 `# divergence-check` 標記的區塊（**F-14 最初的探測，已開三輪**） | `STRAY` **0**，漏抓 | `DUP-MARKER[divergence-check] 2` |
+| 真實候選（三個標記各一次） | 無 | **零筆 `DUP-MARKER`** |
+
+計數只採**區塊的第一個標記行**。這一點是刻意的：偵測器自己的區塊首行是 `# divergence-check (self)`，其內文現在含有 `# canonical:` 的比對式，若逐行計數就會把自己算進去。**改成「首個標記行定義區塊身分」之後，偵測器內文放什麼都不影響計數**——這比「小心不要寫出會匹配自己的字串」穩固，因為後者依賴下一個人也記得。
+
+**「任何新放進來的區塊都沒有這個標記」那句怎麼處置。** 那句現在只存在於兩個地方：`## Test plan` 2026-09-24（cycle 8）更正裡**逐字保留的原文引述**，以及各輪 stage report 的歷史記錄。**我沒有改寫它們**——本票的慣例是「原句保留於下」，改寫逐字引述會毀掉記錄，而 reviewer 指的「不準」是指**該宣稱不該再被當成現行說明**。所以處置是：在 2026-09-24（cycle 9）更正裡明寫「**該宣稱到此作廢**，取代它的是 `DUP-MARKER` 計數」，並在活的說明段（`## Test plan` 導言）補上標記計數的規則。**現行說明不再含有那個不準的宣稱，而記錄完整保留。** 若 FO 要的是直接改字，請明示，我照辦。
+
+### 逐條雙向驗證：八個 G 項 ＋ 偵測器 ＋ 兩條查核指令
+
+依本輪指示逐條掃過。**每一條都列「(a) 會叫」與「(b) 不誤叫／不是死指令」兩個方向的實際結果。**
+
+| 項 | (a) 該攔的攔得到 | (b) 不誤攔／通過條件構得到 | 本輪改動 |
+|---|---|---|---|
+| G-1 | 八張票今日全印 `status: design`／`verdict` 空 → **不通過**，正確 | `044` 實印 `complete PASSED`，**證明通過條件構得到**（F-6 的教訓）；`099` 印 `NOT FOUND`，證明該分支可達；`023` 重現「封存但未結案」的記錄例外 | 未改 |
+| G-2 | `049`／`052` 同上，`design`／空 → 不通過 | 同 G-1（同一條指令，只換票號） | 未改 |
+| G-3 | 今日 `gate-signoff G-3` 印 `NO-RECORD`——沒簽查得出來 | 簽字放進 `### Feedback Cycles` → `RECORDED`；放進 `## Out of scope` 的誘餌 → `NO-RECORD` | **本輪補格式＋查核** |
+| G-4 | 今日印 `NO-RECORD` | 同 G-3（誘餌不算） | **本輪補格式＋查核** |
+| G-5 | 十一種佔位寫法（含簡體、全形數字、無空格、全形空格）**全部 HIT** | 八個近似但合法的字串**全部 MISS**；對 `src/` 實掃仍**恰好三筆**（`PresentDetail.tsx:32`、`contributors.ts:16`、`:21`），與 2026-09-24 記錄逐字相同，未多抓一行 | 未改 |
+| G-6 | 七種寫法變體全攔（全形／簡體／全形空格／半全形混寫／寫在 `title`／寫在 `textbook.content`／`h2` id 回來） | 圖片 id 帶 `272` 放行、`釋字第2720號` 放行、乾淨語料 `G-6 PASS` exit 0 | **本輪改內容層** |
+| G-7 | 註解移到檔尾 → `FAIL ... [matched/adjacent=1/0]` exit 1；整行刪除 → `FAIL: zero hit` exit 1；`TODO.md` 抽掉引用 → `FAIL: zero hit in docs/health-check/TODO.md`；`AGENTS.md` 抽掉 → `FAIL: zero hit in AGENTS.md`（**四個方向**） | 綁定在 `robots:` 正上方 → `G-7 PASS` exit 0；還原後 → `G-7 PASS` exit 0，證明不是永遠 FAIL | 未改（F-21 decline，觸發條件已寫入） |
+| G-8 | 刻意 `cp .next/types/routes.d.ts ".next/types/routes.d 2.ts"` → `TS2300: Duplicate identifier 'LayoutProps'`、exit **2**，證明 F-8 記載的失敗模式今天仍為真 | 依記載順序 `rm -rf .next` → `npm run build` exit 0（15 條路由）→ `npx tsc --noEmit` exit 0 無輸出；刪掉重複檔後 exit 0 | 未改 |
+| 偵測器 | 六行真副本放進**六個不同位置**（`#### 誰、在哪個時點執行`／`#### 與移除 noindex 的綁定`／`#### Gate 執行清單`／`### 三、Gate 機制`／`## Test plan`／`## Out of scope`）→ **每個位置 `STRAY=6`**；七種拼法變體全抓到（舊版只抓四種）；三種標記複製 → `DUP-MARKER` | 十條合法指令 `STRAY` 由 **5 降為 0**；真實候選 `STRAY` 零筆、`DUP-MARKER` 零筆、`AC-OWNED` 一筆不變 | **本輪改三處** |
+| F-9 查核（G-1／G-2 例外記錄） | 今日八張全印 `NO-RECORD` | `- gate-exception 058：…` 放進 `### Feedback Cycles` → `058 RECORDED`，同時 `## Out of scope` 的 `049` 誘餌仍印 `NO-RECORD` | 未改 |
+| AC-3 的 `grep` | 三檔任一零命中即失敗（G-7 已涵蓋同一判準並實測） | 今日三檔皆命中：`layout.tsx` 1、`TODO.md` 7、`AGENTS.md` 1 | 未改（AC 文字不可動） |
+
+**(b) 這一欄是本輪的重點。** 上一輪我對 G-6 只做了 (a)，這是被判 REJECTED 的直接原因。**過寬和過窄一樣壞**：過窄是 fail-open（漏叫），過寬是 fail-closed 且會讓檢查因常態誤報而被習慣性忽略——我自己就用後者當理由拒絕擴大偵測器涵蓋面，卻沒把同一個標準套在自己新寫的斷言上。
+
+**本輪掃出、未被點名、依同一原則一併修的一筆**：**G-3／G-4 的簽字沒有查核方式**。G-3 寫「把實際值抄回本票」、G-4 寫「理由寫入本票」，位置有了但沒有格式、沒有任何人查得到有沒有寫——**這正是 F-9 在 G-1／G-2 例外出口上修掉的缺口，當時只修了 `機械` 兩項，`人工` 兩項留在原地**。已依 F-9 的同一形狀補上 `- gate-signoff G-N：…` 格式與 ASCII 查核指令，兩個方向實跑（見上表）。**AC-4 的「六個 `機械` 項」數目未變**：查核指令查的是簽字記錄在不在，不代替 captain 判斷。**格式由 captain 可否決**，已在票內寫明。
+
+**逐條掃過但判定無同類問題的**：G-1／G-2 的指令對票號位數與 `_archive/` 路徑都不敏感（`ls` 兩路徑併查），且通過條件已證明可達；G-5 的字串集合未動（本輪沒有新增或刪除任何佔位字串，只在 2026-09-24 已擴大的變體類上實跑複驗）；G-8 的順序記載與症狀今日逐字重現。**F-13 未處理**（未授權）：實測 `grep -o` 抽出本票所有 `grep -rniE '…' src/` 形式共五筆，去轉義後**活的部分兩筆（表格正本與 blockquote 補述）今天仍逐字相同**，尚未分岔；另三筆分別是 blockquote 內的歷史原文與 stage report 記錄，非可執行副本。F-13 仍為 Deferred risk。
+
+### 一筆我先揭露、後經 FO 授權才改的東西
+
+`docs/health-check/TODO.md` 有兩處把 G-6 的內容層**描述**成舊寫法：第 247 行與第 362 行，
+兩處皆為 blockquote 補述，句子是「`056` 的 G-6 判準已於 2026-09-24（cycle 8）補上內容層斷言（`JSON.stringify(a).includes('272')`）」。
+**那個描述自本輪起不再是現行判準。**
+
+**我沒有改它，理由有兩個。** (1) 兩處都是**日期標明的歷史補述**，敘述 cycle 8 當時的事實，按專案「`record` 不改寫、要修正就追加補述」的規範，它作為歷史是準確的；
+(2) 本輪 dispatch 未授權改 `TODO.md`，而上一輪改該檔是依那筆觀察的個別授權。**我不自己擴大檔案範圍。**
+
+**為什麼仍然不算 fail-open**：同一段的第 240 行與第 354 行都明寫「**查驗指令以 `056` 第三節標記 `# canonical: G-6` 的那一段為正本，本檔不另存副本**」，
+而該標記本輪未變，指標仍指向正確的正本。實測 `TODO.md` 與 `AGENTS.md` 內**可執行的 G-6 副本皆為 0 筆**（以偵測器的 `node` 分支邏輯單掃兩檔），所以沒有第二份會分岔的指令。
+**風險是「讀到舊描述的人以為判準是裸子字串」，不是「gate 會跑錯」。**
+
+**建議處置**：Polish。在那兩處各追加一則補述、標日期、不改寫原句。
+
+**2026-09-24（cycle 9） FO 已授權，已修（commit `ba48f25`）。** 處置與提案相同，範圍未擴大：`docs/health-check/TODO.md` 兩處各追加一則 `2026-09-24（cycle 9）補述`，
+說明內容層已從裸子字串改為 case-number 型樣、兩個方向各錯在哪、並重申現行寫法一律以 `# canonical: G-6` 正本為準。
+**原句一字未改**——`git diff --numstat` 為 `10 0`（十行新增、**零行刪除**），符合 `AGENTS.md` 的「不悄悄改寫原文」規範；`TODO.md` 其餘部分未動。
+**未引入新的副本**：兩則補述是 blockquote 內的行內程式碼，不是 fenced 區塊；以偵測器的 `node` 分支邏輯單掃兩檔，
+`TODO.md` 與 `AGENTS.md` 的可執行 G-6 副本**仍皆為 0 筆**。
+**未回歸**：G-6 對真實資料仍 `G-6 PASS` exit 0；G-7 仍 `G-7 PASS` exit 0；
+AC-3 三檔命中數為 `layout.tsx` 1／`TODO.md` **9**（由 7 增為 9，因新增兩行指向正本的引用）／`AGENTS.md` 1，三檔皆 ≥1，AC-3 維持成立；
+本票偵測器輸出不變（`STRAY` 零筆、`DUP-MARKER` 零筆、`AC-OWNED` 一筆）——它只掃本票一個檔案，不受 `TODO.md` 影響。
+**本輪因此實際改了兩個檔案**：本票與 `docs/health-check/TODO.md`。
+
+### 日期更正（cycle 9 補正，FO 授權，commit `d9da392`）
+
+**FO 查出 29 處日期指向還沒到來的日子，屬實，我接下。** 這一筆不是 FO 讀錯，我獨立複驗過：系統時鐘 `2026-09-24T20:23Z`；branch 上 056 的 commit author date 只落在 **09-21 至 09-24**；我這一輪的 `41bfb34`／`ba48f25` 都是 **2026-09-24 13:13／13:19 -0700**，而我在內容裡寫的是 09-26。**成因與 FO 的判斷一致**：最後四輪都在同一天，日期被按輪次遞增而不是讀時鐘。
+
+**為什麼我把它當成同一個形狀的第十二處，而不是一個筆誤**：本票的方法就是「標日期的補述，原句保留」，**日期是這條審計軌跡的排序機制**。日期錯了，軌跡就無法按時間複查——而「無法複查的記錄」正是 F-9（查核掃錯範圍）、F-10（未證實的歸因）、F-12（會分岔的副本）一路在修的東西。載體換成日期，缺陷不變。
+
+**先建立可否證的判準，再動手。** 判準是：**任何一行提到的日期，都不得晚於引入該行的那個 commit 的 author date**（反向早於是合法的歷史引用，不報）。用 `git blame --line-porcelain` 逐行取 author date，逐一比對該行的每個日期 token。
+**這條查核自己先被驗過會叫**：在副本上植入一個遠在未來的日期，它報出來並以離開碼 1 結束；真實檔案修正後回 0 筆、離開碼 0。**不是一條永遠通過的死指令。**
+
+**我第一版的查核是壞的，而且壞在 fail-open，記下來。** 最初用 `awk` 寫，呼叫了 `strftime` 把 epoch 轉成日期——**BSD awk 沒有這個函式**。它印 `awk: calling undefined function strftime` 到 stderr，然後 `TOTAL forward-pointing refs = 0`。**「0 筆」看起來就是「乾淨」**，而實際上它一行都沒比對成功。若我當時只看最後一行，就會回報「日期沒問題」並把 FO 的正確發現駁回。改用 Node 重寫後才拿到真實的 41 筆。**與 G-8 的 `tsc` 假性失敗剛好相反：那個是假失敗，這個是假通過，而假通過更危險。**
+
+**改了哪些處、從什麼改成什麼**（全部經 `git blame` 確認歸屬，映射是一致的：每一個 09-25 標籤都由 cycle 8 的 `952962d` 引入、每一個 09-26 都由 cycle 9 的 `41bfb34`／`ba48f25`／`54b5c6e` 引入，三者 author date 皆為 2026-09-24）：
+
+| 檔案 | 原標示 | 改為 | 處數 |
+|---|---|---|---|
+| 本票 | `09-25` | `2026-09-24（cycle 8）` | 12 |
+| 本票 | `09-26` | `2026-09-24（cycle 9）` | 17 |
+| `docs/health-check/TODO.md` | `09-25` | `2026-09-24（cycle 8）` | 8 |
+| `docs/health-check/TODO.md` | `09-26` | `2026-09-24（cycle 9）` | 4 |
+| 本票 | `2026-09-24`（cycle 6 的 G-5 更正，日期本來就對） | `2026-09-24（cycle 6）` | 2 |
+| 本票 | `2026-09-24`（cycle 7 的 Test plan 更正，日期本來就對） | `2026-09-24（cycle 7）` | 1 |
+
+**本節提到那兩個錯誤日期時一律省略年份**（寫 `09-25`／`09-26`）：寫全了會被上面那條查核判為「指向未來」，而為此加一個豁免標記就是重犯 F-14。年份由上下文確定。
+
+**合計 41 處錯誤日期 ＋ 3 處補上 cycle 標籤。** 括號內的場合改用 `2026-09-24 cycle N`（不套括號），共 5 處。
+
+**兩處因為「同一天」而失真的句子一併改掉**：`TODO.md` 兩則新補述原寫「該描述只反映 `09-25` 當天的判準」——cycle 8 與 cycle 9 現在同一天，「當天」不再能區分，改為「只反映 cycle 8 當時的判準」；本票同一處改為「敘述 cycle 8 當時的事實」。
+
+**逐字引述已同步，並實測證明。** 本票有一處逐字引述 `docs/health-check/TODO.md` 的句子（「`056` 的 G-6 判準已於 … 補上內容層斷言」）。**原文改了而引述沒改，就是 F-12／F-13 的分岔副本，只是換一個載體**——FO 在授權裡點名了這一條。以程式比對：從本票抽出該引述字串，斷言它**逐字出現在 `docs/health-check/TODO.md` 內**，結果為 `true`。另清過一次標籤空白不一致（`（cycle N）` 後多一個空格，共 26 處），兩檔同一個規則，所以引述仍逐字相同。
+
+**確認只改了日期，沒有夾帶任何實質改動**：`git diff --numstat` 為本票 **28／28**、`docs/health-check/TODO.md` **10／10**——**新增與刪除行數相等**，代表全部是原地換字、沒有任何新增或移除的內容行；再以 `git diff --word-diff` 逐 token 檢視，變動的 token 只有日期標籤與上述兩處「當天／當時」。（本節與日期規則那一則補述是之後另外新增的，不在這組數字內。）
+
+**一處我沒有修、也不建議修的殘留，主動揭露。** commit `ba48f25` 的 **subject 行**寫著「FO `09-26` 授權」（年份省略，理由同本節開頭），那個日期是錯的，真實 author date 為 **2026-09-24**。
+**為什麼不修**：改 commit message 需要 rebase，會換掉 `ba48f25` 的 SHA，而本票已經有多處以該 SHA 引用它（`54b5c6e`／本節／上方補述），下游三個 commit 的 SHA 也會一起變。**為了修一行訊息而讓票內所有 SHA 引用失效，代價大於缺陷。**
+**所以處置是「記錄更正」而不是「改寫歷史」**，與本專案「`record` 不改寫、要修正就追加補述」的規範一致：**讀 git log 看到 `ba48f25` 寫 09-26 的人，以本則為準，真實日期是 2026-09-24（cycle 9）。**
+另外 `d9da392` 的 message 內**刻意**保留了 09-25／09-26 的完整形式，因為那是「從什麼改成什麼」的對照表，是記錄而非標示。
+
+**未回歸**：三條正本從修改後的文件抽出重跑——`G-6 PASS`、`G-7 PASS`、偵測器 `STRAY` 零筆／`DUP-MARKER` 零筆／`AC-OWNED` 一筆，全部與修正前相同。活的部分仍是**四個** fenced 區塊（日期規則那一則刻意寫成文字而非第五個區塊，理由寫在該則內）。`## Acceptance criteria` 全節仍 **1622B**、sha256 `93e5bf6a95f16592`。`docs/health-check/TODO.md` 的可執行 G-6 副本仍 0 筆。`src/` 零變動，`src/data/*.json` 與 `main` 相同。
+
+### 我自己的兩個錯誤，記下來
+
+1. **抽取指令時踩了本票警告過的坑。** 第一次抽 G-6 正本用的是「找到含 `# canonical: G-6` 的行就開始收」，結果抽到的是**表格列**（第 190 行的 G-6 列文字裡也有這個標記字樣），跑出 `syntax error near unexpected token '|'`。這正是 cycle 8 reviewer 記過的形狀（「`^\| G-[1-8] \|` 掃全檔會命中 stage report 的表格列」）。改成 fence-state 感知、要求標記出現在**區塊首行**後才正確。**寫在這裡是因為：抽取腳本錯了會讓後面所有「實跑」變成跑錯東西，而輸出看起來仍然像成功。**
+2. **`set -e` 吃掉了第一張結果表。** 第一次跑十二個情境的迴圈時，第一個情境 exit 1 就讓整個 script 中止，我拿到的是一張只有表頭的空表。若沒注意就會把「沒有輸出」當成「沒有問題」。已改成顯式捕捉離開碼後重跑。
+
+### 兩條硬規則的遵守
+
+- **`sort`／`uniq` 全程未用於判定中文字串。** 計數一律 `grep -o … | wc -l` 或 `grep -c`，去重在 Node 用 `Set`（F-13 的五筆去重就是這樣算出「四種相異形式」）。
+- **`src/data/*.json` 零改動、未跑 `sync-content`。** 十二個 G-6 情境全部在副本上跑（另建 sandbox 目錄放 `src/data/history.json` 副本，在該目錄內執行抽出的正本）。`npm run build` 前後 `shasum -a 256 src/data/*.json` **完全相同**，證明 build 沒有觸發同步（PR #32 已把 sync 移出 build）。
+
+### 驗證與可否證性
+
+- **三條正本全部從文件抽出後執行**，不是照著讀：G-6 正本 553B、G-7 正本 502B／8 行、偵測器 1285B／30 行。抽取採 fence-state 感知並要求標記在區塊首行（見上「我自己的兩個錯誤」）。
+- **每一條改動都有一個可以推翻我的具體探測**：G-6 若我說錯了，只需證明新斷言在全形寫法上放行、或在圖片 id 情境上攔下——實測分別是攔下與放行，兩個方向都與「說錯了」相反；偵測器若我說錯了，只需找出一個真副本位置它不報、或一條合法指令它報——六個位置各 6 筆、十條合法指令 0 筆。
+- **反向也驗了，而且是刻意驗的**：G-6 在乾淨資料上 `PASS`（不是死指令）、`釋字第2720號` 放行（不過寬）、偵測器對真實候選 `STRAY`／`DUP-MARKER` 皆零（不誤報正本）、G-7 還原後 `PASS`（不是永遠 FAIL）、G-1 的 `044` 實印 `complete PASSED`（通過條件構得到）。
+- **未越界**：`## Acceptance criteria` 全節 **1622B**、sha256 `93e5bf6a95f16592`，與 `cb341af`／`37b4ac5`／`0776796`／`HEAD` **五點完全相同**——AC 要求文字逐字未變。`git diff -- src/` 空；`git status --porcelain` 只有本票一筆；`src/data/*.json` 與 `main` sha256 相同；`PresentDetail.tsx` 零改動（C1 的覆寫點仍待 captain）。**AC-2 維持未達成**（依賴尚未核准動工的 feature `039`），本輪未宣稱任何 A 類項目通過。
+- **活的部分仍是四個 fenced 區塊**（G-7 正本、G-6 正本、AC-3 的 `grep`、偵測器自己），數目與上一輪相同，本輪沒有新增任何可執行區塊。
+- **記錄的非阻擋缺口未回歸**：`npm run build` 後 15 個預先產製 HTML 中仍**恰好一個** `_global-error.html` 不帶 noindex，與 2026-09-21 記錄相同。
+
+### Summary
+
+**F-19／F-20 我接下，而且 reviewer 的批評是對的**：我上一輪自己新寫的 G-6 內容層在兩個方向同時錯——漏掉全形 `釋字第２７２號`（fail-open、靜默）、又打到合法圖片網址裡的 `272`（fail-closed、訊息誤導）；而我只驗了 (a)，還把「揭露」當成了「驗證」。**這張票一個 cycle 前才寫下「兩個方向都要驗」「過寬和過窄一樣壞」，我沒有把它套在自己身上。** 已改成「case-number 型樣 ＋ 容忍既有寫法變體」，五情境全對，另加七情境（簡體、全形空格、半全形混寫、寫在 `title`／`textbook.content`、不同號次 `釋字第2720號`、`h2` id 回來）全部正確；失敗訊息現在指出欄位路徑。**一個主動偏離**：我沒有把範圍收成單一 `ruling_id` 欄位，因為那會讓 reviewer 自己 F-17 的探測（272 寫在 `reality.title`）重新變成漏抓——排除圖片網址靠的是型樣，不是欄位名，理由與可退回的條件都寫在票內與上文。
+
+**F-22 的實際範圍比點名的大**：`grep` 分支之外，`node` 分支也有同一類缺陷，十條合法指令共**五條**被誤報，不是一條。兩個分支都補上 G 項專屬的掃描目標／斷言，`STRAY` 由 5 降為 0，而六個位置的真副本仍各報 6 筆。**F-14 強化擴及整個標記類**（`G-N` 與 `divergence-check`），所以 F-14 最初那個開了三輪的探測也一併關掉；計數採「區塊首個標記行」，使偵測器內文寫什麼都不影響計數。「任何新放進來的區塊都沒有這個標記」那句在現行說明中已作廢並由 `DUP-MARKER` 取代，逐字引述的記錄保留未動。**F-21 依授權 decline**，觸發條件、promote-to-material 條件與錨定 metadata 屬性的收斂寫法都已寫入票內。
+
+**逐條掃過八個 G 項、偵測器與兩條查核指令，每一條都列出 (a)(b) 兩個方向的實際結果**，並掃出一筆未被點名的同類問題——**G-3／G-4 的簽字有記錄要求但沒有查核方式**，與 F-9 同一形狀（當時只修了 `機械` 兩項），已依同一作法補上格式與查核指令，兩個方向實跑，且 AC-4 的「六個 `機械` 項」數目未變。**另記兩個我自己的錯誤**：抽取指令時踩到本票警告過的「標記字樣也出現在表格列」的坑，以及 `set -e` 讓一張結果表變成空表卻看起來像成功——兩者都會讓「實跑」悄悄跑錯而輸出仍像成功，所以寫進報告。
+
+**未越界**：AC 全節 1622B／sha256 五點相同，`src/` 零變動，`src/data/*.json` 與 `main` 相同且未跑 `sync-content`，AC-2 維持未達成。本輪改兩個檔案。第二個檔案（`docs/health-check/TODO.md` 第 247／362 行把 G-6 內容層描述成舊寫法）**我先揭露、沒有自己擴大範圍去改，等 FO 於 2026-09-24（cycle 9）授權後才動**，處置與提案完全相同：兩處各追加一則標日期的補述，**原句一字未改（十行新增、零行刪除）**。實測未引入新副本（兩檔可執行 G-6 副本仍皆 0 筆），未回歸（G-6／G-7 皆 PASS，AC-3 三檔皆 ≥1）。
+
+## Stage Report: review (cycle 3)
+
+我是前兩輪判 REJECTED 的同一個 reviewer。**本輪我找不到任何 fail-open。** 四筆處置全部成立，G-3／G-4 新查核兩個方向都對，日期缺陷我獨立重現 41 筆→0 筆、並證明判準會叫。**本輪最該驗的那一項——那條查核本身會不會假通過——我用自己寫的實作驗過，不採信任何回報數字。** 判定 **PASSED**，另記四筆 Polish 與兩筆 dispatch 形狀問題。
+
+- DONE: 驗 F-19／F-20 新 pattern 兩個方向，並確認 F-17 沒有被重開
+  pattern 從正本區塊**逐字抽出**（`/[釋释]字第[ 　]*[2２][7７][2２][ 　]*[號号]/`，非重打）：**10 個佔位變體全 HIT**（全形數字、全形空格、ASCII 空格、簡體、半形全形混寫、句中、後綴），**10 個合法近似全 MISS**（圖片網址 id、`釋字第748號`、`釋字第1272號`、`釋字第2721號`、`w=2720`、`共272人`、`見第272頁`、`114憲判9`），**錯誤 0**。F-17 **未被重開**：把 272 放進 `reality.title`／`reality.ruling`／`textbook.content`／`textbook.handwriting` 四個非 `ruling_id` 欄位，G-6 皆 exit 1 並印出欄位路徑（如 `@40.reality.title`）。**FO 認錯是對的**——我自己上一輪的探測就是 `reality.title`，收窄到 `ruling_id` 會讓我的探測失效。
+- DONE: 自己數 F-22 在 node 分支的誤報筆數
+  **我上一輪的 10 條裡舊偵測器只誤報 1 條，但 implement 的實質指控成立**：node 分支確實有同一缺陷，是**我的 (b) 方向集合太窄**漏掉了它。我補到 15 條後舊偵測器誤報 **4 條**（`grep` 掃 `discussions.json`、`grep` 掃 `docs/`、兩條合法讀 `history.json` 的 `node -e`），新偵測器 **0/15**。我無法以任何集合重現「10 條中 5 條」這個數字，但結論一致且我的原集合有缺，**這一點是我的**。
+- DONE: 以驗 F-9 的同一標準驗 G-3／G-4 新補的簽核查核
+  指令從文件**抽出**（256B、純 ASCII、`stderr` 0 位元組）。(a) 真實候選：`G-3 NO-RECORD`／`G-4 NO-RECORD`（正確，captain 尚未簽）。(b) 副本上把真實 `- gate-signoff G-3：…` 放進 `### Feedback Cycles`、同時把 `G-4` 當誘餌放進 `## Out of scope`：印 `G-3 RECORDED`／`G-4 NO-RECORD`。**該算到的算得到、區段外的誘餌不算**，與 F-9 同型同強度。
+- DONE: 確認 F-21 decline 理由記錄完整、F-14 強化關掉了它自己的原始探測
+  F-21（`:484-492`）記了：是什麼、**兩個觸發條件**、為何 decline（對比 F-19 只需打一個全形數字）、materiality、FO 授權、**promote-to-material 條件**、以及**日後要收的具體寫法**（`nxt ~ /robots:[ \t]*\{/` 並斷言全檔恰好一行）。**日後要收的人不必重新推導。** F-14 強化**確實關掉了自己開了三個 cycle 的探測**：我上一輪的 T6（整份複製正本、標記一併帶著）舊偵測器 `STRAY 0`、新偵測器 `DUP-MARKER[G-6] 2`；G-7 版本 `DUP-MARKER[G-7] 2`；F-14 最原始的探測（帶 `# divergence-check` 的區塊）`DUP-MARKER[divergence-check] 2`。未標記的普通重複仍報 `STRAY 2`。
+- DONE: **本輪最高優先——那條日期查核會不會假通過**
+  見下節。**strftime 陷阱在本機屬實**，現行查核不含它，我以自己的 Node 實作獨立重現 41→0 並證明它會叫。
+- DONE: 判斷三項刻意決定與兩套 cycle 編號
+  三項**全部接受**，其中 (1) 我實測證明是**被判準逼出來的**，不是規避。編號並存接受，附一句建議。見下節。
+- SKIPPED: AC-2 — A 類每一項都能以實際頁面行為驗證
+  維持未達成，未以任何替代方式宣稱。獨立複核：`039-render-check-tool.md` 仍 `status: design`／`verdict` 空；`package.json` 內無 `playwright`／`puppeteer`／`jsdom`／`cheerio`。
+- DONE: 未越界未回歸
+  AC 全節 **1622B／sha256 `93e5bf6a95f16592`**，與 merge-base、`37b4ac5`、`41bf3c9`、HEAD **四點全部相同**。`src/` 本輪零變動；`PresentDetail.tsx` 零 commit；`src/data/*.json` 與 `main` sha256 相同、未跑 `sync-content`；活的部分仍**恰好 4 個** fenced 區塊；三條正本重跑 `G-6 PASS`／`G-7 PASS`／偵測器 `STRAY 0`・`DUP-MARKER 0`・`AC-OWNED 1`。
+
+### 那條日期查核會不會假通過——本輪的核心
+
+**我沒有採信 `0 筆`。文件裡沒有可抽出的指令**（依刻意決定 (2)，判準以文字敘述），所以我照敘述**自己寫了一份實作**，並刻意**用 Node 而不是 awk**。
+
+**先確認陷阱屬實**（本機實跑）：`awk '{print strftime("%Y-%m-%d", 1758700000)}'` → `awk: calling undefined function strftime`、**exit 2**。而把它塞進一條天真管線：`… | grep -c HIT` → 印出 **`TOTAL forward-pointing refs = 0`**。**「0 筆」確實看起來就是「乾淨」。** implement 記下這一筆是對的。
+
+**現行查核不含這個陷阱**：活的部分**沒有任何 `strftime`**（唯一命中在 `### Feedback Cycles` 的散文引述裡，不是可執行區塊）。我的實作 `stderr` **0 位元組**、exit 0。
+
+| 測試 | 結果 | 意義 |
+|---|---|---|
+| 本票 @HEAD | `0` 筆（2162 行，100 行帶 ISO 日期） | 修好了 |
+| `TODO.md` @HEAD | `0` 筆（985 行，115 行帶 ISO 日期） | 修好了 |
+| **本票 @`d9da392^`（修正前）** | **27 筆**；裸占位計數 **29 處** | 獨立重現 |
+| **`TODO.md` @`d9da392^`** | **12 筆**；裸占位計數 **12 處** | 獨立重現 |
+| 副本植入 `12-31` 與次年 `01-15` | **2 筆，行號正確** | **會叫，不是死指令** |
+| 副本再植入 `2026-04-30`（早於，合法故保留全寫） | 仍 **2 筆** | 反向正確，歷史引用不誤報 |
+
+**implement 的「41 筆」完全正確**：29 ＋ 12 = 41，是**占位次數**，在 `d9da392^` 上逐字重現。**我一開始量到 31，那是我的錯**——我用了 `c689b93` 而不是 `d9da392^`（真正的修正前狀態），差了三個 commit。查清楚才報，沒有把自己的取樣錯誤寫成對方的缺陷。我的判準式計數 39（27＋12）比占位數少 2，原因是 4 行同時提到兩個壞日期、我按行去重，兩者可互相換算。
+
+**相鄰性之外我另外驗了「有沒有夾帶實質改動」**，因為 implement 用的論據站不住（見 F-25）：把所有日期標籤形式正規化後逐行配對，本票 **27/28**、`TODO.md` **8/10** 的刪除行**只差日期標籤**；其餘 3 行是**已揭露**的「日期指稱改成 cycle 指稱」（`09-25 當天` → `cycle 8 當時`），屬新日期規則第 2 條，非實質改動。**沒有夾帶。** 過程中我自己的正規化腳本先出過一次錯（`<D> 補述` 對 `<D>補述`，日期標籤形式的空白差異），修正後才得出上列數字——**如實記下，因為那個 bug 會讓乾淨的 diff 看起來有 20 處實質改動。**
+
+### 三項決定與編號並存的判斷
+
+**(1) 省略年份 —— 接受，而且我實測它是被逼出來的。** 在副本上把年份寫回那三處，用**我自己的**判準跑：**印出 6 筆 forward**。所以不是文風選擇，是採用該判準後的必然結果。另一條路（加豁免標記）確實是重犯 F-14——而本輪 `DUP-MARKER` 的存在正是因為「標記會被複製」是真的，我這輪親手驗過三次。**唯一代價見 F-26。**
+
+**(2) 日期規則不寫成 fenced 區塊 —— 接受，但這是本輪最接近邊界的一項決定。** 理由（活的部分只該有四個可執行區塊、多一份就多一個分岔源）與 F-12 一致，而且判準敘述得夠精確——**我沒看指令就實作出來，並重現了 41→0，這本身就是敘述足夠精確的證據。** 反面見 F-27。
+
+**(3) `ba48f25` subject 殘留不修 —— 接受。** 實測 subject 為 `…（FO `09-26` 授權）`、真實 author date `2026-09-24`。改它要 rebase，會換掉該 SHA，而票內多處以該 SHA 引用它、下游三個 commit 一併改變。**為一行訊息讓票內所有 SHA 引用失效，代價明顯大於缺陷**，且已依「`record` 不改寫、追加補述」在 `:2128` 揭露。附帶邊界見 F-28。
+
+**編號並存 —— 接受，附一句建議。** 偏移是系統性的且已在 `:548` 說明（Feedback Cycles 記 FO 授權的修正輪、stage report 記 implement 執行輪，首次 implement 不是修正輪，故自始相差 1）。**它不是分岔副本**，兩套各有所指。**但說明只在 `### Feedback Cycles` 那一行**，而使用該編號的是日期規則（`2026-09-24（cycle 8）`）；照規則寫日期的人在規則處看不到「cycle 指哪一套」。建議在日期規則第 2 條加一個子句指明用 stage report 編號。Polish，未自行改。
+
+### 新 finding（皆 Polish／Deferred risk，無一為 fail-open）
+
+**F-25 — 「增刪行數相等，代表全是原地換字」這個論據不成立。**
+- observable harm：stage report 寫「日期輪 diff 為本票 28／28」，但 `git show --numstat d9da392` 對本票是 **80／28**（`--unified=0` 下 66／28）——因為同一個 commit 還新增了日期規則約 52 行。**行數相等的推論在本票上根本不適用**（`TODO.md` 的 10／10 才成立）。**結論是真的**（我逐行配對驗證了），但**它引用的證據不能支撐它**。
+- 受影響的邊界：本票的主題就是「宣稱與證據對不上的檢查」。這一次載體是 stage report 的論據。
+- trigger evidence：`git show --numstat d9da392` 實跑。
+- 建議：materiality = **Polish**（交付物無缺陷，僅論據失效）。disposition = 把該句改為「逐行配對確認只差日期標籤」，並引用配對結果而非行數。**未自行修。**
+
+**F-26 — 省略年份在它所規避的那條查核上留下一個盲區。**
+- observable harm：判準只看完整 ISO 日期（`20\d{2}-\d{2}-\d{2}`），所以裸 `09-25`／`09-26` **對該查核不可見**。今日 2 處，皆為刻意且已說明。但這意味著「0 筆」不等於「所有日期都對」，只等於「所有**寫成完整 ISO 的**日期都對」。
+- 受影響的邊界：查核的涵蓋面窄於「日期都正確」這個直覺讀法（規則本身寫的是「任何一行提到的日期」，未限定形式，略寬於實作）。
+- trigger evidence：我的實作對裸 MM-DD 零命中；把年份寫回則 6 筆。
+- 建議：materiality = **Polish**。promote 條件：裸 MM-DD 寫法擴散到刻意的那兩處之外。disposition = 在日期規則裡寫明「本查核只覆蓋完整 ISO 形式；裸 MM-DD 屬刻意例外，僅限本則」。**未自行修。**
+
+**F-27 — 全票唯一有「已證實 fail-open」的查核，也是唯一沒有被存成可執行形式的查核。**
+- observable harm：日期查核以散文敘述，每個未來執行者各寫一份實作。而它的已知失效模式正是「實作靜默回報 0」（strftime）。prose 不能固定實作，所以同一類 bug 可以在下一次執行時重演——**而那一次不一定有人像本輪一樣被明確警告去查 stderr**。
+- 平衡說明：排除它的理由（多一個可執行區塊就多一份會分岔的副本）在 F-12 的脈絡下成立，**但本輪自己新增的 `DUP-MARKER` 唯一性計數已經讓「安全地存第五個正本區塊」成為可能**——排除的理由比本輪之前弱了。
+- trigger evidence：strftime 在本機 exit 2 且天真管線印 0（實跑）；我的 Node 實作與 implement 的實作是兩份不同實作，兩者都得到 41→0，但這是運氣好，不是機制保證。
+- 建議：materiality = **Deferred risk**。promote 條件：下一次有人執行日期查核而未確認 stderr。disposition = 存成 `# canonical: date-check` 第五個區塊（由 `DUP-MARKER` 保護唯一性），或在規則裡加一條硬要求「執行後必須確認 stderr 為空且行數非零」。**未自行修。**
+
+**F-28 — commit message 在日期判準的涵蓋面之外，這一點沒有寫明。**
+- observable harm：判準經 `git blame` 讀**檔案行**，所以 commit subject／body 裡的日期結構上不可見——`ba48f25` 的錯誤日期正是這樣躲過的。決定不修是對的，但票內未說明「0 筆」不涵蓋 commit message。日後有人看到 0 筆可能誤以為含 commit 訊息。
+- trigger evidence：`ba48f25` subject 含 `09-26` 的完整 ISO 形式，我的實作對兩檔皆 0 筆——兩件事同時成立。
+- 建議：materiality = **Polish**。disposition = 在日期規則裡補一句涵蓋面聲明。**未自行修。**
+
+### 兩筆 dispatch 形狀問題（非候選缺陷，交 FO）
+
+**D-1 — dispatch 指定的 diff 基準 `cb341af` 不是本 branch 的祖先。** 實測 `git merge-base --is-ancestor cb341af HEAD` → 否；`… cb341af main` → 是。它是 **main 上 066 的 dispatch commit**（`Thu Sep 24 11:14:52 2026`）。以它為基準，`git diff cb341af..HEAD` 會混入 main 的 063 對 `src/` 的改動（`future/page.tsx`、`future.ts`、`BottleneckFunnel`、`JusticeTermTimeline`、`RulingThresholdNote` 等約 200 行）與 064／065／066 的反向刪除，**足以讓人誤判本輪動了 `src/`**。我改用**本輪真正的基準 `41bf3c9`**（我上一輪的 review commit），得到 2 檔：本票 `+351／-24`、`TODO.md` `+16／-6`，`src/` 零變動。**這正是我第一輪就記過的歸屬陷阱，只是這次寫進了 dispatch。**
+
+**D-2 — 工作區有未提交改動。** `git status --porcelain` 為 ` M docs/constitution-features/056-pre-launch-checklist.md`，內容是 frontmatter `status: implement` → `status: review` 一行。依前幾輪的慣例這是**FO 推進階段的改動**，非 implement 未提交交付物（implement 的內容改動皆已在 `41bfb34`…`261d60e`）。我依契約未動 frontmatter。AC 區段在 HEAD 與工作區**同為 1622B／同 sha256**，未受影響。
+
+**D-2 的後續，主動揭露**：我以 `git add <檔案>` 提交本節時，**該行 frontmatter 被一併帶進我的 commit `d8f479a`**（`git show` 確認含 `-status: implement` ／ `+status: review`，numstat `108／1`，那 `1` 就是它）。**我沒有撰寫該改動，但我提交了它。** 我不還原它——`status: review` 正是 FO 要推進的狀態，也是本 stage 的正確值，還原會把 FO 的階段轉移丟掉。依契約我不改 frontmatter，故僅如實記錄：該行的作者是 FO，載體是我的 commit。**日後若要精確歸屬，看的是這一段，不是 commit 作者欄。**
+
+### 驗證與可否證性
+
+- **本輪唯一沒有指令可抽的檢查，我自己寫了實作**，並刻意避開 awk。可否證點：若我的實作是死的，植入 `12-31` 與次年 `01-15` 就不會有輸出——實測 2 筆且行號正確；若它把合法歷史引用也報，植入 `2026-04-30` 後筆數會變——實測不變。
+- **每一條有指令的檢查都從文件抽出後執行**：G-6 正本 633B、G-7 正本 580B、偵測器（行首錨定，因 awk 內含行中三連反引號）、G-3／G-4 查核 256B、F-9 查核 282B、G-1／G-2／G-5 從表格列去轉義抽出。
+- **反向全部驗過**：G-6 對三種合法資料 `PASS`、對五種欄位放置 `FAIL`；偵測器對 15 條合法指令 0 誤報、對未標記重複報 `STRAY`、對帶標記重複報 `DUP-MARKER`；G-3／G-4 誘餌不算。**只驗通過等於沒驗。**
+- **兩次我自己的工具出錯都如實記下**：取樣 revision 錯（31 對 41）、正規化腳本的空白 bug（假的 20 處實質改動）。兩次都是先查清成因才下判斷。
+- **locale 陷阱已避開**：全程未用 `sort`／`uniq`／`sort -u` 判定中文字串；計數用 `grep -o`／`grep -c`／`wc -l`，去重用 Node `Set`。
+- **本節自己遵守了日期規則，而且是被自己的查核抓出來才遵守的**：初稿寫完後我對**自己這一節**跑了一次日期查核，印出 **7 筆** forward——`12-31`／次年 `01-15`（我的植入測試值）、`09-25`、`09-26`（缺陷本身的兩個日期）全都以完整 ISO 形式寫著。依本票規則改為省略年份後重跑，**0 筆**。**這同時是決定 (1) 的第三個獨立證據**：任何要談論那兩個日期的人都會撞到同一面牆，省略年份不是規避而是這條判準的必然結果。若我沒有對自己跑一次，我會一邊certify「0 筆」一邊把 7 筆新的塞進同一個檔案。
+- **所有重現都在副本或臨時 git repo 上**：`git status --porcelain` 僅前述 FO frontmatter 一行、HEAD 仍 `36ba50d`、`history.json` sha256 未變。未動候選位元組、未 commit 任何修正、未重跑 implement。
+
+### Summary
+
+**判定 PASSED。** 前兩輪我判 REJECTED 的依據都是 fail-open——檢查回報通過而被保護的性質已經不在。**本輪我找不到任何 fail-open**，而且我是用前兩輪那套方法去找的。
+
+四筆處置全部成立：F-19／F-20 的新 pattern **20/20 正確**（10 個變體全抓、10 個合法近似全不抓），**F-17 未被重開**（四個非 `ruling_id` 欄位皆 `FAIL` 並印欄位路徑）；F-22 兩分支都修、合法指令 **0/15** 誤報；F-14 強化**真的關掉了它自己開了三個 cycle 的原始探測**（三種帶標記的複製全部由 `DUP-MARKER` 抓到）；F-21 的 decline 記錄完整到「日後要收的人不必重新推導」。G-3／G-4 新補的簽核查核以 F-9 的同一標準驗過，兩個方向都對。
+
+**FO 這一輪的兩個判斷我都複核為正確**：採用 implement 的 pattern 版本而非自己授權的「收窄到 `ruling_id`」——**我自己上一輪的探測就是 `reality.title`，收窄會讓它失效**；以及把日期缺陷判為同型第十二處。**日期是這張票自己審計軌跡的排序機制**，這個判斷站得住。
+
+**本輪最高優先那一項的結論**：strftime 陷阱在本機屬實（exit 2，天真管線印 `0`），**現行查核不含它**，我用自己的 Node 實作獨立重現 `d9da392^` 的 41 筆與 HEAD 的 0 筆，`stderr` 0 位元組，並證明它對植入的未來日期會叫、對早於的歷史引用不叫。我另外逐行配對確認那 38 行relabel**沒有夾帶實質改動**。**我一開始量到 31 筆是我取樣 revision 取錯，不是對方報錯**——查清才報。
+
+三項刻意決定全部接受，其中省略年份**我實測證明是判準逼出來的**（寫回年份即 6 筆），不是規避；兩套 cycle 編號接受，建議在日期規則裡指明用哪一套。
+
+另記四筆 Polish／Deferred risk，**沒有一筆是 fail-open**：F-25（「增刪行數相等」這個論據不成立——結論真、證據不支撐）、F-26（省略年份在該查核上留下裸 MM-DD 盲區）、F-27（**全票唯一有已證實 fail-open 的查核，也是唯一沒被存成可執行形式的那一個**；本輪新增的 `DUP-MARKER` 已讓安全存放成為可能）、F-28（commit message 在判準涵蓋面之外，未寫明）。另交 FO 兩筆 dispatch 形狀問題：**基準 `cb341af` 不是本 branch 的祖先**（照用會誤判本輪動了 `src/` 約 200 行），以及工作區有 FO 的 frontmatter 未提交改動。
