@@ -118,6 +118,10 @@ runbook 要 captain 實際輸入的 18／21／12 個標題字串（含中文說�
 
 ## 部署 runbook
 
+> ⚠️ **2026-09-24 implement stage 實測更正：下面的步驟 0 指令、步驟 2 字串、步驟 3 欄位表三處與現況不符。**
+> 原文保留。**實際執行請照「implement stage 實測結果（2026-09-24）」的第八節「校正後的步驟 1-7」**，
+> 不要照下面步驟 3 的表。不符之處逐項列在該節第七小節「runbook 缺陷」。
+
 **執行者標示：`captain` 表示只能由人在 Google 試算表手動完成，worker 無法代勞。`工程` 表示可由 worker 執行。**
 
 ### 步驟 0（工程）確認現況欄位，不要憑文件推測
@@ -328,6 +332,509 @@ echo "✅ 部署前後逐字相同"
 ### 步驟 9（工程）合併 040
 
 步驟 8 通過才做。合併後 main 的 `npm run sync-content` 才會恢復可用（證據 2 的階段 D）。
+
+## implement stage 實測結果（2026-09-24）
+
+本節是**實測校正**。上面的「部署 runbook」原文保留，但它的步驟 0 指令、步驟 3 欄位表、
+步驟 2 字串三處與現況不符，**執行部署請照本節的「校正後的步驟 1-7」**，不要照上面的表。
+不符之處逐項列在下方「runbook 缺陷」。
+
+本輪只執行步驟 0。**未對正式試算表做任何寫入**：沒有建欄、沒有改標題、沒有裝 Apps Script、
+沒有設保護範圍、沒有核可任何一列。唯一碰到外部系統的動作是三次 HTTP GET 讀取發布 CSV。
+`src/data/*.json` 的 sha256 在本輪前後相同（`4d1992e3…cea3b`／`4071978a…3162`）。
+
+### 一、步驟 0 的輸出（逐字）
+
+照票內指令執行（`--env-file` 在 `-e` 前面），輸出如下：
+
+```
+Track 1_history
+  id(給系統看的編號),category,year,ruling_id,ruling,content（現有為AI生成）,handwriting（現有為AI生成）,title（現有為AI生成）,image_url（現有為AI生成）,"status
+
+Track 2_discussion
+  id,category,title,author,year,link,abstract,views,status,"owl comment
+
+site_tldr
+  order,label,text,status,link
+```
+
+**這份輸出是被截斷的，不可當作基準。** Track 1 的 `status` 與 Track 2 的 `owl comment`
+兩個標題格**內含換行字元**。票內指令用 `split(/\r?\n/)[0]` 取第一行，
+在引號內的換行處就停住了。Track 2 因此完全看不到 `vibe` 與 `sticky` 兩欄。
+這是 runbook 缺陷 D1，詳見下方。
+
+**改用完整 CSV 解析（處理引號內換行）重讀。** 這份才是基準：
+
+```bash
+# 在 repo 根目錄執行。只讀不寫。--env-file 必須在檔名參數之前。
+cat > /tmp/hdr.mjs <<'EOF'
+function parseFirstRecord(text) {
+  const out = []; let cur = ''; let i = 0; let q = false;
+  if (text.charCodeAt(0) === 0xFEFF) i = 1;
+  for (; i < text.length; i++) {
+    const c = text[i];
+    if (q) { if (c === '"') { if (text[i+1] === '"') { cur += '"'; i++; } else q = false; } else cur += c; }
+    else if (c === '"') q = true;
+    else if (c === ',') { out.push(cur); cur = ''; }
+    else if (c === '\n') { out.push(cur); return out; }
+    else if (c !== '\r') cur += c;
+  }
+  out.push(cur); return out;
+}
+const t = [["Track 1_history","TRACK_1_CSV_URL"],["Track 2_discussion","TRACK_2_CSV_URL"],["site_tldr","SITE_TLDR_CSV_URL"]];
+const res = {};
+for (const [name, key] of t) res[name] = parseFirstRecord(await (await fetch(process.env[key])).text());
+console.log(JSON.stringify(res, null, 2));
+EOF
+node --env-file=.env.local /tmp/hdr.mjs
+```
+
+完整標題列（`\n` 表示標題格內真的有一個換行字元）：
+
+```json
+{
+  "Track 1_history": [
+    "id(給系統看的編號)",
+    "category",
+    "year",
+    "ruling_id",
+    "ruling",
+    "content（現有為AI生成）",
+    "handwriting（現有為AI生成）",
+    "title（現有為AI生成）",
+    "image_url（現有為AI生成）",
+    "status\n（權限保護）"
+  ],
+  "Track 2_discussion": [
+    "id",
+    "category",
+    "title",
+    "author",
+    "year",
+    "link",
+    "abstract",
+    "views",
+    "status",
+    "owl comment\n(允鍾如果有靈感可以寫一句短評)",
+    "vibe",
+    "sticky"
+  ],
+  "site_tldr": [
+    "order",
+    "label",
+    "text",
+    "status",
+    "link"
+  ]
+}
+```
+
+**標題格內的換行不影響兩支程式。** 兩支都先把連續空白字元壓成一個半形空格
+（`sync-content.mjs` 的 `raw.trim().toLowerCase().replace(/\s+/g,' ')`、
+`approval-workflow.gs` 的 `normalizeApprovalText_` 加同樣的 `replace`），
+壓完的空格是合法分隔符。`status\n（權限保護）` 兩支都解析成 `status`。實測已確認（下方第三節）。
+
+### 二、票內兩項已知不符的裁決
+
+| 票內的說法 | 實測結果 |
+|---|---|
+| `Track 1_history` 缺 `chapter` | **成立。** 現況 10 欄，沒有 `chapter` |
+| `Track 2_discussion` 的標題是 `owl comment`（空格） | **成立，但票內的字串寫錯。** 欄名部分確實是空格（`owl comment`），但接在後面的不是空格加括號，是**換行**加括號 |
+| 三個分頁都沒有 `reject_reason` | **成立。** 三個分頁都沒有 |
+
+**另外查出兩項票內沒有記載的不符**，兩者都會擋住部署：
+
+1. **`approved_by` 與 `approved_at` 在三個分頁都不存在。** 票內步驟 3 的表寫
+   `Track 1_history` 與 `Track 2_discussion`「已有 `status`、`approved_by`、`approved_at`」。
+   實測三個分頁的八個審核欄位**只有 `status` 存在**，其餘七個全部要新建。
+2. **`Track 2_discussion` 還缺 `owl_depth_comment` 與 `full_content`。**
+   `approval-workflow.gs:6` 的 `APPROVAL_FIELDS['Track 2_discussion']` 是 13 個欄位，
+   包含這兩個；`resolveApprovalHeaders_` 對缺漏一律 throw。
+   **票內的 runbook 完全沒有這一步。照票內步驟 1-3 做完，步驟 4 在 Track 2 仍然會失敗。**
+
+### 三、校正後的欄位表（以實測標題列為依據）
+
+**`Track 1_history`** — 現況 10 欄，要新建 8 欄。
+
+| # | 現況標題（逐字） | 解析成 |
+|---|---|---|
+| 1 | `id(給系統看的編號)` | `id` |
+| 2 | `category` | `category` |
+| 3 | `year` | `year` |
+| 4 | `ruling_id` | `ruling_id` |
+| 5 | `ruling` | `ruling` |
+| 6 | `content（現有為AI生成）` | `content` |
+| 7 | `handwriting（現有為AI生成）` | `handwriting` |
+| 8 | `title（現有為AI生成）` | `title` |
+| 9 | `image_url（現有為AI生成）` | `image_url` |
+| 10 | `status`＋換行＋`（權限保護）` | `status` ✅ 八個審核欄位中唯一已存在的 |
+
+要新建：`chapter`（內容欄）、`review_decision`、`review_fingerprint`、`approved_by`、
+`approved_at`、`approved_fingerprint`、`reject_reason`、`current_fingerprint`。
+
+**`Track 2_discussion`** — 現況 12 欄，要新建 9 欄，另有 1 次改名。
+
+| # | 現況標題（逐字） | 解析成 |
+|---|---|---|
+| 1-8 | `id`／`category`／`title`／`author`／`year`／`link`／`abstract`／`views` | 同名 |
+| 9 | `status` | `status` ✅ 已存在 |
+| 10 | `owl comment`＋換行＋`(允鍾如果有靈感可以寫一句短評)` | ⚠️ Apps Script 解析不到，要改名 |
+| 11 | `vibe` | `vibe` |
+| 12 | `sticky` | `sticky` |
+
+要新建：`owl_depth_comment`、`full_content`（兩個內容欄）、`review_decision`、
+`review_fingerprint`、`approved_by`、`approved_at`、`approved_fingerprint`、
+`reject_reason`、`current_fingerprint`。
+
+**`site_tldr`** — 現況 5 欄（`order`／`label`／`text`／`status`／`link`，與 `TODO.md:127` 的記錄相符），
+要新建 7 欄：`review_decision`、`review_fingerprint`、`approved_by`、`approved_at`、
+`approved_fingerprint`、`reject_reason`、`current_fingerprint`。
+
+**合計要手動建立 24 欄**（8＋9＋7），另加 1 次改名。票內步驟 3 的表算出的是 17 欄，少算 7 欄。
+
+#### 新欄要插在哪個位置
+
+**全部附加在最右側，不要插入到現有欄位之間。** 兩支程式都以標題解析欄位，欄序不影響輸出
+（已實測，見第五節 fixE）。附加避免了插入時錯位的風險。
+
+**但新欄的排列順序會影響步驟 6 要設幾個保護範圍。** 建議順序（每個分頁都一樣）：
+
+```
+（現有欄位保持不動）
+→ 新增的內容欄        Track 1：chapter／Track 2：owl_depth_comment、full_content／site_tldr：無
+→ review_decision
+→ review_fingerprint
+→ approved_by
+→ approved_at
+→ approved_fingerprint
+→ reject_reason
+→ current_fingerprint   ← 放最後一欄
+```
+
+這個順序讓六個「責任編輯可寫」的欄位連成一段，保護範圍從 15 個降到 12 個。
+若照票內 `APPROVAL_COLUMNS` 的順序建（`current_fingerprint` 在 `reject_reason` 之前），
+`reject_reason` 會被切開，每個分頁多一個範圍。兩種順序的輸出都實測過，逐字相同。
+
+**標題字串沿用票內步驟 3 的建議值**（已再次實測同時通過兩支程式）。
+唯一要補的三個內容欄標題：
+
+| 欄名 | 標題輸入 |
+|---|---|
+| `chapter` | `chapter （目前全部空白）` |
+| `owl_depth_comment` | `owl_depth_comment （新建，全部留白）` |
+| `full_content` | `full_content （新建，全部留白）` |
+
+**⚠️ 不要新增第二個 `status` 欄。** `Track 1_history` 現有的
+`status`＋換行＋`（權限保護）` 已經被解析成 `status`。再加一個會觸發
+`欄位「status」重複。`（`approval-workflow.gs`）與 main 同步的重複欄位中止。
+
+### 四、以實測標題重跑 `resolveApprovalHeaders_`
+
+手法同證據 1：以 stub 取代 Google 端全域物件，用 `node:vm` 載入
+`.worktrees/spacedock-ensign-040-approval-content-version-binding/scripts/apps-script/approval-workflow.gs`
+原始碼，呼叫 `resolveApprovalHeaders_`。差別是**餵入 2026-09-24 實測到的真實標題字串**，
+不是記錄中的推測值。
+
+| 階段 | `Track 1_history` | `Track 2_discussion` | `site_tldr` |
+|---|---|---|---|
+| A　現況 | ⛔ `缺少欄位「chapter」。` | ⛔ `缺少欄位「owl_comment」。` | ⛔ `缺少欄位「review_decision」。` |
+| B　套用票內步驟 1、2 後 | ⛔ `缺少欄位「review_decision」。` | ⛔ `缺少欄位「owl_depth_comment」。` | ⛔ `缺少欄位「review_decision」。` |
+| C　再加七個審核欄後 | ✅ 解析 18 欄 | ⛔ `缺少欄位「owl_depth_comment」。` | ✅ 解析 12 欄 |
+| D　Track 2 再補 `owl_depth_comment`、`full_content` | — | ✅ 解析 21 欄 | — |
+
+**階段 C 的 Track 2 是本輪最重要的發現。** 照票內 runbook 一步一步做完步驟 1、2、3，
+`Track 2_discussion` 的「安裝／更新公式」**仍然會報錯**。
+證據 1 的 Track 2 之所以顯示 ✅ 21 欄，是因為它餵入的標題列已經含
+`owl_depth_comment` 與 `full_content`——那份輸入取自 `design.md` 的設計意圖，不是現況。
+這正是步驟 0 條文「不要憑文件推測」要擋的情況。
+
+補完後 `Track 1_history` 18 欄、`Track 2_discussion` 21 欄、`site_tldr` 12 欄，
+與證據 1 的欄數一致。
+
+### 五、複驗證據 3：新增空白欄不改變同步輸出
+
+2026-09-07 的量測仍然成立，而且本輪驗的範圍比當時更大。
+
+手法：把三個分頁的現況 CSV 抓成本機快照，架一台本機 HTTP server 供應四組 fixture，
+分別用 **main 現行的 `scripts/sync-content.mjs`**（取自 `git show main:`，複製到暫存目錄執行，
+不碰 repo 的 `src/data/`）與 **040 worktree 的新版**跑。fixture 一律經過同一套
+CSV round-trip，所以唯一變數是新增的欄位。
+
+| fixture | 內容 | 用哪支同步 | 結果 |
+|---|---|---|---|
+| `fixRaw` | 現況原始位元組 | main | exit 0 |
+| `fixA` | 現況（round-trip，不加欄） | main | exit 0 |
+| `fixA2` | 現況 + 空白 `chapter`、`owl_depth_comment`、`full_content` | main | exit 0 |
+| `fixD` | 完整部署後（24 欄全建、59 列填入真實指紋） | 040 新版 | exit 0 |
+| `fixE` | 同 `fixD`，但新欄改用建議排序 | 040 新版 | exit 0 |
+| `fixS` | **下方第八節 S2／S4 的實際建欄順序**，24 欄全建、59 列填入真實指紋 | 040 新版 | exit 0 |
+
+六組的 `history.json` 與 `discussions.json` sha256 **完全相同**，且等於 repo 現況：
+
+```
+4d1992e3a5fbb21e13a7324ad9ca573fda48ac7d8209fb7a1c67da57047cea3b  history.json
+4071978a7ad0b3d041f7cf0df5d5cf580db9e1c6b47df657819e698b213d3162  discussions.json
+```
+
+這兩個值與 AC-1 綁定的 2026-09-07 量測值逐字相同——**正式試算表的已發布內容在這段期間沒有變動。**
+
+`fixD` 的指紋不是手填的。它用 040 的 `scripts/content-fingerprint.mjs` 的
+`fingerprintPublishedRow` 逐列算出，Track 2 的 `__sequence` 用
+`sync-content.mjs:392` 的 `publishedRowSequences` 同語意重算。
+040 新版同步對 `fixD` 印出的是：
+
+```
+✅ 檢查通過，已寫入 src/data/history.json（40 筆）
+✅ 檢查通過，已寫入 src/data/discussions.json（16 筆，含 tldr）
+```
+
+**AC-2 要求逐字出現的 40 與 16 兩個數字，已在實測中出現。**
+這也證明 AC-1／AC-2 的驗收手法在真實資料上可執行，不只在 fixture 上成立。
+
+#### `sync-content.mjs` 的 alias 表（實讀，非轉述）
+
+`git show main:scripts/sync-content.mjs` 第 112 行逐字為：
+
+```js
+  { field: 'owl_comment', aliases: ['owl comment', 'owl_comment'], column: 'optional', value: 'optional' },
+```
+
+**兩種寫法都收，票內的說法成立。** 040 worktree 的版本同樣是這兩個 alias。
+所以步驟 2 的改名對同步程式沒有影響，只是為了讓 Apps Script 解析得到。
+
+同時實讀到一項票內沒提的事實：main 現行版本的 `approved_by`、`approved_at`、`reject_reason`
+在 `TRACK_1_COLUMNS` 與 `TRACK_2_COLUMNS` 裡是 `column: 'optional'`（第 97-99、117-119 行），
+但 `SITE_TLDR_COLUMNS`（第 123-129 行）**完全沒有這三欄**。這造就了下一節的安全前綴。
+
+### 六、產線全停窗口的實測大小
+
+#### 窗口不必從步驟 1 就打開
+
+證據 2 的結論是「窗口從建欄那一刻就打開」。**實測顯示這個結論過度概括。**
+有 9 欄可以先建，main 現行的同步仍然 exit 0，而且輸出逐字不變：
+
+| fixture | 做了什麼 | main 現行同步 |
+|---|---|---|
+| `fixB1` | 步驟 1、2 + Track 2 補 `owl_depth_comment`、`full_content` | ✅ exit 0，輸出與 baseline 逐字相同 |
+| `fixB2` | `fixB1` 再加 Track 1／2 的 `approved_by`、`approved_at`、`reject_reason` | ✅ exit 0，輸出與 baseline 逐字相同 |
+| `fixB3` | 八欄全建（三個分頁） | ⛔ exit 1，`第 12 欄的標題「review_decision …」對不到任何預期欄位。` |
+| `fixB4` | Track 1／2 停在 `fixB1`，只有 `site_tldr` 建審核欄 | ⛔ exit 1，`第 6 欄的標題「review_decision …」對不到任何預期欄位。` |
+
+原因見第五節末：main 認得 `approved_by`／`approved_at`／`reject_reason`（Track 1／2），
+不認得 `review_decision`／`review_fingerprint`／`approved_fingerprint`／`current_fingerprint`；
+`site_tldr` 三欄都不認得，所以 `site_tldr` 的任何一個審核欄都在窗口內。
+
+**因此 24 欄分成兩段：**
+
+| 段 | 欄數 | 內容 | main 同步 |
+|---|---|---|---|
+| 安全前綴 | **9** | Track 1：`chapter`、`approved_by`、`approved_at`、`reject_reason`（4）<br>Track 2：`owl_depth_comment`、`full_content`、`approved_by`、`approved_at`、`reject_reason`（5）＋改名 1 次<br>`site_tldr`：0 | 仍可用 |
+| 窗口內 | **15** | Track 1：`review_decision`、`review_fingerprint`、`approved_fingerprint`、`current_fingerprint`（4）<br>Track 2：同 4 欄<br>`site_tldr`：全部 7 欄 | 一建就中止 |
+
+安全前綴可以分幾天慢慢做，做錯了也可以改，產線照常。**窗口只涵蓋 15 欄。**
+
+#### 逐列重新核可的實際列數
+
+從現況資料實測（讀 `status` 欄，以 Node `Map` 計數，未使用 `sort`／`uniq`）：
+
+| 分頁 | 非空白資料列 | `status` = `Approved` | `status` 空白 |
+|---|---|---|---|
+| `Track 1_history` | 42 | **40** | 2（`h2`、`h28`） |
+| `Track 2_discussion` | 43 | **15** | 28（`d3`、`d18`–`d44`） |
+| `site_tldr` | 4 | **4** | 0 |
+| **合計** | 89 | **59** | 30 |
+
+**59 列，與票內的數字相符。** 票內是從 `src/data/*.json` 的筆數推算，本輪是從試算表的
+`status` 欄直接數，兩邊一致。
+
+`editor-onboarding.md:430` 的「這一輪重新核可的工作量比原設計預估的大」**不是指列數變多**。
+該句的主詞是「編輯權限已經開出去」——工作量變大的是**協調成本**：
+窗口期間有 30 列草稿在編輯台手上可以隨時改。任何人改到那 59 列中任一列的發布內容，
+該列的指紋就變了，核可要重做（`approval-workflow.gs` 會報
+`審核期間內容已變更。所有審核欄位已復原。`）。
+
+#### Track 2 的序號暴露面（票內未量化）
+
+`Track 2_discussion` 的指紋含已發布列序號。實測序號分布：
+
+- 15 個 `Approved` 列在試算表的第 2-17 列，序號 1-16。
+- **只有 1 列**未核可的草稿夾在其中：第 4 列（`d3`）。刪掉它，其後 14 列的指紋全變。
+- 其餘 27 列草稿（`d18`–`d44`）全部在第 17 列之後。**在它們身上增刪不影響已核可列的序號。**
+
+所以 Track 2 的順序陷阱只有一個具體風險點：**第 4 列（`d3`）在窗口結束前不可刪除或搬移。**
+在最後一列之後新增草稿是安全的。
+
+#### 步驟 6 要設幾個保護範圍
+
+Google 試算表的一個保護範圍只能是一段連續範圍。範圍數由欄位是否相鄰決定，
+以下 A1 位置由 fixture 的標題列程式算出：
+
+| 排序 | `Track 1_history` | `Track 2_discussion` | `site_tldr` | 合計 |
+|---|---|---|---|---|
+| **建議排序**（`current_fingerprint` 放最後） | A 類 2（`J2:J`＋`R2:R`）／B 類 1（`L2:Q`）／C 類 1（`A1:R1`）＝ **4** | A 類 2（`I2:I`＋`U2:U`）／B 類 1（`O2:T`）／C 類 1（`A1:U1`）＝ **4** | A 類 2（`D2:D`＋`L2:L`）／B 類 1（`F2:K`）／C 類 1（`A1:L1`）＝ **4** | **12** |
+| 票內 `APPROVAL_COLUMNS` 排序 | 5 | 5 | 5 | 15 |
+
+A／B／C 三類的定義同票內步驟 6。`status` 已在原位，與 `current_fingerprint` 不可能相鄰，
+所以 A 類每個分頁固定是 2 個範圍。
+
+#### 窗口時間估算
+
+**這是依動作次數推算的估計值，不是實測的牆鐘時間。** 本輪沒有對試算表做任何寫入，
+所以無法量測 captain 在 Google 試算表 UI 上的實際速度。下表列出動作次數，
+單位時間是保守假設，captain 可自行替換。
+
+| 步驟 | 動作次數（實測） | 單位時間（假設） | 小計 |
+|---|---|---|---|
+| 3′　建窗口內的 15 欄 | 15 欄 | 1-2 分／欄 | 15-30 分 |
+| 4′　安裝 Apps Script + 授權 | 1 次貼程式 + 1 次授權 + 3 次「安裝／更新公式」 | — | 10-20 分 |
+| 5′　確認公式生效 | 3 個分頁各看一次 | 2 分／分頁 | 5-10 分 |
+| 6′　設保護範圍 | 12 個範圍 | 2-3 分／範圍 | 25-35 分 |
+| 7′　逐列重新核可 | 59 列，分 6 段連續選取（Track 1 跳過 `h2`、`h28` 分 3 段；Track 2 跳過 `d3` 分 2 段；`site_tldr` 1 段） | 2-3 分／段 | 15-20 分 |
+| 8′　不落地驗證同步 | 1 次（工程執行） | — | 5 分 |
+| **合計** | | | **75-120 分** |
+
+**結論：請預留一段不受打擾的 2 小時。** 若把「中途發現某一欄打錯、要回頭對名字」
+也算進去，預留 3 小時比較安全。
+
+**這段時間內的兩個硬條件：**
+
+1. **不可發布任何內容。** main 的 `npm run sync-content` 從建第一個窗口內欄位起就會中止。
+2. **編輯台不可改動那 59 列的發布內容。** 改了就要重新核可該列。
+   草稿列（`h2`、`h28`、`d18`–`d44`）可以改，但 `d3` 不可刪除或搬移（見上方序號暴露面）。
+
+安全前綴的 9 欄不在這段時間內，可以事先分次完成。
+
+### 七、runbook 缺陷（獨立列出）
+
+**D1（擋住步驟 0 本身）步驟 0 的指令會靜默截斷標題列。**
+`split(/\r?\n/)[0]` 不處理引號內的換行。Track 1 的 `status` 與 Track 2 的 `owl comment`
+標題格都含換行，所以 Track 1 只印到第 10 欄的一半、Track 2 只印到第 10 欄的一半，
+`vibe` 與 `sticky` 完全看不到。**它不報錯，它少印。**
+照這份輸出填步驟 3 的欄位表，一定算錯。修法見第一節的完整解析版指令。
+
+**D2（擋住步驟 3）步驟 3 的欄位表把 `approved_by`、`approved_at` 記成「已有」。**
+實測三個分頁都沒有這兩欄。票內算出 Track 1／2 各新增 5 欄、`site_tldr` 新增 7 欄，共 17 欄；
+實際要新增 24 欄。
+
+**D3（擋住步驟 4，順序有誤）步驟 3 少了 Track 2 的 `owl_depth_comment` 與 `full_content`。**
+這兩欄不是審核欄位，是 `APPROVAL_FIELDS['Track 2_discussion']` 的內容欄位，
+`resolveApprovalHeaders_` 要求它們存在。**照票內步驟 1-3 做完，步驟 4 在 Track 2 必定失敗**，
+錯誤訊息是 `缺少欄位「owl_depth_comment」。`。第四節階段 C 已實測。
+修法：把這兩欄併入建欄那一步（它們在安全前綴內，可事先建）。
+
+**D4（窗口估算過大）證據 2 的「窗口從建欄那一刻就打開」過度概括。**
+實測有 9 欄的安全前綴，建了之後 main 同步仍 exit 0 且輸出逐字不變。
+窗口只涵蓋 15 欄。第六節有分段表。
+
+**D5（會讓 captain 找不到字串）步驟 2 的「改前」字串寫錯。**
+票內寫 `owl comment (允鍾如果有靈感可以寫一句短評)`，是空格接括號。
+實際是 `owl comment` + **換行** + `(允鍾如果有靈感可以寫一句短評)`。
+captain 若用「尋找並取代」搜票內那個字串會找不到。
+**正確做法：只改「owl」與「comment」之間那一個空格，換成底線。其餘一個字都不要動**
+（包含那個換行）。
+
+**D6（影響步驟 6 的工作量）步驟 6 沒說明保護範圍的數量取決於欄位排列順序。**
+建議排序 12 個，票內排序 15 個。第三節有建議排序。
+
+**沒有任何一步在現況下做不到。** D1-D6 都是「照票內做會失敗或多做」，不是「無法完成」。
+套用上述修正後，步驟 1-9 全部可執行。
+
+### 八、校正後的步驟 1-7
+
+取代票內步驟 1-3 與步驟 6 的對應內容。步驟 4、5、7、8、9 的操作方式沿用票內原文，
+只是編號與範圍依下表調整。
+
+**下面這份順序已整份實測過**（fixture `fixS`，把 S1-S4 的建欄與改名、S8 的 59 列核可全部套上）：
+
+- `resolveApprovalHeaders_` 三個分頁全通過，解析 18／21／12 欄。
+- 040 新版同步 exit 0，印出 `（40 筆）` 與 `（16 筆，含 tldr）`，輸出與 baseline 逐字相同。
+- main 現行同步 exit 1（窗口確實打開），錯誤指向第 15 欄 `review_decision`。
+- S7 的 12 個保護範圍位置由 `fixS` 的標題列算出，不是手數的。
+- S8 的 6 個連續段由 `fixS` 的 `status` 欄算出：第 2 列／第 4-24 列／第 26-43 列、
+  第 2-3 列／第 5-17 列、第 2-5 列。
+
+#### 階段一：安全前綴（`captain`，產線照常，可分次做）
+
+**S1　`Track 2_discussion` 改名。** 把第 10 欄標題的 `owl comment` 改成 `owl_comment`。
+只動「owl」與「comment」之間那一個空格。**後面的換行與中文說明一個字都不要動。**
+
+**S2　三個分頁附加 9 個安全欄，全部留白。**
+
+| 分頁 | 附加在最右側（依序） |
+|---|---|
+| `Track 1_history` | `chapter （目前全部空白）`<br>`approved_by （核可者，自動填）`<br>`approved_at （核可時間 UTC，自動填）`<br>`reject_reason （退回原因）` |
+| `Track 2_discussion` | `owl_depth_comment （新建，全部留白）`<br>`full_content （新建，全部留白）`<br>`approved_by （核可者，自動填）`<br>`approved_at （核可時間 UTC，自動填）`<br>`reject_reason （退回原因）` |
+| `site_tldr` | 無 |
+
+**S3　工程確認產線還活著。** 用 AC-6 的 sandbox 手法跑 main 的同步，必須 exit 0，
+且輸出的兩個 sha256 仍是 `4d1992e3…cea3b` 與 `4071978a…3162`。
+**這一關沒過就不要進階段二。**
+
+#### 階段二：窗口（`captain` + `工程`，一氣呵成，預留 2 小時）
+
+⚠️ **從 S4 的第一欄建起，main 的 `npm run sync-content` 就會中止，直到步驟 9 合併 040。**
+
+**S4　三個分頁附加 15 個窗口內欄位，全部留白。** 每個分頁依序附加：
+
+```
+review_decision （由 Review 選單寫入）
+review_fingerprint （由 Review 選單寫入）
+approved_fingerprint （由 Review 選單寫入）
+current_fingerprint （公式自動產生，不要手動填）
+```
+
+`site_tldr` 另外還要補階段一沒建的三欄，**插在上面四欄之前**，讓可寫區連續：
+
+```
+review_decision （由 Review 選單寫入）
+review_fingerprint （由 Review 選單寫入）
+approved_by （核可者，自動填）
+approved_at （核可時間 UTC，自動填）
+approved_fingerprint （由 Review 選單寫入）
+reject_reason （退回原因）
+current_fingerprint （公式自動產生，不要手動填）
+```
+
+建完的標題數必須是 `Track 1_history` 18 欄、`Track 2_discussion` 21 欄、`site_tldr` 12 欄。
+**數字不對就是漏建或多建，回頭對。** 硬規則同票內步驟 3：欄名不可重複、不要複製整欄備份、
+新欄全部留白。**另外不要新增第二個 `status` 欄**（見第三節）。
+
+**S5　安裝 Apps Script。** 照票內步驟 4 原文。三個分頁各執行一次「安裝／更新公式」。
+
+**S6　確認公式生效。** 照票內步驟 5 原文。
+
+**S7　設 12 個保護範圍。** 三類的定義同票內步驟 6。依 S2／S4 的排序，範圍是：
+
+| 分頁 | A 類（只有 captain） | B 類（只有責任編輯） | C 類（只有 captain） |
+|---|---|---|---|
+| `Track 1_history` | `J2:J`、`R2:R` | `L2:Q` | `A1:R1` |
+| `Track 2_discussion` | `I2:I`、`U2:U` | `O2:T` | `A1:U1` |
+| `site_tldr` | `D2:D`、`L2:L` | `F2:K` | `A1:L1` |
+
+**設之前先核對一次欄位位置。** 上表的 A1 位置是依 S2／S4 的排序算出的。
+若實際建欄順序與上表不同，範圍要重算——**設錯範圍等於沒設**。
+
+**S8　逐列重新核可 59 列。** 照票內步驟 7 原文，分 6 段：
+
+| 分頁 | 段 | 試算表列號 | 列數 |
+|---|---|---|---|
+| `Track 1_history` | 1 | 2 | 1 |
+| | 2 | 4-24 | 21 |
+| | 3 | 26-43 | 18 |
+| `Track 2_discussion` | 4 | 2-3 | 2 |
+| | 5 | 5-17 | 13 |
+| `site_tldr` | 6 | 2-5 | 4 |
+| **合計** | | | **59** |
+
+**跳過的列：`Track 1_history` 第 3 列（`h2`）與第 25 列（`h28`）、
+`Track 2_discussion` 第 4 列（`d3`）。** 這三列現況 `status` 空白，讓它們停在 `Needs review`。
+`Track 2_discussion` 第 18-44 列（`d18`–`d44`）也不核可。
+
+**⚠️ `Track 2_discussion` 第 4 列（`d3`）在 S8 完成前不可刪除或搬移。** 刪了它，
+第 5-17 列的指紋全變，那 13 列要重做。
+
+**S9　工程執行不落地驗證。** 照票內步驟 8 原文，接著跑 AC-3 的 id 比對。
+兩者都通過才做步驟 9 的合併。
 
 ## 相依關係釐清（design stage）
 
@@ -549,3 +1056,36 @@ runbook 裡每一段指令都實跑過，包含一個被淘汰的寫法：`node 
 會 exit 0 但什麼都不做，票內已明文標記不要用。
 留下一項 🔴 需 captain 裁決：044 是否為本票步驟 4 起的硬前置。三項外部證據都指向「是」，
 但 044 卡在「兩個 Google 帳號」這個人的前置，判定成立就會形成僵局，因此不由 worker 決定。
+
+## Stage Report: implement
+
+- DONE: 執行 050 runbook 步驟 0（唯讀），把三個分頁的真實標題列逐字貼進票內。注意 `--env-file` 必須寫在 `-e` 前面。**不得對正式試算表做任何寫入**，不得執行 `npm run sync-content`，`src/data/*.json` 零改動。
+  第一節。票內指令照原樣跑過一次（`--env-file` 在前，環境變數有載入），輸出逐字貼上；另附完整 CSV 解析版指令與三個分頁的完整標題列 JSON。對外部系統只做三次 HTTP GET。`src/data/*.json` 前後 sha256 均為 `4d1992e3…cea3b`／`4071978a…3162`；三個 checkout 的 `git status` 無 `src/data/` 變動。
+- DONE: 用真實標題列校正步驟 3 的欄位表（現況已有哪些欄、八個審核欄位哪幾個要新建、插在哪個位置），並確認票內兩項已知不符是否仍成立（`Track 1_history` 缺 `chapter`、`Track 2_discussion` 為 `owl comment` 空格、三分頁皆無 `reject_reason`）。比照證據 1 的手法、以**這次實測到的真實標題**重跑 `resolveApprovalHeaders_`，分別驗現況／套用步驟 1-2 後／再加八欄後的結果。
+  第二至四節。三項已知不符全部成立。另查出兩項票內沒有的不符：`approved_by`／`approved_at` 三個分頁都不存在（票內記成已有）、`Track 2_discussion` 還缺 `owl_depth_comment` 與 `full_content`。`resolveApprovalHeaders_` 以實測標題重跑四個階段：現況三個分頁全 ⛔；套用步驟 1-2 後仍全 ⛔；再加七個審核欄後 Track 1／site_tldr ✅ 18／12 欄，**Track 2 仍 ⛔ `缺少欄位「owl_depth_comment」。`**。falsifying change：若 `APPROVAL_FIELDS['Track 2_discussion']` 不含那兩欄，階段 C 的 Track 2 就會通過而這項發現不成立。
+- DONE: 量出產線全停窗口（步驟 3→7）的大小：三個分頁合計要手動建立幾欄、**逐列重新核可的實際列數**（實測，不沿用記錄中的 59）、步驟 6 要設幾個保護範圍。並重跑證據 3（空白 `chapter` 不改變同步輸出的 sha256 比對，2026-09-07 量測需複驗）與確認 `sync-content.mjs` 的 alias 表真的同時收 `owl comment` 與 `owl_comment`（實讀該表，不採信轉述）。runbook 若有任何一步現況下做不到或順序有誤，獨立列出。
+  第五至八節。合計要建 24 欄（票內表算 17，少 7）；其中 **9 欄是安全前綴**（main 同步仍 exit 0 且輸出逐字不變），**窗口只涵蓋 15 欄**。逐列核可實測 59 列（40／15／4），與票內數字相符——票內從 JSON 筆數推算，本輪直接數試算表 `status` 欄。保護範圍實測 **12 個**（建議排序）／15 個（票內排序），A1 位置由 fixture 標題列算出。證據 3 複驗成立且範圍更大：六組 fixture 的兩份 JSON sha256 全部相同並等於 repo 現況。alias 表實讀 `git show main:scripts/sync-content.mjs` 第 112 行，`aliases: ['owl comment', 'owl_comment']` 兩種都收。runbook 缺陷 D1-D6 獨立列於第七節，其中 D1、D3 會讓照票執行必定失敗。
+  falsifying change：把 `fixB2` 多加一個 `review_decision` 欄，main 同步就從 exit 0 變 exit 1，安全前綴的界線因此可被推翻；把 `fixD`／`fixS` 任一列的 `chapter` 填入非空值，040 同步的輸出 sha256 就會與 baseline 不同，證據 3 的結論隨之失效。
+
+### Summary
+
+本輪只做步驟 0，未對正式試算表寫入任何一格。步驟 0 本身查出票內指令有缺陷：
+`split(/\r?\n/)[0]` 遇到標題格內的換行就截斷，Track 1 與 Track 2 的標題列都只印出一半，
+`vibe`／`sticky` 完全看不到。改用完整 CSV 解析後才拿到基準。
+
+兩項最重要的發現都會讓照票執行的部署失敗。其一，`Track 2_discussion` 缺
+`owl_depth_comment` 與 `full_content`，票內 runbook 沒有這一步，做完步驟 1-3 後
+「安裝／更新公式」在 Track 2 仍會報錯——證據 1 之所以顯示通過，是因為它餵的是
+`design.md` 的設計意圖而非現況標題。其二，票內表把 `approved_by`／`approved_at`
+記成已存在，實際三個分頁都沒有，要建的欄從 17 個變成 24 個。
+
+窗口反而比票內估的小。實測有 9 欄的安全前綴可先建，main 同步照常 exit 0 且輸出逐字不變；
+窗口只涵蓋 15 欄。核可列數 59 經實測確認，`editor-onboarding.md:430` 的「工作量比預估大」
+指的是協調成本而非列數——窗口期間有 30 列草稿在編輯台手上。另量化了票內只定性描述的
+Track 2 序號陷阱：15 個已核可列中只有第 4 列（`d3`）一列草稿夾在其中，其餘 27 列草稿都在後面，
+所以風險點只有一個。
+
+第八節的 S1-S9 已整份以 fixture `fixS` 實測：Apps Script 三個分頁全通過、040 同步 exit 0
+且輸出與 baseline 逐字相同、main 同步 exit 1（窗口確實打開）、12 個保護範圍與 6 個核可連續段
+都由程式算出。時間估算 75-120 分鐘是依動作次數推算，**不是量測的牆鐘時間**——
+本輪沒有寫入試算表，無法量測 captain 在 Google UI 上的實際速度。
