@@ -456,44 +456,11 @@ export const CRISIS_STATS = {
 // Ruling threshold (憲法訴訟法第 30 條)
 // ---------------------------------------------------------------------------
 
-/**
- * 憲法法庭判決門檻。
- *
- * 現行有效的規定是憲法訴訟法第 30 條第 1 項，給的是**比例**，不是固定人數：
- * 「判決，除本法別有規定外，應經大法官現有總額三分之二以上參與評議，
- *   大法官現有總額過半數同意。」
- *
- * 114 年 1 月 23 日修正曾增訂第 30 條第 2 項，訂下固定人數下限
- * （參與評議不得低於 10 人、同意違憲宣告不得低於 9 人）。
- * 該項已由 114 年憲判字第 1 號（114-12-19）宣告違憲，自公告日起失其效力。
- *
- * 注意：全國法規資料庫至今仍原樣顯示已失效的第 30 條第 2 至 6 項，不加失效標註。
- * 條文是否有效，權威在憲判主文，不在法規資料庫的顯示。
- *
- * `headcount` 為 null，代表尚未經法學背景者拍板具體人數。
- * **渲染端在 headcount 為 null 時，必須完全不顯示人數，並改敘述 `rule`。**
- * 不得顯示替代字元或推算值。拍板事項見
- * docs/constitution-features/063-required-for-ruling-legal-accuracy.md 第五小節。
- */
-export const RULING_THRESHOLD = {
-  /** 條文文字轉成的一句話敘述。渲染端的長版文案來源 */
-  rule: '判決，除本法別有規定外，應經大法官現有總額三分之二以上參與評議，大法官現有總額過半數同意',
-  /** 短版標籤用。掃讀場景，不超過 12 字 */
-  ruleShort: '門檻依現有總額比例計算',
-  /** 現行有效條文出處 */
-  statute: '憲法訴訟法第 30 條第 1 項',
-  /** 已失效的固定人數下限。保留是因為它是報導的主題，不是現行法 */
-  voidedFloor: {
-    participants: 10,
-    unconstitutionalityVotes: 9,
-    statute: '憲法訴訟法第 30 條第 2 項',
-    voidedOn: '2025-12-19',
-    voidedBy: '114 年憲判字第 1 號',
-    rulingUrl: 'https://cons.judicial.gov.tw/docdata.aspx?fid=38&id=355485',
-  },
-  /** 具體人數。待 L1／L2 拍板前一律為 null */
-  headcount: null as number | null,
-} as const;
+// `RULING_THRESHOLD` 已移到 `src/data/ruling-threshold.ts`，那裡是門檻文案的唯一定義處。
+// 這裡保留 re-export，讓既有的 `from '@/data/future'` import 不必改。
+// 搬移的理由見 docs/constitution-features/066-quiz-timeline-voided-quorum-present-tense.md 第五小節；
+// 門檻本身的法律依據與待拍板事項見 docs/constitution-features/063-required-for-ruling-legal-accuracy.md 第五小節。
+export { RULING_THRESHOLD } from './ruling-threshold';
 
 /**
  * 憲法法庭在 10 人下限失效（2025-12-19）之後作成的判決。
