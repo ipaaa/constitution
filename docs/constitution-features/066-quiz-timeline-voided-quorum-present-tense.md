@@ -1,7 +1,7 @@
 ---
 id: 066
 title: quiz 與 controversy-timeline 把已失效的 10 人門檻當現行法
-status: implement
+status: verify
 source: constitution-features/063 V7（captain 2026-09-23 核准開票）
 started: 2026-09-24T17:51:27Z
 completed:
@@ -749,3 +749,53 @@ Verified by:
 此事影響本專案所有以中文內容為主題的驗證，已列入 Out of scope 第 4 點供 FO 判斷是否回溯複驗。
 `/future`（`063` 已修好的同一個法律錯誤）作為對照組三項全 PASS，
 證明這組檢查不是只會 FAIL 的套套邏輯。
+
+## Stage Report: implement
+
+- DONE: 依第二小節的 14 處清單（A／B／C／D 四級）逐處施工，並按**路由**切而非按級別切。`/controversy-timeline` 在 `PUBLIC_PAGES` 內故優先，但兩者都在本輪修完。D 級依 design 的複核處置：`:151`／`:187` 不動；`:152` 的「持續凍結」要改（不是加豁免）；`:164` 的時序錯置要修
+  commit `5eff145`。兩條路由同一輪交付，無中間狀態。A1／A2／B1／B2／B3／C2 在 quiz 兩檔，A3／A4／A5／C1／D-fix／D-chrono 在 `controversy-timeline.ts`。D 級：`:152` 只改「持續凍結」→「當時已凍結」四字，未加豁免清單；`:164` 選**改為後見之明寫法**（「而兩個月後三讀通過的《憲法訴訟法》修正案要求至少 10 人參與評議⋯⋯憲法法庭在新法 2025 年 1 月 23 日生效後面臨實質停擺」）；`:151`／`:187` 逐字比對與 HEAD 相同，且不在 `git diff -U0` 的 +／- 行內（AC4 證據見下）。B1／B2 沿用 `063` 的處置整句刪除而非改寫。
+- DONE: 建立 `src/data/ruling-threshold.ts` 作為失效句的**唯一定義處**，`future.ts` 改 re-export；並落地 `scripts/check-voided-floor.mjs`（第 8.3 小節逐字給出）作為三項自動檢查的唯一定義——**AC 只引用不複製**。AC6 的 `future/page.tsx:201`「每年處理量約 30~40 件」**限定為刪除，不得換數字**
+  `RULING_THRESHOLD` 連同 JSDoc 自 `future.ts` 移入，`future.ts:463` 改 `export { RULING_THRESHOLD } from './ruling-threshold'`，既有 `from '@/data/future'` 的 import 一個都沒改。`VOIDED_FLOOR_SHORT`／`FULL` 自 `RulingThresholdNote.tsx` 移入並 export，字串組法一字未動；新增 `VOIDED_FLOOR_CLAUSE`。腳本以程式自 entity 第 8.3 小節的 js 程式碼圍籬抽出建檔，並回頭逐字比對：`VERBATIM MATCH with entity 8.3`（5073 bytes）。`page.tsx:201` 整句刪除、未填任何數字，口徑待拍板記入 `docs/health-check/TODO.md` 的 P1-9。
+- DONE: 依 AC1–AC7 逐項驗證並貼出輸出：AC2 須在**真實頁面 HTML**（副本作法）上跑六條路由，改完後三項檢查應全部 PASS、離開碼 0。第 8.5 小節列明四處**沒有自動涵蓋**（B3、D-chrono、題幹、`page.tsx:201`），各自落到 AC3–AC6 的人工驗證，請逐項給出人工驗證的證據
+  七項全數驗過，輸出見下方「AC 驗證輸出」。四處人工驗證各有可失敗的證據，見 AC3／AC4／AC5／AC6。
+
+### AC 驗證輸出
+
+**AC1（失效句只有一個定義處）PASS。** `grep -rn '起失其效力' src/ --include=*.ts --include=*.tsx` 共 4 筆，全部落在 `src/data/ruling-threshold.ts`（`:29`／`:67`／`:73`／`:81`）。import 自 `ruling-threshold` 的檔案 5 個（`future.ts`、`RulingThresholdNote.tsx`、`controversy-timeline.ts`、quiz 兩檔），≥ 4 的門檻。會讓它失敗的改動（在 quiz 或時間軸手寫一次失效句）不存在。
+
+**AC2（六條路由三項檢查）PASS，`exit 0`。** 副本作法起兩台 dev server：`before` = `git archive HEAD`（改動前，port 3212）、`after` = 工作樹（port 3221），兩邊只在副本內讓 `LaunchGate` 直接放行。候選 repo 的 `git status --porcelain` 全程只有本票的改動，無 VERIFY-ONLY 字樣。
+
+| 路由 | 改動前（3212） | 改動後（3221） |
+|---|---|---|
+| `/future` | 1 PASS／2 PASS(3)／3 PASS | 1 PASS／2 PASS(3)／3 PASS |
+| `/controversy-timeline` | 1 **FAIL(4)**／2 **FAIL(0)**／3 **FAIL(2)** | 1 PASS／2 PASS(2)／3 PASS |
+| `/quiz/controversy` | 1 PASS／2 **FAIL(0)**／3 **FAIL(1)** | 1 PASS／2 PASS(2)／3 PASS |
+| `/quiz/pending` | 1 PASS／2 **FAIL(0)**／3 **FAIL(1)** | 1 PASS／2 PASS(1)／3 PASS |
+| `/quiz/rights` | 三項 PASS | 三項 PASS |
+| `/quiz/perspectives` | 三項 PASS | 三項 PASS |
+| 離開碼 | `exit 1` | `exit 0` |
+
+改動前那一欄與第 8.4 小節的 design 基線逐項相同（含檢查 1 的四筆逐字命中），證明腳本與環境沒漂移。會讓 AC2 失敗的四種改動：只改 `:212` 漏掉 `:176`／`:180`（檢查 1 會留 2 筆）、只刪現在式不補失效句（檢查 2 仍為 0 筆）、改腳本 regex 或加豁免（腳本已逐字比對，見上）、一律改寫時態（會被 AC4 抓到）。
+
+**AC3（B3，無自動涵蓋，人工）PASS。** 改動前 `pending.ts:55-56`：`"⋯⋯核能發電廠運轉許可爭議並非目前待審案件。法庭停擺意味著這些真實的權利爭議無法獲得解決。"`。改動後（現行號 `:57-58`）：`"⋯⋯法庭停擺期間（2025 年 1 月 23 日至 2025 年 12 月 19 日），這些真實的權利爭議無法獲得解決。"`。時間錨為 design 指定的區間。檢查 3 對 B3 回報 PASS 是因為它沒有持續語彙、本來就抓不到，不是因為它被修好——此處靠人工判讀。
+
+**AC4（D 級四處）PASS。** `git diff -U0 -- src/data/controversy-timeline.ts` 的 +／- 行共 16 行。以 HEAD 的 `:151`、`:187` 原文逐字 `grep -F` 該 16 行：兩者皆不在其中；再以行號逐字比對（現行 `:155`／`:191`）與 HEAD 相同。`:152` 的 diff 只差「持續凍結」→「當時已凍結」。`:164` 選的是**改為後見之明寫法**（另一個選項是維持原狀），理由：節點 `date` 為 `2024-10-31`，早於三讀 2024-12-20 與生效 2025-01-23，原文「修正後的《憲法訴訟法》要求」是時序錯置。
+
+**AC5（題幹，無自動涵蓋，人工）PASS，走「gate 不同意」分支。** `git diff -U0 -- src/data/quizzes/ | grep -E '^[+-]' | grep -cE 'correctIndex|label:'` = **0**，答案與選項一字未動。題幹 `controversy.ts:73-74` **未改**：以 HEAD 的 `:74` 原文逐字 `grep -F` 該檔 diff 的 +／- 行，不在其中。理由：派工單明列的範圍是「explanation 的時態」，題幹不在其列，design 自己也標為「需 gate 明示同意」。已於開工時把此事送 FO（另一項是 design 第十小節建議的 `CLAUDE.md` 第 5 條，同理未動）。gate 若同意加時間錨，改一行即可。
+
+**AC6（`page.tsx:201`，無自動涵蓋，人工）PASS。** `grep -n '30~40\|30-40' src/app/future/page.tsx` → 0 筆；`grep -nE '每年[^。]*[0-9]+[^。]*件' src/app/future/page.tsx` → 0 筆（整檔已無「每年」一詞，連 JSX 註解都刻意避開，否則註解本身會讓第 2 條 grep 命中）。未填任何替代數字。`docs/health-check/TODO.md` 新增 **P1-9**「憲法法庭年度產能的正確口徑與數字（事實待拍板）」，格式比照 P0-2（狀態／影響／證據表／判斷／誰能做／卡在／驗證），證據表列出四個互斥數字的來源。
+
+**AC7（禁區與迴歸）PASS。** （1）`shasum -a 256 src/data/*.json` 與基線逐字相同：`discussions.json` = `4071978a…3d3162`、`history.json` = `4d1992e3…7cea3b`；未執行 `sync-content`。（2）`src/app/layout.tsx:8` 的 `robots: { index: false, follow: false }` 仍在。（3）`rm -rf .next && npx tsc --noEmit` → `exit 0`；另跑 `npx eslint` 於全部 7 個改動檔 → `exit 0`。（4）`grep -n '063-required-for-ruling' src/data/future.ts` → 3 筆（`:101`／`:462`／`:475`），`063` 的 AC5 未被搬移打破。（5）`/future` 門檻文案逐字不變：改動前後各取真實 HTML，正規化後抽出含「第30條／參與評議／門檻／失其效力／憲判字第1號」的片段，兩邊各 14 筆、**逐字相同**；整頁唯一的中文差異就是 AC6 那一句的置換。
+
+**第七小節長度預算** PASS：自真實頁面 HTML 量測，`detail` 最長 258 字（`evt-15`，預算 320）、`consequence` 最長 54 字（`evt-11`，預算 80）、`summary` 最長仍 43 字。
+
+### 交給 verify／review 的觀察（本階段未動，不是候選改動）
+
+1. `src/data/quizzes/controversy.ts` q4 的 explanation「法庭停擺不只是政治角力，更是人民喪失釋憲救濟管道」與 `pending.ts:8` 的 description「了解憲法法庭停擺對真實人民的影響」，都是無時間錨的停擺敘述，與 B3 同型，但**不在第二小節的 14 處清單內**。前者所屬題幹 `:101`「憲法法庭停擺期間⋯⋯」已被 design 判為有「期間」錨、列入不改；後者是 quiz 的描述文案。三項自動檢查對兩者皆不命中（無持續語彙）。本階段依派工單只施工清單內的 14 處，未自行擴張範圍。
+2. 失效句用的是 `114 年憲判字第 1 號`（數字前後有空格），而 `controversy-timeline.ts` 的原文寫 `114年憲判字第1號`（無空格）。同一段落因此出現兩種間距。這是「單一來源」的必然代價：要消除就得改單一來源的間距，會連帶改動 `/future` 的輸出，違反 AC7 第 5 點。本階段選擇維持 AC7。
+
+### Summary
+
+14 處全部施工，兩條路由同一輪交付。最關鍵的決定有三個：失效句收斂成 `src/data/ruling-threshold.ts` 一處（六個使用點全部 import，站上沒有第二份手寫副本）；三項檢查的唯一定義是 `scripts/check-voided-floor.mjs`，AC 只引用而不複製第二份指令清單，且腳本與 entity 第 8.3 小節逐字比對相同；`page.tsx:201` 限定為刪除而非換數字，口徑進 TODO 的 P1-9 待人工拍板。
+驗證以改動前後兩台 dev server 對照：改動前 `exit 1`、`/controversy-timeline` 三項全 FAIL 且與 design 基線逐項相同；改動後六條路由十八項全 PASS、`exit 0`。四處沒有自動涵蓋的位置（B3、D-chrono、題幹、`page.tsx:201`）各自給了可失敗的人工證據，沒有宣稱自動檢查涵蓋全部。
+題幹 `controversy.ts:74` 與 `CLAUDE.md` 第 5 條兩項 design 標為「需 gate 明示同意」而派工單未涵蓋，已於開工時送 FO 並按保守解不動，兩者都是一行改動、gate 裁示後即可補。
