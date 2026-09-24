@@ -1,7 +1,7 @@
 ---
 id: 063
 title: requiredForRuling 的法律正確性（114憲判1）
-status: review
+status: implement
 source: constitution-features/056 第二節 D3
 started: 2026-09-21T21:16:25Z
 completed:
@@ -20,6 +20,19 @@ mod-block:
 這一項原本掛在 `021`／`026` 兩張**已封存**的票上。掛在封存票上等於沒人負責——這正是 feature `056` 的 Problem 一節所說的「各自漂走」。`056` 因此判定開專票。
 
 內容涉及 114 年憲判字第 9 號，需要法學判斷才能拍板。
+
+> ⚠️ **2026-09-23 更正：上句的「114 年憲判字第 9 號」不存在。**
+> 正確號次是 **114 年憲判字第 1 號【憲法訴訟法修正案】**（114-12-19，
+> `cons.judicial.gov.tw/docdata.aspx?fid=38&id=355485`）。
+> 上句寫於開票時，沿用了 `056` 傳進來的誤引，**原句保留**。
+> 誤引的源頭與擴散路徑見第六小節。
+>
+> **這一行為什麼到 review gate 才被抓到：** AC7 的 `Verified by:` 只寫了緊寫法的
+> `grep -n '114憲判9'`，而本行用的是空格寫法「114 年憲判字第 9 號」。
+> 前三輪 verify 依該 grep 回報 AC7 PASS **並沒有錯，是 AC 的 grep 沒涵蓋這個寫法**，
+> 不是誰失職。**AC7 的文字本輪未修改**——AC 變更只有 captain 能做。
+> 這一點比這一行本身更值得記下：驗收用的 grep 若只涵蓋一種寫法，
+> 就會在另一種寫法上出現穩定的盲區。
 
 ## Proposed approach
 
@@ -1162,3 +1175,64 @@ V10 修好了，而且修法比我建議的好。我給的第一案是把標頭�
 五項 finding 沒有一項 Material。R1 是本票內部的一行未標記誤引，**站上真 HTML 0 筆**、`title` 已改、第六小節整節追溯，損害不及任何發布面；它之所以漏掉，是 AC7 的 `Verified by:` 只寫了緊寫法的 grep，前三輪依該 grep 回報 PASS 並沒有錯——這一點我認為比那一行本身更值得 FO 記下。R2 是 P0-7 的 L1 列停在舊問法，而 P0-7 正是要交給法學協作者的東西，成本一行、值得順手補。R3 版面、R4 屬設計層且 implement 照規格執行無誤、R5 是 FO 的 ledger 簿記。
 
 **這份 diff 可以交付。** 但交付不等於這件事做完了——`headcount` 還是 `null`，L1 到 L4 仍待法學背景者拍板，L5 在本環境無法量測，而 V7 指出的 `/quiz/*` 與 `/controversy-timeline` 仍以現在式把已失效的 10 人門檻當現行法，那是同一個法律錯誤的最大殘餘面，且 `/controversy-timeline` 在 `PUBLIC_PAGES` 內。這些都正確地留在票內等 captain，不是被這張票解決掉了。
+
+## Stage Report: implement (cycle 4)
+
+處理 captain 於 2026-09-23 在 review gate 的 revise。授權範圍只有 R1 與 R2，兩項都只動文件。
+`src/` 零變動。
+
+- DONE: R1：本票第 22 行把不存在的「114 年憲判字第 9 號」當成事實陳述，補一行標日期的更正補述（號次不存在、正確為 114 年憲判字第 1 號、指向第六小節），**原句保留**。並在票內記明 reviewer 的附帶觀察⋯⋯**但不得因此修改 AC7 的文字**。
+  原句第 22 行原樣保留，其後加一則 2026-09-23 更正框：號次不存在、正確為 114 年憲判字第 1 號【憲法訴訟法修正案】（114-12-19，附 `docdata` 連結）、指向第六小節。同框內記明 reviewer 的附帶觀察：AC7 的 `Verified by:` 只寫緊寫法 `grep -n '114憲判9'`，而第 22 行是空格寫法，故前三輪依該 grep 回報 AC7 PASS 並無錯誤，是 AC 規格不足而非失職。**AC7 文字未改**——AC 全節自 `7f1f44e` 以來逐字相同（2425 bytes，程式比對，見下方越界檢查）。
+- DONE: R2：把 `docs/health-check/TODO.md` 的 P0-7 的 L1 列更新為與本票第五小節一致的問法，補上 V9 的證據。
+  P0-7 的 L1 列改為與第五小節同一問法（「法庭已連續七則判決都採『拒絕參與評議者不計入現有總額』，站上要不要照法庭的算法寫？」），附 115憲判6【30】原文引述與七則判決的算法，並保留原問法原句。兩份文件的 L1 現在一致。
+- DONE: 確認未越界。
+  `git status --porcelain` 只有本票與 `docs/health-check/TODO.md` 兩個檔案；`src/` 零變動。R3（P0-7 結尾兩條 `---`）未動，仍為 2；R4（`compact` 的 `aria-label`）未動，仍在 `RulingThresholdNote.tsx:43`；R5 未補第三行，`### Feedback Cycles` 仍為 Cycle 1／Cycle 2 兩行。V7／V8／V11 與 `page.tsx:201` 相對 `HEAD` 零變動。`headcount` 仍為 `null`。未宣稱 L5 已量測。未執行 `sync-content`。
+- SKIPPED: R3（純版面）／R4（設計層）／R5（計數器誤會）。
+  依授權 decline，三項零變動。R5 已由 FO 查證：本票只有兩個修正輪（Cycle 1＝V1–V9、Cycle 2＝V10），`### Feedback Cycles` 兩行齊備；reviewer 數的是 stage report 序號（implement cycle 3），兩個計數器不同。補第三行會是憑空記錄，故不補。
+
+### 為什麼 R1 值得記在票內，而不只是改掉
+
+這一行的價值不在它本身，在它暴露的驗收盲區。
+
+AC7 的失敗條件寫的是語意（「把誤引當成正確引註繼續往下傳」），
+但它的 `Verified by:` 只給了一個寫法的 grep（`114憲判9`）。
+同一個號次在本專案至少有兩種寫法：緊寫法 `114憲判9` 與空格寫法「114 年憲判字第 9 號」。
+grep 只涵蓋前者，於是後者形成一個**穩定**的盲區——
+不是偶爾漏，是每一輪都會漏，而且每一輪都會正確地回報 PASS。
+
+三輪 verify 依該 grep 回報 AC7 PASS 並沒有錯。抓到它的是 review gate 的人眼。
+**本輪不修改 AC7 的文字**（AC 變更只有 captain 能做，且本輪未授權）；
+記在此處供 captain 日後決定要不要把 `Verified by:` 的 grep 補成涵蓋兩種寫法。
+
+### 越界檢查實跑輸出
+
+```
+git status --porcelain
+  M docs/constitution-features/063-required-for-ruling-legal-accuracy.md
+  M docs/health-check/TODO.md          ← 只有這兩個檔
+git status --porcelain -- src/          → 空（src/ 零變動）
+AC 全節（十、Acceptance criteria）      → 2425 bytes → 2425 bytes，逐字相同
+grep -n '^- Cycle' 本票                 → 第 45、46 行兩筆（未補第三行）
+P0-7 區段 '^---' 計數                   → 2（R3 未動）
+RulingThresholdNote.tsx aria-label      → :43 仍在（R4 未動）
+headcount: null                         → future.ts:495
+```
+
+### Summary
+
+R1 與 R2 兩項完成，都只動文件，`src/` 零變動。
+
+R1：第 22 行原句保留，其後加 2026-09-23 更正框，標明「114 年憲判字第 9 號」不存在、
+正確為 114 年憲判字第 1 號、並指向第六小節。作法與本票先前各輪處理原句的方式一致
+（不悄悄改寫原文，追加補述）。同框記下 reviewer 的附帶觀察：這一行漏掉的原因是
+AC7 的 `Verified by:` 只涵蓋緊寫法 grep，空格寫法形成穩定盲區——
+**這是 AC 規格不足，不是前三輪 verify 失職**，它們依該 grep 回報 PASS 並沒有錯。
+AC7 文字未動。
+
+R2：`docs/health-check/TODO.md` 的 P0-7 的 L1 問法與本票第五小節對齊，
+補上 115憲判6【30】的七則判決證據，原問法保留原句。P0-7 是要交給法學協作者的文件，
+先前它停在被 V9 取代前的問法，交付後對方會讀到舊問題；現在兩份一致。
+
+R3／R4／R5 依授權零變動。R5 特別註明不補第三行 Cycle，因為那會是憑空記錄——
+本票只有兩個修正輪，reviewer 數的是 stage report 序號，兩個計數器不同。
+L1／L2／L3 仍未拍板，`headcount` 維持 `null`；L5 仍未量測，本輪未宣稱已量測。
