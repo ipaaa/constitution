@@ -1,7 +1,7 @@
 ---
 id: 050
 title: 正式 SSOT 部署 feature 040 的審核欄位（040 合併的硬前置）
-status: verify
+status: implement
 source: captain 2026-09-04（把關機制體檢最高風險項：無票、無人負責）
 started: 2026-09-07T23:15:17Z
 completed:
@@ -37,7 +37,7 @@ feature 040 把八個審核欄位全部改為必填。正式試算表尚未建�
 3. **逐列重新核可。** `docs/content-pipeline/design.md` 明訂舊列不能批次補造指紋——部署新欄位後既有的 `Approved` 會**全部先顯示 `Needs review`**。
 4. **確認保護範圍。** 八個審核欄位需設為投稿者不可編輯。與 `status` 欄的保護是分開設定的。
 
-`editor-onboarding.md:430` 特別註明：**編輯權限已經開出去，這一輪重新核可的工作量比原設計預估的大。**
+`editor-onboarding.md:434` 特別註明：**編輯權限已經開出去，這一輪重新核可的工作量比原設計預估的大。**
 
 ## 相依關係
 
@@ -206,7 +206,7 @@ reject_reason
 |---|---|---|
 | `Track 1_history` | `status`、`approved_by`、`approved_at` | `review_decision`、`review_fingerprint`、`approved_fingerprint`、`current_fingerprint`、`reject_reason` |
 | `Track 2_discussion` | `status`、`approved_by`、`approved_at` | 同上五欄 |
-| `site_tldr` | `status`（`TODO.md:127` 記錄現況為 `order｜label｜text｜status｜link`） | `review_decision`、`review_fingerprint`、`approved_by`、`approved_at`、`approved_fingerprint`、`current_fingerprint`、`reject_reason` |
+| `site_tldr` | `status`（`TODO.md:156` 記錄現況為 `order｜label｜text｜status｜link`） | `review_decision`、`review_fingerprint`、`approved_by`、`approved_at`、`approved_fingerprint`、`current_fingerprint`、`reject_reason` |
 
 **三條硬規則：**
 
@@ -486,7 +486,7 @@ node --env-file=.env.local /tmp/hdr.mjs
 `review_fingerprint`、`approved_by`、`approved_at`、`approved_fingerprint`、
 `reject_reason`、`current_fingerprint`。
 
-**`site_tldr`** — 現況 5 欄（`order`／`label`／`text`／`status`／`link`，與 `TODO.md:127` 的記錄相符），
+**`site_tldr`** — 現況 5 欄（`order`／`label`／`text`／`status`／`link`，與 `TODO.md:156` 的記錄相符），
 要新建 7 欄：`review_decision`、`review_fingerprint`、`approved_by`、`approved_at`、
 `approved_fingerprint`、`reject_reason`、`current_fingerprint`。
 
@@ -647,7 +647,7 @@ CSV round-trip，所以唯一變數是新增的欄位。
 **59 列，與票內的數字相符。** 票內是從 `src/data/*.json` 的筆數推算，本輪是從試算表的
 `status` 欄直接數，兩邊一致。
 
-`editor-onboarding.md:430` 的「這一輪重新核可的工作量比原設計預估的大」**不是指列數變多**。
+`editor-onboarding.md:434` 的「這一輪重新核可的工作量比原設計預估的大」**不是指列數變多**。
 該句的主詞是「編輯權限已經開出去」——工作量變大的是**協調成本**：
 窗口期間有 30 列草稿在編輯台手上可以隨時改。任何人改到那 59 列中任一列的發布內容，
 該列的指紋就變了，核可要重做（`approval-workflow.gs` 會報
@@ -658,7 +658,7 @@ CSV round-trip，所以唯一變數是新增的欄位。
 `Track 2_discussion` 的指紋含已發布列序號。實測序號分布：
 
 - 15 個 `Approved` 列在試算表的第 2-17 列，序號 1-16。
-- **只有 1 列**未核可的草稿夾在其中：第 4 列（`d3`）。刪掉它，其後 14 列的指紋全變。
+- **只有 1 列**未核可的草稿夾在其中：第 4 列（`d3`）。刪掉它，其後 13 列（第 5-17 列）的指紋全變。
 - 其餘 27 列草稿（`d18`–`d44`）全部在第 17 列之後。**在它們身上增刪不影響已核可列的序號。**
 
 所以 Track 2 的順序陷阱只有一個具體風險點：**第 4 列（`d3`）在窗口結束前不可刪除或搬移。**
@@ -766,9 +766,40 @@ captain 若用「尋找並取代」搜票內那個字串會找不到。
 | `Track 2_discussion` | `owl_depth_comment （新建，全部留白）`<br>`full_content （新建，全部留白）`<br>`approved_by （核可者，自動填）`<br>`approved_at （核可時間 UTC，自動填）`<br>`reject_reason （退回原因）` |
 | `site_tldr` | 無 |
 
+**⚠️ `chapter`、`owl_depth_comment`、`full_content` 三個內容欄在 S9 完成前必須保持全欄留白。**
+階段一可以分幾天做，而保護範圍要到 S7 才設——這三欄在這段期間是**編輯台可寫的**。
+**沒有任何程式會擋填值**：實測填入非空值，main 的同步仍然 exit 0，
+只有輸出的 sha256 會變（`38e662f6…`／`6895ef6b…`）。
+填了值，AC-1 的逐字比對就會失敗。請在階段一開始前告知責任編輯不要動這三欄。
+
 **S3　工程確認產線還活著。** 用 AC-6 的 sandbox 手法跑 main 的同步，必須 exit 0，
 且輸出的兩個 sha256 仍是 `4d1992e3…cea3b` 與 `4071978a…3162`。
 **這一關沒過就不要進階段二。**
+
+**AC-6 那段 `grep` 在 S3 會印 ⛔，那是對的。** 它是給窗口打開之後用的，
+階段一還沒有任何窗口內欄位，本來就不該出現標題錯誤。S3 只看 exit code 與 sha256。
+
+此時 main 成功會把兩個 JSON 寫進 `$SANDBOX/src/data/`（不是 repo），所以可以直接比：
+
+```bash
+shasum -a 256 "$SANDBOX/src/data/history.json" "$SANDBOX/src/data/discussions.json"
+diff "$REPO/src/data/history.json" "$SANDBOX/src/data/history.json"
+diff "$REPO/src/data/discussions.json" "$SANDBOX/src/data/discussions.json"
+```
+
+**sha256 不符時怎麼辦。** 先看上面兩個 `diff` 印出什麼，分辨是哪一種，不要直接停住：
+
+| 分辨方式 | 判定 | 處置 |
+|---|---|---|
+| main 同步 exit 0，`diff` 只落在那三個內容欄或那 59 列的發布內容，且編輯台確認是有人正常填稿 | **編輯合法填值** | **重新量 baseline。** 把新的兩個 sha256 更新進 AC-1 的綁定值，在 AC-1 旁註明新值、量測日期與換基準的原因，然後繼續階段二 |
+| main 同步轉為 exit 1，或 `diff` 落在沒人動過的欄位 | **部署副作用** | 停住。回頭查 S1／S2 是否改到欄位位置、刪到列、或在新欄填了值。**不要重量 baseline** |
+
+**重量 baseline 不等於放寬 AC-1。** AC-1 的判準不變（部署前後逐字相同），
+變的只是「部署前」那個基準的量測時點。重量之後，S9 仍然必須逐字相同。
+**只有 captain 能改 AC 的要求**；工程在這裡做的是更新一個量測值，不是改判準。
+
+**這一段何時升級為 Material**：任何人在階段一對 `chapter`、`owl_depth_comment`、`full_content`
+或那 59 列的發布內容寫入任何值。在那之前它是 deferred risk——2026-09-24 重量 baseline 仍未漂移。
 
 #### 階段二：窗口（`captain` + `工程`，一氣呵成，預留 2 小時）
 
@@ -836,6 +867,125 @@ current_fingerprint （公式自動產生，不要手動填）
 **S9　工程執行不落地驗證。** 照票內步驟 8 原文，接著跑 AC-3 的 id 比對。
 兩者都通過才做步驟 9 的合併。
 
+### 九、F1-F4 的處置與引用複核（2026-09-24 第二輪）
+
+verify stage 判 **PASSED**，並提出 F1-F4 四筆 finding。FO 授權**四筆全部 fix**。
+本輪**未對正式試算表做任何寫入**，也未讀取它——四筆全部是票內文字的修正，
+所需事實改由重跑 main 的同步程式（本機 fixture、暫存沙箱）與實讀被引用的檔案取得。
+`src/data/*.json` 零改動。
+
+#### 四筆 finding 的處置
+
+| finding | 分類 | 改了哪裡 | 改成什麼 |
+|---|---|---|---|
+| **F2** | Material | AC-6 的 `Verified by:` | 判準改為「同一行同時含 `對不到任何預期欄位` 與 `review_decision` 兩個子串」，並在 sandbox 指令裡附上該 `grep`。不再逐字比對引號內容，不再綁欄號 |
+| **F4** | Deferred risk | S2、S3 | S2 加「三個內容欄在 S9 完成前必須全欄留白」；S3 加 sha256 不符時的分辨表與 re-baseline 條文，並記下升級為 Material 的條件。順帶補上 S3 的 `diff` 指令——原本只寫「比 sha256」，沒寫怎麼看出差在哪 |
+| **F1** | Polish | 第六節「Track 2 的序號暴露面」 | 「其後 14 列」改為「其後 13 列（第 5-17 列）」 |
+| **F3** | Polish | 步驟 3 的表、第三節 | `TODO.md:127` 改為 `TODO.md:156` |
+
+**AC 的要求文字一字未動。** F2 只改 AC-6 的 `Verified by:`（改「怎麼認出那一行」），
+AC-6 的標題與「必須 exit 1 並輸出一行指出 `review_decision` 這一欄對不到任何預期欄位」
+這個要求本身不變。F4 的兩處都落在 S2／S3，沒有碰 AC-1 的條文。
+
+#### F2 的字串已獨立重測
+
+架本機 HTTP server 供應三個分頁的 fixture（標題用第三節的建議值、S2／S4 的排序），
+把 `git show main:scripts/sync-content.mjs` 複製到暫存沙箱執行。exit 1，逐字印出：
+
+```
+第 15 欄的標題「review_decision （由 Review 選單寫入）」對不到任何預期欄位。檢查是否打錯字。
+```
+
+兩項確認：
+
+1. `grep '「review_decision」'` **找不到**這一行（引號內多了中文說明），F2 成立。
+2. 新判準 `grep '對不到任何預期欄位' | grep -q 'review_decision'` **認得**這一行。
+
+另查出訊息實際結尾還有 `檢查是否打錯字。`（`sync-content.mjs` 第 294 行的
+`addError(...)` 樣板）。AC-6 原文只引到 `對不到任何預期欄位。`，那是子串，不影響判準；
+新版已把完整訊息逐字寫進票內，工程不會再對不上。
+
+#### 引用複核：票內每一處 `檔名:行號`
+
+verify 說它實讀通過 8 處。本輪把範圍擴到**全票**：31 個被引用的位置
+（含以「第 N 行」「第 N 節第 M 點」形式寫的；同一個引用出現多次的合併成一列）。
+**四處指不到宣稱的內容，全部已修；其餘 27 處實讀通過。**
+四處之中 `TODO.md:127` 是 verify 點名的 F3，另外三處是本輪新查出的同類。
+
+| 引用 | 宣稱的內容 | 結果 |
+|---|---|---|
+| `editor-onboarding.md:430`（4 處） | 「編輯權限已經開出去，這一輪重新核可的工作量比原設計預估的大」 | ⛔ 該句在**第 434 行**。第 430 行是「正確順序是：試算表建欄 → …」。**已改為 `:434`** |
+| `040-…md:221` | 040 的 Out of scope「不上線正式 SSOT 設定，直到隔離測試表完成驗證並由 captain 確認」 | ⛔ 該句在**第 290 行**，第 221 行是空行（main、040 worktree、本 worktree 三份皆同）。**已改為 `040-approval-content-version-binding.md:290`**（並補全檔名，原本寫成 `040-…md`） |
+| 本票「第 50 行」 | 「spike 的形式是在隔離測試表上先跑一次（即 feature 044）」 | ⛔ 該句在**第 53 行**。**已改為第 53 行，並補上 `## Risk evidence` 首句** 當錨點 |
+| `TODO.md:127` | `site_tldr` 現況為 `order｜label｜text｜status｜link` | ⛔ 第 127 行是空行，該記錄在**第 156 行**。**已改**（即 F3） |
+| `editor-onboarding.md:425-430` | 「一旦先合併而試算表還沒建那八欄…」＋「正確順序是…」兩句 | ✅ 兩句分別在第 428、430 行，都落在區間內 |
+| `editor-onboarding.md:261` | `reject_reason` 欄在試算表上不存在 | ✅ 逐字相符 |
+| `editor-onboarding.md:104-111` | 風險 5（改到欄位標題，整條產線停擺） | ✅ 標題在第 104 行，整段落在區間內 |
+| `editor-onboarding.md:110` | 標題列保護與 `status` 是分開設定的 | ✅ 逐字相符 |
+| `editor-onboarding.md:58` | 「整列刪除」保護尚未確認 | ✅ 逐字相符 |
+| `editor-onboarding.md:344-345` | `h28` 掛了 `h14` 的標題，以清空 `status` 擋住 | ✅ 逐字相符 |
+| `2026-08-31-content-pipeline.md:174` | `收集區` 的 Track 1 為 9 欄、不含 `chapter` | ✅ 逐字相符 |
+| `TODO.md` P3-7 | `chapter` 欄位設計已被放棄 | ✅ 標題在第 865 行，存在 |
+| `approval-workflow.gs:5` | `APPROVAL_FIELDS['Track 1_history']` 含 `chapter` | ✅ |
+| `approval-workflow.gs:6` | `APPROVAL_FIELDS['Track 2_discussion']` 是 13 個欄位 | ✅ 實數 13 個 |
+| `approval-workflow.gs:12-14` | `WRITABLE_REVIEW_FIELDS` 排除 `status` 與 `current_fingerprint` | ✅ |
+| `approval-workflow.gs:76-80` ／ 第 79 行 | Track 2 的指紋含 `__sequence` | ✅ 第 79 行為 `projection.push(['__sequence', …])` |
+| `approval-workflow.gs:127-144` | `resolveApprovalHeaders_` | ✅ 第 127 行是函式開頭，第 144 行是它的結尾 `}` |
+| `approval-workflow.gs:159` | `這個分頁不支援核可公式。` | ✅ 逐字相符 |
+| `approval-workflow.gs:219` | 不可核可標題列 | ✅ 逐字相符 |
+| `approval-workflow.gs:220` | `Session.getActiveUser().getEmail()` | ✅ 逐字相符 |
+| 040 `sync-content.mjs:84-93` | `APPROVAL_COLUMNS` 八欄全為 `required` | ✅ 第 84 行宣告、第 93 行 `];`，八筆皆 `column: 'required'` |
+| 040 `sync-content.mjs:392` | `publishedRowSequences` | ✅ 函式定義在該行 |
+| main `sync-content.mjs` 第 94 行 | `chapter` 為 `optional` | ✅ |
+| main 第 97-99 行 | Track 1 的 `approved_by`／`approved_at`／`reject_reason` | ✅ 三行逐字相符 |
+| main 第 112 行 | `aliases: ['owl comment', 'owl_comment']` | ✅ 逐字相符 |
+| main 第 113、116 行 | `owl_depth_comment`、`full_content` | ✅ |
+| main 第 117-119 行 | Track 2 的三欄 | ✅ |
+| main 第 123-129 行 | `SITE_TLDR_COLUMNS` 無 `approved_by`／`approved_at`／`reject_reason` | ✅ 七行實讀，確實沒有 |
+| `operations.md:12` ／ 第 15-25 行 | probe 但書；「隔離表部署」一節 | ✅ 第 12 行逐字相符；該節內容為第 15-25 行（第 26 行空白、第 27 行是下一節） |
+| `design.md` 第二節第 4 點 | 找不到標題就中止並指名 | ✅ 第二節在第 135 行，第 4 點為「找不到就中止，並指名是哪個標題看不懂」 |
+| 本票「第 45 行」 | 「兩者不互為前置」 | ✅ 仍指到該句；已補上 `## 相依關係` 第二個項目符號當錨點 |
+
+**F3、`editor-onboarding.md:430`、`040-…md:221`、本票「第 50 行」是同一種錯**：
+引用的行號在寫下之後就沒有再被驗證過。修法一致——實讀一次，改成對的行號，
+並在自我引用的地方補上章節錨點，讓它不再隨著票內插入內容而漂移。
+
+**verify 自己那兩處 `TODO.md:127` 刻意保留**（它的第四節末與第七節 F3）。
+那兩處在**描述這個缺陷本身**，改掉就看不懂 F3 在講什麼。
+
+#### 數字複核：同一件事在多處出現是否一致
+
+| 數字 | 出現在哪裡 | 結果 |
+|---|---|---|
+| 刪 `d3` 後受影響的列數 | 第六節「其後 N 列」／S8「那 13 列要重做」 | ⛔ 14 對 13。**已把第六節改為 13**（即 F1） |
+| 24 欄 | 第三節（8＋9＋7）、第六節分段表、第七節 D2、implement Stage Report、verify 第一節 | ✅ 全部 24，且 8＋9＋7＝24 |
+| 9 欄安全前綴 | 第六節（4＋5＋0）、第八節 S2 的表、verify 第一節 | ✅ 全部 9，S2 的表實際列出 4＋5＋0＝9 欄 |
+| 15 欄窗口內 | 第六節（4＋4＋7）、S4、時間估算表、verify 第一節 | ✅ 全部 15，S4 實際列出 4＋4＋7＝15 欄。9＋15＝24 |
+| 17 欄（票內舊值） | 第三節、第七節 D2 | ✅ 兩處皆 17，且步驟 3 的表確實算出 5＋5＋7＝17；24－17＝7 與「少算 7 欄」相符 |
+| 18／21／12 欄（建完的總欄數） | 證據 1、第三節、第四節、第八節 S4、verify 第一節 | ✅ 五處一致，且 10＋8＝18、12＋9＝21、5＋7＝12 |
+| 59 列 | 步驟 7 的表、第六節、時間估算表、S8 的表、verify 第三節、AC 相關敘述 | ✅ 全部 59，且 40＋15＋4＝59 |
+| 89／30 列 | 第六節的表 | ✅ 42＋43＋4＝89；2＋28＋0＝30；59＋30＝89 |
+| 6 段連續選取 | 時間估算表（3＋2＋1）、S8 的表、verify 第三節 | ✅ 三處一致；S8 的表列出 1＋21＋18＋2＋13＋4＝59 列、共 6 段 |
+| 12／15 個保護範圍 | 第三節、第六節的表、第七節 D6、S7 的表、verify 第三節 | ✅ 全部 12／15；S7 的表實際列出 4＋4＋4＝12 個範圍 |
+| 27 列草稿（`d18`–`d44`） | 第六節、implement Summary、verify 第三節 | ✅ 第 18-44 列即 27 列，與 S8「第 18-44 列也不核可」相符 |
+| `review_decision` 的欄號 | 第六節 fixB3／fixB4（第 12／第 6 欄）、第八節（第 15 欄）、AC-6（新版）、verify（第 15 欄、第 18 欄起、第 6 欄起） | ✅ 差異源自排序不同，不是矛盾：建議排序 12、S2／S4 排序 15（Track 2 為 18、`site_tldr` 為 6）。AC-6 新版已明寫「不要綁欄號」並列出兩個值 |
+| 540 行 | verify 第六節的 placeholder scan 範圍 | ✅ `git log --numstat 2e83adf` 為 `540 0` |
+| 「三處與現況不符」 | 部署 runbook 的 ⚠️ 橫幅、第八節開頭 | ✅ 不是矛盾。「三處」指**與現況不符的三個位置**（步驟 0 指令、步驟 2 字串、步驟 3 欄位表）；D4 是估算過大、D6 是漏說明，兩者不屬於「與現況不符」。兩處橫幅的措辭一致 |
+
+**未改動 verify 已確認的任何數字**：24／9／15 欄、59 列、12／15 個保護範圍、6 個連續段，
+以及 18／21／12、40／16、89／30、27 全部原值保留。F1 改的 14→13 是 verify 自己提的更正。
+
+#### 未越界
+
+- **正式 Google 試算表零寫入，本輪連讀取都沒有。** 沒有 HTTP 請求送到試算表。
+- 未執行 `npm run sync-content`。main 的同步跑了兩次，兩次都在暫存沙箱、餵本機 fixture：
+  一次驗 F2 的錯誤字串（exit 1），一次驗 S3 新增的 `diff` 指令指對地方（exit 0，
+  兩個 JSON 確實寫進 `$SANDBOX/src/data/`，沒有碰 repo）。
+- `src/data/*.json` 逐位元組未變，sha256 仍為 `4d1992e3…cea3b`／`4071978a…3162`。
+- 未改動任何 acceptance criteria 的**要求文字**。
+- 未動 040 的 worktree（只以 `git show main:` 與唯讀 `sed` 取內容）。
+- 判定中文字串時未使用 `sort`／`uniq`；欄名與訊息比對一律用 `grep -o … | wc -l` 或 Python 的字串計數。
+
 ## 相依關係釐清（design stage）
 
 ### 相依一：`docs/content-pipeline/operations.md` 只存在於 040 的 worktree
@@ -859,15 +1009,16 @@ current_fingerprint （公式自動產生，不要手動填）
 
 ### 相依二：票內自相矛盾——044 到底是不是前置
 
-**矛盾確認**。本票第 45 行寫「044 的結果可降低本票的風險，但兩者不互為前置」；
-第 50 行寫「spike 的形式是在隔離測試表上先跑一次（即 feature 044）」。
+**矛盾確認**。本票第 45 行（`## 相依關係` 第二個項目符號）寫
+「044 的結果可降低本票的風險，但兩者不互為前置」；
+第 53 行（`## Risk evidence` 首句）寫「spike 的形式是在隔離測試表上先跑一次（即 feature 044）」。
 既然 `no spike needed` 不成立、而 spike 就是 044，044 就是前置。兩句不能同時成立。
 
-**我的判定：第 45 行錯，044 是步驟 4 起的硬前置。三項外部證據都指向同一邊：**
+**我的判定：第 45 行（`## 相依關係` 第二個項目符號）錯，044 是步驟 4 起的硬前置。三項外部證據都指向同一邊：**
 
 1. `docs/content-pipeline/operations.md:12`（040 worktree）：
    「兩帳號隔離 probe 完成前，不要把 Apps Script 套到正式 SSOT。」
-2. feature 040 的 Out of scope（`040-…md:221`）：
+2. feature 040 的 Out of scope（`040-approval-content-version-binding.md:290`）：
    「不上線正式 SSOT 設定，**直到隔離測試表完成驗證並由 captain 確認**。」
 3. 本票 AC-3（非核可者不能編輯審核欄位）與 044 的第二個待驗證命題**是同一件事**。
    差別只在：044 在可丟棄的測試表上做，本票在 40 筆已上線內容的唯一來源上做。
@@ -965,13 +1116,25 @@ current_fingerprint （公式自動產生，不要手動填）
   ```bash
   SANDBOX="$(mktemp -d)"; mkdir -p "$SANDBOX/scripts" "$SANDBOX/src/data"
   git -C "$REPO" show main:scripts/sync-content.mjs > "$SANDBOX/scripts/sync-content.mjs"
-  node --env-file="$REPO/.env.local" "$SANDBOX/scripts/sync-content.mjs"; echo "exit=$?"
+  node --env-file="$REPO/.env.local" "$SANDBOX/scripts/sync-content.mjs" > "$SANDBOX/out.txt" 2>&1
+  echo "exit=$?"   # 必須是 1
+  grep '對不到任何預期欄位' "$SANDBOX/out.txt" | grep -q 'review_decision' \
+    && echo "✅ 出現預期的標題錯誤（窗口確實打開）" \
+    || echo "⛔ 沒有出現預期的標題錯誤"
   ```
-  必須 exit 1 並輸出 `第 N 欄的標題「review_decision」對不到任何預期欄位。`。
+  必須 exit 1 並輸出一行指出 `review_decision` 這一欄對不到任何預期欄位。
+  **怎麼認出那一行**：同一行同時含 `對不到任何預期欄位` 與 `review_decision` 兩個子串，即成立。
+  上面的 `grep` 就是這個判準。
+  **不要逐字比對引號內的內容，也不要綁欄號。** 照第三節的建議標題建欄後，程式實印的是
+  `第 15 欄的標題「review_decision （由 Review 選單寫入）」對不到任何預期欄位。檢查是否打錯字。`
+  ——引號內含中文說明，所以 `grep '「review_decision」'` 會找不到；
+  欄號則依實際建欄順序而變（S2／S4 的分階段順序為第 15 欄，第三節「建議排序」為第 12 欄）。
   這是**預期行為**，不是 bug。合併 040 之後再跑一次（此時 main 的程式已是新版），必須 exit 0。
 - **會怎麼失敗**：若這一步 exit 0，代表八個欄位沒有真的建進正式表，前面所有步驟都沒生效。
 - **這個 sandbox 手法 design stage 已實測**：以本機 fixture 餵入四個部署階段的 CSV，
-  main 版程式在階段 A exit 0、階段 B/C/D 全部 exit 1，錯誤訊息與上面逐字相同。
+  main 版程式在階段 A exit 0、階段 B/C/D 全部 exit 1。
+  那一輪的 fixture 用**純欄名**當標題，所以印出的是 `「review_decision」`（引號內沒有中文說明）。
+  改用含中文說明的真實標題後，引號內就多了說明字串——這正是上面那個 `grep` 判準要吸收的差異。
 - **這一項的用意**：讓「產線停擺窗口」變成可觀測的事實，而不是口頭承諾。
   合併 040 之前若有人跑了 main 的同步並看到錯誤，本票已經寫明那是預期的。
 
@@ -1018,6 +1181,8 @@ current_fingerprint （公式自動產生，不要手動填）
 | `docs/project/` 全部 | 架構與技術選型不變 |
 | `docs/_archive/` | 依規定不動 |
 | `scripts/` 下任何程式 | 本票是純部署票。程式在 040，已完成 |
+
+### Feedback Cycles
 
 ## Out of scope
 
@@ -1080,7 +1245,7 @@ runbook 裡每一段指令都實跑過，包含一個被淘汰的寫法：`node 
 記成已存在，實際三個分頁都沒有，要建的欄從 17 個變成 24 個。
 
 窗口反而比票內估的小。實測有 9 欄的安全前綴可先建，main 同步照常 exit 0 且輸出逐字不變；
-窗口只涵蓋 15 欄。核可列數 59 經實測確認，`editor-onboarding.md:430` 的「工作量比預估大」
+窗口只涵蓋 15 欄。核可列數 59 經實測確認，`editor-onboarding.md:434` 的「工作量比預估大」
 指的是協調成本而非列數——窗口期間有 30 列草稿在編輯台手上。另量化了票內只定性描述的
 Track 2 序號陷阱：15 個已核可列中只有第 4 列（`d3`）一列草稿夾在其中，其餘 27 列草稿都在後面，
 所以風險點只有一個。
@@ -1337,7 +1502,7 @@ D4 是對的、也是好消息，但它把部署從「一段 2 小時窗口」�
 我實測：把它們填入非空值，main 同步**仍 exit 0**，只有輸出 sha256 改變
 （`38e662f6…`／`6895ef6b…`）。AC-1 綁的是 2026-09-07 量到的固定值。
 - 已釋出使用者與正常流程：責任編輯在階段一期間照常使用試算表
-  （`editor-onboarding.md:430` 明記「編輯權限已經開出去」）。
+  （`editor-onboarding.md:434` 明記「編輯權限已經開出去」）。
 - 可觀察到的損害：S3 會攔下來（它同時檢查 exit 0 **與**兩個 sha256，這一關寫得很好），
   但票內只寫「這一關沒過就不要進階段二」，**沒寫沒過要怎麼辦**。
   若是編輯合法填入內容，正解是重新量 baseline 而不是永久停住；
@@ -1396,3 +1561,41 @@ D3 是對 captain 最要緊的一條，也確認了：照票內步驟 1-3 做完
 **F4**——D4 把單一窗口改成跨日計畫，而 AC-1 綁死一個 2026-09-07 的 sha256，
 階段一要先建三個**編輯台可寫**的內容欄而保護要到階段二才設。S3 攔得住（它同時檢查
 exit 0 與兩個 sha256），但票內沒寫攔下來之後怎麼辦。今日重量 baseline 未漂移。
+
+## Stage Report: implement (cycle 2)
+
+- DONE: F2（Material，最優先）AC-6 改為比對 `對不到任何預期欄位` 與 `review_decision` 兩個子串，不綁完整引號內容；欄號改寫成「依實際建欄順序」。屬 captain 一次性授權範圍：只改 `Verified by:` 怎麼認，不改 AC-6 的要求文字。
+  AC-6 的 `Verified by:` 已改。sandbox 指令現在把輸出導到 `$SANDBOX/out.txt`，再以 `grep '對不到任何預期欄位' | grep -q 'review_decision'` 判定；票內同時逐字寫出程式實印的完整訊息，並明寫「不要逐字比對引號內的內容，也不要綁欄號」，附上兩個欄號值（S2／S4 排序第 15 欄、建議排序第 12 欄）。**AC-6 的標題與要求本身一字未動。** 另修同一項下一句原本寫「錯誤訊息與上面逐字相同」——那句在 AC-6 改寫後就對不上了（design stage 的 fixture 用純欄名標題），已改為說明兩者差在引號內的中文說明。
+  獨立重測：架本機 HTTP server 供三個分頁 fixture（標題用建議值、S2／S4 排序），`git show main:scripts/sync-content.mjs` 複製到暫存沙箱執行，exit 1，逐字得 `第 15 欄的標題「review_decision （由 Review 選單寫入）」對不到任何預期欄位。檢查是否打錯字。`。`grep '「review_decision」'` 找不到它（F2 成立）；新判準認得它。另查出訊息實際結尾還有 `檢查是否打錯字。`（main `sync-content.mjs:294` 的樣板），已一併寫進票內。
+- DONE: F4（Deferred risk，第二優先）S2 補「`chapter`／`owl_depth_comment`／`full_content` 三欄在 S9 完成前必須保持全欄留白」；S3 補 re-baseline 條文；把 promote-to-material 條件記進票內。
+  S2 尾端加一段 ⚠️：三欄必須全欄留白、階段一期間它們是編輯台可寫的、沒有任何程式會擋填值（實測填值 main 仍 exit 0，只有 sha256 變成 `38e662f6…`／`6895ef6b…`）、要事先告知責任編輯。S3 加了三樣東西：兩個 `diff` 指令（原本只寫「比 sha256」，沒寫怎麼看出差在哪）、一張二分判定表（編輯合法填值 → 重新量 baseline 並更新 AC-1 綁定值、註明日期與原因；部署副作用 → 停住，不要重量），以及「重量 baseline 不等於放寬 AC-1」一句（判準不變，變的只是基準的量測時點；只有 captain 能改 AC 的要求）。promote-to-material 條件照 verify 原文記入：任何人在階段一對那三欄或那 59 列的發布內容寫入任何值。**F4 的修改全部落在 S2／S3，未碰 AC-1 的條文。**
+  S3 新增的 `diff` 指令已實測指對地方：同一沙箱手法餵一份合法 fixture，main exit 0 並把兩個 JSON 寫進 `$SANDBOX/src/data/`（不是 repo），`ls` 確認。
+- DONE: F1（Polish）第六節「其後 14 列」改 13；F3（Polish）`TODO.md:127` 改 156。
+  第六節「Track 2 的序號暴露面」已改為「其後 13 列（第 5-17 列）的指紋全變」，與同文件 S8 的 13 一致。`TODO.md:127` 兩處載重引用（步驟 3 的表、第三節）已改為 `:156`；實讀確認第 127 行是空行、該記錄在第 156 行。verify 自己那兩處 `TODO.md:127`（它的第四節末與第七節 F3）刻意保留——那兩處在描述缺陷本身。
+- DONE: 一併掃同類——票內所有「第 N 列／N 欄／N 筆」在多處出現時是否一致；所有 `檔名:行號` 是否真的指到宣稱內容。逐項列出檢查範圍與結果，未被點名的同類一併修並列出。
+  第九節兩張表。**引用**：範圍擴到全票 31 個被引用位置（verify 只掃了 8 處）。四處指不到宣稱內容——`TODO.md:127`（即 F3）加上**三處本輪新查出的同類**：`editor-onboarding.md:430` 出現 4 次都是指「編輯權限已經開出去…工作量比原設計預估的大」，該句實際在第 **434** 行（第 430 行是順序那一句）；`040-…md:221` 指的 Out of scope 原句實際在第 **290** 行（第 221 行在三個 checkout 都是空行），已一併補全檔名；本票自我引用「第 50 行」實際是第 **53** 行。四處全部已修，兩處自我引用另補上章節錨點（`## 相依關係` 第二個項目符號、`## Risk evidence` 首句），讓它們不再隨票內插入內容漂移。其餘 27 處實讀通過，逐處列出宣稱內容與核對結果。
+  **數字**：14 對 13 是唯一矛盾（即 F1）。其餘全部一致並附加總驗算：24＝8＋9＋7、9＝4＋5＋0、15＝4＋4＋7、9＋15＝24、17＝5＋5＋7、24－17＝7、18＝10＋8／21＝12＋9／12＝5＋7、59＝40＋15＋4、89＝42＋43＋4、30＝2＋28＋0、59＋30＝89、6 段＝3＋2＋1 且 1＋21＋18＋2＋13＋4＝59、12＝4＋4＋4、27 列＝第 18-44 列、540 行以 `git log --numstat 2e83adf` 核對為 `540 0`。`review_decision` 的欄號在票內有 12／15／18／6 四個值，實為排序差異而非矛盾，已在表中說明並在 AC-6 明寫不要綁欄號。「三處與現況不符」與 D1-D6 也不是矛盾：D4 是估算過大、D6 是漏說明，兩者不屬於「與現況不符」。
+  falsifying change：把 AC-6 新判準的第二段 `grep` 換成 `grep -q '「review_decision」'`，同一份實測輸出就會判失敗——證明新舊判準真的不同，且新判準不是放寬成「永遠通過」（把輸入換成一份沒有標題錯誤的合法 fixture 輸出，新判準同樣判失敗）。
+
+### Summary
+
+四筆 finding 全部按 FO 授權修完，改動全部在票內文字，**未對正式試算表寫入或讀取任何一格**。
+
+F2 是最優先的一筆，因為它發生在窗口內。AC-6 原本要求工程逐字看到
+`第 N 欄的標題「review_decision」對不到任何預期欄位。`，但照票用含中文說明的標題建欄後，
+程式實印的是 `「review_decision （由 Review 選單寫入）」`——引號內多了說明，逐字比對找不到。
+現在判準改成「同一行同時含兩個子串」，並把 `grep` 直接寫進 sandbox 指令，
+欄號不再綁定。**AC-6 的要求文字一字未動**，改的只是怎麼認出那一行。
+這一串字串本輪自己重跑 main 的同步重測過，新舊判準的差異已用反向改動證明。
+
+F4 補的是「攔下來之後怎麼辦」。S2 現在明寫三個內容欄必須全欄留白，
+並說明沒有任何程式會擋填值；S3 加了 `diff` 指令、二分判定表與 re-baseline 條文，
+並說清楚重量 baseline 不是放寬 AC-1——判準不變，變的是基準的量測時點，
+而改 AC 的要求仍然只有 captain 能做。
+
+F1／F3 是同一類：引用寫下之後沒有再被驗證。把整票掃過一遍，
+除了 verify 點名的 `TODO.md:127`，又查出**三處同類**：`editor-onboarding.md:430`
+（出現 4 次，該句其實在第 434 行）、`040-…md:221`（其實在第 290 行）、
+本票自我引用「第 50 行」（其實是第 53 行）。四處全修，兩處自我引用另外補了章節錨點，
+讓它們不再隨著票內插入內容漂移。數字方面，14 對 13 是唯一的矛盾；
+其餘每一組都附上加總驗算，verify 已確認的 24／9／15／59／12／6 全部原值保留。
