@@ -69,6 +69,11 @@ gates:
                 at: "2026-09-24T17:44:56.238255Z"
                 decision: revise
                 reason: captain 2026-09-24 退回，修 F-12 的根。前八處同型盲區都是「檢查只認一種寫法」，F-12 不同——本票有兩份同一檢查的副本（## Test plan 區塊與第三節），而兩者已在兩處分岔：Test plan 的 G-8 仍把 tsc 列在 build 之前，照它做會直接走進 F-8 記載的假性失敗（該分岔是 cycle 4 只修第三節那一列造成的）；Test plan 的 G-5 pattern 只有 5 個變體而第三節有 6 個，少了「快速了解最新判決的5個重點」，跑那一份會整個漏掉一個佔位值，又是 fail-open。採納 reviewer 的建議：修根而不是補兩處——讓 Test plan 指向第三節、不再複述指令，因為只要兩份副本還在就會有第三次分岔。本票已跑六輪、每輪 reviewer 都找到同一類缺陷的新實例，這是第一個能讓它停下來的修法。此修法不超出 2026-09-24 的授權：它移除一份過時的重複副本，不是改任何檢查要求什麼。
+            - id: gate-attempt:056-verify-5
+              briefing:
+                id: briefing:056:verify:attempt-5:revision-1
+                digest: sha256:1c986e0807bcaa00fd16c259362a3d988b9f70d602dd443e9a3f0bb7ffc5e120
+                room-ref: '@review/verify/briefing-5'
 ---
 
 網站目前是 `noindex` 且無對外網域，「讀者」是有連結的夥伴而非公眾。因此下列破口不是「今天要修」，而是**「公開之前必須為真」**。本票把六個散落的無票缺口收成一道 launch gate。
