@@ -27,7 +27,17 @@ const { default: EraComparisonStrip } = await import('@/components/threshold-ana
 const { default: OchreBandFactors } = await import('@/components/threshold-analysis/OchreBandFactors');
 const { default: ChartAxes } = await import('@/components/threshold-analysis/ChartAxes');
 const { default: ThresholdBoundary } = await import('@/components/threshold-analysis/ThresholdBoundary');
-const { default: ThresholdCaseAnalysis } = await import('@/components/threshold-analysis/ThresholdCaseAnalysis');
+const { default: ThresholdsPage } = await import('@/app/past/thresholds/page');
+
+/**
+ * 整個頁面的渲染輸出，含 page.tsx 的外殼，不只元件子樹。
+ *
+ * 守衛只渲染元件是一個真實被打穿過的洞：reviewer 把換算後的人數注進頁面外殼，
+ * 25 條測試全綠。守衛宣稱保護的是「站上」，涵蓋面就必須是整頁。
+ */
+const renderPage = () => renderToStaticMarkup(createElement(ThresholdsPage));
+const pageVisibleText = () =>
+  renderPage().replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
 
 const {
   ERAS,
@@ -159,8 +169,15 @@ const THRESHOLD_TERMS = [
  * 兩個條件必須各自獨立可失敗，否則守衛只剩一半。
  */
 const ATTRIBUTION_MARKERS = ['會議記錄', '會議原文', '會議說', '投影片'];
-/** 反駁標記：這句話有沒有當場說清楚該說法不成立。 */
-const REBUTTAL_MARKERS = ['不成立', '1993-02-03', '時間順序'];
+/**
+ * 反駁標記：這句話有沒有當場說清楚該說法**不成立**。
+ *
+ * 原本收了裸日期 `1993-02-03` 與「時間順序」。兩者都不是反駁語意：
+ * 一個日期可以出現在任何句子裡，「時間順序」也可以是「時間順序如下」。
+ * reviewer 用一句「帶歸屬、含門檻詞彙、只放一個裸日期、完全沒有反駁」的錯誤因果
+ * 打穿了守衛。因此改為只收**明確否定該主張**的詞。
+ */
+const REBUTTAL_MARKERS = ['不成立', '不符', '並非', '站不住', '並不是'];
 
 /** 標籤換成分隔符而非空白——否則相鄰元素的文字會黏成一段，讓不相干的詞混進同一句。 */
 const SENTINEL = '\u0000';
@@ -182,8 +199,8 @@ function claimShapedSegments(text) {
 test('AC-1 沒有一處把門檻變動寫成 1987 年', () => {
   // 純字串 grep 1987 會恆真失敗：1987 必然是 YEARS 的年份鍵（1987 年 9 件）。
   // 因此查的是「1987 與門檻主張同句」這個形狀，再要求該句必須歸屬且反駁。
-  const pageHtml = renderToStaticMarkup(createElement(ThresholdCaseAnalysis));
-  const scanned = [...SCANNED_SOURCES, ['<rendered page>', htmlToText(pageHtml)]];
+  // 掃整頁（含 page.tsx 外殼），不只元件子樹 —— AC-1 宣稱的是「頁面」。
+  const scanned = [...SCANNED_SOURCES, ['<rendered page>', htmlToText(renderPage())]];
 
   let claimShapedCount = 0;
   for (const [file, body] of scanned) {
@@ -205,8 +222,13 @@ test('AC-1 沒有一處把門檻變動寫成 1987 年', () => {
   // 年份鍵本身必須還在，否則上面整組就是空轉。
   assert.equal(YEARS.find((y) => y.year === 1987).count, 9);
   // 年份鍵所在的句段不得被誤判成主張句。
-  const yearKeyOnly = segmentsOf(String(YEARS.find((y) => y.year === 1987).year));
-  assert.equal(claimShapedSegments(yearKeyOnly.join('\n')).length, 0);
+  // 原本這裡是 `segmentsOf(String(1987))`，也就是拿一個硬寫的字串去問守衛，
+  // 而那個字串當然沒有門檻詞彙，結果恆為 0。改成問**資料模組裡真正那一行**：
+  // 句段切法若壞掉、把 YEARS 那一大塊與某處的門檻詞彙併成一段，這條就會紅。
+  const dataSource = SCANNED_SOURCES.find(([f]) => f.endsWith('threshold-analysis.ts'))[1];
+  const yearKeySegments = segmentsOf(dataSource).filter((seg) => /year: 1987\b/.test(seg));
+  assert.equal(yearKeySegments.length, 1);
+  assert.equal(claimShapedSegments(yearKeySegments[0]).length, 0);
 });
 
 test('AC-1 沒有任何時期的起訖日以 1987 開頭', () => {
@@ -352,8 +374,13 @@ test('AC-4 OchreBandFactors 為每個待拍板項目渲染待確認標記與拍�
     assert.ok(html.includes(f.uncertainty), `${f.id} 沒有渲染 uncertainty`);
   }
   // 不必拍板的那一項不得掛待確認標記。
+  // 原本寫的是 `settled.length === FACTORS.length - needsRuling.length`。
+  // settled 與 needsRuling 是同一個陣列依同一個條件切兩半，這個等式對任何陣列都成立，
+  // 改壞任何一項的 needsRuling 它都不會紅。改成指名「哪一項不必拍板」——
+  // 規格說只有資料邊界那一項本票可以自己斷言，其餘四項都要外部拍板。
   const settled = FACTORS.filter((f) => f.needsRuling === null);
-  assert.equal(settled.length, FACTORS.length - needsRuling.length);
+  assert.deepEqual(settled.map((f) => f.id), ['f5-excluded-cases']);
+  assert.equal(needsRuling.length, 4);
   assert.ok(html.includes('無須外部拍板'));
 });
 
@@ -540,10 +567,27 @@ test('D1 規則期已補上一手條文，且網站仍然不寫出 1/2', () => {
   // 「不寫出 1/2」的決定仍然成立，而且已證明是對的：實際條文是三分之二出席＋過半數同意。
   assert.equal(html.includes('1/2'), false);
   assert.equal(html.includes('二分之一'), false);
-  // 也不得把限定語換算成人數或改寫成「總額」。
-  assert.equal(/規則期[\s\S]{0,200}總額/.test(rules.ruleSummary), false);
+  // 也不得把限定語改寫成「總額」。
+  // 原本這裡還有一條 `/規則期[\s\S]{0,200}總額/.test(rules.ruleSummary) === false`。
+  // 那條永遠成立：正規式要求 ruleSummary 裡出現「規則期」，但「規則期」是 label 不是
+  // summary，ruleSummary 裡不可能有它，因此 .test() 恆為 false。已移除。
+  // 真正要守的語意改由下面兩條承擔，並擴大到整個規則期的渲染輸出 ——
+  // c3 說「在中央政府所在地全體大法官」與「總額」「現有總額」不是同一個概念，
+  // 那就不只 ruleSummary 一個欄位不能混用。
   assert.equal(rules.ruleSummary.includes('總額'), false);
   assert.ok(rules.ruleSummary.includes('在中央政府所在地全體大法官'));
+
+  const rulesTile = renderToStaticMarkup(
+    createElement(EraComparisonStrip, {
+      items: STATS.filter((st) => st.era.id === 'rules'),
+      selectedEraId: null,
+      onSelectEra: () => {},
+    }),
+  ).replace(/<[^>]+>/g, ' ');
+  // 規則期自己的呈現裡，「總額」只能出現在 c3 那句「與後續法規的『總額』…不是同一個概念」，
+  // 不能被當成規則期的門檻用語。
+  assert.ok(rulesTile.includes('不是同一個概念'));
+  assert.equal(/總額[^」]{0,6}(出席|同意|之)/.test(rulesTile), false);
 });
 
 test('D1 規則期的三項限制都存在，且都渲染得出來', () => {
@@ -589,7 +633,8 @@ test('D1 規則期 79 筆中有 2 筆不在已引條文之下，且在圖下另�
   assert.ok(before.every(([, , d]) => d < RULES_ERA_UNCOVERED.amendedOn));
 
   // 圖下的固定註腳必須指名這兩筆，不能只放在 hover 才看得到的 tooltip。
-  const html = renderToStaticMarkup(createElement(ThresholdCaseAnalysis));
+  // 用整頁渲染：註腳日後若被搬到頁面外殼，這條不該因為只看元件而誤紅。
+  const html = renderPage();
   assert.ok(html.includes('釋字第 1、第 2 號'));
   assert.ok(html.includes(RULES_ERA_UNCOVERED.amendedOn));
   assert.ok(html.includes('未取得的原始版規則'));
@@ -623,9 +668,8 @@ test('c3 站上不得出現換算後的人數', () => {
   // 這三個字串是現行憲訴法自己的用語，人數來自條文原文，不是換算。
   const allowed = [current.label, current.ruleSummary, current.quotedText];
 
-  const pageText = renderToStaticMarkup(createElement(ThresholdCaseAnalysis))
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/\s+/g, ' ');
+  // 整頁，含 page.tsx 外殼。只渲染元件的版本被 reviewer 用外殼注入打穿過。
+  const pageText = pageVisibleText();
   // 先確認允許清單真的有被用到，否則下面的挖除是空轉。
   for (const a of allowed) assert.ok(pageText.includes(a), `頁面找不到允許字串：${a}`);
 

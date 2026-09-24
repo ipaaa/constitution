@@ -51,7 +51,19 @@ registerHooks({
       const file = resolveFile(base);
       if (file) return { url: pathToFileURL(file).href, format: 'module', shortCircuit: true };
     }
-    return nextResolve(specifier, context);
+
+    try {
+      return nextResolve(specifier, context);
+    } catch (err) {
+      // `next` 的 package.json 沒有 exports 欄位，因此 ESM 解析 `next/link` 這種
+      // 無副檔名的裸子路徑會失敗（CJS 會自動補 .js，ESM 不會）。
+      // 只在 Node 自己解析失敗時才補副檔名，不改變任何本來就能解析的路徑。
+      if (/^[^./]/.test(specifier) && !path.extname(specifier)) {
+        const withExt = nextResolve(`${specifier}.js`, context);
+        if (withExt) return withExt;
+      }
+      throw err;
+    }
   },
 
   load(url, context, nextLoad) {
