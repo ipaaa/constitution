@@ -85,6 +85,14 @@ gates:
               application:
                 target-stage: review
                 state: consumed
+        - id: gate:056:review
+          stage: review
+          attempts:
+            - id: gate-attempt:056-review-1
+              briefing:
+                id: briefing:056:review:attempt-1:revision-1
+                digest: sha256:6fb4d528ef244d42d7a7d98ec93d74a34d6b104a0bd07e4e77ff89c5a8ee57c3
+                room-ref: '@review/review/briefing-1'
 ---
 
 網站目前是 `noindex` 且無對外網域，「讀者」是有連結的夥伴而非公眾。因此下列破口不是「今天要修」，而是**「公開之前必須為真」**。本票把六個散落的無票缺口收成一道 launch gate。
