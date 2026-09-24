@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
-/* ─── Data: 5 contested provisions from 114年憲判字第1號 ─── */
+/* ─── Data: 5 contested provisions from 113年憲判字第9號 ─── */
 
 interface Provision {
   id: string;

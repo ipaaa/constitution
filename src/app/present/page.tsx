@@ -15,8 +15,8 @@ const CourtTimeline = () => {
   const milestones = [
     { year: '2019', label: '憲法訴訟法三讀通過', detail: '從「會議制」轉向「法院制」的法源基礎，將案件審理司法化、裁判化。', status: 'history' },
     { year: '2022', label: '憲法法庭正式揭牌', detail: '裁判化轉型正式啟動，大法官改以「憲法法庭」名義行使職權並公告裁判。', status: 'present' },
-    { year: '2024', label: '114年憲判字第1號', detail: '關於國會職權修法之重大判決，確立了權力分立與法律明確性原則的當代界線。', status: 'critical' },
     { year: '2024.08', label: '大法官提名遭立院否決', detail: '賴清德總統於8月30日提名7名大法官填補缺額，立法院於12月24日投票否決全部人選。', status: 'blocked' },
+    { year: '2024.10', label: '113年憲判字第9號', detail: '關於國會職權修法之重大判決，確立了權力分立與法律明確性原則的當代界線。', status: 'critical' },
     { year: '2025.03', label: '第二次提名再遭否決', detail: '總統於3月21日再度送出提名咨文，立法院於7月25日投票否決全部人選，大法官缺額持續無法補齊。', status: 'blocked' },
     { year: '未來', label: '憲政體制的韌性考驗', detail: '面臨大法官缺額、預算凍結與程序法修法等爭議，憲法法庭的功能完整性將受挑戰。', status: 'danger' },
   ];
