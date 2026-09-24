@@ -11,6 +11,17 @@ worktree: .worktrees/spacedock-ensign-065-opinion-lazybag-wrong-ruling-citation
 issue:
 pr:
 mod-block:
+gates:
+    version: 1
+    records:
+        - id: gate:065:verify
+          stage: verify
+          attempts:
+            - id: gate-attempt:065-verify-1
+              briefing:
+                id: briefing:065:verify:attempt-1:revision-1
+                digest: sha256:c5d02d28d23ee8637ecbafe7870bccc5514748e3245dddd120a3a4125806ae91
+                room-ref: '@review/verify/briefing-1'
 ---
 
 站上把「國會職權修法」判決的內容標成 114 年憲判字第 1 號，但那是憲法訴訟法修正案；國會職權修法是 113 年憲判字第 9 號。這是公開頁面上的事實錯誤，且涉及具名大法官。
