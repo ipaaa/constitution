@@ -41,6 +41,10 @@ mod-block:
 
 `no spike needed`：位置與時態問題皆由 `063` 的 verify 階段逐行讀過並附行號，一手來源（114憲判1 主文與公告日）亦已由該票三輪逐字查核。
 
+### Feedback Cycles
+
+- Cycle 1: PASSED-with-findings — verify（FO 授權處置，未經 gate；六項 findings 全為 Polish／Deferred risk／Needs decision，無一造成對 value AC 或保護邊界的實質損害）。verify 的證據方式：自建副本、自起 server、自跑腳本，改動後六路由十八項全 PASS `exit 0`，改動前基準與 design 第 8.4 小節逐項相同故 implement 的對照可信；另做**三項負面對照**（逐一還原三處錯誤，對應檢查各自且僅各自 FAIL），證明 PASS 不是套套邏輯；`scripts/check-voided-floor.mjs` 與票內 8.3 小節 `cmp` 逐字相同（5073 bytes）且 regex 只存在於這兩處——**「AC 只引用不複製」名副其實**，票內沒有第二份可執行的檢查清單。F-3 fix（Needs decision → FO 授權：`controversy-timeline.ts:168` 的「兩個月後」與實際差 10 天，2024-10-31→2024-12-20 實為 50 天，該頁在 `PUBLIC_PAGES` 內而精確日期就在同檔相鄰的 `evt-09`；**歸屬不在 implement**——該措辭由 design 第 144 行以「例如」給出、AC4 未訂精確度要求）；F-1 fix（AC1 第二條 `Verified by:` 命令引號敏感，依 captain 2026-09-24 的一次性授權修其涵蓋面；**並記明上一輪換過命令卻未揭露**這件事的成因與教訓）；F-2 fix（AC3 的 `sed` 行號漂移，改為**不依賴行號**的定位而非換新行號）；F-4 fix（指向已封存 `063` 的註解路徑改為 `_archive/`——**實際為 6 筆不是 FO 授權單寫的 7 筆**，FO 的算法把一筆**搬移的** JSDoc 同時算進「新增」與「既存」兩邊；implement 主動更正。另有 2 筆舊路徑在 `docs/` 內、非註解、不在授權範圍，未動）；F-6 fix（消除 AC6 第 2 條 grep 的第二份可執行副本，未刪 `TODO.md` P1-9 的驗證區塊）。F-5 hold（Deferred risk：失效視窗日期在三處新字串手寫、不由 `RULING_THRESHOLD.voidedFloor` 推導；**不改因為 design 的 AC3 本來就要求字面時間錨**，改成推導會與 AC3 衝突而 AC 變更只有 captain 能做）。**F-7 hold（Deferred risk，需 captain：verify 於 `24465d2` 新增——檢查 2 是頁級粒度（`c2 = floorNumCount === 0 || clauseHits.length >= 1`），但 FO 追加的判準「題幹＋explanation 那一對自足」是題級；`/quiz/controversy` 有 q2、q5 兩個子句載體，故 q2 整句失去失效子句時檢查 2 仍 PASS、exit 仍 0、**無聲通過**；`/quiz/pending` 只有一個載體故缺口不顯現。第 8.5 小節的涵蓋矩陣未揭露此粒度落差。今日無實害；promote 條件為任何後續改動縮短或移除 q2 explanation 末句。修法是讓檢查 2 在 quiz 路由逐題判定——**屬檢查語意變更，超出 captain 的 `Verified by:` 授權範圍**）。**F-3 的實際措辭為「同年12月20日」（無空格）而非 FO 授權單字面的「同年 12 月 20 日」，implement 主動揭露，理由是同一字串內既有日期皆為無空格寫法——**FO 採納其判斷**。一項既存觀察不動、FO 另開票：`controversy-timeline.ts:156` 的「立法院當時已凍結人事同意權（不審查新提名人）」與同檔 `evt-11` 記載 2024-12-24「投票否決」互相牴觸。
+
 ## Out of scope
 
 不改 `/future`（`063` 已交付）。不動 `src/data/*.json`（`sync-content` 產物）。不處理 `REFERENCE_DATE` 身兼兩職的問題（另有其票）。
