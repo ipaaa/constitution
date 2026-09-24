@@ -9,7 +9,7 @@ verdict:
 score: 0.75
 worktree: .worktrees/spacedock-ensign-063-required-for-ruling-legal-accuracy
 issue:
-pr: "#37"
+pr: pr-merge:37
 mod-block: merge:pr-merge
 gates:
     version: 1
