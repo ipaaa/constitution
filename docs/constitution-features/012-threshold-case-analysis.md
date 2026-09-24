@@ -74,6 +74,11 @@ gates:
                 at: "2026-09-24T19:15:08.238977Z"
                 decision: revise
                 reason: captain 2026-09-24 退回，折進 F8／F9／F10。review 重審已判 PASSED，退回的理由是 reviewer 用它自己加的兩個對抗性探測打穿了這一輪剛建的守衛，而三項都便宜、都不涉 AC 變更、都是這一輪守衛自己的洞。F8（同型盲區第十處，最要緊）：c3 的守衛只渲染元件不渲染 page.tsx——reviewer 把換算人數注進頁面外殼後 25 條測試全綠；而那條守衛存在的唯一理由就是守住本票的核心承諾「站上不得出現換算後的人數」。F9：反駁標記收了裸日期 1993-02-03，對抗性探測讓一句沒有反駁的錯誤因果過關。F10：reviewer 上一輪的 F7 被誤植，它當初指名的那條仍然恆真。這與 056 的殘留性質不同——056 的 F-13 是不可執行的展示形式，這三項是可被繞過的可執行缺陷。附帶採納 reviewer 的判定：eslint 的 4 個 error 不由本票處置（既有、main 上同樣存在、四檔本分支從未觸碰、本票自身路徑 0/0，在此修是 scope creep）。
+            - id: gate-attempt:012-review-3
+              briefing:
+                id: briefing:012:review:attempt-3:revision-1
+                digest: sha256:24b60b6476891e85b4272f27fb24db76d406ee57db94331f42dc69a0092dfbf0
+                room-ref: '@review/review/briefing-3'
 ---
 
 研究大法官會議時期通過舊案數量與提升門檻之間的關聯，製作時間軸 infographic。
