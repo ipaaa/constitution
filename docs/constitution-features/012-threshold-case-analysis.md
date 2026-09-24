@@ -79,6 +79,14 @@ gates:
                 id: briefing:012:review:attempt-3:revision-1
                 digest: sha256:24b60b6476891e85b4272f27fb24db76d406ee57db94331f42dc69a0092dfbf0
                 room-ref: '@review/review/briefing-3'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:012:review:3
+                briefing: briefing:012:review:attempt-3:revision-1
+                by: person:captain
+                at: "2026-09-24T19:57:52.268849Z"
+                decision: revise
+                reason: Captain 退回：不接受只修 F12 單一實例。依本票自己在前幾輪建立的原則，掃全類——把同型問題一次掃完，而不是點名修補。
 ---
 
 研究大法官會議時期通過舊案數量與提升門檻之間的關聯，製作時間軸 infographic。
