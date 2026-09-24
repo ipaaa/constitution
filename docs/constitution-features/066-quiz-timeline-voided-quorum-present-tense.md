@@ -1,7 +1,7 @@
 ---
 id: 066
 title: quiz 與 controversy-timeline 把已失效的 10 人門檻當現行法
-status: verify
+status: implement
 source: constitution-features/063 V7（captain 2026-09-23 核准開票）
 started: 2026-09-24T17:51:27Z
 completed:
@@ -858,3 +858,29 @@ AC5 的判準以真實渲染頁與 `QuizQuestion.tsx` 的揭曉邏輯驗證：ex
 六筆 findings 全為 Polish／Deferred risk／Needs decision，沒有一筆構成對 value AC 或保護邊界的實質損害；最值得 FO 一看的是 F-3（一行措辭，歸屬在 design 而非 implement）。
 
 **VERDICT: PASSED**
+
+### 補述：FO 兩項更正的處置（verify，2026-09-24）
+
+**更正 1（diff 基準用 `cb341af`）：無須重跑。** 本階段全部 diff 類查核**原本就以 `cb341af` 為基準**，未用過 `HEAD~N`：AC4 的 `:151`／`:187` 逐字比對用 `git show cb341af:src/data/controversy-timeline.ts`，AC5 用 `git diff -U0 cb341af HEAD -- src/data/quizzes/`，AC2 的改動前 server 用 `git archive cb341af`。獨立複核結果與 implement 轉述一致：`correctIndex`／`label:` 改動數 **0**，四個 quiz 檔的 `correctIndex`／`label:`／`text:` 行集合與 `cb341af` **逐字相同**，題幹未出現在 diff 的 +／- 行內。
+
+**更正 2（`f850130` 的可失敗點須自行重現）：已重現，且查出一個未揭露的涵蓋缺口。**
+
+於獨立副本（`git archive HEAD` + 停用 LaunchGate，port 3251）逐項實跑：
+
+| 施加的改動 | 題幹＋explanation 合讀 | `scripts/check-voided-floor.mjs` |
+|---|---|---|
+| 無（現況） | 自足 | `/quiz/controversy` `/quiz/pending` 皆三項 PASS，`exit 0` |
+| 移除 q2 explanation 末句 | **失去自足** | `/quiz/controversy` 仍三項 **PASS**，`exit 0` |
+| 移除 `pending` q5 explanation 末句 | 失去自足 | `/quiz/pending` 檢查 2 **FAIL(0)**，`exit 1` |
+
+第二列即 implement 自陳的可失敗點，已實測成立：移除末句後，該對經程式判定**不含**失效語彙（`失效|失其效力|不再適用` → false）、**不含**依據（`114 年憲判字第 1 號` → false）、且**不含**任何其他時態訊號（`曾|當時|已失|過去` → false），題幹的「需要」確實成為全對唯一的時態訊號，而它是現在式。**現況（第一列）則自足，FO 的判準通過。**
+
+**F-7（新增 finding）　檢查 2 是「以頁為單位」，而 FO 的判準是「以題為單位」，兩者的粒度不一致。**
+腳本第 93 行的 `c2 = floorNumCount === 0 || clauseHits.length >= 1`：整頁只要有**一題**帶失效子句就通過。`/quiz/controversy` 有兩個帶子句的題（q2、q5），因此 **q2 可以整句失去失效事實而檢查 2 仍 PASS、離開碼仍 0**（上表第二列，已實跑）。`/quiz/pending` 只有 q5 一個載體，缺口不顯現（第三列）。
+四項證據：（1）`/quiz/*` 目前只在 team mode 開放、不在 `PUBLIC_PAGES`；（2）今日無實害——三題的子句都在，合讀皆自足；（3）受影響的是 FO 於 `f850130` 追加的判準，該判準**沒有任何自動檢查涵蓋**，而第 8.5 小節的涵蓋矩陣只把「題幹」列為人工項，未揭露「檢查 2 的頁級粒度使任一題可無聲失去子句」；（4）觸發證據見上表第二列。
+**分類：Deferred risk。** promote-to-material 條件：任何後續改動縮短或移除 `controversy.ts` q2 explanation 的末句。
+**建議（不屬本階段權限，供 FO 判斷）：** 若要自動涵蓋，作法是讓檢查 2 在 quiz 路由改成逐題判定（flight payload 的每個 `explanation` 欄位各自檢查），而非整頁判定。這是檢查語意的變更，屬 design／captain 範圍，本階段不動腳本。
+
+**本補述未改動任何程式碼**；三次探針全在副本上施加並已還原，副本兩檔還原後與候選逐字相同（`cmp` 通過）、還原後 `exit 0`，候選 worktree 無任何原始碼改動。
+
+**VERDICT 維持 PASSED**（F-7 為 Deferred risk，今日無實害；連同 F-3 一併交 FO 判斷）。
