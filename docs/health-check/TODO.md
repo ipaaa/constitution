@@ -522,6 +522,17 @@ for f in $(grep -rl '[一-鿿]' src/app src/components --include='*.tsx'); do
 done | sort -rn | head -12
 ```
 
+### P1-9　`/opinion-lazybag` 的意見光譜已移除，尚未補回　🔴 發布檢查表不要漏掉
+
+- **狀態**：待 `049` 重建資料後補回
+- **做了什麼**：`065` 於 2026-09-23 把 `/opinion-lazybag` 的「大法官怎麼想的」整段移除，首頁 CTA 也不再承諾「大法官意見的光譜分佈」。captain 已核可。
+- **為什麼移除**：該段的 14 位具名大法官名單對 113憲判9 與 114憲判1 **兩個判決都不成立**。4 位（黃虹霞、吳陳鐶、蔡明誠、林俊益）不在任一合議庭；漏列 113憲判9 合議庭 5 人（含主筆蔡宗珍）；呂太郎、楊惠欽被標「不同意見」但未提出任何意見書。這是公開頁面上對真實公職人員的不實陳述。
+- **檔案沒刪**：`src/components/opinion-lazybag/StanceSpectrum.tsx` 保留，未被任何檔案 import。
+- **誰補回**：`docs/constitution-features/049-opinion-lazybag-content-provenance.md`。一手來源是 113憲判9 判決書頁面的「憲法法庭113年憲判字第9號判決主文立場表」PDF（`https://cons.judicial.gov.tw/docdata.aspx?fid=38&id=352966`）。
+- **對發布的影響**：`/opinion-lazybag` 不在 `src/data/launch-status.ts:3` 的 `PUBLIC_PAGES`，本項不擋發布。列此是為了避免發布檢查表把「意見光譜」當成既有功能。
+- **驗證**：`grep -rn 'StanceSpectrum' src/` 只應命中元件檔本身。
+
+
 ---
 
 ## P2 — 結構性問題（不修就會再發生一次）
