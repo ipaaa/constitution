@@ -1,7 +1,7 @@
 ---
 id: 066
 title: quiz 與 controversy-timeline 把已失效的 10 人門檻當現行法
-status: implement
+status: verify
 source: constitution-features/063 V7（captain 2026-09-23 核准開票）
 started: 2026-09-24T17:51:27Z
 completed:
