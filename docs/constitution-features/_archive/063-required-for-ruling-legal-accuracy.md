@@ -1,16 +1,16 @@
 ---
 id: 063
 title: requiredForRuling 的法律正確性（114憲判1）
-status: review
+status: complete
 source: constitution-features/056 第二節 D3
 started: 2026-09-21T21:16:25Z
-completed:
-verdict:
+completed: 2026-09-24T17:50:05Z
+verdict: PASSED
 score: 0.75
 worktree: .worktrees/spacedock-ensign-063-required-for-ruling-legal-accuracy
 issue:
 pr: pr-merge:37
-mod-block: merge:pr-merge
+mod-block:
 gates:
     version: 1
     records:
@@ -73,7 +73,8 @@ gates:
                 reason: captain 2026-09-24 核准交付。review 重審判 PASSED：R1 與 R2 都修好且作法與本票一貫原則一致（原句一字不動、追加標日期補述），115憲判6【30】引文逐字對回當天重取的一手來源、刪節號未吃掉任何改變語意的字。未越界未回歸：src/ 零變動、AC 全節 sha256 三點相同、R3／R4 零變動、V7／V8／V11 與 page.tsx:201 零變動、headcount 仍為 null、AC1–AC7 重跑無回歸。reviewer 把 R1 的診斷推到根上：真正成因是 AC3 第 3 條早已同時列出兩種寫法而 AC7 沒跟上，屬規格自身不一致。其順線查出的 S1／S2／S3 三處同型盲區只記錄未修，已納入 captain 於同日給出的一次性 Verified-by 授權範圍，另行處理。仍未達成者原樣留存：L1／L2／L3 待法學拍板、L5 本環境無法量測、V7 已另開票 066。
               application:
                 target-stage: complete
-                state: pending
+                state: consumed
+archived: 2026-09-24T17:50:05Z
 ---
 
 確認 `requiredForRuling` 這項法律內容的正確性，並讓它有明確的負責人。
