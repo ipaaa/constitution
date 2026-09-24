@@ -2244,6 +2244,8 @@ AC-3 三檔命中數為 `layout.tsx` 1／`TODO.md` **9**（由 7 增為 9，因�
 
 **D-2 — 工作區有未提交改動。** `git status --porcelain` 為 ` M docs/constitution-features/056-pre-launch-checklist.md`，內容是 frontmatter `status: implement` → `status: review` 一行。依前幾輪的慣例這是**FO 推進階段的改動**，非 implement 未提交交付物（implement 的內容改動皆已在 `41bfb34`…`261d60e`）。我依契約未動 frontmatter。AC 區段在 HEAD 與工作區**同為 1622B／同 sha256**，未受影響。
 
+**D-2 的後續，主動揭露**：我以 `git add <檔案>` 提交本節時，**該行 frontmatter 被一併帶進我的 commit `d8f479a`**（`git show` 確認含 `-status: implement` ／ `+status: review`，numstat `108／1`，那 `1` 就是它）。**我沒有撰寫該改動，但我提交了它。** 我不還原它——`status: review` 正是 FO 要推進的狀態，也是本 stage 的正確值，還原會把 FO 的階段轉移丟掉。依契約我不改 frontmatter，故僅如實記錄：該行的作者是 FO，載體是我的 commit。**日後若要精確歸屬，看的是這一段，不是 commit 作者欄。**
+
 ### 驗證與可否證性
 
 - **本輪唯一沒有指令可抽的檢查，我自己寫了實作**，並刻意避開 awk。可否證點：若我的實作是死的，植入 `12-31` 與次年 `01-15` 就不會有輸出——實測 2 筆且行號正確；若它把合法歷史引用也報，植入 `2026-04-30` 後筆數會變——實測不變。
