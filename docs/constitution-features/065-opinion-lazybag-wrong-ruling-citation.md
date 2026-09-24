@@ -332,3 +332,36 @@ A1–A5 五處號次更正與 AC-6 的意見光譜段移除全部落地，AC-1�
 ### Summary
 
 captain 授權的是「驗證涵蓋面」而不是「AC 要求」，因此本輪 `src/` 零變動，只改 entity 檔的五處 `Verified by:`。AC-5 的核心修正是固定字串換成容許空白的 regex，實測由 9 行變 11 行，與 AC-5 本來就列出的 11 筆集合對齊；可失敗性已實跑證明——改壞 B11 時新寫法轉紅、舊寫法仍綠。同型問題在 AC-1／AC-2／AC-3 也成立（三者的「不含 114憲判1」都是對加空格寫法全盲的不存在斷言），AC-4 則是另一種涵蓋面缺口（`head -1` 只檢第一個 chunk、且沒有不存在斷言），四項一併修正。施工中另有兩項發現寫進了規格：一是站上其實有**第三種**寫法 `111 年 憲判字第 17 號`（連 `年` 後也有空格），所以 regex 採每個接縫都容許空白而非只補一處；二是 AC-4 的不存在斷言不可寫成全域，因為有 3 個 chunk 合法含有 114憲判1。順帶一提，我自己在還原測試副本時用了一次盲目全域替換，把 `controversy.ts:69` 這行正確的 113憲判9 也一併改掉了——只發生在暫存副本上，但正好是 AC-5 要擋的那種事故的現場重演。
+
+## Stage Report: verify
+
+- DONE: 獨立重跑 AC-1 到 AC-7 全部七項的 `Verified by:`，不採信 implement 的自我回報
+  全新副本（`rsync` 排除 `node_modules`／`.next`／`.git`／`.worktrees` ＋ `cp -Rc node_modules`，`ls -la` 確認 `node_modules` 為實目錄非 symlink），`diff -r` 確認副本 `src/` 與候選檔逐位元相同 → `npx next build` **BUILD_EXIT=0**、16 頁全生（AC-7）→ `npx next start -p 3291`。七項全過，數值與 implement 回報完全一致。
+- DONE: 確認 `/opinion-lazybag` 與首頁的 `114年憲判字第1號` 皆為 0、`113年憲判字第9號` 分別為 3 與 1
+  AC-1 實測（容許空白 regex）：`/opinion-lazybag` 114憲判1 ＝ **0**、113憲判9 ＝ **3**、`國會職權修法` ＝ **3**。AC-2：`/` 114憲判1 ＝ **0**、113憲判9 ＝ **1**。另跑全 13 條路由的獨立回歸：僅 `/controversy-timeline`（3）、`/quiz/controversy`（1）、`/quiz/perspectives`（1）仍有 114憲判1，恰為 B4／B6×2／B10／B11，其餘 10 條路由皆 0——無外溢。
+- DONE: 確認意見光譜段與首頁「光譜」文案皆已消失、且 `StanceSpectrum.tsx` 檔案仍在
+  AC-6 實測：`/opinion-lazybag` 的 `大法官怎麼想的\|意見光譜` ＝ **0**；`/` 的 `光譜` ＝ **0**。`ls -la src/components/opinion-lazybag/StanceSpectrum.tsx` ＝ **9916 bytes、198 行、檔案存在**；`grep -rn 'StanceSpectrum' src/` 只命中該檔 `:47` 自身 export，無任何 import（留給 `049` 重建）。
+- DONE: 判定 implement 的核心主張是否成立——自行重現加空格寫法的盲區
+  **主張成立，已雙向實跑。**（A）AC-3 情境：在副本的 `DecisionFlowchart.tsx` 插入 `114 年憲判字第 1 號` → 舊固定字串 grep 仍回 **0（全盲，誤判通過）**，新 regex 回 **1（抓到）**；還原後回 0。（B）AC-5 情境：把 B11（`quizzes/controversy.ts:115`）改成別的號次 → 舊寫法 9 → **9（仍綠，全盲）**，新寫法 11 → **10（轉紅）**；還原後回 11。測試全在 `/tmp` 的 `src` 副本上做，候選檔 `git rev-parse HEAD:src` 全程為 `6a7bad6`、`git status` 全程乾淨。
+- DONE: 確認 AC-5 的正確基準確為 11 而非 9
+  **確為 11。** `grep -rnE '114[[:space:]]*年[[:space:]]*憲判字第[[:space:]]*1[[:space:]]*號' src/` ＝ **11 行**，file:line 集合與 AC-5 列出的 11 筆逐筆相同（`controversy-timeline/page.tsx:70`、`controversy-timeline.ts:222/224`、`history.json:638`、`discussions.json:5/8/46/53/58`、`quizzes/controversy.ts:115`、`quizzes/perspectives.ts:89`）。舊固定字串寫法 ＝ 9 行，缺的正是加空格的 B10／B11。**design 寫的 11 是對的，FO 先前記的 9 是錯的。**
+- DONE: 確認未越界——`git diff` 刪除行全部落在 `Verified by:` 或「會失敗的改動」段，沒有任何一行 AC 要求被刪改
+  自行比對，未採信報告。`git show 2359f40` 刪除行共 **6 行**：5 行 `Verified by:` ＋ 1 行 AC-5 的「會失敗的改動」。再以 `diff <(git show eb90b9a:… | grep -E '^- \*\*AC-[0-9]') <(grep -E '^- \*\*AC-[0-9]' …)` 逐位元比對七項 AC 的要求句 → **IDENTICAL，零差異**。授權邊界未被逾越。
+- DONE: 確認本輪 `src/` 零變動
+  `git rev-parse {b294597,eb90b9a,2359f40,c4b09c5,a509b1e,HEAD}:src` **六個提交全部同為 `6a7bad6af38a7f28b7557a622169353549a9d231`**。cycle 2 的 `2359f40` 只動 entity 檔一個。
+- DONE: 複核 AC-4 的發現——`.next/static/chunks/` 有 3 個 chunk 合法含有 114憲判1，故不存在斷言不可用全域寫法
+  **成立。** 實測全域 `grep -rlE '114…1…號' .next/static/chunks/` ＝ **3 檔**（`efd3eef351a4d8c3`、`181a5a7ee428247c`、`70ab9d61f573bfd3`）。逐檔看上下文，命中內容全是 B9（`discussions.json` 三篇評論標題與 `owl_comment`）與 B8（`history.json` 的 `ruling_id`），**全部合法**——全域不存在斷言確實會恆紅。AC-4 三項定點檢查實測：命中 chunk ＝ **1**、相鄰字串 `status:"blocked"},{year:"2024.10",label:"113年憲判字第9號",detail:"關於國會職權修法之重大判決` ＝ **1**、舊筆殘留 `year:"2024",label:"114` ＝ **0**。另驗 AC-4 的前提：`/present` 服務出的 HTML 的 113憲判9 與 `憲法法庭正式揭牌` 皆 ＝ 0，確認是全 client 頁，驗證對象取 chunk 正確。
+- DONE: 一手來源複核（未沿用轉述，自行 `curl`）
+  `id=352966` → **113年憲判字第9號【立法院職權行使法等案】、判決日期 113年10月25日**；`id=355485` → **114年憲判字第1號【憲法訴訟法修正案】、判決日期 114年12月19日**。逐項與 design 第一節相符。合議庭名單自判決書末段實取：113憲判9 為 **15 人**（許宗力審判長、蔡烱燉、許志雄、張瓊文、黃瑞明、詹森林、黃昭元、謝銘洋、呂太郎、楊惠欽、蔡宗珍、蔡彩貞、朱富美、陳忠五、尤伯祥）、**主筆蔡宗珍**、**意見書 9 份**；114憲判1 為 **5 人**（謝銘洋審判長、呂太郎、蔡彩貞、陳忠五、尤伯祥）、**主筆呂太郎**。
+- DONE: 複核 AC-6 的事實依據（captain 已核可，但據以核可的事實須成立）
+  **全部成立。** `StanceSpectrum.tsx` 硬編 14 名實取比對：黃虹霞、吳陳鐶、蔡明誠、林俊益 **4 位不在上述任一合議庭**；113憲判9 合議庭漏列蔡宗珍（主筆）、蔡彩貞、朱富美、陳忠五、尤伯祥 **5 人**；呂太郎、楊惠欽標「不同意見」但不在 9 份意見書的提出人之列（提出人為黃瑞明；許志雄、張瓊文、蔡彩貞、朱富美、尤伯祥；詹森林、黃昭元、謝銘洋）。`:26` 林俊益「三讀程序未經逐條實質討論即付表決⋯相關條文應屬無效」與**主文一原文**直接相反——判決書主文一：「其立法程序雖存有瑕疵⋯準此，上開法律尚不因立法程序瑕疵而牴觸憲法。」
+- DONE: Placeholder scan（verify 階段具名輸出）
+  `grep -rnE '某學者|某大學法律系|lorem ipsum|快速了解最新判決的5個重點' src/` ＝ **無命中**。`src/app/present/page.tsx:367` 的 `placeholder` 為 `<input>` 的搜尋框屬性（`placeholder="搜尋文章標題、作者..."`），非種子內容。
+- DONE: 確認未動 `src/data/opinions.ts`、`docs/design-assets/003`、未執行 `npm run sync-content`
+  `git show b294597 --stat` 只含 4 個 `src/` 檔 ＋ 2 個 `docs/` 檔，三者皆不在內。副本 build 前後 `src/data/*.json` 的 sha256 完全相同（`discussions.json` ＝ `4071978a…`、`history.json` ＝ `4d1992e3…`），證明 build 未觸發同步。`049` 與 `TODO.md` 的 `git diff --numstat` 分別為 `39 0`、`11 0`，**零刪除**；`049:39` 前後逐字比對相同。
+
+### Summary
+
+七項 AC 全部獨立重跑通過，**判定 PASSED**。implement 的核心主張經自行重現後成立：固定字串 grep 對加空格寫法確實全盲——插入 `114 年憲判字第 1 號` 時舊寫法回 0 誤判通過、新 regex 抓到；改壞 B11 時舊寫法 9→9 仍綠、新寫法 11→10 轉紅。AC-5 的正確基準確為 **11** 而非 9，集合與 design 列出的 B4／B6×2／B8／B9×5／B10／B11 逐筆相同。授權邊界未逾越：七項 AC 的要求句以 `diff` 逐位元比對為零差異，6 行刪除全落在 `Verified by:` 與「會失敗的改動」；本輪 `src/` 零變動（六個提交的 `HEAD:src` 同為 `6a7bad6`）。AC-4 的發現亦成立——3 個 chunk 合法含有 114憲判1（內容全來自 B8／B9），全域不存在斷言會恆紅。一手來源已自行 `curl` 複核，兩則判決的字號、案名、日期、合議庭人數、主筆、意見書份數逐項相符；AC-6 據以核可的四項事實（4 位不在任一合議庭、漏列含主筆在內 5 人、2 位無意見書卻標不同意見、1 筆與主文一相反）全部實證成立，主文一原文已取得。
+
+**未發現第九處盲區。** 逐項審過七項 `Verified by:` 的涵蓋面：AC-1／AC-2／AC-3／AC-5 已改為容許空白 regex（實測亦涵蓋全形空格 U+3000）；AC-4 的定點固定字串由同段的正向斷言（第 2 項回 1）釘住最小化引號慣例，不構成同型缺口；AC-6／AC-7 的斷言字串無數字與空白變體。兩點非阻斷觀察供 FO 參考：（1）regex 不涵蓋 `&nbsp;` 寫法，但全站 `src/` 實測 0 處，非現行風險；（2）AC-1／AC-2／AC-5 的**要求句**仍寫緊接的 `114年憲判字第1號`，而指令已是容許空白 regex——指令嚴格寬於要求句（安全方向），此為 `063` reviewer 指出的「規格自身不一致」的殘留，改要求句超出本次授權邊界，故不動，列此供後續一次性收斂。
