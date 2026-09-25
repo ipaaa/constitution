@@ -116,6 +116,7 @@ gates:
               application:
                 target-stage: complete
                 state: pending
+mod-block: merge:pr-merge
 ---
 
 研究大法官會議時期通過舊案數量與提升門檻之間的關聯，製作時間軸 infographic。
