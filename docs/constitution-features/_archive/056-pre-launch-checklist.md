@@ -1,16 +1,16 @@
 ---
 id: 056
 title: 上線前檢查清單：公開之前每一項都必須有結論
-status: review
+status: complete
 source: captain 2026-09-07（把關機制體檢與任務地圖的綜合結論）
 started: 2026-09-21T18:56:47Z
-completed:
-verdict:
+completed: 2026-09-25T16:19:45Z
+verdict: PASSED
 score: 0.85
 worktree: .worktrees/spacedock-ensign-056-pre-launch-checklist
 issue:
 pr: pr-merge:40
-mod-block: merge:pr-merge
+mod-block:
 gates:
     version: 1
     records:
@@ -116,7 +116,8 @@ gates:
                 reason: Captain 核准：十四輪收斂，最終輪依硬性判準判 PASSED——無 fail-open、無 Material 缺陷、無會讓執行者照著做而失敗的東西。AC-2 維持未達成且核准不豁免它：上線當天由 captain 人工開瀏覽器驗 A1-A4（curl 對整站零命中而看似通過，因 LaunchGate 在 hydration 前回傳 null）。
               application:
                 target-stage: complete
-                state: pending
+                state: consumed
+archived: 2026-09-25T16:19:45Z
 ---
 
 網站目前是 `noindex` 且無對外網域，「讀者」是有連結的夥伴而非公眾。因此下列破口不是「今天要修」，而是**「公開之前必須為真」**。本票把六個散落的無票缺口收成一道 launch gate。
