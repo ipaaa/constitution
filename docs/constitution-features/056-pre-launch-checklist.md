@@ -10,7 +10,113 @@ score: 0.85
 worktree: .worktrees/spacedock-ensign-056-pre-launch-checklist
 issue:
 pr:
-mod-block:
+mod-block: merge:pr-merge
+gates:
+    version: 1
+    records:
+        - id: gate:056:verify
+          stage: verify
+          attempts:
+            - id: gate-attempt:056-verify-1
+              briefing:
+                id: briefing:056:verify:attempt-1:revision-1
+                digest: sha256:a314d03de98cb8dc1316e5553cf8cfb0de9105e13b92b70e633173dcaaa232ca
+                room-ref: '@review/verify/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:056:verify:1
+                briefing: briefing:056:verify:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-23T17:49:23.330602Z"
+                decision: revise
+                reason: captain 2026-09-23 退回，並授權本票的 Cycle 3（README 的 disposition 規定 Cycle 3 升級給 captain，此授權即為該升級的答覆）。理由：本票的交付物就是「一道能被執行的 gate」，而 F-7 與 F-8 兩項恰恰是關於它能不能被執行——F-7 的「captain 逐票明確接受」出口沒有記錄位置也沒有查核指令（章節導言把「寫在 Feedback Cycles」限定在人工項，而 G-1／G-2 標的是機械項，涵蓋不到）；F-8 的 G-8 會因 .next 殘留重複檔假性失敗，本輪實際撞到一次，而一個會狼來了的檢查項最後會被忽略。兩項修法各是一個子句，留到後續票等於把這張票存在的理由留一半沒做完。
+            - id: gate-attempt:056-verify-2
+              briefing:
+                id: briefing:056:verify:attempt-2:revision-1
+                digest: sha256:97a577971ecbeedd09a905b5c8909ddc0a133f66115726fffdc7cb6a583ba5a2
+                room-ref: '@review/verify/briefing-2'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:056:verify:2
+                briefing: briefing:056:verify:attempt-2:revision-1
+                by: person:captain
+                at: "2026-09-24T00:29:47.898497Z"
+                decision: revise
+                reason: 'captain 2026-09-23 退回。F-9 是 fail-open：新的查核指令 grep 整份 entity 而非 ### Feedback Cycles 區段，檔案裡任何一行以該前綴加真實票號開頭都會回報 RECORDED，reviewer 在副本上重現兩次。gate 會因此宣稱一個沒有人簽過的核准。本票的主題就是「看起來對但執行時不成立的檢查」——F-6 是主條件不可達、F-7 是出口無法稽核、F-9 是檢查會說謊；前兩個都修了，第三個是本輪自己造出來的，不該帶著交付。修法一個子句（用 awk 限縮 grep 到該區段）。併同處理 F-10：G-8 註記把成因歸給 iCloud，但 FO 複核發現在本 sandbox 下 CloudDocs 與 brctl 兩項檢查都回 Operation not permitted，是被擋住不是不存在，reviewer 的證據本身可能是 sandbox 產物；處置改為不歸因，只描述症狀與解法。'
+            - id: gate-attempt:056-verify-3
+              briefing:
+                id: briefing:056:verify:attempt-3:revision-1
+                digest: sha256:dcfc05c5a3a9eace06567e6a12de9742b9e3f4c3aa96f09034625d47ec034902
+                room-ref: '@review/verify/briefing-3'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:056:verify:3
+                briefing: briefing:056:verify:attempt-3:revision-1
+                by: person:captain
+                at: "2026-09-24T17:29:46.109515Z"
+                decision: revise
+                reason: 'captain 2026-09-24 退回，修 F-11，並同日給出一次性授權：「授權修正 Verified by: 涵蓋既有寫法變體，不改 AC 要求本身」。F-11 與 F-9 同類但更尖銳——它落在 G-5，正是本票為了防止 015 事故（某學者，某大學法律系 公開顯示四個月）而加的那道檢查。G-5 的掃描寫 前端工程師 [AB]，其中半形空格是必要的，因此無空格寫法、全形空格、簡體 某学者／某大学、全形 ５個重點 全部掃不到（reviewer 逐行測了十一個字串）。G-5 以零命中為通過，故這是 fail-open。目前三個既有佔位值仍抓得到，但若 052 改寫 contributors.ts 時把那個空格拿掉，立刻變成抓不到。'
+            - id: gate-attempt:056-verify-4
+              briefing:
+                id: briefing:056:verify:attempt-4:revision-1
+                digest: sha256:b68e2452142b89fadd69c25916907b2f9f1192fc2adc5281b9a4404ad674e97e
+                room-ref: '@review/verify/briefing-4'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:056:verify:4
+                briefing: briefing:056:verify:attempt-4:revision-1
+                by: person:captain
+                at: "2026-09-24T17:44:56.238255Z"
+                decision: revise
+                reason: captain 2026-09-24 退回，修 F-12 的根。前八處同型盲區都是「檢查只認一種寫法」，F-12 不同——本票有兩份同一檢查的副本（## Test plan 區塊與第三節），而兩者已在兩處分岔：Test plan 的 G-8 仍把 tsc 列在 build 之前，照它做會直接走進 F-8 記載的假性失敗（該分岔是 cycle 4 只修第三節那一列造成的）；Test plan 的 G-5 pattern 只有 5 個變體而第三節有 6 個，少了「快速了解最新判決的5個重點」，跑那一份會整個漏掉一個佔位值，又是 fail-open。採納 reviewer 的建議：修根而不是補兩處——讓 Test plan 指向第三節、不再複述指令，因為只要兩份副本還在就會有第三次分岔。本票已跑六輪、每輪 reviewer 都找到同一類缺陷的新實例，這是第一個能讓它停下來的修法。此修法不超出 2026-09-24 的授權：它移除一份過時的重複副本，不是改任何檢查要求什麼。
+            - id: gate-attempt:056-verify-5
+              briefing:
+                id: briefing:056:verify:attempt-5:revision-1
+                digest: sha256:1c986e0807bcaa00fd16c259362a3d988b9f70d602dd443e9a3f0bb7ffc5e120
+                room-ref: '@review/verify/briefing-5'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:056:verify:5
+                briefing: briefing:056:verify:attempt-5:revision-1
+                by: person:captain
+                at: "2026-09-24T19:13:24.330688Z"
+                decision: approve
+                reason: captain 2026-09-24 核准進入 review。verify cycle 7 判 PASSED，F-12 的根本修法經對抗性實證有效：reviewer 在三個不同區段各植入一份重複的 G 項清單，三份全部回報 STRAY 且區段標籤正確；反向測試（放在第三節內的清單正確地不被標記）排除了「什麼都報因而永遠不通過」的假檢查；真實候選零 STRAY，一筆 AC-OWNED 以已知例外的身分宣告而非藏起來。核准的判準是：本票七輪累積的**可執行**缺陷已全數清除（F-6 主條件不可達、F-9 與 F-11 fail-open、F-12 兩份可執行副本分岔），殘留的 F-13 是為表格儲存格轉義而存在的**不可執行**展示形式、F-14 是自我排除機制的邊界情形，兩者皆不使任何 AC 失敗且已完整記錄在票內供 gate 執行者閱讀。三項未達成的驗證項仍在 captain 身上：AC-2（依賴尚未核准動工的 feature 039）、C1 的真實信箱覆寫點、G-3 的 Vercel dashboard 人工項。
+              application:
+                target-stage: review
+                state: consumed
+        - id: gate:056:review
+          stage: review
+          attempts:
+            - id: gate-attempt:056-review-1
+              briefing:
+                id: briefing:056:review:attempt-1:revision-1
+                digest: sha256:6fb4d528ef244d42d7a7d98ec93d74a34d6b104a0bd07e4e77ff89c5a8ee57c3
+                room-ref: '@review/review/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:056:review:1
+                briefing: briefing:056:review:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-24T22:51:04.15649Z"
+                decision: revise
+                reason: Captain 退回：修那個日期檢查（F-27）。全票唯一已被證實會靜默回報 0 的查核，也是唯一沒有存成可執行形式的那一條；本票的主題就是檢查的涵蓋面要對得上它宣稱保護的東西，不修等於在自己的成果上留一個反例。一併修 F-25／F-26／F-28。
+            - id: gate-attempt:056-review-2
+              briefing:
+                id: briefing:056:review:attempt-2:revision-1
+                digest: sha256:1cdc214d22095f6d5eb70dd3190626f7da452c506413734081d56ac47481ed71
+                room-ref: '@review/review/briefing-2'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:056:review:2
+                briefing: briefing:056:review:attempt-2:revision-1
+                by: person:captain
+                at: "2026-09-25T16:09:31.982551Z"
+                decision: approve
+                reason: Captain 核准：十四輪收斂，最終輪依硬性判準判 PASSED——無 fail-open、無 Material 缺陷、無會讓執行者照著做而失敗的東西。AC-2 維持未達成且核准不豁免它：上線當天由 captain 人工開瀏覽器驗 A1-A4（curl 對整站零命中而看似通過，因 LaunchGate 在 hydration 前回傳 null）。
+              application:
+                target-stage: complete
+                state: pending
 ---
 
 網站目前是 `noindex` 且無對外網域，「讀者」是有連結的夥伴而非公眾。因此下列破口不是「今天要修」，而是**「公開之前必須為真」**。本票把六個散落的無票缺口收成一道 launch gate。
