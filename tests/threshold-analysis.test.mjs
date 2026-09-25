@@ -142,17 +142,46 @@ const SPEC_PATH = 'docs/constitution-features/012-threshold-case-analysis.md';
 const SPEC = fs.readFileSync(path.join(ROOT, SPEC_PATH), 'utf8');
 
 /**
- * 取出規格檔裡某一條 AC 的區塊（自 `**AC-n —` 起，到下一條 AC 的粗體標題為止）。
+ * `## Acceptance criteria` 那一節的內容。
  *
- * 切在 AC 邊界上是必要的：stage report 會大段引述 AC 的內容，
- * 整檔搜尋會抓到歷史記錄而不是現行條文。
+ * **行首錨定，並斷言命中恰一次。** 這串字在本檔出現多次而且每一輪都在增加 ——
+ * 每份報告只要提到那個章節就多一次，第一次命中還是一句行內引用而不是章節標題。
+ * 切到下一個**行首** `## ` 為止，不是切到檔尾。
+ */
+function acSection() {
+  const hits = [...SPEC.matchAll(/^## Acceptance criteria$/gm)];
+  assert.equal(hits.length, 1, `${SPEC_PATH} 的 ^## Acceptance criteria 應恰為 1 節，實際 ${hits.length}`);
+  const start = hits[0].index;
+  const next = [...SPEC.matchAll(/^## /gm)].map((m) => m.index).find((i) => i > start);
+  return SPEC.slice(start, next ?? SPEC.length);
+}
+
+/**
+ * 取出規格檔裡某一條 AC 的區塊（自 `**AC-n —` 起，到下一條 AC 的定義行為止）。
+ *
+ * **三件事都是刻意的，而且都被咬過**：
+ *
+ *   1. **只在 `## Acceptance criteria` 一節內找。** stage report 會大段引述 AC 的內容，
+ *      整檔搜尋會抓到歷史記錄而不是現行條文。
+ *   2. **定義行行首錨定，並斷言恰為 1 行**（O9）。舊版用 `SPEC.indexOf('**AC-n — ')`，
+ *      **不是行首錨定**，只靠「AC 章節在全部 stage report 之前」這個文件順序才安全 ——
+ *      靠的是排版，不是語法。行內引用或報告搬家都會讓它抓錯，而且是**安靜地**抓錯。
+ *      同一個形狀在本票咬過三次（一次 `## Acceptance criteria` 的比對腳本，兩次切節工具）。
+ *   3. **上界取下一條 AC 的定義行，取不到就取節尾** —— 不是取檔尾。
+ *      最後一條 AC 若以檔尾為界，它的區塊會吞掉後面所有的報告。
  */
 function acBlock(id) {
-  const start = SPEC.indexOf(`**${id} — `);
-  assert.notEqual(start, -1, `${SPEC_PATH} 找不到 ${id}`);
-  const rest = SPEC.slice(start + 3);
-  const end = rest.search(/\n\*\*AC-\d+ — /);
-  return end === -1 ? rest : rest.slice(0, end);
+  const section = acSection();
+  const heads = [...section.matchAll(/^\*\*AC-\d+ — /gm)];
+  const mine = heads.filter((m) => m[0] === `**${id} — `);
+  assert.equal(
+    mine.length,
+    1,
+    `${SPEC_PATH} 的 ${id} 定義行（行首錨定）應恰為 1 行，實際 ${mine.length} 行`,
+  );
+  const i = heads.indexOf(mine[0]);
+  const end = heads[i + 1]?.index ?? section.length;
+  return section.slice(mine[0].index, end);
 }
 
 /**
