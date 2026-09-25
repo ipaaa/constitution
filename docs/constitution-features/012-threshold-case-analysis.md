@@ -9,7 +9,7 @@ verdict:
 score: 0.8
 worktree: .worktrees/spacedock-ensign-012-threshold-case-analysis
 issue:
-pr:
+pr: "#41"
 gates:
     version: 1
     records:
