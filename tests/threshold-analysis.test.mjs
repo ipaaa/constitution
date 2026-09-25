@@ -467,8 +467,29 @@ test('AC-4 每項因素都交代 basis、basisRef、uncertainty 與拍板者', (
   }
 });
 
-// 本測試逐項的 `html.includes(label)` 有兩個滿足者，見本規格檔 review cycle 7 的 N1。
-// N1 尚未取得 FO 授權，因此本輪**不動**這裡。
+/**
+ * 某一項因素自己的渲染區段。`OchreBandFactors` 把每一項因素渲染成一個 `<li>`，
+ * 那份 `<ul>` 底下沒有別的 `<li>`（本函式以基數斷言釘住這一點）。
+ * 以該項唯一的 `factor.claim` 定位它落在哪一個 `<li>`。
+ *
+ * **為什麼要切到這個粒度（N1）。** `RULING_AUTHORITY_LABEL` 的值會重複：
+ * `f1-1958-drop` 與 `f4-1950-51-zero` 的拍板者都是「法學背景審閱者」，
+ * 該字串在整份輸出裡出現 2 次。逐項的 `html.includes(label)` 因此有兩個滿足者。
+ * 實測過：只讓 `f1-1958-drop` 不渲染自己的拍板者、徽章與 `uncertainty` 都留著，
+ * 舊斷言 28 pass／0 fail 全綠 —— 由 `f4-1950-51-zero` 的拍板者頂替。
+ * 徽章基數斷言擋不住那個突變，因為徽章還在。
+ * 本測試的名稱寫的是「**每個**待拍板項目」，所以斷言必須逐項釘住產生者。
+ */
+function factorRegion(html, factor) {
+  const starts = [...html.matchAll(/<li[\s>]/g)].map((m) => m.index);
+  assert.equal(starts.length, FACTORS.length, '因素清單的 <li> 基數與 FACTORS 不符');
+  const at = html.indexOf(factor.claim);
+  assert.notEqual(at, -1, `${factor.id} 的 claim 沒有渲染出來`);
+  const i = starts.filter((s) => s <= at).length - 1;
+  assert.ok(i >= 0, `${factor.id} 的 claim 不在任何 <li> 裡`);
+  return html.slice(starts[i], starts[i + 1] ?? html.length);
+}
+
 test('AC-4 OchreBandFactors 為每個待拍板項目渲染待確認標記與拍板者', () => {
   const html = renderToStaticMarkup(createElement(OchreBandFactors, { factors: FACTORS }));
   const needsRuling = FACTORS.filter((f) => f.needsRuling !== null);
@@ -478,10 +499,13 @@ test('AC-4 OchreBandFactors 為每個待拍板項目渲染待確認標記與拍�
   const markers = html.match(/>待確認<\/span>/g) ?? [];
   assert.equal(markers.length, needsRuling.length);
 
+  // 每一項都在**自己**的 <li> 裡驗，不看整份輸出。拍板者的值會重複，見 factorRegion。
   for (const f of needsRuling) {
+    const region = factorRegion(html, f);
     const label = data.RULING_AUTHORITY_LABEL[f.needsRuling];
-    assert.ok(html.includes(label), `${f.id} 沒有渲染拍板者 ${label}`);
-    assert.ok(html.includes(f.uncertainty), `${f.id} 沒有渲染 uncertainty`);
+    assert.ok(region.includes(label), `${f.id} 沒有渲染拍板者 ${label}`);
+    assert.ok(region.includes(f.uncertainty), `${f.id} 沒有渲染 uncertainty`);
+    assert.match(region, />待確認<\/span>/, `${f.id} 沒有掛待確認標記`);
   }
   // 不必拍板的那一項不得掛待確認標記。
   // 原本寫的是 `settled.length === FACTORS.length - needsRuling.length`。
@@ -491,7 +515,10 @@ test('AC-4 OchreBandFactors 為每個待拍板項目渲染待確認標記與拍�
   const settled = FACTORS.filter((f) => f.needsRuling === null);
   assert.deepEqual(settled.map((f) => f.id), ['f5-excluded-cases']);
   assert.equal(needsRuling.length, 4);
-  assert.ok(html.includes('無須外部拍板'));
+  // 同樣切到那一項自己的區段：「無須外部拍板」要由它本人渲染，而且它不得掛徽章。
+  const settledRegion = factorRegion(html, settled[0]);
+  assert.ok(settledRegion.includes('無須外部拍板'), `${settled[0].id} 沒有渲染「無須外部拍板」`);
+  assert.doesNotMatch(settledRegion, />待確認<\/span>/, `${settled[0].id} 不該掛待確認標記`);
 });
 
 /** 一個元件檔以相對路徑 import 的本地元件。 */
@@ -954,12 +981,21 @@ test('D1 規則期 79 筆中有 2 筆不在已引條文之下，且在圖下另�
   // 圖下的固定註腳必須指名這兩筆，不能只放在 hover 才看得到的 tooltip。
   // 用整頁渲染：註腳日後若被搬到頁面外殼，這條不該因為只看元件而誤紅。
   //
-  // `amendedOn` 這一條有四個滿足者，見本規格檔 review cycle 7 的 N2。
-  // N2 尚未取得 FO 授權，因此本輪**不動**這裡。
+  // 三樣東西必須在**同一個**段落裡，不是散在整頁的任何地方（N2）。
+  // `amendedOn`（`1952-04-16`）整頁有四個產生點：本註腳、規則期 tile 的但書清單、
+  // `f1-1958-drop` 的 uncertainty、頁尾的來源清單。
+  // 實測過：只把註腳裡的日期換成「該次修正」、其餘三處不動，舊斷言 28 pass／0 fail 全綠。
+  // 註腳因此沒有寫出是哪一次修正，讀者無從判斷那兩筆為什麼不在條文之下。
+  // 另兩個字串（「釋字第 1、第 2 號」與「未取得的原始版規則」）整頁各只有 1 個產生點，
+  // 所以用前者定位註腳、再要求另兩樣都在同一段裡，三者就都釘在同一個產生者上。
   const html = renderPage();
-  assert.ok(html.includes('釋字第 1、第 2 號'));
-  assert.ok(html.includes(RULES_ERA_UNCOVERED.amendedOn));
-  assert.ok(html.includes('未取得的原始版規則'));
+  const footnotes = [...html.matchAll(/<p\b[^>]*>((?:(?!<\/?p\b)[\s\S])*?)<\/p>/g)]
+    .map((m) => m[1])
+    .filter((t) => t.includes('釋字第 1、第 2 號'));
+  assert.equal(footnotes.length, 1, '圖下找不到指名那兩筆的註腳，或不只一處');
+  const footnote = footnotes[0];
+  assert.ok(footnote.includes(RULES_ERA_UNCOVERED.amendedOn), '註腳沒有寫出是哪一次修正');
+  assert.ok(footnote.includes('未取得的原始版規則'), '註腳沒有寫出條文版本未取得');
 });
 
 test('D2 2022-01-04 至 2025-01-23 的條文已逐字核對，不標未確認', () => {
