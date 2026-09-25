@@ -16,6 +16,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import crypto from 'node:crypto';
+import { spawnSync } from 'node:child_process';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -1101,13 +1103,24 @@ const dataStringLeaves = (value, path = '') =>
       ? Object.entries(value).flatMap(([k, v]) => dataStringLeaves(v, path ? `${path}.${k}` : k))
       : [];
 
-/** 以產生者為根的資料樹。加新的匯出資料就加在這裡，涵蓋面跟著長。 */
-const DATA_BY_PRODUCER = () => ({
-  ...Object.fromEntries(ERAS.map((e) => [e.id, e])),
-  interim: data.INTERIM_SEGMENT,
-  uncovered: RULES_ERA_UNCOVERED,
-  factors: FACTORS,
-});
+const DATA_MODULE_PATH = 'src/data/threshold-analysis.ts';
+
+/**
+ * 被掃描的資料面，**自模組的匯出枚舉出來，不是一份手寫的根清單**。
+ *
+ * **為什麼一定要枚舉（F21）。** 上一版寫的是一份手寫的七個根
+ * （四期 ＋ `interim` ＋ `uncovered` ＋ `factors`），而模組匯出 18 個執行期的東西。
+ * `SERIES_BOUNDARY_NOTES` 不在那七個裡，**而它今天就已經帶人數**。
+ * 實測把「規則期的門檻換算後約為 10 人 9 人」寫進 `SERIES_BOUNDARY_NOTES[0].body`
+ * （**明確歸給規則期，正是 `c3` 禁止的事**）→ **30 tests／29 pass／0 fail，全綠**；
+ * 同一句寫成「約為 11 位大法官」→ 紅。**同一句話，寫成被豁免的那串字就過關。**
+ *
+ * **這是第三個軸，不是「多重滿足者」那一族**：一個欄位路徑不會有多個產生點，
+ * 問題在「**被掃描的面本身是一份名單**」。本票在 F4、F9、M4、F21 上各中一次。
+ * 修法照 M4 的前例（AC-4 的「及其子元件」由寫死六個檔名改為自 `import` 遞迴求閉包）：
+ * **不要列舉被掃描的面，把它推導出來。**
+ */
+const dataExportRoots = () => Object.fromEntries(Object.entries(data));
 
 /**
  * 唯一可以帶人數的三個欄位，**以路徑指名**。
@@ -1120,27 +1133,81 @@ const DATA_BY_PRODUCER = () => ({
  * `'總額 3/4 出席，出席人 3/4 同意（10 人 9 人）'` —— 28 pass／0 fail 全綠，
  * 因為「10 人 9 人」正是 `current.label`，被全站豁免。
  * 同一個違規行為，寫成被豁免的那串字就過關，寫成「（約 11 位大法官）」就不過。
+ *
+ * 路徑的根是匯出名（`ERAS`），序位**由 `id` 反查**而不是寫死 —— 重排 `ERAS` 不該讓它誤紅。
+ *
+ * **豁免清單刻意是一份清單，而掃描面刻意不是。** 兩者是不同的軸：
+ * 掃描面是「要檢查哪些東西」，漏一個就是漏檢（F21）；
+ * 豁免是「授權哪一個產生者可以帶人數」，那本來就該逐筆寫明、逐筆可稽核。
+ * **但清單不得成為後門**，所以下面的測試對每一筆豁免再加一層限制：
+ * 它帶的每一個人數，**必須逐字出自 `current` 期自己那三個欄位**。
+ * 加一個路徑進豁免清單，它仍然不能寫「約 11 位大法官」。
+ *
+ * `SERIES_BOUNDARY_NOTES` 的 `b3-current-no-data.heading` 在清單裡，
+ * 因為它用 `current.label` 指稱現行門檻（「現行 10 人 9 人條件落在釋字序列結束之後」）。
+ * **那是現行憲訴法自己的用語，不是把規則期的限定語換算成人數。**
+ * 這一筆是本輪枚舉掃描面之後才浮出來的 —— 手寫七個根的版本從來沒掃到它。
  */
-const HEADCOUNT_EXEMPT_PATHS = new Set([
-  'current.label',
-  'current.ruleSummary',
-  'current.quotedText',
-]);
+const headcountExemptPaths = () => {
+  const i = ERAS.findIndex((e) => e.id === 'current');
+  assert.notEqual(i, -1, 'ERAS 裡沒有 current 期');
+  const n = data.SERIES_BOUNDARY_NOTES.findIndex((b) => b.id === 'b3-current-no-data');
+  assert.notEqual(n, -1, 'SERIES_BOUNDARY_NOTES 裡沒有 b3-current-no-data');
+  return new Set([
+    `ERAS.${i}.label`,
+    `ERAS.${i}.ruleSummary`,
+    `ERAS.${i}.quotedText`,
+    `SERIES_BOUNDARY_NOTES.${n}.heading`,
+  ]);
+};
 
-test('c3 豁免按產生者發：只有 current 期自己的三個欄位可以帶人數', () => {
-  const leaves = dataStringLeaves(DATA_BY_PRODUCER());
+test('c3 豁免按產生者發，且掃描面自模組匯出枚舉', () => {
+  const roots = dataExportRoots();
+  const exempt = headcountExemptPaths();
 
-  // 防空轉：三個被豁免的路徑必須真的存在，而且真的帶人數。
-  // 少了這一條，豁免清單寫錯路徑時整條測試會變成空轉。
-  for (const p of HEADCOUNT_EXEMPT_PATHS) {
-    const hit = leaves.find(([path]) => path === p);
-    assert.ok(hit, `豁免路徑不存在：${p}`);
-    assert.notEqual(hit[1].match(HEADCOUNT_RE), null, `豁免路徑 ${p} 沒有人數，豁免是空轉的`);
+  // 防空轉 1（F21 的根）：枚舉出的根數必須等於原始碼裡的執行期匯出宣告數。
+  // 少了這一條，掃描面縮小時整條測試會安靜地變窄 —— 那正是 F21 的成因。
+  // 正規式**行首錨定**：`export const`／`export function` 只認宣告，不認文中提及。
+  const moduleSrc = fs.readFileSync(path.join(ROOT, DATA_MODULE_PATH), 'utf8');
+  const declared = (moduleSrc.match(/^export (?:const|function) /gm) ?? []).length;
+  assert.equal(
+    Object.keys(roots).length,
+    declared,
+    `掃描面的根數（${Object.keys(roots).length}）與 ${DATA_MODULE_PATH} 的執行期匯出宣告數（${declared}）不符`,
+  );
+
+  const leaves = dataStringLeaves(roots);
+
+  // 防空轉 2：每一個帶中日韓字元的匯出，都必須至少貢獻一個葉節點。
+  // 這一條擋的是「遞迴走不進某種容器」—— 根數對了，但走訪漏掉整個子樹。
+  const reached = new Set(leaves.map(([p]) => p.split('.')[0]));
+  for (const [name, value] of Object.entries(roots)) {
+    if (typeof value === 'function') continue;
+    if (!/[一-鿿]/.test(JSON.stringify(value) ?? '')) continue;
+    assert.ok(reached.has(name), `匯出 ${name} 含中文字串，但掃描沒有走進去`);
   }
 
-  // 其餘每一個欄位，一律不得帶人數 —— 不論它寫的是哪一串字。
+  // 防空轉 3：每一筆豁免必須真的存在，而且真的帶人數。
+  // 第二層限制：它帶的每一個人數，必須逐字出自 current 期自己那三個欄位。
+  // 這一層讓豁免清單無法成為後門 —— 加一個路徑進來，它仍然不能寫「約 11 位大法官」。
+  const current = eraOf('current');
+  const statuteWording = [current.label, current.ruleSummary, current.quotedText];
+  for (const p of exempt) {
+    const hit = leaves.find(([path]) => path === p);
+    assert.ok(hit, `豁免路徑不存在：${p}`);
+    const found = hit[1].match(HEADCOUNT_RE);
+    assert.notEqual(found, null, `豁免路徑 ${p} 沒有人數，豁免是空轉的`);
+    for (const m of found) {
+      assert.ok(
+        statuteWording.some((w) => w.includes(m)),
+        `豁免路徑 ${p} 帶的「${m}」不出自現行憲訴法自己的用語 —— 豁免不是這樣用的`,
+      );
+    }
+  }
+
+  // 其餘每一個欄位，一律不得帶人數 —— 不論它寫的是哪一串字、在哪一個匯出底下。
   for (const [path, s] of leaves) {
-    if (HEADCOUNT_EXEMPT_PATHS.has(path)) continue;
+    if (exempt.has(path)) continue;
     const m = s.match(HEADCOUNT_RE);
     assert.equal(
       m,
@@ -1235,5 +1302,295 @@ test('AC-6 線上重抓的結果與 fixture 一致', { skip: !process.env.THRESH
     } else {
       assert.equal(count, recorded.get(year), `${year} 年憲判字件數變了`);
     }
+  }
+});
+
+// ---------------------------------------------------------------------------
+// AC-7 — 本 feature 不動內容產線
+//
+// **這兩條是 AC-7 的第一批自動守衛。** 在此之前 AC-7 一條自動守衛都沒有
+// （reviewer 在 cycle 8 的 C2 機械確認：測試檔完全不提產線兩檔與 `build`），
+// 所以它的滿足者是**執行指令的人**，而「施工前後比對 sha256」這句話
+// **連「拿同一個檔案算兩次」都能滿足**。那就是 F20 存活八輪的成因。
+//
+// 條文原本寫「`build` 被塞進抓取程式，即失敗」。reviewer 把抓取程式放進
+// **預渲染頁面的模組層**（它在 `build` 期間載入並執行），而條文列的那些檢查
+// **逐項全部通過**。下面兩條守的就是那個探測。
+// **它們守不到什麼，寫在 AC-7 的 `Verified by:` 裡，不在這裡重複。**
+// ---------------------------------------------------------------------------
+
+const ts = (await import('typescript')).default;
+
+/** 遞迴列出一個目錄下的檔案，跳過 `node_modules` 與隱藏目錄。 */
+function walkFiles(rel) {
+  let entries;
+  try {
+    entries = fs.readdirSync(path.join(ROOT, rel), { withFileTypes: true });
+  } catch {
+    return [];
+  }
+  return entries.flatMap((e) =>
+    e.name === 'node_modules' || e.name.startsWith('.')
+      ? []
+      : e.isDirectory()
+        ? walkFiles(path.join(rel, e.name))
+        : [path.join(rel, e.name)],
+  );
+}
+
+/** 會被當成程式執行的副檔名。`.mjs`／`.js` 也算 —— F20 的探測就是 import 一支 `.mjs`。 */
+const EXECUTABLE_RE = /\.(tsx?|mjs|cjs|js)$/;
+const MODULE_EXTS = ['', '.tsx', '.ts', '/index.tsx', '/index.ts'];
+function resolveModule(base) {
+  for (const ext of MODULE_EXTS) {
+    const candidate = base + ext;
+    try {
+      if (fs.statSync(path.join(ROOT, candidate)).isFile()) return candidate;
+    } catch {
+      /* 不存在就試下一個 */
+    }
+  }
+  return null;
+}
+
+/** 一個檔案的全部 import／re-export／動態 import 的 module specifier。 */
+function moduleSpecifiers(rel) {
+  const src = fs.readFileSync(path.join(ROOT, rel), 'utf8');
+  const sf = ts.createSourceFile(
+    rel,
+    src,
+    ts.ScriptTarget.ES2022,
+    true,
+    /\.tsx$/.test(rel) ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
+  );
+  const out = [];
+  const visit = (node) => {
+    if (
+      (ts.isImportDeclaration(node) || ts.isExportDeclaration(node)) &&
+      node.moduleSpecifier &&
+      ts.isStringLiteral(node.moduleSpecifier)
+    ) {
+      out.push({ text: node.moduleSpecifier.text, dynamic: false });
+    }
+    if (ts.isCallExpression(node) && node.expression.kind === ts.SyntaxKind.ImportKeyword) {
+      const arg = node.arguments[0];
+      out.push({ text: arg && ts.isStringLiteral(arg) ? arg.text : null, dynamic: true });
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(sf);
+  return out;
+}
+
+/**
+ * `next build` 會載入並執行的模組閉包。
+ *
+ * **進入點自檔案系統枚舉，不是一份手寫清單**（F21 的那個軸）：
+ * `next.config.ts` 加上 `src/app/` 底下全部的路由檔。
+ * 閉包只收 `.ts`／`.tsx` —— `.json` 與 `.css` 是資料，不是會執行的程式。
+ */
+function buildTimeClosure() {
+  const routes = walkFiles('src/app').filter((f) =>
+    /\/(page|layout|template|route|error|not-found|global-error)\.tsx?$/.test(f),
+  );
+  const entries = ['next.config.ts', ...routes];
+  for (const e of entries) {
+    assert.ok(fs.existsSync(path.join(ROOT, e)), `建置進入點不存在：${e}`);
+  }
+  assert.ok(routes.length > 0, 'src/app 底下找不到任何路由檔，進入點枚舉壞了');
+
+  const seen = new Set();
+  const nonLocal = new Set();
+  const dynamic = [];
+  const queue = [...entries];
+  while (queue.length > 0) {
+    const file = queue.pop();
+    if (seen.has(file)) continue;
+    seen.add(file);
+    if (!EXECUTABLE_RE.test(file)) continue;
+    for (const spec of moduleSpecifiers(file)) {
+      if (spec.dynamic) dynamic.push({ file, text: spec.text });
+      if (spec.text === null) continue;
+      let base = null;
+      if (spec.text.startsWith('@/')) base = path.join('src', spec.text.slice(2));
+      else if (spec.text.startsWith('./') || spec.text.startsWith('../')) {
+        base = path.join(path.dirname(file), spec.text);
+      } else {
+        nonLocal.add(spec.text);
+        continue;
+      }
+      const resolved = resolveModule(base);
+      assert.ok(resolved, `${file} 的 import '${spec.text}' 解析不到檔案`);
+      queue.push(resolved);
+    }
+  }
+  return { files: [...seen].filter((f) => EXECUTABLE_RE.test(f)), nonLocal, dynamic };
+}
+
+/**
+ * 建置期允許出現的非本地 import，**白名單**。
+ *
+ * **刻意用白名單而不是黑名單。** 黑名單（「不得 import `node:fs`／`child_process`…」）
+ * 是一份寫法表，漏一個就放行 —— 那是 F4／F9／F21 同一個形狀，**失效方向是放行**。
+ * 白名單漏一個則是**擋下**：新增相依必須有人明白加進來，順便被看見。
+ * 規格也明文「不新增相依」，所以這份名單本來就該是封閉的。
+ */
+const BUILD_IMPORT_ALLOWLIST = new Set([
+  'react',
+  'react-dom',
+  'next',
+  'next/link',
+  'next/image',
+  'next/navigation',
+  'next/font/google',
+  'lucide-react',
+  'tailwindcss',
+]);
+
+test('AC-7 建置期載入的模組閉包不得抓取或寫檔', () => {
+  const { files, nonLocal, dynamic } = buildTimeClosure();
+
+  // (0) **閉包的邊界**：建置期載入的東西只能是 `next.config.ts` 或 `src/` 底下的檔案。
+  //     這一條擋的是 F20 那個探測本身 —— 把 `scripts/` 的抓取程式 import 進預渲染頁面。
+  //     第一版的守衛沒有這一條，reviewer 的探測照樣全綠（那支 `.mjs` 被解析到卻沒被檢查）。
+  for (const f of files) {
+    assert.ok(
+      f === 'next.config.ts' || f.startsWith('src/'),
+      `建置期閉包載入了 src/ 之外的程式：${f} —— 抓取程式不得進入 build`,
+    );
+  }
+
+  // 防空轉：閉包必須真的走下去，不是只剩進入點。
+  // 指名兩個必須在閉包內的檔案 —— 一個是本票的頁面，一個要走兩層才會到，
+  // 所以它同時證明「多層遞迴有效」。
+  assert.ok(files.length > 0, '閉包是空的');
+  for (const known of ['src/app/past/thresholds/page.tsx', 'src/data/threshold-analysis.ts']) {
+    assert.ok(files.includes(known), `建置期閉包沒有走到 ${known}`);
+  }
+
+  // (1) 非本地 import 必須全部在白名單內。加一個抓取用的套件就會在這裡紅。
+  for (const spec of nonLocal) {
+    const bare = spec.startsWith('@') ? spec.split('/').slice(0, 2).join('/') : spec.split('/')[0];
+    assert.ok(
+      BUILD_IMPORT_ALLOWLIST.has(spec) || BUILD_IMPORT_ALLOWLIST.has(bare),
+      `建置期閉包 import 了白名單外的模組：'${spec}' —— 新增相依要先有人明白加進白名單`,
+    );
+  }
+
+  // (2) 閉包內不得有動態 import。動態 import 的 specifier 可以是算出來的，
+  //     靜態掃描看不到它指向哪裡，因此整類不准。
+  assert.deepEqual(
+    dynamic.map((d) => `${d.file} → ${d.text ?? '<非字面值>'}`),
+    [],
+    '建置期閉包出現動態 import',
+  );
+
+  // (3) 逐檔看頂層語句。頂層語句就是「被 import 時會跑的程式」。
+  for (const file of files) {
+    const src = fs.readFileSync(path.join(ROOT, file), 'utf8');
+    const sf = ts.createSourceFile(
+      file,
+      src,
+      ts.ScriptTarget.ES2022,
+      true,
+      /\.tsx$/.test(file) ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
+    );
+    for (const st of sf.statements) {
+      // 頂層 await —— 那正是「抓取程式放進模組層」會長出來的東西。
+      let topLevelAwait = false;
+      const scan = (n) => {
+        if (n.kind === ts.SyntaxKind.AwaitExpression) topLevelAwait = true;
+        // 不進函式體：函式裡的 await 要等有人呼叫才跑，不在 import 時執行。
+        if (!ts.isFunctionLike(n)) ts.forEachChild(n, scan);
+      };
+      if (!ts.isFunctionLike(st)) ts.forEachChild(st, scan);
+      assert.equal(topLevelAwait, false, `${file} 的頂層有 await —— 那會在 build 期間執行`);
+
+      // 頂層的裸運算式。唯一允許的是 "use client" 這類字串指示詞。
+      if (ts.isExpressionStatement(st)) {
+        assert.ok(
+          ts.isStringLiteral(st.expression),
+          `${file} 的頂層有會執行的運算式：${st.getText().slice(0, 60)}`,
+        );
+      }
+    }
+  }
+});
+
+test('AC-7 build 指令與寫出產線檔的程式都不得夾帶內容同步', () => {
+  const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
+
+  // (1) `build` 必須恰為 `next build`。串一條 `&&` 進去就會在這裡紅。
+  assert.equal(pkg.scripts.build, 'next build', 'build 指令不再是單純的 next build');
+
+  // (2) 不得有任何生命週期掛鉤 —— 它們會在 install／build 前後自動執行。
+  //     這裡也用白名單：scripts 的鍵必須恰為這五個。
+  assert.deepEqual(
+    Object.keys(pkg.scripts).sort(),
+    ['build', 'dev', 'lint', 'start', 'sync-content'].sort(),
+    'package.json 的 scripts 多了或少了項目 —— 生命週期掛鉤會自動執行',
+  );
+
+  // (3) 提到 sync-content 的 script 必須恰為 `sync-content` 自己。
+  assert.deepEqual(
+    Object.entries(pkg.scripts)
+      .filter(([, v]) => v.includes('sync-content'))
+      .map(([k]) => k),
+    ['sync-content'],
+    '除了 sync-content 自己，還有別的 script 會跑內容同步',
+  );
+
+  // (4) 全 repo 只有 `scripts/sync-content.mjs` 會寫出產線兩檔。
+  //     這一條把 cycle 8 的 C1 由人工查證改成自動守衛。
+  const WRITE_RE = /\b(writeFileSync|writeFile|createWriteStream|appendFileSync|copyFileSync|renameSync)\s*\(/;
+  const PROD_RE = /discussions\.json|history\.json/;
+  const scanned = ['src', 'scripts', 'tests'].flatMap(walkFiles).filter((f) => /\.(mjs|js|ts|tsx)$/.test(f));
+  assert.ok(scanned.length > 0, '掃描面是空的');
+  const writers = scanned.filter((f) => {
+    const src = stripComments(fs.readFileSync(path.join(ROOT, f), 'utf8'));
+    return WRITE_RE.test(src) && PROD_RE.test(src);
+  });
+  assert.deepEqual(writers, ['scripts/sync-content.mjs'], '寫出產線兩檔的程式不只同步程式一支');
+
+  // (5) `src/` 底下完全不得有寫檔呼叫。網站的程式不寫檔，這一條擋住整類。
+  const srcWriters = walkFiles('src')
+    .filter((f) => /\.(ts|tsx)$/.test(f))
+    .filter((f) => WRITE_RE.test(stripComments(fs.readFileSync(path.join(ROOT, f), 'utf8'))));
+  assert.deepEqual(srcWriters, [], 'src/ 底下出現寫檔呼叫');
+});
+
+test('AC-7 產線兩檔與 main 逐位元相同', () => {
+  // **這一條把條文的「施工前後比對 sha256」由人工步驟改成自動守衛。**
+  // 原本那句話的滿足者是執行指令的人，而它**連「拿同一個檔案算兩次」都能滿足** ——
+  // 那正是 C2 指出的成因。基準改成 `main`：本票宣稱不動產線，
+  // 所以工作樹的這兩檔必須與分支點逐位元相同。
+  const baseRef = 'main';
+  const resolved = spawnSync('git', ['rev-parse', '--verify', `${baseRef}^{commit}`], {
+    cwd: ROOT,
+    encoding: 'utf8',
+  });
+  // 不做「取不到就跳過」—— 靜默跳過就是一個洞。取不到就大聲失敗。
+  assert.equal(resolved.status, 0, `解析不到基準 ref ${baseRef}，這條守衛需要它`);
+
+  const PIPELINE_FILES = ['src/data/discussions.json', 'src/data/history.json'];
+  for (const rel of PIPELINE_FILES) {
+    const base = spawnSync('git', ['show', `${baseRef}:${rel}`], {
+      cwd: ROOT,
+      encoding: 'buffer',
+      maxBuffer: 64 * 1024 * 1024,
+    });
+    assert.equal(base.status, 0, `${baseRef} 上取不到 ${rel}`);
+    const baseHash = crypto.createHash('sha256').update(base.stdout).digest('hex');
+    const nowHash = crypto
+      .createHash('sha256')
+      .update(fs.readFileSync(path.join(ROOT, rel)))
+      .digest('hex');
+    assert.equal(nowHash, baseHash, `${rel} 與 ${baseRef} 不同 —— 本票不得動內容產線`);
+  }
+
+  // 防空轉：兩檔都必須真的有內容，否則上面比的是兩個空檔。
+  for (const rel of PIPELINE_FILES) {
+    const parsed = JSON.parse(fs.readFileSync(path.join(ROOT, rel), 'utf8'));
+    assert.ok(Array.isArray(parsed) && parsed.length > 0, `${rel} 解析不出非空陣列`);
   }
 });
