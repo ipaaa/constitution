@@ -33,6 +33,14 @@ gates:
               application:
                 target-stage: review
                 state: consumed
+        - id: gate:050:review
+          stage: review
+          attempts:
+            - id: gate-attempt:050-review-1
+              briefing:
+                id: briefing:050:review:attempt-1:revision-1
+                digest: sha256:649af86574ff2fdd1ab86b0bd3600cc91eab843ff55044f9a642cc95a8c10bcd
+                room-ref: '@review/review/briefing-1'
 ---
 
 feature 040 把八個審核欄位全部改為必填。正式試算表尚未建立這些欄位。**順序做錯會讓整條產線停擺。**

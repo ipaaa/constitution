@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:050:review:attempt-1:revision-1",
+  "question": "050 的 runbook 已通過獨立審查（review cycle 4 判 PASSED）。但本票七項 AC 全部要求「部署已實際完成」才能滿足，而 captain 此刻正在執行 S7。核准會讓本票進入終端並開 PR，那會終結一張每一項 AC 都還沒滿足的票。建議 hold，等部署完成後再核准。",
+  "artifacts": [
+    {
+      "id": "artifact:050:review:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/9a11e82a6f511e30ceb2720dd7d3a7c359f12493/docs/constitution-features/050-ssot-approval-deployment.md",
+      "rev": "sha256:324d436a95e340d4ba72f62e67d4bf7ed9914af921f60292bc360ccdd283bae3",
+      "mediaType": "text/markdown",
+      "summary": "runbook 由推測校正為實測，經 8 輪 implement／5 輪 verify／4 輪 review 收斂，全程對正式試算表零寫入零讀取。兩筆 Material 皆為「照票做完之後沒有任何一步會揭露錯誤」：K1（044 為 050 寫的三項結論一項都沒被採用，S7 缺行為驗收、缺模式指示、AC-4／AC-5 沒有落點）與 K7（S7-b 的測試者角色寫反，18／30 格會與預期相反、且處置會把責任編輯移出允許名單使其部署後核可靜默失敗）。五輪 verify 找出五族引用漂移（位置／檔名／票的狀態／不存在的票），review 另找出第六族——別人指定本票要做的事，從本票內部出發的掃描無論多完整都掃不到。七項 AC 全部要求部署已完成：AC-1 逐字 sha256、AC-2 實際同步成功、AC-3 無列停在 Needs review、AC-4 非核可者被拒、AC-5 標題列受保護、AC-6 部署後 main 不可用被記錄。仍待 captain 兩項裁決：AC-4 要不要擴到逐欄逐分頁、要不要納入「責任編輯必須改得到 B 類六欄」（後者目前完全沒有被驗，而最早偵測點 S8 由 captain 執行、照票做不會觸發）。票內 🔴 亦未解：040 Out of scope 的「並由 captain 確認」那一半。"
+    }
+  ]
+}
