@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:056:review:attempt-2:revision-1",
+  "question": "056 第十四輪：review cycle 5 依硬性收斂判準判 PASSED——沒有 fail-open、沒有 Material 缺陷、沒有會讓 gate 執行者照著做而失敗的東西。是否核准交付？注意 AC-2 仍未達成，而它只有兩條合格路徑：feature 039 的 jsdom 掛載（該票仍在 design、未核准動工），或 captain 人工開瀏覽器。核准不豁免 AC-2。",
+  "artifacts": [
+    {
+      "id": "artifact:056:review:attempt-2:revision-1:item-1",
+      "uri": "git-root://main/0cdcb70455c6cd3d9a901c6f097ba5596458c76e/docs/constitution-features/056-pre-launch-checklist.md",
+      "rev": "sha256:fdcad91ad8b9d3bc8f344e77a5a09d78d2272b16337f9e1ba24bb1ce397d969b",
+      "mediaType": "text/markdown",
+      "summary": "十三輪 implement／五輪 review／七輪 verify。本票交付的是一道可被執行的 gate，而它的歷史就是「看起來對但執行時不成立的檢查」被逐一修掉的過程：F-6 主條件構造上不可達、F-9 檢查會說謊、F-15 位置無關而保護的性質位置相關、F-17 以 id 判定而保護的性質是內容、F-19／F-20 同一斷言兩個方向都錯、F-31 三道護欄全過而基準差一天、F-32 比了 9 筆命中卻在量 8 個健康的旁觀者。最後三輪的產出是方法而非修補：Q1（它到底有沒有真的比）／Q2（它的基準可不可信）／Q3（它比的是不是該比的那個對象）三問並列，各有機械答案，並以 F-32 作為「三者不能互相替代」的可重跑反例；姊妹票 012 同日獨立到達同一個 Q3，三種載體收束為「檢查確認了有人滿足那個性質，從來沒有確認該負責的那個對象滿足它」。第四種載體：沒有，另名兩個兄弟軸（代理軸、時刻軸）以免下一輪誤以為問過。AC-2 維持未達成，依賴尚未核准動工的 feature 039，或由 captain 人工開瀏覽器完成。"
+    }
+  ]
+}
