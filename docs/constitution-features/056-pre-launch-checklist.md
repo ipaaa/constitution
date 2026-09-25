@@ -9,7 +9,7 @@ verdict:
 score: 0.85
 worktree: .worktrees/spacedock-ensign-056-pre-launch-checklist
 issue:
-pr:
+pr: "#40"
 mod-block: merge:pr-merge
 gates:
     version: 1
