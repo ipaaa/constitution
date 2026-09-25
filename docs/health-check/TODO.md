@@ -242,6 +242,13 @@ curl -s https://constitution-nine.vercel.app/past -o p.html
 
 ### P0-2　h2 的釋字第272號內容錯誤（法律錯誤）　🔺 全清單最高優先
 
+> **2026-09-21 補述：此列在線上已消失，並加一道反向保護。原文保留。**
+> feature `056`（`../constitution-features/056-pre-launch-checklist.md`）的複驗確認：captain 清空 `status` 後，
+> `scripts/sync-content.mjs:354` 的 `isApproved()` 把 `h2` 濾掉。`src/data/history.json` 40 筆內已無 `h2`。
+> 讀者現在看不到這筆錯誤。
+> 「待法學確認」仍然成立。改變的只是它不再是線上可見的錯誤，而是一道必須守住的閘門。
+> **反向保護見本節末的「反向保護」一條。**
+
 - **狀態**：**待法學確認** — 不要在確認前修改
 - **為何在受眾修正後仍維持最高優先**：看到這筆錯誤的人**包含法學背景的工作夥伴**。專業受眾看到錯誤的釋字解讀，對專案專業性的信任損害，比公開與否更難補救。這是唯一不因「還沒公開」而降級的項目
 - **影響**：現行資料將釋字第272號誤植為言論自由案
@@ -257,6 +264,24 @@ curl -s https://constitution-nine.vercel.app/past -o p.html
 - **注意**：此列結構正常，機器掃不出來，只有靠人讀才發現
 - **誰能做**：法學協作者確認 → 工程師修正
 - **卡在**：需要一位法學背景的人拍板
+- **反向保護**（2026-09-21 加入，對應 `056` 的 `G-6`）：把 `h2` 重新標成 `Approved` 之前，必須先有法學背景者的確認記錄。
+  沒有記錄就重新標 `Approved`，下次同步會把錯誤內容送回線上。
+  **查驗指令以 `../constitution-features/056-pre-launch-checklist.md` 第三節標記 `# canonical: G-6` 的那一段為正本，本檔不另存副本**
+  （2026-09-24 cycle 8 改；原本此處自帶一份 `node -e` 指令，見下方補述）。通過條件為印出 `G-6 PASS` 且離開碼 `0`。
+  2026-09-21 曾實測 id 層輸出 `false false`。任一列回來、或 `272` 的內容以任何 id 出現，表示有人把該列重新標成 `Approved`，
+  `../constitution-features/056-pre-launch-checklist.md` 的 gate 即不通過，不可移除 noindex（見 P3-8）
+
+> **2026-09-24（cycle 8）補述：本節原本自帶一份 G-6 查驗指令，已移除並改為指向正本。原指令逐字保留於此。**
+> 原句為：「沒有記錄就重新標 `Approved`，下次同步會把錯誤內容送回線上。查驗指令如下，兩個輸出都必須是 `false`：」，其後為一個 `bash` 區塊，內容逐字為 `node -e "const a=require('./src/data/history.json');const i=a.map(x=>x.id);console.log(i.includes('h2'),i.includes('h28'))"`。
+> **為什麼移除而不是留著**：`056` 的 G-6 判準已於 2026-09-24（cycle 8）補上內容層斷言（`JSON.stringify(a).includes('272')`），
+> 因為只看 id 會漏掉「同樣的錯誤內容換一個 id 重新核可」。本檔這一份是 id 層的舊形式，留著就是第二份會分岔的副本——
+> 事實上它在被移除時**已經**與正本不同形（`console.log` 對 `process.exit(1)`）。
+> `056` 的分岔偵測只掃該票一個檔案，看不到本檔，所以本檔的副本沒有任何機制保護。移除副本比再蓋一層偵測可靠。
+> **2026-09-24（cycle 9）補述：上面提到的內容層斷言已再次改強，該描述只反映 cycle 8 當時的判準。原句不改寫。**
+> `056` 的 G-6 內容層已於 2026-09-24（cycle 9）從裸子字串 `JSON.stringify(a).includes('272')` 改為 **case-number 型樣**——
+> 容忍半形／全形數字、有無空格（半形或全形）與簡繁，並掃**所有字串欄位**、回報命中的欄位路徑。
+> 原因是裸子字串**兩個方向都錯**：漏掉全形 `釋字第２７２號`（fail-open，靜默），又會打到圖片網址裡的 `272`（fail-closed）。
+> **現行寫法一律以正本為準**，即 `../constitution-features/056-pre-launch-checklist.md` 標記 `# canonical: G-6` 的那一段；本檔仍不另存副本。
 
 ---
 
@@ -339,6 +364,13 @@ curl -s https://constitution-nine.vercel.app/past -o p.html
 
 ### P0-6　`h28` 掛了 `h14` 的標題　🔺 對外可見的事實錯誤
 
+> **2026-09-21 補述：此列在線上已消失，並加一道反向保護。原文保留。**
+> feature `056`（`../constitution-features/056-pre-launch-checklist.md`）的複驗確認：`src/data/history.json` 40 筆內已無 `h28`。
+> 標題「對外可見」這個描述已不成立。「待補正確標題」仍然成立。
+> **反向保護見本節末的「反向保護」一條。它補在下方「解除方式」之上，不取代它。**
+> 同一次複驗另外找到一組同型缺陷：`h34`（釋字第708號）與 `h35`（釋字第710號）的 `reality.title` 一字不差，
+> 兩筆都在線上。該項由 `056` 列為 D4 並另行開票，不併入本節。
+
 - **狀態**：已由 captain 於 2026-09-02 清空 `status` 暫時擋住，**待補正確標題**
 - **證據**：兩筆的 `title` 一字不差
 
@@ -351,7 +383,25 @@ curl -s https://constitution-nine.vercel.app/past -o p.html
 - **為什麼先前抓不到**：037 做過兩次「505 項欄位比對」，但那驗的是「有沒有忠實抄自試算表」。
   **這裡是試算表本身寫錯**，逐欄比對必然通過
 - **誰能做**：內容判斷。FO 不擬標題 —— 生一句「看起來對」的正是本專案在清的東西
-- **解除方式**：在 `SSOT_收集區` 補上正確 `title`，並把 `status` 改回 `Approved`
+- **反向保護**（2026-09-21 加入，對應 `056` 的 `G-6`）：把 `h28` 重新標成 `Approved` 之前，必須先有確認記錄，
+  記明正確 `title` 已經由具法學背景者核對過。FO 不擬標題。
+  **查驗指令與 P0-2 的「反向保護」同一條，正本在 `../constitution-features/056-pre-launch-checklist.md` 的 `# canonical: G-6`，本檔不另存副本**
+  （2026-09-24 cycle 8 改；原本此處自帶一份 `node -e` 指令，見下方補述）。通過條件為印出 `G-6 PASS` 且離開碼 `0`。
+  2026-09-21 曾實測 id 層輸出 `false false`。任一列回來，表示有人把該列重新標成 `Approved`，
+  `../constitution-features/056-pre-launch-checklist.md` 的 gate 即不通過，不可移除 noindex（見 P3-8）
+- **解除方式**：在 `SSOT_收集區` 補上正確 `title`，並把 `status` 改回 `Approved`。此步驟以上一條的確認記錄為前置
+
+> **2026-09-24（cycle 8）補述：本節原本自帶一份 G-6 查驗指令，已移除並改為指向正本。原指令逐字保留於此。**
+> 原句為：「記明正確 `title` 已經由具法學背景者核對過。FO 不擬標題。查驗指令與 P0-2 的「反向保護」同一條，兩個輸出都必須是 `false`：」，其後為一個 `bash` 區塊，內容逐字為 `node -e "const a=require('./src/data/history.json');const i=a.map(x=>x.id);console.log(i.includes('h2'),i.includes('h28'))"`。
+> **為什麼移除而不是留著**：`056` 的 G-6 判準已於 2026-09-24（cycle 8）補上內容層斷言（`JSON.stringify(a).includes('272')`），
+> 因為只看 id 會漏掉「同樣的錯誤內容換一個 id 重新核可」。本檔這一份是 id 層的舊形式，留著就是第二份會分岔的副本——
+> 事實上它在被移除時**已經**與正本不同形（`console.log` 對 `process.exit(1)`）。
+> `056` 的分岔偵測只掃該票一個檔案，看不到本檔，所以本檔的副本沒有任何機制保護。移除副本比再蓋一層偵測可靠。
+> **2026-09-24（cycle 9）補述：上面提到的內容層斷言已再次改強，該描述只反映 cycle 8 當時的判準。原句不改寫。**
+> `056` 的 G-6 內容層已於 2026-09-24（cycle 9）從裸子字串 `JSON.stringify(a).includes('272')` 改為 **case-number 型樣**——
+> 容忍半形／全形數字、有無空格（半形或全形）與簡繁，並掃**所有字串欄位**、回報命中的欄位路徑。
+> 原因是裸子字串**兩個方向都錯**：漏掉全形 `釋字第２７２號`（fail-open，靜默），又會打到圖片網址裡的 `272`（fail-closed）。
+> **現行寫法一律以正本為準**，即 `../constitution-features/056-pre-launch-checklist.md` 標記 `# canonical: G-6` 的那一段；本檔仍不另存副本。
 - **驗證**：
   ```bash
   # 同步後，兩筆的 title 不應相同
@@ -883,6 +933,7 @@ captain 指出那些中文是寫給學者老師看的，刪掉編輯端就失去
 ### P3-8　🚨 發布前必須移除 noindex
 
 - **狀態**：**現在刻意保持著，不要動**（2026-09-01 確認）—— 目前就是不要讓 Google 搜尋得到。**等真的要對外發布時才移除**
+- **解除條件**（2026-09-21 加入）：`../constitution-features/056-pre-launch-checklist.md` 第三節的 gate 執行清單 `G-1` 至 `G-8` 八項全數通過。八項未全數通過，不可移除這一行。移除後在該票的 Feedback Cycles 記下執行日期與 commit SHA
 - **原狀態**：已加入（2026-08-31），**發布時必須移除**
 - **位置**：`src/app/layout.tsx` 的 `metadata.robots`
 
