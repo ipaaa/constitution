@@ -467,6 +467,8 @@ test('AC-4 每項因素都交代 basis、basisRef、uncertainty 與拍板者', (
   }
 });
 
+// 本測試逐項的 `html.includes(label)` 有兩個滿足者，見本規格檔 review cycle 7 的 N1。
+// N1 尚未取得 FO 授權，因此本輪**不動**這裡。
 test('AC-4 OchreBandFactors 為每個待拍板項目渲染待確認標記與拍板者', () => {
   const html = renderToStaticMarkup(createElement(OchreBandFactors, { factors: FACTORS }));
   const needsRuling = FACTORS.filter((f) => f.needsRuling !== null);
@@ -578,11 +580,8 @@ test('AC-4 只有資料模組與協調者可以引用 FACTORS', () => {
 // AC-5 — 現行 10 人 9 人門檻在圖上看得出「沒有釋字資料可用」
 // ---------------------------------------------------------------------------
 
-test('AC-5 current 期無年均，且圖上以斜線網底與文字標明無釋字資料', () => {
-  assert.equal(statOf('current').meanPerYear, null);
-  assert.equal(statOf('current').totalCount, 0);
-
-  const html = renderToStaticMarkup(
+const renderChart = () =>
+  renderToStaticMarkup(
     createElement(ThresholdChart, {
       years: YEARS,
       eras: ERAS,
@@ -593,12 +592,124 @@ test('AC-5 current 期無年均，且圖上以斜線網底與文字標明無釋�
       onSelectEra: () => {},
     }),
   );
-  assert.match(html, /<pattern[^>]*id="threshold-hatch"/);
-  assert.match(html, /fill="url\(#threshold-hatch\)"/);
-  assert.ok(html.includes('無釋字資料'));
-  // <desc> 必須帶四期的年均，讀螢幕軟體才拿得到同一份對比。
-  assert.ok(html.includes('年均 6.7 件'));
-  assert.ok(html.includes('年均 17.3 件'));
+
+/**
+ * 每一條色帶的 `<title>`（`ThresholdBand.tsx:59`，內容為「{label}（{effectiveFrom} 起）」）。
+ * 色帶是連續的兄弟節點，所以這些 `<title>` 是切出「哪一條色帶自己的輸出」的界標。
+ */
+const BAND_TITLE_RE = /<title>([^<]*（\d{4}-\d{2}-\d{2} 起）)<\/title>/g;
+const bandTitles = (chartHtml) => [...chartHtml.matchAll(BAND_TITLE_RE)];
+
+/**
+ * 某一條色帶自己的渲染區段：自己的 `<title>` 起，到下一條色帶的 `<title>` 止。
+ *
+ * **為什麼一定要切到這個粒度。** AC-5 要求的東西在圖的子樹裡各有**兩個以上的產生點**：
+ * `fill="url(#threshold-hatch)"` 有兩個發出者（`current` 期的色帶，以及 `INTERIM_SEGMENT`
+ * 的色帶 —— 後者的 `hatched` 是硬寫的 `true`）；「年均 6.7 件」有兩個（該期色帶與 `<desc>`）。
+ * 「無釋字資料」有三個程式產生點（色帶標籤、`<desc>`、右端引線註解），
+ * 目前渲染出兩個 —— 色帶標籤那一個因為 `current` 的色帶太窄而不畫，見下面的 (2)。
+ *
+ * 裸 `includes()` 只問「這個子樹裡有沒有」，不問「是不是該負責的那一個產生的」。
+ * 該負責的那一個壞掉時，斷言由另一個產生點滿足，**假綠**。
+ *
+ * 三次實測，每一次舊斷言都是 27/27 全綠，本檔的新斷言都轉紅：
+ *   1. `ThresholdChart` 傳給 `current` 色帶的 `hatched` 改成 `false` —— 讀者失去斜線網底。
+ *   2. `ThresholdBand` 的 `showLabel` 改成 `false` —— 圖上不再顯示年均與期間名稱。
+ *   3. 右端引線註解拿掉「／兩段皆無釋字資料」—— 圖上不再寫出 `current` 期沒有資料。
+ */
+function bandRegion(chartHtml, label) {
+  const hits = bandTitles(chartHtml);
+  const i = hits.findIndex((m) => m[1].startsWith(`${label}（`));
+  assert.notEqual(i, -1, `找不到色帶 <title>：${label}`);
+  assert.ok(i + 1 < hits.length, `${label} 是最後一條色帶，區段沒有下界，不得拿它做斷言`);
+  return chartHtml.slice(hits[i].index, hits[i + 1].index);
+}
+
+/**
+ * 圖上**看得見**的文字，也就是 `<text>` 的內容。
+ *
+ * 刻意排除 `<desc>` 與 `<title>`：那兩者是給讀螢幕軟體的替代文字，不畫在圖上。
+ * AC-5 的要求文字寫的是「現行 10 人 9 人門檻**在圖上**看得出『沒有釋字資料可用』」，
+ * 而裸 `includes()` 分不出「圖上看得見」與「替代文字裡提到過」。
+ */
+const visibleChartTexts = (chartHtml) =>
+  [...chartHtml.matchAll(/<text[^>]*>([\s\S]*?)<\/text>/g)].map((m) => m[1]);
+
+test('AC-5 current 期無年均，且圖上以斜線網底與文字標明無釋字資料', () => {
+  assert.equal(statOf('current').meanPerYear, null);
+  assert.equal(statOf('current').totalCount, 0);
+
+  const html = renderChart();
+  const current = eraOf('current');
+
+  // 色帶的 <title> 必須照這個順序出現。下面每一條都靠它定位產生者，
+  // 順序或數量變了就中止 —— 不讓區段切錯之後還繼續判定。
+  assert.deepEqual(
+    bandTitles(html).map((m) => m[1]),
+    [
+      '規則期（1948-09-16 起）',
+      '雙四分之三（1958-07-21 起）',
+      '雙三分之二（1993-02-03 起）',
+      '10 人 9 人（2025-01-23 起）',
+      '憲訴法原始門檻（2022-01-04 起）',
+    ],
+  );
+
+  // 斜線圖樣的定義必須在 <defs> 裡，否則上面那些 fill 引用指向不存在的圖樣。
+  const defs = html.match(/<defs>[\s\S]*?<\/defs>/);
+  assert.ok(defs, '圖裡沒有 <defs>');
+  assert.match(defs[0], /<pattern[^>]*id="threshold-hatch"/);
+
+  // (1) 網底必須畫在 current 期**自己**的色帶上。
+  //     整張圖有兩個發出者，只問「整張圖有沒有」時 INTERIM_SEGMENT 那個會頂替。
+  assert.match(
+    bandRegion(html, current.label),
+    /fill="url\(#threshold-hatch\)"/,
+    'current 期自己的色帶沒有斜線網底',
+  );
+
+  // (2)「無釋字資料」必須由圖上看得見的文字提供，而且要連得回 current 期。
+  //     合格的方式有兩種，任一即可 —— 斷言追的是要求，不是某一種實作：
+  //       (a) 有一個看得見的 <text> 同時提到 current 期與「無釋字資料」；或
+  //       (b)「無釋字資料」出現在 current 期自己的色帶區段裡。
+  //     目前成立的是 (a)：圖右下的引線註解寫「2025-01-23 10 人 9 人／兩段皆無釋字資料」。
+  //     (b) 目前不成立，而且不是疏漏 —— current 期的色帶只有約 22px 寬，
+  //     低於 ThresholdBand 的 MIN_LABEL_WIDTH（72），因此它根本不畫標籤。
+  //     日後若色帶變寬而畫出標籤，(b) 會成立，這條照樣通過。
+  const namedOnChart = visibleChartTexts(html).filter(
+    (t) => t.includes('無釋字資料') && t.includes(current.label) && t.includes(current.effectiveFrom),
+  );
+  const inOwnBand = bandRegion(html, current.label).includes('無釋字資料');
+  assert.ok(
+    namedOnChart.length > 0 || inOwnBand,
+    '圖上沒有任何看得見的文字把 current 期與「無釋字資料」連在一起（<desc> 不算，它不在圖上）',
+  );
+
+  // (3) 兩個有資料期的年均必須畫在**各自**的色帶上，不是只存在於 <desc>。
+  //     實測過：把 ThresholdBand 的 showLabel 改成 false，圖上不再顯示年均，舊斷言 27/27 全綠。
+  assert.match(bandRegion(html, '雙四分之三'), /年均 6\.7 件/);
+  assert.match(bandRegion(html, '雙三分之二'), /年均 17\.3 件/);
+});
+
+/**
+ * 無障礙描述是**另一個**要求，不是上面那條的替代品。
+ *
+ * 兩條各自釘住自己的產生者：上面那條只認圖上看得見的元素，這條只認 `<desc>`。
+ * 因此兩者不能互相頂替 —— 這正是 AC-5 原本假綠的成因。
+ */
+test('AC-5 無障礙描述另外帶四期的年均，與圖上的標示各自獨立', () => {
+  const desc = renderChart().match(/<desc[^>]*>([\s\S]*?)<\/desc>/);
+  assert.ok(desc, '圖裡沒有 <desc>');
+  const body = desc[1];
+  for (const s of STATS) {
+    const expected =
+      s.meanPerYear === null
+        ? `${s.era.label}（${s.era.effectiveFrom} 起）無釋字資料`
+        : `${s.era.label}（${s.era.effectiveFrom} 起）年均 ${s.meanPerYear.toFixed(1)} 件`;
+    assert.ok(body.includes(expected), `<desc> 少了 ${s.era.id}：${expected}`);
+  }
+  // 四期全帶，讀螢幕軟體使用者才拿得到與視覺讀者相同的那份對比。
+  assert.equal(STATS.length, 4);
 });
 
 test('AC-5 憲判字年份不計入任何時期的年均', () => {
@@ -842,6 +953,9 @@ test('D1 規則期 79 筆中有 2 筆不在已引條文之下，且在圖下另�
 
   // 圖下的固定註腳必須指名這兩筆，不能只放在 hover 才看得到的 tooltip。
   // 用整頁渲染：註腳日後若被搬到頁面外殼，這條不該因為只看元件而誤紅。
+  //
+  // `amendedOn` 這一條有四個滿足者，見本規格檔 review cycle 7 的 N2。
+  // N2 尚未取得 FO 授權，因此本輪**不動**這裡。
   const html = renderPage();
   assert.ok(html.includes('釋字第 1、第 2 號'));
   assert.ok(html.includes(RULES_ERA_UNCOVERED.amendedOn));
