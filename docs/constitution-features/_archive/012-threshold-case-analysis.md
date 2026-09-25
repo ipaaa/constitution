@@ -1,11 +1,11 @@
 ---
 id: "012"
 title: 解釋門檻與案件數量關聯視覺化
-status: review
+status: complete
 source: meetup-20260416
 started: 2026-09-21T19:21:11Z
-completed:
-verdict:
+completed: 2026-09-25T16:28:27Z
+verdict: PASSED
 score: 0.8
 worktree: .worktrees/spacedock-ensign-012-threshold-case-analysis
 issue:
@@ -115,8 +115,9 @@ gates:
                 reason: Captain 核准：十一輪收斂，最終輪判 PASSED。三項未達成的驗證項核准不豁免，且只有 captain 能完成：AC-3 朗讀測試（3 名非法學受測者、三道不提示的問題）、D5 視覺檢查（375px／1280px，本環境無可用無頭瀏覽器）、c3 的法學解讀（需法學背景審閱者拍板）。
               application:
                 target-stage: complete
-                state: pending
-mod-block: merge:pr-merge
+                state: consumed
+mod-block:
+archived: 2026-09-25T16:28:27Z
 ---
 
 研究大法官會議時期通過舊案數量與提升門檻之間的關聯，製作時間軸 infographic。
