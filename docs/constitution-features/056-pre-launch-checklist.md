@@ -3335,6 +3335,7 @@ F-29 修成 `/h2|h28|272|釋字|字第/`。我逐一量過**哪一個** alternat
 
 本輪處理 review 判 REJECTED 的唯一阻擋項 **F-32（Material）** 與一併授權的 **F-33**，並把第三個問題升成一般性的判準。**改一個檔案**：本票。
 **diff 基準現算**：`git merge-base main HEAD` = **`d0a9bda2f`**（本輪複算，未沿用記憶中的 SHA）。
+**本輪 commit：`0bfa006`**（author date **2026-09-24**，依日期規則第 1 條取實際 commit 日期；本節所有 `2026-09-24（cycle 13）` 標籤皆據此）。
 
 - DONE: **F-32 fix（Material，本輪唯一阻擋項）。** G-7 改為對三處綁定**各自驗身分與唯一性**，不再數檔案命中數。
   **證據**：兩條消失路徑各自轉紅——刪掉 `TODO.md` 的 P3-8 解除條件（其餘 8 筆保留）由 `G-7 PASS` 變 `G-7 FAIL … place2 … [count=0]` exit `1`；
