@@ -2798,7 +2798,7 @@ promote 條件改成兩條可機械判定且目前為否的條件。**交一條�
 
 本輪處理 FO 授權的 F-29 fix，確認 F-26 的措辭歸屬更正，並依 FO 指示把兩個觀察獨立成節。**改一個檔案**：本票。
 **diff 基準現算**：`git merge-base main HEAD` = **`d0a9bda2f`**（本輪複算，未沿用記憶中的 SHA）。
-**本輪 commit：`c1cc10c`**（author date **2026-09-24**，依日期規則第 1 條取實際 commit 日期；本節所有 `2026-09-24（cycle 11）` 標籤皆據此）。
+**cycle 11 commit：`c1cc10c`**（author date **2026-09-24**，依日期規則第 1 條取實際 commit 日期；本節所有 `2026-09-24（cycle 11）` 標籤皆據此）。
 
 - DONE: **F-29 fix（FO 授權）。** 偵測器 `node` 分支由 `/h2|h28|272|釋字/` 改為 `/h2|h28|272|釋字|字第/`，**改動一個 token，未新增任何區塊**。
   四個方向＋真實候選全部從文件抽出後實跑，逐一分別量 exit code 與 stderr：漏抓的那一行 **0 → 1**；六行真副本仍 **6**（六個位置各 6）；七種拼法變體仍 **7**；十條合法指令仍 **0**；真實候選 `STRAY` 0／`DUP-MARKER` 0／`AC-OWNED` 1 完全不變。詳表見 F-29 一節末的「處置」小節。
@@ -3035,6 +3035,7 @@ A／B 對照只差幾小時的時鐘時間：17:39 那一列 `violations=0` **�
 
 本輪處理 FO 授權的 **F-31 fix（Material）** 與 **F-30 追加補述**，並把 F-27／F-31 的區分與兩條判準留在票內。**改一個檔案**：本票。
 **diff 基準現算**：`git merge-base main HEAD` = **`d0a9bda2f`**（本輪複算，未沿用記憶中的 SHA）。
+**本輪 commit：`97700b4`**（author date **2026-09-24**，依日期規則第 1 條取實際 commit 日期；本節所有 `2026-09-24（cycle 12）` 標籤皆據此）。
 
 - DONE: **F-31 fix（Material，FO 授權）。** date-check 正本改用 `git blame --line-porcelain` 的 **`author-tz`** 位移到作者當地時間，與規則第 1 條的 `%ad --date=short` 對齊。
   **FO 的硬條件已實作並實測**：取不到 `author-tz`／`author-time` 時一律判失敗、**回離開碼 `3`**、不預設 `+0000`。摘要行多印 `no-tz=<筆數>`。
