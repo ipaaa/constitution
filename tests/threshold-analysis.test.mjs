@@ -936,6 +936,38 @@ test('D1 規則期已補上一手條文，且網站仍然不寫出 1/2', () => {
   assert.equal(/總額[^」]{0,6}(出席|同意|之)/.test(rulesTile), false);
 });
 
+/**
+ * 規則期三項但書各自的 `<li>`，依陣列順序回傳。
+ *
+ * `EraComparisonStrip.tsx:152` 的 `caveats.map` 把每一項渲染成一個連續的兄弟 `<li>`，
+ * 適用「切兄弟區段」。切兄弟區段的兩項前提在這裡這樣滿足：
+ *
+ *   1. **釘住界標**：先斷言但書清單的 `<li>` 基數等於 `rules.caveats.length`。
+ *   2. **釘住順序**：不能用但書自己的 `text` 定位 —— 摘錄斷言要驗的**就是那份 text 的內容**，
+ *      用它定位就是循環論證（內容改了連定位一起改，斷言永遠不會紅，那正是 F16）。
+ *      改用**與內容無關**的界標：唯一帶 `needsRuling` 的那一項會渲染待確認徽章，
+ *      斷言那個徽章恰好出現一次、而且落在它在陣列裡的序位上。
+ *
+ * 區段只取但書那個 `<ul>`，不取整份輸出 —— 別處日後長出 `<li>` 不該影響這裡。
+ */
+function caveatRegions(html) {
+  const rules = eraOf('rules');
+  const ul = html.match(/這段條文的 \d+ 項限制[\s\S]*?<ul[^>]*>([\s\S]*?)<\/ul>/);
+  assert.ok(ul, '找不到但書清單的 <ul>');
+  const lis = [...ul[1].matchAll(/<li\b[^>]*>((?:(?!<\/?li\b)[\s\S])*?)<\/li>/g)].map((m) => m[1]);
+  assert.equal(lis.length, rules.caveats.length, '但書清單的 <li> 基數與 rules.caveats 不符');
+
+  const BADGE = '待確認·法學背景審閱者';
+  const withBadge = lis.filter((t) => t.includes(BADGE));
+  assert.equal(withBadge.length, 1, `待確認徽章不是恰好一個，區段可能切錯：${withBadge.length}`);
+  assert.equal(
+    lis.findIndex((t) => t.includes(BADGE)),
+    rules.caveats.findIndex((c) => c.needsRuling !== null),
+    '待確認徽章的序位與 rules.caveats 不一致，區段順序對不上',
+  );
+  return lis;
+}
+
 test('D1 規則期的三項限制都存在，且都渲染得出來', () => {
   const rules = eraOf('rules');
   assert.equal(rules.caveats.length, 3);
@@ -950,14 +982,41 @@ test('D1 規則期的三項限制都存在，且都渲染得出來', () => {
   const html = renderToStaticMarkup(
     createElement(EraComparisonStrip, { items: STATS, selectedEraId: null, onSelectEra: () => {} }),
   );
-  for (const c of rules.caveats) {
-    assert.ok(html.includes(c.text), `${c.id} 沒有渲染出來`);
+
+  // 每一項但書切到**它自己**的 <li>，見 caveatRegions()。
+  const caveatLis = caveatRegions(html);
+  for (const [i, c] of rules.caveats.entries()) {
+    assert.ok(caveatLis[i].includes(c.text), `${c.id} 沒有渲染出來`);
   }
-  assert.ok(html.includes('待確認·法學背景審閱者'));
+
   // 三項限制的具體內容必須看得見，不能只留一句「有但書」。
-  assert.ok(html.includes('1952-04-16 修正後的版本'));
-  assert.ok(html.includes('79 筆中的 77 筆'));
-  assert.ok(html.includes('在中央政府所在地全體大法官'));
+  // **每一條都必須由該項自己的 <li> 提供**（F16）。
+  // c1 與 c2 的摘錄在四格 tile 裡各只有 1 個產生點，c3 的有 4 個
+  // （`rules.ruleSummary`、`rules.quotedText` 兩處、`caveats[2].text`）。
+  // 原本三條都是整份輸出的裸 includes()，c3 那一條因此由別人頂替：
+  // 實測把 caveats[2].text 的「在中央政府所在地全體大法官」改寫成「那個限定語」、
+  // 其餘三個產生點全部保留 —— 舊斷言 28 pass／0 fail 全綠。
+  // 而 c3 是全票唯一需要法學拍板的那一項，它的**逐字原文**就是那個承諾的載體。
+  //
+  // 摘錄斷言**按 id 取區段，不按序位**。`<li>` 依陣列順序渲染，所以序位由 id 反查而來。
+  // 實測過只寫死序位的版本：把 c3 移到陣列第一位（純換順序、內容不變）會誤紅。
+  const regionOf = (id) => {
+    const i = rules.caveats.findIndex((c) => c.id === id);
+    assert.notEqual(i, -1, `但書 ${id} 不存在`);
+    return caveatLis[i];
+  };
+  assert.ok(
+    regionOf('c1-amended-version').includes('1952-04-16 修正後的版本'),
+    'c1 的具體內容不在它自己的但書裡',
+  );
+  assert.ok(
+    regionOf('c2-coverage-gap').includes('79 筆中的 77 筆'),
+    'c2 的具體內容不在它自己的但書裡',
+  );
+  assert.ok(
+    regionOf('c3-scope-wording').includes('在中央政府所在地全體大法官'),
+    'c3 的限定語原文不在它自己的但書裡 —— 本頁承諾不解釋這個限定語，逐字原文就是那個承諾的載體',
+  );
 });
 
 test('D1 規則期 79 筆中有 2 筆不在已引條文之下，且在圖下另作標示', () => {
@@ -1029,9 +1088,79 @@ test('D2 2022-01-04 至 2025-01-23 的條文已逐字核對，不標未確認', 
  */
 const HEADCOUNT_RE = /(?:[0-9０-９]+|[零〇一二兩三四五六七八九十廿卅]+)\s*[人位名]/g;
 
+/**
+ * 資料模組每一個字串葉節點的 `[欄位路徑, 值]`。
+ *
+ * 路徑以產生者為根（`current.label`、`three-quarters.ruleSummary`、`factors.0.uncertainty` …），
+ * 因為豁免要**按產生者發**，不能按字串值發。見下面的 `HEADCOUNT_EXEMPT_PATHS`。
+ */
+const dataStringLeaves = (value, path = '') =>
+  typeof value === 'string'
+    ? [[path, value]]
+    : value && typeof value === 'object'
+      ? Object.entries(value).flatMap(([k, v]) => dataStringLeaves(v, path ? `${path}.${k}` : k))
+      : [];
+
+/** 以產生者為根的資料樹。加新的匯出資料就加在這裡，涵蓋面跟著長。 */
+const DATA_BY_PRODUCER = () => ({
+  ...Object.fromEntries(ERAS.map((e) => [e.id, e])),
+  interim: data.INTERIM_SEGMENT,
+  uncovered: RULES_ERA_UNCOVERED,
+  factors: FACTORS,
+});
+
+/**
+ * 唯一可以帶人數的三個欄位，**以路徑指名**。
+ *
+ * 這三個是現行憲訴法自己的用語，人數來自條文原文，不是換算。
+ * **關鍵是「按路徑」而不是「按字串值」。** 原本的豁免寫法是
+ * `for (const a of allowed) residue = residue.split(a).join(' ')`，
+ * 那是**全站逐字刪除、不限定產生位置**，所以豁免按字串值發、**有多重施用者**：
+ * 實測把「雙四分之三」期的 `ruleSummary` 改成
+ * `'總額 3/4 出席，出席人 3/4 同意（10 人 9 人）'` —— 28 pass／0 fail 全綠，
+ * 因為「10 人 9 人」正是 `current.label`，被全站豁免。
+ * 同一個違規行為，寫成被豁免的那串字就過關，寫成「（約 11 位大法官）」就不過。
+ */
+const HEADCOUNT_EXEMPT_PATHS = new Set([
+  'current.label',
+  'current.ruleSummary',
+  'current.quotedText',
+]);
+
+test('c3 豁免按產生者發：只有 current 期自己的三個欄位可以帶人數', () => {
+  const leaves = dataStringLeaves(DATA_BY_PRODUCER());
+
+  // 防空轉：三個被豁免的路徑必須真的存在，而且真的帶人數。
+  // 少了這一條，豁免清單寫錯路徑時整條測試會變成空轉。
+  for (const p of HEADCOUNT_EXEMPT_PATHS) {
+    const hit = leaves.find(([path]) => path === p);
+    assert.ok(hit, `豁免路徑不存在：${p}`);
+    assert.notEqual(hit[1].match(HEADCOUNT_RE), null, `豁免路徑 ${p} 沒有人數，豁免是空轉的`);
+  }
+
+  // 其餘每一個欄位，一律不得帶人數 —— 不論它寫的是哪一串字。
+  for (const [path, s] of leaves) {
+    if (HEADCOUNT_EXEMPT_PATHS.has(path)) continue;
+    const m = s.match(HEADCOUNT_RE);
+    assert.equal(
+      m,
+      null,
+      `${path} 帶了換算後的人數：${m} —— 豁免只發給 current 期自己的三個欄位，不發給字串值`,
+    );
+  }
+});
+
 test('c3 站上不得出現換算後的人數', () => {
   const current = eraOf('current');
   // 這三個字串是現行憲訴法自己的用語，人數來自條文原文，不是換算。
+  //
+  // **這一條的豁免仍然是按字串值發的，而那是刻意的，範圍也已經講明。**
+  // 按產生者發的那一半由上一條測試承擔（`HEADCOUNT_EXEMPT_PATHS`，按欄位路徑）。
+  // 這一條掃的是**渲染後的整站文字**，包含手寫 JSX 散文 —— 散文引用現行憲訴法自己的
+  // 用語（期別名稱、門檻摘要、條文原文）是本頁允許的，所以對散文而言按字串值豁免就是對的。
+  // 實測過「完整文字節點才豁免」這個替代設計：**不可行**。`current.label` 在站上有 1 處
+  // 是完整文字節點、5 處是較長文字節點的子字串（例：「10 人 9 人（2025-01-23 起）」），
+  // 改成只豁免完整節點會讓現況誤紅。
   const allowed = [current.label, current.ruleSummary, current.quotedText];
 
   // 整站：整頁外殼（只渲染元件的版本被 reviewer 用外殼注入打穿過）
