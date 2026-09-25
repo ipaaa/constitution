@@ -41,6 +41,14 @@ gates:
                 id: briefing:050:review:attempt-1:revision-1
                 digest: sha256:649af86574ff2fdd1ab86b0bd3600cc91eab843ff55044f9a642cc95a8c10bcd
                 room-ref: '@review/review/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:050:review:1
+                briefing: briefing:050:review:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-25T17:33:50.614272Z"
+                decision: revise
+                reason: Captain 裁決三項（方向採納，review cycle 4 的 PASSED 不變）：(1) AC-4 擴大至逐欄逐分頁，對齊 S7-b 既有的 30 格；(2) 新增反向對照 B——以責任編輯身分驗 B 類六欄必須可改，6 欄 x 3 分頁 = 18 格，補上 S7-b 只驗單一方向的缺口；(3) 放行 040 Out of scope 後半句「並由 captain 確認」，選項 A。退回 implement 僅為落實 captain 授權的 AC 變更與對應 S7 程序，非否定 runbook。另 FO 以 AC-6 唯讀探針實測確認：main 同步 exit 0、無 review_decision 標題錯誤、sha256 與 baseline 逐字相同（4d1992e3…cea3b / 4071978a…3162）、筆數 40/16——窗口未打開，S4 起全部未執行，票內「captain 正在 S7」為未查證的轉述。
 ---
 
 feature 040 把八個審核欄位全部改為必填。正式試算表尚未建立這些欄位。**順序做錯會讓整條產線停擺。**
