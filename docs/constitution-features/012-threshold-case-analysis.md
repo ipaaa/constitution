@@ -10,6 +10,113 @@ score: 0.8
 worktree: .worktrees/spacedock-ensign-012-threshold-case-analysis
 issue:
 pr:
+gates:
+    version: 1
+    records:
+        - id: gate:012:verify
+          stage: verify
+          attempts:
+            - id: gate-attempt:012-verify-1
+              briefing:
+                id: briefing:012:verify:attempt-1:revision-1
+                digest: sha256:9618cd2cc0a3302c28ab561720daceac00ebb182290e38ca401fe7f1e9d8feae
+                room-ref: '@review/verify/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:012:verify:1
+                briefing: briefing:012:verify:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-23T17:48:27.256551Z"
+                decision: revise
+                reason: captain 2026-09-23 退回，並授權修改 AC-1 的 primary-source 期數斷言由三期改為四期。採納 V1：verify 在 pcode=A0030300（廢止法規紀錄）找到 design 與 implement 都查不到的《司法院大法官會議規則》全文，第 12 條載明「三分之二以上出席、過半數之同意」，規範規則期 79 筆中的 77 筆。頁面目前對整個規則期顯示「門檻條文待確認」，等於低報已知事實，且藏起一個支持 AC-3 第 1 題敘事的事實。現在修比 review 跑完再修便宜。限制須逐項寫明：取得的是 1952-04-16 修正版而非 1948 原始版，釋字第 1、2 號（皆 1949-01-06）仍落在未取得的原始版之下；「在中央政府所在地全體大法官」這個限定語的解讀仍未經法學拍板，不得自行下定論。
+            - id: gate-attempt:012-verify-2
+              briefing:
+                id: briefing:012:verify:attempt-2:revision-1
+                digest: sha256:01e0b39f90da3c685c997fd4fd92ff7d1da0e5c4d20d7b2c49d174b17fb26497
+                room-ref: '@review/verify/briefing-2'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:012:verify:2
+                briefing: briefing:012:verify:attempt-2:revision-1
+                by: person:captain
+                at: "2026-09-24T00:28:57.215033Z"
+                decision: approve
+                reason: captain 2026-09-23 核准進入 review。verify cycle 2 零新 finding：V1 的採納由提出它的同一位 reviewer 以同一標準複驗，三個一手端點自行重抓、77/79 切分自 813 筆原始日期獨立重算、三項限制與三處標示改用真實渲染 HTML（57815 bytes）確認、兩條新測試以突變實測確認可失敗。AC 變更經七塊逐字比對確認只動 AC-1（三期→四期，保留原文並追加授權註記）。全頁無任何換算後的人數，c3 的未拍板限制被遵守。三項未達成的驗證項維持在 captain 與法學背景者身上：AC-3 朗讀測試、D5 視覺檢查、c3 的法學解讀（未拍板前不得斷言 1958 那次的門檻變動方向）。
+              application:
+                target-stage: review
+                state: consumed
+        - id: gate:012:review
+          stage: review
+          attempts:
+            - id: gate-attempt:012-review-1
+              briefing:
+                id: briefing:012:review:attempt-1:revision-1
+                digest: sha256:50c63aa24c1ddb057dedcdc0b0a6f136f27fdccfa29b1e7b9949073da76d041a
+                room-ref: '@review/review/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:012:review:1
+                briefing: briefing:012:review:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-24T17:29:46.540677Z"
+                decision: revise
+                reason: 'captain 2026-09-24 退回，一輪折進 F4／F5／F6／F7，並同日給出一次性授權：「授權修正 Verified by: 涵蓋既有寫法變體，不改 AC 要求本身」。review 重審已判 PASSED、F1 修得比 reviewer 要求的更完整，退回的理由是這四項全部指向同一件事——本票的核心紀律「對可斷言的講、對不可斷言的不講」目前沒有任何自動守衛。F6 是本 session 同型盲區的第八處（c3 明文承諾站上不得出現換算後的人數，卻無任何測試守著；目前 0 處違反故為 Deferred risk，補測試不涉 AC 變更）。F4 依本次授權修正 AC-1 的正規式詞彙表（現行詞彙表漏掉頁面上唯一真正的 1987 句子所用的「表決條件」「改低」，使全頁唯一讓 1987 與門檻變動主張同時出現之處正好在守衛之外）。F5 與 F4 同源（同一概念五種用詞，違反 AGENTS.md，且 reviewer 指出若 AC-3 朗讀測試理解度不如預期這是第一個該查的原因）。F7 為一條恆真斷言。'
+            - id: gate-attempt:012-review-2
+              briefing:
+                id: briefing:012:review:attempt-2:revision-1
+                digest: sha256:d48283288537711b281909c6cfdbeaf73edd93c1f9f8d9b1c3dd923ffe6ec433
+                room-ref: '@review/review/briefing-2'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:012:review:2
+                briefing: briefing:012:review:attempt-2:revision-1
+                by: person:captain
+                at: "2026-09-24T19:15:08.238977Z"
+                decision: revise
+                reason: captain 2026-09-24 退回，折進 F8／F9／F10。review 重審已判 PASSED，退回的理由是 reviewer 用它自己加的兩個對抗性探測打穿了這一輪剛建的守衛，而三項都便宜、都不涉 AC 變更、都是這一輪守衛自己的洞。F8（同型盲區第十處，最要緊）：c3 的守衛只渲染元件不渲染 page.tsx——reviewer 把換算人數注進頁面外殼後 25 條測試全綠；而那條守衛存在的唯一理由就是守住本票的核心承諾「站上不得出現換算後的人數」。F9：反駁標記收了裸日期 1993-02-03，對抗性探測讓一句沒有反駁的錯誤因果過關。F10：reviewer 上一輪的 F7 被誤植，它當初指名的那條仍然恆真。這與 056 的殘留性質不同——056 的 F-13 是不可執行的展示形式，這三項是可被繞過的可執行缺陷。附帶採納 reviewer 的判定：eslint 的 4 個 error 不由本票處置（既有、main 上同樣存在、四檔本分支從未觸碰、本票自身路徑 0/0，在此修是 scope creep）。
+            - id: gate-attempt:012-review-3
+              briefing:
+                id: briefing:012:review:attempt-3:revision-1
+                digest: sha256:24b60b6476891e85b4272f27fb24db76d406ee57db94331f42dc69a0092dfbf0
+                room-ref: '@review/review/briefing-3'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:012:review:3
+                briefing: briefing:012:review:attempt-3:revision-1
+                by: person:captain
+                at: "2026-09-24T19:57:52.268849Z"
+                decision: revise
+                reason: Captain 退回：不接受只修 F12 單一實例。依本票自己在前幾輪建立的原則，掃全類——把同型問題一次掃完，而不是點名修補。
+            - id: gate-attempt:012-review-4
+              briefing:
+                id: briefing:012:review:attempt-4:revision-1
+                digest: sha256:f6dab5082ed5ba1275bca08a04bba52ea7aef719b8a254c87ef2073e105dfcf0
+                room-ref: '@review/review/briefing-4'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:012:review:4
+                briefing: briefing:012:review:attempt-4:revision-1
+                by: person:captain
+                at: "2026-09-24T22:51:04.6459Z"
+                decision: revise
+                reason: Captain 退回並裁定 F14 納入授權範圍：修正 Verified by 使其真的測到 AC 所要求的東西（AC-5 的斷言不得再由隱藏的無障礙說明文字滿足），AC-5 的要求文字不變。一併修 F13（M5 的分類與事實陳述）與 F15。
+            - id: gate-attempt:012-review-5
+              briefing:
+                id: briefing:012:review:attempt-5:revision-1
+                digest: sha256:08791ca176c364f02fde9bbe6fb9a8381464a9d72788a91b5a2bdd23b0f48bac
+                room-ref: '@review/review/briefing-5'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:012:review:5
+                briefing: briefing:012:review:attempt-5:revision-1
+                by: person:captain
+                at: "2026-09-25T16:09:32.753214Z"
+                decision: approve
+                reason: Captain 核准：十一輪收斂，最終輪判 PASSED。三項未達成的驗證項核准不豁免，且只有 captain 能完成：AC-3 朗讀測試（3 名非法學受測者、三道不提示的問題）、D5 視覺檢查（375px／1280px，本環境無可用無頭瀏覽器）、c3 的法學解讀（需法學背景審閱者拍板）。
+              application:
+                target-stage: complete
+                state: pending
+mod-block: merge:pr-merge
 ---
 
 研究大法官會議時期通過舊案數量與提升門檻之間的關聯，製作時間軸 infographic。
