@@ -32,6 +32,15 @@ node scripts/sync-content.mjs
 
 要改內容，改試算表。
 
+**`src/data/` 底下的 `.ts` 檔不在這條禁令內，可以改。**
+`src/data/threshold-analysis.ts`、`controversy-timeline.ts`、`future.ts` 等都是手寫資料模組，
+與試算表同步無關。以 `threshold-analysis.ts` 為例，來源是
+`cons.judicial.gov.tw`（案件計數）與 `law.moj.gov.tw`（門檻條文），
+由 `scripts/fetch-interpretation-counts.mjs` 人工抓取後人工審閱寫入。
+
+判斷方式：**副檔名是 `.json` 就不要手改，是 `.ts` 就可以。**
+`scripts/fetch-interpretation-counts.mjs` 也不寫 `src/data/`，它只寫 `tests/fixtures/`。
+
 ### 3. 不要把設計文件裡的範例當成真實內容
 
 2026-04-30 發生過一次：`015` 的設計文件有一節叫「Sample data shape」，

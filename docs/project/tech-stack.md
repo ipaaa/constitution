@@ -41,3 +41,29 @@
 5.  **全球分發 (CDN)**：靜態檔案部署至 Vercel 或 GitHub Pages，由全球 CDN 節點分發給末端使用者，達到零首屏延遲與無限併發能力。
 
 這套架構確保了專案可以永遠免費託管，且不會因為資料庫連線超載而當機。
+
+
+---
+
+## 📎 補述（2026-09-21）：第二支人工執行的外部資料抓取程式
+
+上面「資料流動路徑」第 1 點說的 Python 爬蟲不存在，這點檔頭的警告已經講了。
+以下補記實際存在的抓取程式，共兩支，**都不進 `npm run build`**。
+
+| 程式 | 抓什麼 | 寫到哪 | 何時執行 |
+|---|---|---|---|
+| `scripts/sync-content.mjs` | Google 試算表 SSOT | `src/data/discussions.json`、`src/data/history.json` | 人工執行 `npm run sync-content`，跑完必須開 PR 讓 captain 對 diff |
+| `scripts/fetch-interpretation-counts.mjs` | `cons.judicial.gov.tw` 的釋字與憲判字清單 | `tests/fixtures/interpretation-dates.json` | 人工執行，只在需要重新核對計數時跑 |
+
+`fetch-interpretation-counts.mjs` 的三條界線：
+
+1. **不進 `build`。** `package.json` 的 `build` 仍然只有 `next build`。
+2. **不碰 `src/data/*.json`。** 它只寫 `tests/fixtures/`。
+   網站實際讀的是手寫的 `src/data/threshold-analysis.ts`，那支程式不會改它。
+3. **必須用 Node 的 `fetch` 或 `curl` 寫，不可用 Python。**
+   `cons.judicial.gov.tw` 的 TLS 憑證缺少 Subject Key Identifier 擴充欄位，
+   Python 的 `urllib` 會以 `CERTIFICATE_VERIFY_FAILED` 拒絕連線。
+   這不是某台機器的設定問題，任何用 OpenSSL 預設信任鏈的機器都會失敗。
+
+重新抓取的結果可用 `THRESHOLD_LIVE=1 node --test tests/threshold-analysis.test.mjs` 與已提交的
+fixture 比對。未設該環境變數時該測試跳過，`node --test` 不連外部網站。
