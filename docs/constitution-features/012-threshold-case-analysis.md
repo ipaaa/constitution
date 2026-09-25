@@ -100,6 +100,11 @@ gates:
                 at: "2026-09-24T22:51:04.6459Z"
                 decision: revise
                 reason: Captain 退回並裁定 F14 納入授權範圍：修正 Verified by 使其真的測到 AC 所要求的東西（AC-5 的斷言不得再由隱藏的無障礙說明文字滿足），AC-5 的要求文字不變。一併修 F13（M5 的分類與事實陳述）與 F15。
+            - id: gate-attempt:012-review-5
+              briefing:
+                id: briefing:012:review:attempt-5:revision-1
+                digest: sha256:08791ca176c364f02fde9bbe6fb9a8381464a9d72788a91b5a2bdd23b0f48bac
+                room-ref: '@review/review/briefing-5'
 ---
 
 研究大法官會議時期通過舊案數量與提升門檻之間的關聯，製作時間軸 infographic。
