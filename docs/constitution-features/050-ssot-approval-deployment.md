@@ -7567,3 +7567,56 @@ L3 把一份無法被否證的四列清單換成一份可以被否證的十一�
 ### Summary
 
 兩筆 FO 授權的修正已落在 `fff8465`：S5 前的分頁名稱確認，與 S7-a 依類別選允許名單。S7-a 更正框放在小節末，避免「選錯的後果」段被誤讀為指向「只有你」。對正式試算表零讀零寫；`src/`／`scripts/` 零變動；未寫 `### Feedback Cycles`。
+
+## review stage 第十輪：N1／N2 部署窗口內修正複審（2026-09-28）——**PASSED**
+
+審查對象：`fff8465`（本文）＋ `a115c5a`（implement 報告）；FO 的 `6d6c010`（Cycle 13 一行）只核對位置。
+對正式試算表零讀零寫。
+
+### N1　S5 之前確認分頁名稱——成立
+
+| 宣稱 | 實查 | 結果 |
+|---|---|---|
+| `.gs:159` 逐字比對三個名稱 | `git show a51b5d9:scripts/apps-script/approval-workflow.gs` 第 159 行：`key !== 'Track 1_history' && key !== 'Track 2_discussion' && key !== 'site_tldr'` → `throw new Error('這個分頁不支援核可公式。')` | 成立 |
+| sync 不查名稱 | `grep -c "getSheetByName\|SpreadsheetApp" scripts/sync-content.mjs` 在 `b05efba`／`a51b5d9`／`HEAD` 皆 0；sync 以 `TRACK_1_CSV_URL` 等環境變數讀取（`a51b5d9` 的 `:27-29`） | 成立 |
+| `site_tldr` 那一條帶 `gid=310949254` | 主 checkout 的 `.env.local:6` 的 `SITE_TLDR_CSV_URL` 含 `gid=310949254` | 成立 |
+| 改名不影響 gid | Google 試算表的 gid 是分頁的固定識別碼，改名不變；Cycle 12 記錄改名後 S6 以同一 CSV 讀取成功 | 成立 |
+| 三個名稱逐字、「大小寫、底線、空格皆須相同」 | 新段落的程式碼區塊三行與 `.gs:159` 三個字串逐字相同；該句有寫 | 成立 |
+| `Site_TLDR` 標為 captain 口頭回報 | 步驟 4 與 S5 前段落兩處皆標「來源：captain 口頭回報」 | 成立 |
+
+### N2　S7-a 與步驟 6 一致——成立
+
+- A／C 類「只有你」、B 類「自訂 → 只勾責任編輯」，與步驟 6 類別表（A、C 只有 captain；B 只有責任編輯）一致。captain 即擁有者，「只有你」＝「只有 captain」。
+- 「不可選顯示警告」為 S7-a 首句。
+- 範圍數 6＋3＋3＝12，與 S7 的 12 範圍表逐列相符（每分頁 A 類 2、B 類 1、C 類 1）。
+- S7-b：投稿者帳號不在 A／B／C 任何允許名單內，第 1-9 列「擋」、第 10 列「可改」的預期不受影響。
+- S7-d：該節前提「測之前先確認他已經被加進 B 類允許名單」，改寫後的 S7-a 正好建立這個前提；「不可加進 A 或 C 類」也與 A／C「只有你」一致。無衝突。
+- 原句保留在更正框內，逐字引述，說明錯在哪一半。符合 `AGENTS.md` 的「不要悄悄改寫原文」。
+
+### 未越界——成立
+
+`git diff -U0 b05efba HEAD` 共六個 hunk：`fff8465` 四個（步驟 4 `+3`、S4／S5 之間 `+18`、S7-a 本文 `-2／+11`、S7-a 末更正框 `+6`）、`6d6c010` 一個（`### Feedback Cycles` 的 Cycle 13，FO 提交）、`a115c5a` 一個（檔尾 implement 報告）。
+刪除行只有 S7-a 原兩行，且已逐字保留於更正框。
+報告區塊、S7-b 30 格表（`:1198` 起）、S7 12 範圍表（`:1158-1166`）、S3、S8、S7-d（`:1396` 起）、`## Acceptance criteria`（`:3549` 起）皆無 hunk。
+`git diff --quiet b05efba HEAD -- src scripts` 為真。implement 未寫 `### Feedback Cycles`。
+Documentation impact：本輪只改本票，無新增或刪除文件，`docs/INDEX.md` 不需變動。
+
+### Findings（依 Cycle 10 收斂規則，皆 Polish，記錄不修）
+
+- **R10-P1**：S5 前段落寫「`.gs` 內會因名稱不符而中止的只有這一行」。實讀 `a51b5d9` 的 `:185-186`：`fingerprintForSheetRow_` 對不符名稱會取到 `APPROVAL_FIELDS[key]` ＝ undefined，核可／退回時在 `.map` 拋 TypeError。這不是「中止並跳訊息」，但也是失敗。四欄證據：使用者與流程＝captain 照 runbook；可觀察損害＝無，因為 S5 先執行且本步要求先改名，名稱不符到不了核可路徑；受影響 AC＝無；觸發證據＝假設性。分類 Polish。
+- 無其他 findings。
+
+**判定：PASSED。** N1、N2 兩筆 Material 已修正且可操作，未越界。captain 可照現行 runbook 進 S7。
+
+## Stage Report: review (cycle 10)
+
+- DONE: N1：S5 之前的分頁名稱確認是否寫對且可操作——三個名稱逐字正確、「大小寫、底線、空格皆須相同」有寫明、理由（`.gs:159` 逐字比對、sync 以 gid 讀取不查名稱）請自行對 `a51b5d9` 的 `.gs` 與 `scripts/sync-content.mjs` 查證、改名不影響 gid 的說法成立、`Site_TLDR` 標明為 captain 口頭回報
+  `git show a51b5d9:…approval-workflow.gs` 第 159 行逐字比對三名稱；sync grep 在三個 SHA 皆 0；`.env.local:6` 含 `gid=310949254`；兩處皆標口頭回報。一筆 Polish（R10-P1，「只有這一行」措辭不精確，不影響操作）。
+- DONE: N2：改寫後的 S7-a 是否與步驟 6 的類別表一致——A／C 類「只有你」、B 類「自訂 → 只勾責任編輯」、「不可選顯示警告」仍在最前、範圍數合計 12 且與 S7 的 12 範圍表相符；並確認改寫後的 S7-a 與 S7-b（投稿者測 30 格）、S7-d（責任編輯測 18 格）的預期值不衝突
+  6＋3＋3＝12 與 `:1158-1166` 表逐列相符；S7-b 投稿者不在任何名單，預期不變；S7-d 的「先確認他已在 B 類名單」由新 S7-a 建立。
+- DONE: 未越界：`git diff -U0 b05efba HEAD` 的 hunk 是否只落在步驟 4、S4／S5 之間、S7-a 三處與 FO 的 Cycle 13 一行；報告區塊、S7-b 的 30 格表、S7 的 12 範圍表、S3、S8、S7-d 的 18 格表、`## Acceptance criteria` 全段逐位元組未動。依 Cycle 10 收斂規則，只有四欄證據全部成立的 Material 才阻擋，Polish 記錄即可
+  六個 hunk：`fff8465` 四個（步驟 4、S4／S5、S7-a 本文、S7-a 更正框）、`6d6c010` Cycle 13、`a115c5a` 檔尾報告；受保護區塊零 hunk；`src`／`scripts` 零變動。
+
+### Summary
+
+逐項重跑 N1、N2 的證據：`.gs:159`、sync 的 grep、`.env.local` 的 gid 均成立，新 S7-a 與步驟 6、S7 範圍表、S7-b、S7-d 無衝突，diff 只落在授權位置。一筆 Polish（R10-P1）記錄不修。判定 PASSED，captain 可照現行 runbook 進 S7。
