@@ -39,7 +39,7 @@ export default function ThresholdsPage() {
           </p>
           <p>
             下面這張圖把兩件事放在一起：底層色帶是各時期的門檻，長條是當年實際作成的件數。
-            門檻的起點一律取自法規公布日。10 人 9 人一期的終點 {voidedFloor.voidedOn}
+            門檻的起點一律取自法規公布日。10 人 9 人一期的終點 {voidedFloor.voidedOn}{' '}
             取自憲法法庭判決公告日，當天沒有新的法規公布。都不取自任何人的口述年份。
           </p>
           <p>
