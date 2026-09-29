@@ -625,3 +625,40 @@ Problem 第一句寫「`/past/thresholds`（公開頁）」。原句保留。實
 ### Summary
 
 10 人 9 人期改名為 `fixed-floor`，終點由 `RULING_THRESHOLD` 推導為 2025-12-19。新增 `RESTORED_SEGMENT`，頁面在卡片、邊界註記、`<desc>` 與桌機引線註解四處寫明失效。失效句一律 import 自 `ruling-threshold.ts`。AC-1 至 AC-7 都已實跑，含各自會失敗的改動；兩個例外見發現 2，另有一個測試盲點。012 套件原本唯一的 fail 是 040 帶進 main 的既存問題，經 FO 授權後已在本票收窄守衛修正，現為 0 fail。桌機引線註解第三行是否被裁切，要交 captain 目視確認。
+
+## Stage Report: verify
+
+**判定：PASSED。** 分支上的法律事實全部對得上一手來源。AC-1、AC-2 重跑結果與 implement 回報一致。下列發現都不擋合併。
+
+- DONE: Verify every legal fact the branch ships against primary sources: 114憲判1 main text (第 30 條第 2–6 項 unconstitutional, void from 2025-12-19), the 第 30 條第 1 項 text now shown as applying, every date on /past/thresholds and in RESTORED_SEGMENT, and the judgment link target; run the placeholder scan over the diff. Flag each error with the correct value and source.
+  2026-09-29 以 `curl` 取原文。`docdata.aspx?fid=38&id=355485` 就是「114年憲判字第1號【憲法訴訟法修正案】」，所以判決連結指向正確。該頁記載判決日期為 114年12月19日，判決公告日期為 114年12月19日。主文一宣告 114-01-23 修正公布的第 4 條第 3 項、第 30 條第 2 至 6 項與第 95 條「均牴觸憲法，應自本判決公告之日起失其效力」。
+  `LawSingle…flno=30`（整編截止 115-09-18）的第 1 項，與 `RULING_THRESHOLD.rule` 加句號逐字相同。第 2 至 6 項至今仍列在該頁，沒有失效標註，所以頁面上那句提醒是真的。`LawHistory` 的最後一次修正是 114-01-23，之後沒有新的公布，所以「當天沒有新的法規公布」這句成立。
+  頁面上所有日期都已比對：1948-09-16、1952-04-16、1958-07-21、1993-02-03、2019-01-04 加三年等於 2022-01-04，以及 2025-01-23，都對得上 `LawHistory`。釋字 2、3、813 號的日期（1949-01-06、1952-05-21、2021-12-24）對得上 `tests/fixtures/interpretation-dates.json`。2025-12-19 對得上判決頁。`RESTORED_SEGMENT` 的起點、條文與 ruleSummary 都正確。錯誤數為 0。
+  紀年：新增文字的敘述日期都用西元，民國只出現在判決字號「114 年憲判字第 1 號」，符合 captain 2026-09-29 的決定。
+  佔位字串：對 diff 的新增行掃描 `某學者`、`某大學法律系`、`lorem`、`快速了解最新判決的5個重點`、test／sample／佔位，結果 0 筆。只有 `test(` 呼叫被掃到，它們是測試程式碼。`src/data/*.json` 沒有改動。
+- DONE: Independently re-run AC-1 (hydration probe, mobile and desktop) and AC-2 (066 check across seven routes with floor count ≥ 1) on the branch versus main, and judge implement's finding 2 — AC-1/AC-2 do not fail when the era card alone drops the voiding sentence — as a finding with a proposed disposition.
+  AC-1：先從 entity 抽出探針，sha256 為 `56e4ee…99ea`，與設計相符。另用 `git archive` 各建一份副本：main `30bb68c` 與 HEAD `2f172b1`。桌機與行動版兩次輸出相同。main 上 N1–N3 為 0，N4、N5 為 1。候選版 N1 為 3／3／3，N2、N3 各為 1，N4、N5 為 0，「判決公告日」為 2。兩版 SSR 對照都是 0 字元。
+  AC-2：兩份副本都放行 LaunchGate，port 3378 跑 main、3379 跑候選版，`check-voided-floor.mjs` 與 main `cmp` 相同。main 上 `/past/thresholds` 的檢查 2 FAIL，下限數字 16 次，exit 1。候選版七條路由全部 PASS，`/past/thresholds` 下限數字 24 次，exit 0。
+  發現 2 重現成功：卡片拿掉失效句後，AC-2 仍 PASS（檢查 2 為 6 筆，exit 0），AC-1 的 N1 仍為 2／2／2，只有 T-D 轉紅。根因是探針把 `<desc>` 算成兩版都可見，但讀者在畫面上看不到 `<desc>`。扣掉它之後，N1 實際可見數為 2，拿掉卡片句後會變成 1，AC-1 本來會因此 FAIL。
+  四欄證據：受影響的是日後改這一頁的維護者。現在讀者沒有受損，因為候選版的卡片有失效句。受影響的 AC 是 AC-1 的「行動版可見 ≥ 2」，以及 AC-2 列出的「會失敗的改動」。觸發條件是日後同時刪掉卡片句和 T-D，這個情境是假設性的。
+  提議：分類為 Deferred risk，不歸本票處理。處置為 decline，並在紀錄中留一則補述。升級為 Material 的條件：T-D 被刪除或弱化。後續修法有兩個方向，一是探針把 `<desc>`／`<title>` 排除在可見性之外，二是修改 AC-2 的敘述。AC 是 captain 的範圍，交由 captain 決定。
+- DONE: Verify the FO-authorized 012 AC-7 (4) narrowing still catches real production writers (re-run at least one falsifying change) and that the full suite is 0 fail on the branch; confirm scope held (src/data sha256 unchanged, no sync-content, content-audit shows no new failures).
+  在副本上逐一套用下列改動，每次都已還原。F1：`scripts/` 寫入 `src/data/history.json`，轉紅。F2：`tests/` 用 `${ROOT}/src/data/…` 寫入，轉紅。F3：`tests/` 用 `path.join(ROOT,'src','data',…)` 寫入，轉紅。F5：`tests/` 寫入暫存目錄的同名檔，維持綠，這是原本要修的誤報。
+  盲點 F4：`tests/` 先把 `src` 存進變數，再 join 出 `data`，這種寫法會維持綠。收窄之前它會轉紅。分類為 Deferred risk，因為目前沒有測試這樣寫。升級條件：出現從測試寫入正式資料的需求。
+  全套 `node --test tests/*.test.mjs` 在 worktree 上為 105 tests／104 pass／0 fail／1 skip（AC-6 線上比對）。`tsc --noEmit` exit 0。
+  AC-4 反向改動另外重跑：b3 heading 加回「現行」時 T-C 轉紅。`effectiveTo:null` 時 T-A、T-B 轉紅。複製一份 `voided` 物件時 T-A 轉紅。`RESTORED_SEGMENT` 條文漂移時 T-B 轉紅。
+  範圍：json、fixtures、scripts 與 base 相比沒有差異。sha 為 `4071978a…3162`／`4d1992e3…ea3b`，我跑測試前後也相同。noindex 仍在。AC-3 的 grep 為 0，AC-6 為 0／1。AC-5：`起失其效力` 只出現在 `ruling-threshold.ts`。我沒有執行 sync-content。
+  `content-audit check`：main 與候選版都是 M4=1、M5=2、M6=9，沒有新增失敗。差異只有行號移位：M5 的 `:238` 移到 `:247`，TODO 的 M6 各移 6 行。
+
+### 發現（交 FO，皆不擋 PASSED）
+
+1. **Polish**：`page.tsx:42` 的 JSX 換行把空白吃掉了，讀者看到「終點 2025-12-19取自憲法法庭」。同段其他地方的數字與中文之間都有空格。修法：在 `{voidedFloor.voidedOn}` 後補 `{' '}`。
+2. **Polish**：連結文字寫「全國法規資料庫 第 30 條」，實際指向 `LawAll`（全法），不是 `LawSingle…flno=30`。這照設計的 `sourceUrl` 做，目前讀者不會因此看錯條文，但要自己捲到第 30 條。
+3. **Deferred risk**：這是發現 2，四欄證據與提議見上方第二項。
+4. **Deferred risk**：AC-7 (4) 的盲點 F4，說明見上方第三項。
+5. **範圍外**：頁面上既有的「民國 111 年至 115 年」（`page.tsx:62`）與「民國 90 年 4 月」是敘述用的民國紀年，與 captain 的紀年決定不符。本分支沒有改動這兩處。後者已列在 `docs/health-check/TODO.md` P1-10 第 3 項；前者 content-audit 的 M5 沒有抓到，建議併入紀年統一的後續票。
+6. **交 captain 目視，verify 不判定**：桌機引線註解的第三行位於 `PLOT_H + 66`，距 SVG 底緣 6px。
+
+### Summary
+
+一手來源（判決頁主文與公告日、法規資料庫第 30 條與沿革）逐項核對，分支所有法律事實與日期正確，無佔位字串。AC-1、AC-2 在 main 與候選副本上獨立重跑，結果與 implement 相同；implement 發現 2 已重現，根因是探針把 `<desc>` 算成可見，提議 Deferred risk／decline 並留紀錄。012 AC-7 (4) 收窄後仍抓得到三種真實寫入，另記一個盲點；全套 0 fail、禁區未動、content-audit 無新增失敗。判定 PASSED。
