@@ -9,8 +9,8 @@ verdict:
 score: 0.85
 worktree: .worktrees/spacedock-ensign-threshold-page-voided-quorum-current
 issue:
-pr:
-mod-block:
+pr: "#45"
+mod-block: merge:pr-merge
 gates:
     version: 1
     records:
@@ -41,6 +41,17 @@ gates:
                 id: briefing:068:review:attempt-1:revision-1
                 digest: sha256:ea156124c90c87c10af51ec41c2ce24b809df51847ee6450d9ff7092f0b8b74d
                 room-ref: '@review/review/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:068:review:1
+                briefing: briefing:068:review:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-29T20:31:38.394571Z"
+                decision: approve
+                reason: 'Captain approved 068 review in chat 2026-09-29 (「全部照建議」): review PASSED, Polish space fix applied. Captain did not explicitly report the desktop callout 6px visual check; approval given per FO recommendation.'
+              application:
+                target-stage: complete
+                state: pending
 ---
 
 `/past/thresholds`（公開頁）把已失效的評議門檻當成現行法呈現。讀者會帶著錯誤的法律認知離開。

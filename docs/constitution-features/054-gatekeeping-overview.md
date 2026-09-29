@@ -1,7 +1,7 @@
 ---
 id: 054
 title: 內容把關機制現況總覽，以及讓它不過時的機制
-status: verify
+status: review
 source: captain 2026-09-04（把關機制體檢；captain 明確要求本票須設計更新機制）
 started: 2026-09-29T18:59:22Z
 completed:
@@ -10,7 +10,56 @@ score:
 worktree: .worktrees/spacedock-ensign-054-gatekeeping-overview
 issue:
 pr:
-mod-block:
+mod-block: merge:pr-merge
+review-round:
+    id: round:054:review:2
+    stage: review
+    cycle: 2
+    briefing:
+        id: briefing:054:review:round-2
+        digest: sha256:07af0fa93f3b825b2387b1cf6c45b6aba4aa154e031ea7ec3118a0dd67320199
+        room-ref: '@review/review/round-2'
+gates:
+    version: 1
+    records:
+        - id: gate:054:verify
+          stage: verify
+          attempts:
+            - id: gate-attempt:054-verify-1
+              briefing:
+                id: briefing:054:verify:attempt-1:revision-1
+                digest: sha256:4a6ff51c5a6c908443f6be76221ea23c2ca49ff2c9993580c3f6ab74ae01cea3
+                room-ref: '@review/verify/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:054:verify:1
+                briefing: briefing:054:verify:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-29T20:31:38.03914Z"
+                decision: approve
+                reason: 'Captain approved 054 verify cycle 2 in chat 2026-09-29 (「全部照建議」): V1–V5 corrected, fresh reader 8/8, AGENTS.md byte-identical to approved text.'
+              application:
+                target-stage: review
+                state: consumed
+        - id: gate:054:review
+          stage: review
+          attempts:
+            - id: gate-attempt:054-review-1
+              briefing:
+                id: briefing:054:review:attempt-1:revision-1
+                digest: sha256:a0865d862ea75390bd2d2f9f64e88c3bb9f8dfbceefae4b45d3e208b345827ef
+                room-ref: '@review/review/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:054:review:1
+                briefing: briefing:054:review:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-29T20:48:17.17Z"
+                decision: approve
+                reason: 'Captain approved 054 review cycle 2 in chat 2026-09-29 (「1235照建議」): overview delivered, R1–R3 fixed, AGENTS.md as approved.'
+              application:
+                target-stage: complete
+                state: pending
 ---
 
 沒有任何一份文件回答「現在到底有哪些把關、各擋什麼、哪些缺口還開著」。但新增一份 evergreen 文件等於新增一個會過時的東西——**本票的核心不是寫那份文件，是設計讓它不過時的機制。**
@@ -428,13 +477,13 @@ Semantics this may change：README review stage 多一項必要輸出（repo 外
 | `docs/project/contributing.md` | 總覽檔已建立 | 〈內容協作〉末加一行指向總覽 |
 | `AGENTS.md` | captain 核准 `## Design` 第三節 (b)、(c) 的措辭 | 「絕對不要做的事」第 5 條；〈文件地圖〉一列 |
 | `docs/content-pipeline/design.md` 第六節 | 同上 | 不變式表第 7 列；修訂紀錄一則 |
+| `docs/health-check/TODO.md` | FO 對 AC-6 的處置（implement cycle 1） | 新增 P2-13、P2-14 與進度紀錄一列。P3-8 由 `069` 修改，本票以指令讀出；P2-12 的過時句不屬本票 |
 
 ### 不更新
 
 | 文件 | 理由 |
 |---|---|
 | `docs/content-pipeline/operations.md` | 過時的第 5、12、41、79 行屬 `050`〈實作後更新〉。本票只連結它 |
-| `docs/health-check/TODO.md` | P3-8 由 `069` 修改，本票以指令讀出。P2-12 的過時句已回報 FO，不屬本票 |
 | `docs/health-check/2026-09-03-editor-onboarding.md` | record。補述屬 `050`〈實作後更新〉 |
 | `docs/content-pipeline/data-collection-guide.md` | 總覽只連結它 |
 | `docs/constitution-features/_archive/` 內的 `056`、`067`、`040` | 已封存，不改 |
@@ -443,6 +492,8 @@ Semantics this may change：README review stage 多一項必要輸出（repo 外
 ### Feedback Cycles
 
 - 2026-09-29 captain 核准措辭（「全部照建議」，經 FO 轉述）：`## Design` 第三節 (a)、(b)、(c) 照提案原文套用；(b) 第 5 條逐字同時作為 `design.md` 第六節不變式第 7 列；候選規則「把關總覽跟著把關變動」不採用。README 條款由 FO 於 `34663fd` 套用。
+- Cycle 1: REJECTED — verify（`8026f4a`）判 V1（第 7 章把 L／H 閱讀清單寫成 P3-8 條件，AC-5 7/8）、V2（:119 無出處日期）Material。FO 授權 V1–V5 fix（V3 依 captain 2026-09-29 核准記錄「逐字」補齊 `design.md` 第 7 列，不改 `AGENTS.md`），V6 decline for 054（交 `064`：後合併者重判總覽），V7 無動作。implement cycle 2 修正於 `f916c94`，fresh agent AC-5 8/8。round 記錄：`review/verify/round-1`。
+- Cycle 2: REJECTED — review（`c01e361`）判 R1 Material（`gatekeeping.md:198` 自連結在 054 封存後使 M6 由 9 變 10）。FO 授權 R1–R3 fix（R1 改指 `_archive/` 路徑；R2 `TODO.md` 移到〈實作後更新〉；R3 第 4 章加一句「指紋」說明），R4 無動作（合併時由 FO 處理），R5 decline for 054（後合併者重判總覽第 4、5 章）。implement cycle 3 修正於 `3cdddd7`，clone 上封存前後 M6 皆 9、不指名總覽。round 記錄：`review/review/round-2`。
 
 ## Stage Report: design
 
@@ -485,3 +536,109 @@ Semantics this may change：README review stage 多一項必要輸出（repo 外
 
 總覽 `docs/content-pipeline/gatekeeping.md` 已寫成並列入 INDEX；`AGENTS.md` (a)(b)(c)、`design.md` 不變式第 7 列依核准原文套用，G-7 仍 PASS，M6 無新增。
 需要 FO 知道的有三件事。AC-1 的 R0 首輪漏抓，第二輪抓到，design 寫的「會失敗的改動」兩輪都沒使 reviewer 失敗，因為總覽還有其他句子會被推翻。AC-5 首輪 7／8，已補第 6 章後 8／8。AC-6 的兩列缺口已依 FO 處置新增 `TODO.md` P2-13、P2-14 並改指過去，無偏離。
+
+## Stage Report: verify
+
+- FAILED: Verify every factual claim in docs/content-pipeline/gatekeeping.md against its canonical source: per-role flow, the A/B/C protection classes and ranges (050), the approval-binding rule (040/operations.md), pre-launch checks (056 G-1..G-8, P3-8), and each defense/gap row's cited ticket or TODO item; flag any sentence that misstates or goes stale, with the correct value.
+  已查核：第 1 章對照 `sync-content.mjs:358-427`（`isApproved`、`validateApprovalBinding`），`Needs review` 列不寫進 JSON 屬實。第 2 至 4 章對照 `050` 步驟 6、7、S7-b（27 格擋、3 格可改，`:3655-3657`）、S7-d 18 格、〈部署窗口記錄〉第二節，以及 `approval-permission-probe.md` 的 P1、P7 與〈過程發現〉一、二；拒絕必填原因見 `.gs:204`。第 5 章：`PLACEHOLDER_PATTERNS` 5 組（`sync-content.mjs:69-75`），`056` G-1 至 G-8 分類，`067` 的 M1–M6、L、H（`## Design` 第二、三、十節），`check-voided-floor.mjs` 出自 `066`（`5eff145`）。第 6 章對照 `data-collection-guide.md` T3 SOP（:116-141）。第 8 章 9 張票的 title 與缺口列相符；`039` 的 title 寫明「非 AI 內容偵測」。**共 4 筆不符，列於下方 V1、V2、V4、V5。**
+- FAILED: Confirm AGENTS.md (a)(b)(c) and design.md §六 row 7 are byte-identical to the captain-approved wording in 054's design, the symlink is intact, and no other AGENTS.md line changed; re-run AC-4 (ticket-status command, 0 NOT FOUND) and AC-6 (every 無票 row resolves to a TODO heading).
+  AGENTS 的 (a)、(b) 分別與 `3fe06a9` 第 253–255、260–264 行的提案比對，`diff` 皆無輸出。提案文字自 design commit `b4807cc` 起沒有改過。(c) 那一列 `grep -c` 得 1。`AGENTS.md` 只有新增 11 行、刪除 0 行。`CLAUDE.md` 是 mode `120000`，指向 `AGENTS.md`。AC-4：exit 0，12 行，沒有 `NOT FOUND`；在併入 main 的 clone 上重跑也一樣。AC-6：P0-2 在 :243，P2-13 在 :720，P2-14 在 :730，各命中 1 行。**不符的一項是 V3：`design.md` 第 7 列只有 (b) 的前兩句，不是逐字的完整 (b)。**
+- FAILED: Independently re-run AC-5 with a fresh agent that has not seen the ticket (the captain's four questions answered only from gatekeeping.md) and AC-3's M6 protection on at least three archived paths; placeholder scan; confirm 056 G-7 PASS and content-audit shows no new failures.
+  AC-5：只給 fresh agent 一份檔案的副本，結果 **7／8**。第 7 題列出 `067` 的 `check` 與閱讀清單，當成移除 noindex 的條件；正本 P3-8 只有 `056` 那一條（見 V1）。AC-3 在 clone 上封存 5 條路徑：`050` 票得 6 筆（:47、:92、:116），`operations.md` 5 筆，`043` 2 筆，`approval-permission-probe.md` 2 筆，`TODO.md` 12 筆；全部移回後都是 0 筆。佔位掃描：diff 的新增行只在引述事故（`某學者，某大學法律系`）與測試檔名時命中，`src/` 零變動。單調句掃描 0 行。G-7 依正本抽出執行（1018 B），結果 `G-7 PASS [place1=1/1 place2=1 place3=1]`，exit 0。`content-audit check`：main 與 worktree 都是 M4=1、M5=2、M6=9，差別只有 `TODO.md` 行號位移 21 行，沒有新增失敗。
+
+### Findings（唯讀，未動候選）
+
+- **V1（Material，本票可修）**：第 7 章 :150–154 把 `067` 的 `check` 與 L／H 閱讀清單寫成「條件引用的檢查」。正本 `TODO.md` P3-8（:986）的解除條件只有 `056` 那一條，用第 7 章自己的 `awk` 指令就能印出。`069`（design）依 captain 2026-09-29「要綁」的決定，只加 `check`（`069` 票 :21、:50-59），**閱讀清單從來不是 P3-8 的條件**。captain 的受眾會把這段讀成 noindex 的前置條件，fresh reader 第 7 題就是這樣讀的。建議修法：分成兩段，一段寫「P3-8 的條件用指令印出」，另一段寫「captain 2026-09-29 決定把 `check` 綁進 P3-8，施工單 `069`」，並寫明閱讀清單不是 P3-8 的條件。修法沿用單調句規則，不寫「尚未」。
+- **V2（Material，本票可修）**：第 5 章 :119 寫「擋不到 2026-05-01 之前上線的內容」，這個日期在 repo 內找不到出處。`verify` stage 由 `565cd93`（2026-04-30）加入。具名的佔位掃描由 `1eff0e2`（2026-09-02 refit）加入。workflow 在 2026-09-02 之前休眠（見 `AGENTS.md`〈實作方式〉）。正確的邊界是「不走 workflow 的改動」。如果要寫日期，佔位掃描的日期是 2026-09-02。
+- **V3（Needs decision，captain 措辭）**：`design.md` 第 7 列等於 (b) 的前兩句，缺「要加內容，寫進試算表並走核可。」與指向總覽的那一句。核准記錄（`### Feedback Cycles`）寫「(b) 第 5 條逐字同時作為…第 7 列」。修訂紀錄 :742 也寫「與 `AGENTS.md` 第 5 條相同」。有兩條路：第 7 列補上缺的句子，或把修訂紀錄與核准記錄改成「取前兩句」並由 captain 確認。兩條路都不改 `AGENTS.md`。
+- **V4（Polish，併入 main 就過時）**：:181 寫「`067` 與 `069` 的檔名沒有編號前綴」。main 的 `be77290` 已把 `069` 改名為 `069-content-audit-followups.md`，所以 `069` 那一半不成立。指令本身不受影響。
+- **V5（Polish）**：第 4 章 :100 寫「同步不信任試算表顯示的 `status`」。實際上 `status` 決定這一列要不要檢查（`isApproved`；`approval-permission-probe.md`〈過程發現〉一）。`design.md` :651 的寫法「同步不再只憑 `status = Approved` 放行」較準確。
+- **V6（Deferred risk，交 FO）**：`064` 分支在 `sync-content.mjs` 新增 `case_ref` 允許清單、`stance` 允許清單與兩欄成對的檢查。這是新的防線，第 5 章 :117 沒有列出。`064` 的 base 沒有總覽，所以它的 Documentation impact 列不到總覽。升級為 Material 的條件：兩票都合併，而後合併的那一張沒有重判總覽。
+- **V7（資訊，050 合併時）**：在 clone 上試併 `050` 分支，`docs/INDEX.md` 與 `design.md` 修訂紀錄各有一處兩邊都新增的衝突，保留兩邊即可解決，`TODO.md` 自動合併。`050` 封存時，M6 會指名總覽 :47、:92、:116 與 `TODO.md` 的 P2-13、P2-14，這是設計好的行為。屆時 :92 的正本改指 `operations.md`〈正式 SSOT 部署〉〈保護範圍（12 個）〉，這一節由 `050` 新增。
+- 另記：`tests/threshold-analysis.test.mjs` 31／32，main 上一樣失敗，與本票無關。binding test 52／52，exit 0。
+
+### Summary
+
+REJECTED。檔頭 AGENTS (a)(b)(c) 與核准文字逐字相同，symlink 完整。AC-3、AC-4、AC-6、G-7 都通過，佔位掃描乾淨，`content-audit` 沒有新增失敗。退件理由有兩項。V1：第 7 章把不在 P3-8 裡的檢查寫成移除 noindex 的條件，fresh reader 的第 7 題因此答錯，AC-5 只得 7／8。V2：:119 的日期沒有出處。V3 要 captain 定案 `design.md` 第 7 列是否要逐字。V4 至 V7 是 Polish、延後風險或合併時的提醒。
+
+## Stage Report: implement (cycle 2)
+
+- DONE: V1 — 第 7 章改成兩段：(1) P3-8 的解除條件以 `awk` 指令印出，並指向 `056` G-1 至 G-8；(2) captain 2026-09-29 決定把 `content-audit.mjs check` 綁進 P3-8，施工單 `069`，以指令輸出為準。另寫明 L／H 閱讀清單不是 P3-8 的條件。
+  AC-5 用沒看過兩張票的 fresh agent 重跑，只給 `gatekeeping.md`：8／8。第 7 題明寫「`067` 的閱讀清單不是條件」。
+- DONE: V2 — 第 5 章 verify 那一列的擋不到什麼改成「不走 workflow 的改動。具名的佔位掃描自 2026-09-02 refit（`1eff0e2`）起才寫進 `verify` 的輸出」。
+  `grep -c 2026-05-01` = 0。
+- DONE: V3 — `design.md` 第六節第 7 列改為 (b) 的完整三句本文，逐字。
+  本票提案 (b) 去掉標題後的三行接成一行，與第 7 列 `diff` 無輸出。`git diff --quiet 3fe06a9 -- AGENTS.md` 成立，`AGENTS.md` 未動。修訂紀錄「與第 5 條相同」因此成立。
+- DONE: V4 — 第 8 章刪掉「`067` 與 `069` 的檔名沒有編號前綴」。
+  指令保留。
+- DONE: V5 — 第 4 章改為「同步不再只憑 `status = Approved` 放行。`status` 決定一列要不要檢查；被檢查的列，同步自己重算指紋…」。
+  與 `design.md` :651 一致。
+- DONE: 檢查。
+  G-7 PASS（place1=1/1、place2=1、place3=1）。`content-audit check` 仍是 M4=1、M5=2、M6=9，指名 `gatekeeping.md` 0 行，沒有新增失敗。單調句掃描 0 行。
+- SKIPPED: V6 由 FO 帶到 `064`；V7 無需動作。
+  依 FO 處置。
+
+### Summary
+
+依 FO 處置修了 V1–V5，只動 `gatekeeping.md` 第 4、5、7、8 章與 `design.md` 第 7 列。AC-5 重跑 8／8，第 7 題不再把閱讀清單列為上線條件。本 commit 一併帶上 FO 在工作區改的 frontmatter `status: implement`，本輪沒有改 frontmatter。
+
+## Stage Report: verify (cycle 2)
+
+- DONE: Re-check V1–V5 against canonical sources
+  V1：第 7 章改成「P3-8 的條件用指令印出」。現在印出 1 行，只有 `056` 那一條，文字與 P3-8「（2026-09-21 加入）」相符。`067` 的 `check` 寫成 captain 決定綁入、施工單 `069`，並寫明「出現在指令輸出裡才算條件」，與 `069` 票 :21、:50-59 相符。閱讀清單寫明不是 P3-8 的條件。V2：新寫法是「具名的佔位掃描自 2026-09-02 refit（`1eff0e2`）起才寫進 `verify`」。`git log -S'Placeholder scan' --all -- docs/constitution-features/README.md` 只有 `1eff0e2`，相符。V4：:181 的檔名那句已刪除，指令不依賴檔名。V5：:100 改為「不再只憑 `status = Approved` 放行；`status` 決定一列要不要檢查」，與 `sync-content.mjs` 的 `isApproved`／`validateApprovalBinding` 相符，也與 `design.md` :651 一致。
+- DONE: Re-run AC-5 with a new fresh agent (target 8/8; Q7 must not list the reading list as a P3-8 condition)
+  這次用新的 fresh agent，副本改名為 `overview.md`，只讀一個檔，不執行指令，得 **8／8**。第 7 題答 `056` 的 G-1 至 G-8、完整清單在 `056` 第三節，另補一句「自 `069` 起加入 `067` 的 `check`」。**沒有列閱讀清單**。其餘七題逐題對照正本，與 cycle 1 的判定相同。
+- DONE: Confirm design.md row 7 byte-identical to (b), AGENTS.md unchanged from 3fe06a9, G-7 PASS, content-audit no new failures
+  第 7 列與 (b) 提案三行串接後的字串相同，`diff` 無輸出。`design.md` 對 `657e015` 只有新增，刪除行數為 0；對 `8026f4a` 只換了第 7 列那一行。修訂紀錄寫「與第 5 條相同」，現在成立。`git diff 3fe06a9 HEAD -- AGENTS.md CLAUDE.md` 無輸出，`CLAUDE.md` 仍是 mode `120000`。G-7 依正本抽出執行，得 `G-7 PASS [place1=1/1 place2=1 place3=1]`，exit 0。`content-audit check` 的輸出與 cycle 1 逐字相同（M4=1、M5=2、M6=9，96 份文件），指名總覽的行數為 0。單調句掃描 0 行。
+
+### Summary
+
+PASSED。V1、V2、V4、V5 已依正本修正，V3 的第 7 列已與 (b) 逐字相同。新的 fresh reader 得 8／8，第 7 題沒有把閱讀清單當成 P3-8 條件。`AGENTS.md` 自核准版本起未再變動，G-7 通過，`content-audit` 沒有新增失敗。本輪沒有新 finding。V6（交 `064`）與 V7（`050` 合併時的兩處保留兩邊的衝突）依 FO 處置，未重判。
+
+## Stage Report: review
+
+- DONE: Review gatekeeping.md and the AGENTS.md/design.md/INDEX/contributing.md edits against the design for what verify did not own: structure and readability for a non-engineer captain, links written as docs/… paths, no ticket status in prose, and the design's update mechanism actually delivered (README clause present at 34663fd, commands in the doc run and print what the doc claims).
+  結構照 design 第二節十章，198 行（預估 150–220）。每道防線先寫擋什麼、擋不到什麼，只靠人的防線都標明。全部 Markdown 連結的可見文字都是 `docs/…` 路徑，`AGENTS.md` 在根目錄，M6 本來就不管。單調句掃描 0 行。`34663fd` 是 HEAD 的祖先，條款與 design 1.2 逐字相同。三條指令都實跑過：P3-8 指令 exit 0，印 1 行（`056` 那條）；票況指令 exit 0，12 行，沒有 `NOT FOUND`；自查 `check | grep gatekeeping.md` 無輸出。AC-1 另做一次獨立重演：clone 壓成單一 commit，拿掉本票，候選是 043 形狀（兩成跌幅門檻，測試全過），fresh reviewer 判 REJECTED，第 1 項 finding 指名 `gatekeeping.md:117`、`:162`。累計 R0 類 5 次抓到 4 次。發現 R1、R3，見下方。
+- DONE: Check every ## Documentation impact row against delivered behavior, record docs untouched (editor-onboarding etc.), AGENTS.md change limited to the three captain-approved edits, TODO P2-13/P2-14 correctly formed; apply the new README out-of-repo clause (no out-of-repo step expected).
+  〈實作後更新〉六列都已完成。README 條款在 main `34663fd`。INDEX 的列在〈內容產線〉，標 evergreen。`git diff 657e015 HEAD --stat` 只改 7 個檔。operations、editor-onboarding、data-collection-guide、`_archive/`、`docs/content-audit/` 都沒動。`AGENTS.md` 只加 11 行、刪 0 行，就是 (a)(b)(c) 三處。`CLAUDE.md` 仍是 symlink。P2-13、P2-14 六欄齊全，數字與 main 上 `050` 票相符（:7742-7747、:2315-2323、18／21／12、`d44`），進度紀錄也加了一列。repo 外步驟條款：本票沒有執行 repo 外步驟，不需要重判。發現 R2，見下方。
+- DONE: Identify regressions (056 G-7, content-audit no new failures, tests/tsc/build) and anticipate merge interplay with 050 (INDEX, design.md revision log) and 064 (new sync checks missing from ch.5); end with a clear PASSED or REJECTED verdict.
+  G-7 從正本抽出執行，得 `PASS [place1=1/1 place2=1 place3=1]`，exit 0。`content-audit check` 是 M4=1、M5=2、M6=9，與 verify 相同。binding test 52/52、content-audit test 16/16、tsc exit 0。build exit 0，`src/data/*.json` sha256 不變，`noindex, nofollow`。`threshold-analysis` 31/32，在 main `96d5908` 上同樣失敗，本 branch 只改 `.md`。合併與 064 見 R4、R5。判定：**REJECTED**，只因 R1。
+
+### Findings（唯讀，未動候選）
+
+- **R1（Material，本票可修）**：`gatekeeping.md:198` 寫 `docs/constitution-features/054-gatekeeping-overview.md`。本票完成時一定會封存，封存後 M6 會多出一筆新失敗。實測：在 clone 上 `git mv` 到 `_archive/` 後，M6 從 9 變成 10，第 10 筆是 `gatekeeping.md:198 … 已封存`。第 9 章自查指令寫著「應無輸出」，封存後會印出一行。AC-3「指名 gatekeeping.md 的行數為 0」也不再成立。`050` 封存時的命中是設計好的，因為那時缺口表要跟著改；本票封存時的命中沒有要改的內容。修法：把路徑改成 `docs/constitution-features/_archive/054-gatekeeping-overview.md`。實測封存前後 M6 都是 9，沒有指名總覽。另一個做法是 FO 在封存的 commit 裡改這一行。
+- **R2（Polish）**：〈不更新〉還列著 `docs/health-check/TODO.md`，但本 branch 在 TODO 新增了 P2-13、P2-14。這是 FO 依 AC-6 授權的處置。修法：把這一列移到〈實作後更新〉，或補一行說明。
+- **R3（Polish）**：總覽第 23 行起用了「指紋」，全文沒有解釋。captain 不是工程師。建議在第 4 章加一句說明：指紋是依發布內容算出的代碼，內容改一個字，代碼就不同。
+- **R4（合併提醒，050）**：在 clone 上先併 main，只有本票 frontmatter 的 `status` 衝突，屬於 FO 的狀態記錄。接著併 `050`：`docs/INDEX.md` 衝突時，保留 `050` 兩列更新後的日期，加上本票新增的那一列。`design.md` 修訂紀錄衝突時，兩則都保留。`050` 那一則寫著「上一則修訂紀錄（feature 054）已補的檔頭與〈部署狀態〉」，所以它要緊接在 054 design 階段那則補述之後，放在不變式 #7 那則之前。否則「上一則」會指到不變式 #7。`050` 的 `operations.md` 已有〈保護範圍（12 個）〉，與總覽 :92 相符。
+- **R5（合併提醒，064，延續 V6）**：`064` 除了 `sync-content.mjs` 新增的 `case_ref`／`stance` 允許清單與成對檢查（第 5 章 :117），也把兩欄選填欄位放進指紋（`content-fingerprint.mjs`、`.gs`）。填了值的列要重新核可。所以第 4 章也要重判，不是只看 :117。
+- 實驗 clone 都在 scratchpad，沒有推送。沒有執行 `npm run sync-content`。沒有動 git stash。
+
+### Summary
+
+REJECTED，只因 R1。本票一封存，總覽第 198 行自己的連結就會讓 M6 多一筆失敗，第 9 章寫的自查也會失敗。修法是改一行，已實測有效。其餘都通過：更新機制已交付，三條指令輸出與文件所述相符。AC-1 獨立重演再抓到一次，累計 5 次抓到 4 次。`AGENTS.md` 只有核准的三處。G-7、tests、tsc、build 沒有回歸。R2、R3 是可以一起修的 Polish。R4、R5 是給合併與 `064` 的提醒。
+
+## Stage Report: implement (cycle 3)
+
+- DONE: R1 — `gatekeeping.md:198` 的自連結改為 `docs/constitution-features/_archive/054-gatekeeping-overview.md`。
+  clone 上 `content-audit.mjs check`：封存前 M6=9、指名 `gatekeeping.md` 0 行；`git mv` 054 進 `_archive/` 後 M6=9、0 行；第 9 章自查兩次都無輸出。對照：封存後改回舊路徑 → M6=10，指名 `gatekeeping.md:199`。
+- DONE: R2 — 本票〈Documentation impact〉的 `docs/health-check/TODO.md` 由〈不更新〉移到〈實作後更新〉。
+  新列：「| `docs/health-check/TODO.md` | FO 對 AC-6 的處置（implement cycle 1） | 新增 P2-13、P2-14 與進度紀錄一列。P3-8 由 `069` 修改，本票以指令讀出；P2-12 的過時句不屬本票 |」。
+- DONE: R3 — 第 4 章第一次出現「指紋」處前加一條：「指紋是依發布內容算出的代碼，內容改一個字，代碼就不同。」
+  `gatekeeping.md:99`。單調句掃描 0 行，G-7 PASS，`git diff --quiet 3fe06a9 -- AGENTS.md` 成立。
+
+### Summary
+
+依 FO 處置修了 R1–R3。R4 不動，R5 依處置不在本票處理。自連結改指封存後的路徑，封存前後 M6 都不指名總覽。本 commit 一併帶上 FO 在工作區改的 frontmatter `status: implement`。
+
+## Stage Report: review (cycle 2)
+
+- DONE: Re-check R1 on a clone: M6 stays 9 with 0 lines naming gatekeeping.md before and after a simulated archive; ch.9 self-check prints nothing
+  clone 在 `455b872`。封存前：M6=9，指名總覽 0 行。`git mv` 054 進 `_archive/` 後：M6=9，0 行，而且 `_archive/054-gatekeeping-overview.md` 真的存在。兩次的第 9 章自查都無輸出。worktree 上直接跑自查，也無輸出。
+- DONE: Confirm R2 and R3 as assigned; no other candidate change since c01e361 beyond these fixes and state lines
+  R2：`TODO.md` 那一列在〈實作後更新〉（:431），〈不更新〉已經沒有它。R3：第 4 章 :99 新增一句說明「指紋」。`git diff --name-only c01e361 HEAD` 只有兩個檔：`gatekeeping.md` 加 1 行、改 1 行（R3、R1），本票檔只有 frontmatter、R2 那一列、Feedback Cycles 與 implement 報告。單調句掃描 0 行。
+- DONE: G-7 PASS, and AGENTS.md unchanged vs 3fe06a9
+  G-7 從 `056` 正本抽出執行，得 `G-7 PASS [place1=1/1 place2=1 place3=1]`，exit 0。`git diff --quiet 3fe06a9 HEAD -- AGENTS.md CLAUDE.md` 成立，`CLAUDE.md` 仍指向 `AGENTS.md`。
+
+### Summary
+
+PASSED。R1 已修好：模擬封存前後，M6 都停在 9，沒有一行指名總覽，第 9 章自查無輸出。R2、R3 依授權完成，自 `c01e361` 起沒有其他候選改動。G-7 通過，`AGENTS.md` 自核准版起未變。本輪沒有新 finding。R4 在合併時由 FO 處理，R5 由後合併的那張票處理，兩項依處置未重判。
