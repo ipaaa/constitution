@@ -580,3 +580,16 @@ REJECTED，只因 R1。本票一封存，總覽第 198 行自己的連結就會�
 ### Summary
 
 依 FO 處置修了 R1–R3。R4 不動，R5 依處置不在本票處理。自連結改指封存後的路徑，封存前後 M6 都不指名總覽。本 commit 一併帶上 FO 在工作區改的 frontmatter `status: implement`。
+
+## Stage Report: review (cycle 2)
+
+- DONE: Re-check R1 on a clone: M6 stays 9 with 0 lines naming gatekeeping.md before and after a simulated archive; ch.9 self-check prints nothing
+  clone 在 `455b872`。封存前：M6=9，指名總覽 0 行。`git mv` 054 進 `_archive/` 後：M6=9，0 行，而且 `_archive/054-gatekeeping-overview.md` 真的存在。兩次的第 9 章自查都無輸出。worktree 上直接跑自查，也無輸出。
+- DONE: Confirm R2 and R3 as assigned; no other candidate change since c01e361 beyond these fixes and state lines
+  R2：`TODO.md` 那一列在〈實作後更新〉（:431），〈不更新〉已經沒有它。R3：第 4 章 :99 新增一句說明「指紋」。`git diff --name-only c01e361 HEAD` 只有兩個檔：`gatekeeping.md` 加 1 行、改 1 行（R3、R1），本票檔只有 frontmatter、R2 那一列、Feedback Cycles 與 implement 報告。單調句掃描 0 行。
+- DONE: G-7 PASS, and AGENTS.md unchanged vs 3fe06a9
+  G-7 從 `056` 正本抽出執行，得 `G-7 PASS [place1=1/1 place2=1 place3=1]`，exit 0。`git diff --quiet 3fe06a9 HEAD -- AGENTS.md CLAUDE.md` 成立，`CLAUDE.md` 仍指向 `AGENTS.md`。
+
+### Summary
+
+PASSED。R1 已修好：模擬封存前後，M6 都停在 9，沒有一行指名總覽，第 9 章自查無輸出。R2、R3 依授權完成，自 `c01e361` 起沒有其他候選改動。G-7 通過，`AGENTS.md` 自核准版起未變。本輪沒有新 finding。R4 在合併時由 FO 處理，R5 由後合併的那張票處理，兩項依處置未重判。
