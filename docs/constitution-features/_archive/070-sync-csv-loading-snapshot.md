@@ -1,16 +1,16 @@
 ---
 id: 070
 title: 同步讀到「載入中…」快照時隨機整份中止
-status: review
+status: complete
 source: 050 AC-2 正式同步失敗（2026-09-29），captain 同日核准開票
 started: 2026-09-29T19:52:07Z
-completed:
-verdict:
+completed: 2026-09-29T22:19:46Z
+verdict: PASSED
 score: 0.8
 worktree: .worktrees/spacedock-ensign-070-sync-csv-loading-snapshot
 issue:
 pr: pr-merge:48
-mod-block: merge:pr-merge
+mod-block:
 gates:
     version: 1
     records:
@@ -51,7 +51,8 @@ gates:
                 reason: 'Captain approved 070 review in chat 2026-09-29 (「070 approve」): fetch-layer retry and entry-point fix, 040 validation untouched, 137 tests 0 fail, R1 docs fixed; F1 accepted as Deferred risk.'
               application:
                 target-stage: complete
-                state: pending
+                state: consumed
+archived: 2026-09-29T22:19:46Z
 ---
 
 `040` 合併後，正式同步可能隨機失敗：Google 發布的 CSV 有時送出公式仍在計算的舊快照，`status` 欄顯示「載入中…」，`040` 的驗證因此判整份不符而中止。不會把錯的內容推上網站，但會讓編輯看到數十筆錯誤而以為內容壞了。
