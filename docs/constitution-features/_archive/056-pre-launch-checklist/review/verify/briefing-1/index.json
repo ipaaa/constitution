@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:056:verify:attempt-1:revision-1",
+  "question": "verify cycle 3 判 PASSED——F-6（G-1／G-2 的通過條件構造上不可能成立）已修好且新判準經獨立重製確認構得到（全 repo 命中 34 張 vs 舊判準 0 張），指令、AC、原句三者皆逐位元未變。要核可 056 進入 review，還是先把 F-7／F-8 兩項折進來？兩項皆為 Deferred risk、皆非本輪引入、皆未讓任何 AC 失敗，但都直接關係到「這道 gate 被執行時能不能用」：F-7——G-1／G-2 的「captain 逐票明確接受」出口沒有指定記錄位置、也沒有查核指令（章節導言把「寫在 Feedback Cycles」限定在人工項，而 G-1／G-2 標的是機械項，涵蓋不到），修法是比照 G-4 補一個子句；F-8——G-8 的 `npx tsc --noEmit` 本輪曾因 `.next/types/routes.d 2.ts` 這個殘留重複檔而假性失敗，reviewer 已用「清掉→exit 0／重建→同一錯誤 exit 2／刪除→exit 0、原始碼零變動」證明是環境問題而非候選缺陷，修法是在 G-8 補一句「先 build 或 rm -rf .next 再跑 tsc」。**注意：折進來會是本票的 Cycle 3，而 README 的 disposition 規定 Cycle 3 升級給 captain——所以這個決定本來就是你的。** 另有三項與此決定無關但需你處理的未達成項：AC-2（依賴未獲核准的 feature 039）、C1 的真實信箱覆寫點、以及 G-3 的 Vercel dashboard 人工項。",
+  "artifacts": [
+    {
+      "id": "artifact:056:verify:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/16c7615ec96dde32688cdf204e64ff5ffe590494/docs/constitution-features/056-pre-launch-checklist.md",
+      "rev": "sha256:14d392bcce9871a8aa039c8adecee9ff64fafd60535c1c619e816b19d050a23e",
+      "mediaType": "text/markdown",
+      "summary": "F-6 是本票最重要的一次攔截：它交付的 launch gate 原本寫「通過條件為 `status` 為 `archived` 且 `verdict` 非空」，但本 workflow 的 status enum 無 `archived` 值（README:81 為 design／implement／verify／review／complete），封存票實際是 `status: complete`＋`verdict: PASSED`，全 repo `status: archived` 命中 0 張——那是一道構造上永遠不會通過的 gate，正是本票 Problem 一節要防的事。implement 刻意採比 FO 建議更嚴的判準（`verdict: PASSED` 而非「非空」），三項理由成立：「非空」會讓 REJECTED 的票替該項背書；封存路徑本身不是結論證據（反例 `_archive/023` 為 `status: design`／`verdict` 空，35 張中唯一例外）；REJECTED 與空 verdict 走兩列原有的 captain 人工出口。reviewer 以逐檔解析 63 張票的 frontmatter 獨立重製了 34 vs 0 這組數字，並確認指令 257B／241B、AC 1622B、原句三者逐位元未變。reviewer 同時背書該嚴格判準，但誠實指出目前全 repo 沒有任何 REJECTED 票，故該門檻現階段等價於「非空」、價值在未來。AC-3 的三處 noindex 綁定仍成立（三檔命中 1／5／1，`awk` 證明綁定下一行即 `robots:`）；AC-2 維持未達成且歸因正確（依賴未獲核准的 feature 039，且 `LaunchGate.tsx:30` 讓只讀 SSR HTML 的檢查必然假通過）。"
+    }
+  ]
+}

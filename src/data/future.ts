@@ -27,7 +27,23 @@
 //
 // Refresh procedure
 // -----------------
-// 1. Update `REFERENCE_DATE` and `LAST_UPDATED` below to the new snapshot date.
+// 1. The two dates below are NOT the same thing and are no longer updated together.
+//
+//    `REFERENCE_DATE` — the case-list snapshot date. `daysPending` is derived
+//    from each `filingDate` against it, and the justice-seat chart's TODAY line
+//    and countdown are drawn from it. Update it ONLY together with steps 2-4,
+//    because moving it re-ages every case and moves the chart.
+//
+//    `LAST_UPDATED` — the date shown in the page header. It records when the
+//    data on this page was last refreshed, which is not necessarily the
+//    case-list snapshot date.
+//
+//    They may legitimately differ. As of 2026-09-21 they do: the ruling-threshold
+//    content (`RULING_THRESHOLD`, `RULINGS_SINCE_FLOOR_VOIDED`) was refreshed on
+//    2026-09-21, while the case list is still the 2026-04-29 snapshot. The page
+//    header therefore prints both dates — see `src/app/future/page.tsx`. If you
+//    refresh the case list, set both to the new snapshot date and the two header
+//    lines will agree again.
 // 2. Visit cons.judicial.gov.tw/docdata.aspx?fid=52 and update `RAW_CASES`.
 // 3. Update `REAL_TOTAL_PENDING` from aggregate statistics or media reports.
 // 4. Update `CRISIS_STATS` institutional numbers if justices change.
@@ -77,8 +93,14 @@ export const REFERENCE_DATE = '2026-04-29';
 /**
  * Human-readable date string for display on the page.
  * Update this whenever the dataset is refreshed.
+ *
+ * 2026-09-21：本次更新的是判決門檻相關內容（`RULING_THRESHOLD`、
+ * `RULINGS_SINCE_FLOOR_VOIDED`），取證日為 2026-09-21。
+ * 待審案件清單仍以 `REFERENCE_DATE`（2026-04-29）推導 `daysPending`，尚未重新收集。
+ * `REFERENCE_DATE` 牽動席次圖的 TODAY 線與倒數，更新它屬另一張票，
+ * 見 docs/constitution-features/_archive/063-required-for-ruling-legal-accuracy.md 第十二小節第 2 點。
  */
-export const LAST_UPDATED = '2026-04-29';
+export const LAST_UPDATED = '2026-09-21';
 
 /**
  * Real total number of pending cases before the Constitutional Court,
@@ -421,7 +443,6 @@ export const CRISIS_STATS = {
   /** Number of curated cases displayed in the card list. */
   curatedCount: CURATED_COUNT,
   activeJustices: ATTENDING_JUSTICES.length,
-  requiredForRuling: 10,
   designatedTotal: 15,
   /** Seats where the term has expired and no replacement appointed */
   vacantSeats: 15 - ACTIVE_JUSTICES.length,
@@ -430,3 +451,38 @@ export const CRISIS_STATS = {
   avgDaysPerCase: 120,
   estimatedClearanceYears: 3.4,
 };
+
+// ---------------------------------------------------------------------------
+// Ruling threshold (憲法訴訟法第 30 條)
+// ---------------------------------------------------------------------------
+
+// `RULING_THRESHOLD` 已移到 `src/data/ruling-threshold.ts`，那裡是門檻文案的唯一定義處。
+// 這裡保留 re-export，讓既有的 `from '@/data/future'` import 不必改。
+// 搬移的理由見 docs/constitution-features/066-quiz-timeline-voided-quorum-present-tense.md 第五小節；
+// 門檻本身的法律依據與待拍板事項見 docs/constitution-features/_archive/063-required-for-ruling-legal-accuracy.md 第五小節。
+export { RULING_THRESHOLD } from './ruling-threshold';
+
+/**
+ * 憲法法庭在 10 人下限失效（2025-12-19）之後作成的判決。
+ *
+ * 用途：站上先前寫「實質上無法做出任何判決」。該敘述與一手來源衝突，
+ * 本清單即為否證材料。民國 114 年全年只作成第 1 號一則判決，
+ * 下限失效後，民國 115 年已作成下列六則。
+ *
+ * 來源：憲法法庭判決清單 https://cons.judicial.gov.tw/judcurrentNew1.aspx?fid=38
+ * 逐則開啟確認，`id` 為 docdata.aspx 的查詢參數。
+ * 取證日期 2026-09-21。待拍板事項見
+ * docs/constitution-features/_archive/063-required-for-ruling-legal-accuracy.md 第五小節。
+ */
+export const RULINGS_SINCE_FLOOR_VOIDED = [
+  { docket: '115 年憲判字第 1 號', rocDate: '115-01-02', dateLabel: '115 年 1 月 2 日', id: 350743 },
+  { docket: '115 年憲判字第 2 號', rocDate: '115-02-06', dateLabel: '115 年 2 月 6 日', id: 343660 },
+  { docket: '115 年憲判字第 3 號', rocDate: '115-03-27', dateLabel: '115 年 3 月 27 日', id: 358150 },
+  { docket: '115 年憲判字第 4 號', rocDate: '115-05-08', dateLabel: '115 年 5 月 8 日', id: 351300 },
+  { docket: '115 年憲判字第 5 號', rocDate: '115-06-05', dateLabel: '115 年 6 月 5 日', id: 343661 },
+  { docket: '115 年憲判字第 6 號', rocDate: '115-08-14', dateLabel: '115 年 8 月 14 日', id: 352140 },
+] as const;
+
+/** 下限失效後最近一則判決。`RULINGS_SINCE_FLOOR_VOIDED` 依日期遞增排列 */
+export const LATEST_RULING =
+  RULINGS_SINCE_FLOOR_VOIDED[RULINGS_SINCE_FLOOR_VOIDED.length - 1];

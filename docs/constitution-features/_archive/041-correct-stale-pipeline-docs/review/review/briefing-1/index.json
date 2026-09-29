@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:041:review:attempt-1:revision-1",
+  "question": "review 判 PASSED。是否核可 041 進入 complete（terminal）並開始交付？另有三項 finding 待裁示，其中 F-6 只有 captain 能決定是否擴充範圍。",
+  "artifacts": [
+    {
+      "id": "artifact:041:review:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/da476af4886a4af729f262668f37473482e8afd9/docs/constitution-features/041-correct-stale-pipeline-docs.md",
+      "rev": "sha256:a161cd2f18144f542610fbe0d6432957c116ea96591dbc26ccbd2faea775daaa",
+      "mediaType": "text/markdown",
+      "summary": "四項 AC 全數以指令獨立重現成立，未採信前兩階段的自我回報。Documentation impact 三類逐筆查核，兩份 record 與 _archive 零命中，operations.md「待新增」那列維持不動且解除條件已記錄。無超出授權範圍的改動，20 則更正段之間查無矛盾。三項 finding 只回報未修改：F-5 導覽行號差一行（Polish）、F-6 dcg:216／:132 兩句殘留過時敘述但不在 captain 核可的 23 處內（Needs decision）、F-7 不更新表與擴充後的 AC-1 第 22 項矛盾（Polish）。合併對齊：041 不需 rebase；與 040 在 design.md 的檔頭與文末修訂紀錄兩處相撞，後合併者需人工對齊。"
+    }
+  ]
+}

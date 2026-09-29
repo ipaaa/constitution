@@ -36,6 +36,15 @@ node scripts/sync-content.mjs
 
 要改內容，改試算表。
 
+**`src/data/` 底下的 `.ts` 檔不在這條禁令內，可以改。**
+`src/data/threshold-analysis.ts`、`controversy-timeline.ts`、`future.ts` 等都是手寫資料模組，
+與試算表同步無關。以 `threshold-analysis.ts` 為例，來源是
+`cons.judicial.gov.tw`（案件計數）與 `law.moj.gov.tw`（門檻條文），
+由 `scripts/fetch-interpretation-counts.mjs` 人工抓取後人工審閱寫入。
+
+判斷方式：**副檔名是 `.json` 就不要手改，是 `.ts` 就可以。**
+`scripts/fetch-interpretation-counts.mjs` 也不寫 `src/data/`，它只寫 `tests/fixtures/`。
+
 ### 3. 不要把設計文件裡的範例當成真實內容
 
 2026-04-30 發生過一次：`015` 的設計文件有一節叫「Sample data shape」，
@@ -53,6 +62,8 @@ robots: { index: false, follow: false },
 
 現在刻意保持。網站尚未對外發布，不要讓搜尋引擎收錄。
 正式發布時才移除。追蹤項目見 `docs/health-check/TODO.md` 的 P3-8。
+移除前必須通過 `docs/constitution-features/056-pre-launch-checklist.md` 的上線前檢查清單。
+該票第三節的 gate 執行清單 G-1 至 G-8 八項全數通過，才可移除這一行。
 
 ---
 
@@ -146,6 +157,15 @@ robots: { index: false, follow: false },
 
 - `docs/constitution-features/` — 網站功能。**已於 2026-09-02 refit 至 0.28，可使用**
 - `docs/design-assets/` — 視覺素材。仍為 0.9.5，要用之前需先 refit
+
+> ⚠️ **2026-09-04 更正：上面「目前皆休眠」寫於 refit 之前，已不成立。**
+> `docs/constitution-features/` 已於 2026-09-02 refit 至 0.28 並開始使用。
+> 上面第一個項目符號自己就寫了「已於 2026-09-02 refit 至 0.28，可使用」，與「皆休眠」互相矛盾。
+> **本文刻意不寫票號與票況。** 那是會隨流程漂移的快照，寫進 evergreen 文件就會過時。
+> 要知道當下有哪些票、各自在哪一階段，跑這條指令：
+> `for f in docs/constitution-features/0*.md; do printf '%s ' "$(basename "$f")"; grep -m1 '^status:' "$f"; done`
+> `docs/design-assets/` 的休眠敘述仍然正確。`docs/design-assets/README.md:2` 為 `commissioned-by: spacedock@0.9.5`，要用之前需先 refit。
+> 原句保留。
 
 **內容產線的施工走 `constitution-features` workflow**（2026-09-02 captain 決定，
 推翻 8/31「暫不進 workflow」的舊決定 —— 該決定的前提是 workflow 版本過舊，已於

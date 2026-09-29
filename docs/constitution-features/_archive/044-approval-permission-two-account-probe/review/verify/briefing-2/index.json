@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:044:verify:attempt-2:revision-1",
+  "question": "verify cycle 3 判 PASSED，Finding 2／3 已正確修正。是否核可 044 進入 review？另有一項超出 AC 範圍、需 captain 決定：原始記錄 /tmp/sd044-probe-log.md 是三輪查核的唯一基準，目前不在 repo 內，重開機即消失。",
+  "artifacts": [
+    {
+      "id": "artifact:044:verify:attempt-2:revision-1:item-1",
+      "uri": "git-root://main/b1890c7a03ef990e13ebe861f1574a284fca5e24/docs/constitution-features/044-approval-permission-two-account-probe.md",
+      "rev": "sha256:db5da954010dfe216e2d82aa63b097720a2844096725ff5956b083cddb72b4cd",
+      "mediaType": "text/markdown",
+      "summary": "檔頭缺口數已由五改為七，verify 自行逐節清點內文得九處缺口陳述對應檔頭七項，逐項有出處、無虛構、無遺漏。日期歸屬以原始記錄逐一核對全部正確。未破壞既有成果以最強證據確認：證據文件分隔線之後 418 行逐位元組相同，票的本輪刪除行數為 0，九列 AC 判定逐字相同。七道安全掃描乾淨，src/data 兩檔 sha256 與 main 相同。三項新 finding 皆非 Material：Finding 5（implement 的可失敗證據第一條為巧合，不影響結論）與 Finding 6（:371 函式名漏記未列入檔頭，該缺口已在表格內印為「未記錄」）經 FO 授權 decline；Finding 7（原始記錄不在 repo）需 captain 決定。"
+    }
+  ]
+}

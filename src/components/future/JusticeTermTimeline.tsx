@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { TERM_EVENTS, REFERENCE_DATE, FAILED_NOMINATIONS, JUSTICES } from '@/data/future';
 import JusticeCountdown from './JusticeCountdown';
 import JusticeSeatGrid from './JusticeSeatGrid';
@@ -78,8 +79,12 @@ function buildDataPoints(): DataPoint[] {
   return points;
 }
 
-// Quorum threshold
-const QUORUM = 10;
+// 此圖原本畫一條「表決門檻 (10人)」的水平虛線。該門檻是憲法訴訟法第 30 條第 2 項
+// 的參與評議人數下限，已由 114 年憲判字第 1 號於 2025-12-19 宣告違憲失效。
+// 現行有效的第 30 條第 1 項給的是「現有總額」的比例，不是固定席次，
+// 因此在席次折線圖上畫不出對應的水平線。虛線與標籤已移除，
+// 門檻敘述改由 RulingThresholdNote 單一來源負責。
+// 見 docs/constitution-features/_archive/063-required-for-ruling-legal-accuracy.md
 
 // Year markers for X axis
 const YEAR_MARKS = [2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032];
@@ -176,29 +181,6 @@ export default function JusticeTermTimeline() {
               </g>
             );
           })}
-
-          {/* Quorum threshold dashed line */}
-          <line
-            x1={PAD.left}
-            y1={yForCount(QUORUM)}
-            x2={PAD.left + PLOT_W}
-            y2={yForCount(QUORUM)}
-            stroke="#D32F2F"
-            strokeWidth={1}
-            strokeDasharray="6 4"
-            opacity={0.5}
-          />
-          <text
-            x={PAD.left + 4}
-            y={yForCount(QUORUM) - 6}
-            textAnchor="start"
-            fontFamily="monospace"
-            fontSize="9"
-            fill="#D32F2F"
-            opacity={0.7}
-          >
-            表決門檻 (10人)
-          </text>
 
           {/* "You are here" vertical line */}
           <line
@@ -409,8 +391,17 @@ export default function JusticeTermTimeline() {
         )}
 
         {/* Bottom label */}
-        <div className="mt-2 text-[10px] font-mono text-gray-400 uppercase tracking-widest">
-          Justice Seat Count / 大法官席次變化折線圖
+        <div className="mt-2 flex flex-wrap items-baseline justify-between gap-2">
+          <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest">
+            Justice Seat Count / 大法官席次變化折線圖
+          </span>
+          {/* 上面那條 10 人門檻線只是現行條件。門檻改過四次，另一頁畫了全部四次。 */}
+          <Link
+            href="/past/thresholds"
+            className="text-xs font-serif underline text-gray-500 hover:text-gray-900"
+          >
+            這條 10 人門檻是怎麼來的？看 1949 年以來的四次門檻變動
+          </Link>
         </div>
       </div>
 

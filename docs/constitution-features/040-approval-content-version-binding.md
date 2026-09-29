@@ -62,6 +62,11 @@ gates:
                 at: "2026-09-05T03:36:59.070656Z"
                 decision: hold
                 reason: 交付品質已達核可標準（六項 AC 全 PASSED、四項授權修正各以反向改動證明可失敗、越界檢查全乾淨），但核可即進入合併儀式，而合併有未完成的硬前置。captain 於 2026-09-04 裁決 hold。恢復條件：feature 050 完成正式 SSOT 的四項人工步驟——三個發布分頁各建八個審核欄位、安裝 CONTENT_FINGERPRINT 與 APPROVAL_STATUS 公式及 Review 選單、既有 40 筆逐列重新核可、審核欄位設定保護範圍。依 2026-09-03-editor-onboarding.md:425-430，順序不可反：先合併而試算表未建欄，下次同步會整份中止。040 的程式不需再改動。
+            - id: gate-attempt:040-review-2
+              briefing:
+                id: briefing:040:review:attempt-2:revision-1
+                digest: sha256:b362febf6cec6fe3289c8d43c320b54f40e744d246280efa37ba99acc7e3c07d
+                room-ref: '@review/review/briefing-2'
 review-round:
     id: round:040:review:1
     stage: review

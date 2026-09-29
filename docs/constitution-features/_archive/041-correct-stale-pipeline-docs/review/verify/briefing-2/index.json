@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:041:verify:attempt-2:revision-1",
+  "question": "verify cycle 3 判 PASSED，F-1 至 F-4 全部修正並經獨立複驗。是否核可 041 進入 review？",
+  "artifacts": [
+    {
+      "id": "artifact:041:verify:attempt-2:revision-1:item-1",
+      "uri": "git-root://main/15e32e22457040b90560cef0114b4d08c651a35b/docs/constitution-features/041-correct-stale-pipeline-docs.md",
+      "rev": "sha256:cf7ac3b7061e2e378c7625ef5dd8cf81a349ac9db1e309cec7bf67f7b88f7cb1",
+      "mediaType": "text/markdown",
+      "summary": "F-1 的修法成立：AGENTS.md 更正段九句無一斷言票號、階段或數量，三道精確掃描零命中，未來票況怎麼變都不會與它衝突；段內實質主張（refit commit、兩個版本號、自我矛盾引文）逐一獨立查證屬實。F-2／F-3／F-4 三處導覽指引已指向正確，六個被引行號全部實讀複驗；F-2 原句一字未改，僅以補述指出節次有誤。既有成果未破壞：累計刪除行仍只有 5 行日期欄位，24 處更正距離全驗 ≤20，src／scripts／兩份 record／_archive 皆未動。placeholder 五類零命中，資料檔指紋未變。一項 Deferred risk 經 FO 授權 decline for 041，promote 條件已記錄。"
+    }
+  ]
+}

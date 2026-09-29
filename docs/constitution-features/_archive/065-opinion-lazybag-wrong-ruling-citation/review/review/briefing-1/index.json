@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:065:review:attempt-1:revision-1",
+  "question": "review 判 PASSED，七項 AC 由新的獨立 reviewer 在真實 build 與 HTTP 回應上全部重現通過，一手來源全部自行 curl 複核。**我建議核准交付。** 本 diff 自身正確——它停止了站上對真實公職人員的不實陳述，且 StanceSpectrum.tsx 保留給 049 的狀態正確（檔案仍在、無任何 import、已被 tree-shaking 排除、不實名單零送達瀏覽器）。**但有一項要你決定，它不擋這次交付、卻會影響 049：F-1——AC-6 的 Verified by 涵蓋不到它自己的要求。** AC-6 的要求是「不再**渲染** StanceSpectrum」，但三項斷言只檢**兩個小標字串**與 build 退出碼，**完全沒提到該元件**。reviewer 已實跑證成：在副本上把 StanceSpectrum 重新接回、小標改寫為「立場分布」、build 退出碼 0，**AC-6 三項斷言實測仍為 0／0／0 全綠——而該元件確實在渲染、14 位不實名單已進 client chunk**。**AC-6 可以在它禁止的事情正在發生時通過。** 它沒修，因為補斷言等於改 AC-6 的 Verified by，而你 2026-09-24 的授權限於 AC-1～AC-5。減輕因素：TODO.md 的 P1-9 已把 grep -rn StanceSpectrum src/ 寫成驗證行，專案層級有這道檢查、只是不在 AC-6 內。**建議的收斂寫法**：AC-6 增列「grep -rn StanceSpectrum src/ 只命中元件檔本身」並加「.next/ 內該段獨有字串 ＝ 0」。**要不要把授權延伸到 AC-6，並一併處理 F-2 的要求句收斂？**",
+  "artifacts": [
+    {
+      "id": "artifact:065:review:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/75e7cfb9cbeafba4beba0082dcc13250ca6b2394/docs/constitution-features/065-opinion-lazybag-wrong-ruling-citation.md",
+      "rev": "sha256:bb5291fb71f8acb238bd292d556c10606932d7d6198f4b7b5ed67505dc499123",
+      "mediaType": "text/markdown",
+      "summary": "七項 AC 以副本作法在真實 build 與 HTTP 回應上獨立重現全部通過，並在第二次 rm -rf .next 重建上複現同值。AC-5 的正確基準由 reviewer 自行算出為 11 行（固定字串寫法為 9），集合與 design 列出的 B 清單逐筆相同。一手來源全部自行 curl 複核：兩則判決的字號、案名、日期、合議庭人數、主筆、意見書份數，以及 AC-6 據以核可的四項事實（4 位不在任一合議庭、漏列含主筆蔡宗珍在內 5 人、2 位無意見書卻標不同意見、:26 與主文一原文相反）逐項實證成立。加空格盲區由 reviewer 自行雙向實跑重現，未採信前三輪紀錄。StanceSpectrum.tsx 仍在（9916 bytes／198 行）、無任何 import、已被 tree-shaking 排除，不實名單零送達瀏覽器。文件影響三筆逐一相符：049 為純尾端追加（39 0，前 75 行逐位元相同）、TODO.md 的 P1-9 已記錄移除與補回責任、docs/INDEX.md 依第八節不需增減。無回歸：13 條路由皆 200、全站 113憲判9 增量恰為 5、src/data/ 零變動。另四項 finding 皆不擋交付：F-2（AC-1／2／5 的要求句仍寫緊接寫法而指令已容許空白，方向安全但不同義）、F-3（regex 抓不到 HTML entity 間隔的寫法，實測全站 0 命中故非現行風險）、F-4（opinions.ts 的不實名單因 LazybegCtaSection value-import 仍進 server bundle 但未送達瀏覽器；記此是因為 049 的處置不應假設該資料已不可達）、F-5（AC-4 第 2 項綁定最小化後的精確字串，但第 1、3 項已提供獨立支撐）。"
+    }
+  ]
+}

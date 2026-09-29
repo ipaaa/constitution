@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:056:verify:attempt-4:revision-1",
+  "question": "verify cycle 6 判 PASSED，F-11 雙向驗過且授權邊界嚴守。**我建議再退回一次，但這次修的是根，不是又一個補丁。** reviewer 抓到的 F-12 是同型盲區第九處，而它的形狀不同：**本票有兩份同一檢查的副本**——`## Test plan` 區塊與第三節——而兩者已在兩處分岔。(1) Test plan 的 G-8 仍把 `tsc` 列在 `build` **之前**，照它做會直接走進 F-8 記載的假性失敗；這個分岔是 cycle 4 只修了第三節那一列造成的，之後沒有人比對過。(2) Test plan 的 G-5 pattern 只有 5 個變體、第三節有 6 個，**少了 `快速了解最新判決的5個重點`**，跑那一份會整個漏掉一個佔位值——又是 fail-open。reviewer 的建議我完全同意：**修根而不是補兩處——讓 Test plan 指向第三節，不要再複述指令。「只要兩份副本還在，就會有第三次分岔。」** 本票已跑六輪，每一輪 reviewer 都找到同一類缺陷的新實例；這是第一個能讓它停下來的修法。此修法不超出你 2026-09-24 的授權：它**移除一份過時的重複副本**，不是改任何檢查要求什麼（G-5 Test plan 副本少的那個字串，第三節的正本本來就有）。",
+  "artifacts": [
+    {
+      "id": "artifact:056:verify:attempt-4:revision-1:item-1",
+      "uri": "git-root://main/b0cc8a193e0b5e33c912f7199101a8b799ec1696/docs/constitution-features/056-pre-launch-checklist.md",
+      "rev": "sha256:f2ad07f6e0746a41721e5240952cb990d5ebb2aa924f3d9c9cf69a17b8c1d715",
+      "mediaType": "text/markdown",
+      "summary": "F-11 以抽出的 pattern 雙向驗過。涵蓋面：十一個字串由舊 pattern 的 6/11 提升為新 pattern 的 11/11。未過寬：對真實 `src/` 實掃，舊新輸出 `diff` 逐位元相同——同樣三筆命中、三個既有佔位值全部仍抓得到、一行不多。reviewer 另加九個合法的近似字串（`台灣大學法律系`、`前端工程師的工作內容`、`這則判決的5個重點` 等）測試，**九個全部 MISS**；它指出這一半與涵蓋面同樣重要——過寬的 pattern 會讓 G-5 永遠不通過，那和永遠通過一樣是假檢查。授權邊界以兩種互相獨立的方式確認嚴守：六個 alternation 各自在摺疊變體括號後化約為**逐字相同的字串**，且新 pattern 在舊 pattern 匹配到的每一個字串上都是其**超集**——沒有新增、沒有移除、沒有替換，只改變每個既有字串認得幾種寫法。其餘七列 G 項逐位元相同，故「其他項涵蓋面未改」屬實。F-12 的 G-5 那一半**早於本輪存在**，implement 主動揭露並刻意不動，判斷正確——補上那個字串會改變該檢查要求什麼，超出授權。"
+    }
+  ]
+}

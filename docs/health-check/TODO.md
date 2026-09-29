@@ -2,6 +2,8 @@
 
 體檢日期：2026-08-31　　最後更新：2026-09-03
 
+**最後查核**：2026-09-04（feature 041 逐處查證敘述與實際行為是否相符）
+
 本清單依**危險程度**排序，不是依工作量。每一項都附證據與驗證指令，可自行重跑確認。
 
 **產線設計已定案**，見 [`../content-pipeline/design.md`](../content-pipeline/design.md)。P2、P3 的多數項目已被該設計吸收為施工項目。
@@ -29,6 +31,16 @@
   npm run sync-content
   npm run build          ← build 也會跑 sync
 ```
+
+> ⚠️ **2026-09-04 更正：`npm run build` 的禁令已於 2026-09-02 解除。**
+> 上面方框與下面三段寫於 2026-09-01，當時同步程式還沒改寫。
+> `package.json` 的 `build` 現在是 `next build`，不含同步。改動在 PR #32。
+> 驗證方式：`npm run build` 前後跑 `shasum -a 256 src/data/*.json`，兩次相同。
+> 2026-09-04 於 feature 041 的 worktree 實測，兩檔指紋前後皆未變。
+> 下面「真正的解除條件」所指的施工項目 7 與 8，都已於 2026-09-02 完成。
+> 仍然不要自己執行 `npm run sync-content` 或 `node scripts/sync-content.mjs`。
+> 那兩個指令會覆寫 `src/data/*.json`。只在要發布內容時執行，且跑完必須開 PR 對 diff。
+> 原文保留。本次更正見文末「進度紀錄」的 2026-09-04 一列。
 
 **這條禁令尚未解除。** 2026-09-01 更新：搶救內容已回填試算表（原本的解除條件），
 但**同步程式還沒改寫**，所以現在跑它仍會出問題：
@@ -83,6 +95,35 @@ npm run build 完整跑過，16 個頁面全部產生成功
 curl -s https://constitution-nine.vercel.app/past -o p.html
 # 內容為 client-render，資料在 JS bundle 而非 HTML，需抓 /_next/static/*.js 比對
 ```
+
+> 📌 **2026-09-21 補充：要拿「渲染後的真 HTML」時的安全作法。**
+>
+> 為什麼 `curl` 只拿得到外框：`src/components/LaunchGate.tsx` 的
+> `if (!ready) return null;` 中，`ready` 只在 `useEffect` 裡設為 true，
+> 而 `useEffect` 不在伺服器端執行。所以任何被 `LaunchGate` 包住的頁面，
+> 伺服器端渲染出來都是 `null`，`curl` 只會拿到導覽列與頁尾。
+>
+> **正確作法：把已 commit 的狀態複製到暫存目錄，只在副本裡改那一行。**
+> 候選檔（工作目錄裡真正要交付的檔案）一個位元都不動。
+>
+> ```bash
+> git archive HEAD | tar -x -C "$SCRATCH/repo"
+> cp -Rc <repo-root>/node_modules "$SCRATCH/repo/node_modules"   # -Rc 走 APFS clone，不佔空間
+> # 只在副本裡把 LaunchGate.tsx 那一行改成：
+> #   if (!ready && typeof window !== 'undefined') return null;
+> cd "$SCRATCH/repo" && ./node_modules/.bin/next dev -p <port>
+> curl -s "http://localhost:<port>/future" -o real.html
+> ```
+>
+> **限制：`git archive HEAD` 取的是「已 commit」的狀態。**
+> verify 階段正確（候選已 commit）。implement 階段邊改邊驗時它看不到未 commit 的修改，
+> 要改用 `git stash create` 產生暫時 commit 再 archive，或用
+> `rsync -a --exclude node_modules --exclude .next <repo-root>/ "$SCRATCH/repo/"`。
+>
+> ⛔ **不要用「暫時改候選檔、抓完再還原」的作法。**
+> 它的安全性取決於「改」與「還原」之間不被打斷。本專案常有多個 agent 同時作業，
+> 一旦那個狀態被 commit 出去，尚未發布的站台就會在**伺服器端**吐出完整內容，
+> 而 `noindex` 只擋遵守規則的爬蟲。
 
 ### ~~2. 回填 SSOT 的 10 格~~ 🟡 **大部分已完成（2026-09-01 查核）**
 
@@ -201,6 +242,13 @@ curl -s https://constitution-nine.vercel.app/past -o p.html
 
 ### P0-2　h2 的釋字第272號內容錯誤（法律錯誤）　🔺 全清單最高優先
 
+> **2026-09-21 補述：此列在線上已消失，並加一道反向保護。原文保留。**
+> feature `056`（`../constitution-features/056-pre-launch-checklist.md`）的複驗確認：captain 清空 `status` 後，
+> `scripts/sync-content.mjs:354` 的 `isApproved()` 把 `h2` 濾掉。`src/data/history.json` 40 筆內已無 `h2`。
+> 讀者現在看不到這筆錯誤。
+> 「待法學確認」仍然成立。改變的只是它不再是線上可見的錯誤，而是一道必須守住的閘門。
+> **反向保護見本節末的「反向保護」一條。**
+
 - **狀態**：**待法學確認** — 不要在確認前修改
 - **為何在受眾修正後仍維持最高優先**：看到這筆錯誤的人**包含法學背景的工作夥伴**。專業受眾看到錯誤的釋字解讀，對專案專業性的信任損害，比公開與否更難補救。這是唯一不因「還沒公開」而降級的項目
 - **影響**：現行資料將釋字第272號誤植為言論自由案
@@ -216,6 +264,24 @@ curl -s https://constitution-nine.vercel.app/past -o p.html
 - **注意**：此列結構正常，機器掃不出來，只有靠人讀才發現
 - **誰能做**：法學協作者確認 → 工程師修正
 - **卡在**：需要一位法學背景的人拍板
+- **反向保護**（2026-09-21 加入，對應 `056` 的 `G-6`）：把 `h2` 重新標成 `Approved` 之前，必須先有法學背景者的確認記錄。
+  沒有記錄就重新標 `Approved`，下次同步會把錯誤內容送回線上。
+  **查驗指令以 `../constitution-features/056-pre-launch-checklist.md` 第三節標記 `# canonical: G-6` 的那一段為正本，本檔不另存副本**
+  （2026-09-24 cycle 8 改；原本此處自帶一份 `node -e` 指令，見下方補述）。通過條件為印出 `G-6 PASS` 且離開碼 `0`。
+  2026-09-21 曾實測 id 層輸出 `false false`。任一列回來、或 `272` 的內容以任何 id 出現，表示有人把該列重新標成 `Approved`，
+  `../constitution-features/056-pre-launch-checklist.md` 的 gate 即不通過，不可移除 noindex（見 P3-8）
+
+> **2026-09-24（cycle 8）補述：本節原本自帶一份 G-6 查驗指令，已移除並改為指向正本。原指令逐字保留於此。**
+> 原句為：「沒有記錄就重新標 `Approved`，下次同步會把錯誤內容送回線上。查驗指令如下，兩個輸出都必須是 `false`：」，其後為一個 `bash` 區塊，內容逐字為 `node -e "const a=require('./src/data/history.json');const i=a.map(x=>x.id);console.log(i.includes('h2'),i.includes('h28'))"`。
+> **為什麼移除而不是留著**：`056` 的 G-6 判準已於 2026-09-24（cycle 8）補上內容層斷言（`JSON.stringify(a).includes('272')`），
+> 因為只看 id 會漏掉「同樣的錯誤內容換一個 id 重新核可」。本檔這一份是 id 層的舊形式，留著就是第二份會分岔的副本——
+> 事實上它在被移除時**已經**與正本不同形（`console.log` 對 `process.exit(1)`）。
+> `056` 的分岔偵測只掃該票一個檔案，看不到本檔，所以本檔的副本沒有任何機制保護。移除副本比再蓋一層偵測可靠。
+> **2026-09-24（cycle 9）補述：上面提到的內容層斷言已再次改強，該描述只反映 cycle 8 當時的判準。原句不改寫。**
+> `056` 的 G-6 內容層已於 2026-09-24（cycle 9）從裸子字串 `JSON.stringify(a).includes('272')` 改為 **case-number 型樣**——
+> 容忍半形／全形數字、有無空格（半形或全形）與簡繁，並掃**所有字串欄位**、回報命中的欄位路徑。
+> 原因是裸子字串**兩個方向都錯**：漏掉全形 `釋字第２７２號`（fail-open，靜默），又會打到圖片網址裡的 `272`（fail-closed）。
+> **現行寫法一律以正本為準**，即 `../constitution-features/056-pre-launch-checklist.md` 標記 `# canonical: G-6` 的那一段；本檔仍不另存副本。
 
 ---
 
@@ -298,6 +364,13 @@ curl -s https://constitution-nine.vercel.app/past -o p.html
 
 ### P0-6　`h28` 掛了 `h14` 的標題　🔺 對外可見的事實錯誤
 
+> **2026-09-21 補述：此列在線上已消失，並加一道反向保護。原文保留。**
+> feature `056`（`../constitution-features/056-pre-launch-checklist.md`）的複驗確認：`src/data/history.json` 40 筆內已無 `h28`。
+> 標題「對外可見」這個描述已不成立。「待補正確標題」仍然成立。
+> **反向保護見本節末的「反向保護」一條。它補在下方「解除方式」之上，不取代它。**
+> 同一次複驗另外找到一組同型缺陷：`h34`（釋字第708號）與 `h35`（釋字第710號）的 `reality.title` 一字不差，
+> 兩筆都在線上。該項由 `056` 列為 D4 並另行開票，不併入本節。
+
 - **狀態**：已由 captain 於 2026-09-02 清空 `status` 暫時擋住，**待補正確標題**
 - **證據**：兩筆的 `title` 一字不差
 
@@ -310,7 +383,25 @@ curl -s https://constitution-nine.vercel.app/past -o p.html
 - **為什麼先前抓不到**：037 做過兩次「505 項欄位比對」，但那驗的是「有沒有忠實抄自試算表」。
   **這裡是試算表本身寫錯**，逐欄比對必然通過
 - **誰能做**：內容判斷。FO 不擬標題 —— 生一句「看起來對」的正是本專案在清的東西
-- **解除方式**：在 `SSOT_收集區` 補上正確 `title`，並把 `status` 改回 `Approved`
+- **反向保護**（2026-09-21 加入，對應 `056` 的 `G-6`）：把 `h28` 重新標成 `Approved` 之前，必須先有確認記錄，
+  記明正確 `title` 已經由具法學背景者核對過。FO 不擬標題。
+  **查驗指令與 P0-2 的「反向保護」同一條，正本在 `../constitution-features/056-pre-launch-checklist.md` 的 `# canonical: G-6`，本檔不另存副本**
+  （2026-09-24 cycle 8 改；原本此處自帶一份 `node -e` 指令，見下方補述）。通過條件為印出 `G-6 PASS` 且離開碼 `0`。
+  2026-09-21 曾實測 id 層輸出 `false false`。任一列回來，表示有人把該列重新標成 `Approved`，
+  `../constitution-features/056-pre-launch-checklist.md` 的 gate 即不通過，不可移除 noindex（見 P3-8）
+- **解除方式**：在 `SSOT_收集區` 補上正確 `title`，並把 `status` 改回 `Approved`。此步驟以上一條的確認記錄為前置
+
+> **2026-09-24（cycle 8）補述：本節原本自帶一份 G-6 查驗指令，已移除並改為指向正本。原指令逐字保留於此。**
+> 原句為：「記明正確 `title` 已經由具法學背景者核對過。FO 不擬標題。查驗指令與 P0-2 的「反向保護」同一條，兩個輸出都必須是 `false`：」，其後為一個 `bash` 區塊，內容逐字為 `node -e "const a=require('./src/data/history.json');const i=a.map(x=>x.id);console.log(i.includes('h2'),i.includes('h28'))"`。
+> **為什麼移除而不是留著**：`056` 的 G-6 判準已於 2026-09-24（cycle 8）補上內容層斷言（`JSON.stringify(a).includes('272')`），
+> 因為只看 id 會漏掉「同樣的錯誤內容換一個 id 重新核可」。本檔這一份是 id 層的舊形式，留著就是第二份會分岔的副本——
+> 事實上它在被移除時**已經**與正本不同形（`console.log` 對 `process.exit(1)`）。
+> `056` 的分岔偵測只掃該票一個檔案，看不到本檔，所以本檔的副本沒有任何機制保護。移除副本比再蓋一層偵測可靠。
+> **2026-09-24（cycle 9）補述：上面提到的內容層斷言已再次改強，該描述只反映 cycle 8 當時的判準。原句不改寫。**
+> `056` 的 G-6 內容層已於 2026-09-24（cycle 9）從裸子字串 `JSON.stringify(a).includes('272')` 改為 **case-number 型樣**——
+> 容忍半形／全形數字、有無空格（半形或全形）與簡繁，並掃**所有字串欄位**、回報命中的欄位路徑。
+> 原因是裸子字串**兩個方向都錯**：漏掉全形 `釋字第２７２號`（fail-open，靜默），又會打到圖片網址裡的 `272`（fail-closed）。
+> **現行寫法一律以正本為準**，即 `../constitution-features/056-pre-launch-checklist.md` 標記 `# canonical: G-6` 的那一段；本檔仍不另存副本。
 - **驗證**：
   ```bash
   # 同步後，兩筆的 title 不應相同
@@ -320,11 +411,60 @@ curl -s https://constitution-nine.vercel.app/past -o p.html
   print(t); print('相同' if len(set(t.values()))==1 else '已區分 ✅')"
   ```
 
+### P0-7　判決門檻的具體人數待法學確認（法律判斷）　🔺 與 P0-2 同級
+
+- **狀態**：**待法學確認** — 程式碼已停止顯示任何人數，確認前不要填回數字
+- **背景**：站上原本寫「判決門檻 10 名大法官同意」。這句錯兩層：
+  10 是「參與評議人數下限」，不是同意人數；而訂下它的條文已經失效
+- **一手來源**：
+
+| 項目 | 內容 | 出處 |
+|---|---|---|
+| 現行有效門檻 | 「應經大法官現有總額三分之二以上參與評議，大法官現有總額過半數同意」 | 憲法訴訟法第 30 條第 1 項 |
+| 已失效的固定下限 | 參與評議不得低於 10 人；同意違憲宣告不得低於 9 人 | 同法第 30 條第 2 項 |
+| 失效依據 | 114 年憲判字第 1 號，114-12-19（2025-12-19）公告日起失其效力 | https://cons.judicial.gov.tw/docdata.aspx?fid=38&id=355485 |
+
+- **⚠️ 查證陷阱**：全國法規資料庫至今仍原樣顯示已失效的第 30 條第 2 至 6 項，
+  不加任何失效標註。**只查該站會得到「10 是對的」這個錯誤結論。**
+  條文是否有效，權威在憲判主文，不在法規資料庫的顯示
+- **待拍板的四項**（編號沿用
+  `docs/constitution-features/063-required-for-ruling-legal-accuracy.md` 第五小節）：
+
+| 代號 | 待拍板問題 |
+|---|---|
+| L1 | **（2026-09-23 更新問法）法庭已連續七則判決都採「拒絕參與評議者不計入現有總額」，站上要不要照法庭的算法寫？**<br>證據：115 憲判 6 理由【30】已實跑自一手來源確認：「本庭現任大法官8人，因其中3人持續拒絕參與評議……應由實際參與評議之大法官5人作成本判決，合先敘明（本庭114年憲判字第1號、115年憲判字第1號至第5號判決參照）。」該括號把 114憲判1 與 115憲判1 至 5 全部列為先例，加上 115憲判6 本身即七則。<br>原問法（保留原句）：「「現有總額」現在是 8（在職人數）還是 5（扣除持續拒絕參與評議者）？114 憲判 1 理由【50】的認定是否及於其他案件」——該問法問的是「是否及於其他案件」，七則判決已回答了法庭自己怎麼做；仍待拍板的是**站上要不要照寫**，那是編輯決定，不是法律解釋 |
+| L2 | 依 L1 的答案，「三分之二以上」遇到非整數時如何進位 |
+| L3 | 114 憲判 1 該描述為「全部違憲」還是「部分違憲」。第 30 條第 1 項未被聲請、未受審查、仍有效 |
+| L4 | 站上還能不能說憲法法庭「實質上無法做出任何判決」。民國 115 年已有六則判決，最近一則 115-08-14 |
+
+- **目前的擋法**：`src/data/future.ts` 的 `RULING_THRESHOLD.headcount` 為 `null`。
+  渲染端 `src/components/future/RulingThresholdNote.tsx` 在 `null` 時完全不顯示人數，
+  改敘述條文給的比例。站上寫「換算成具體人數須經法學確認，本站不列。」
+- **誰能做**：法學協作者拍板 L1 到 L4 → 工程師填 `headcount` 並改文案
+- **卡在**：需要一位法學背景的人拍板
+- **解除方式**：拍板後把結論寫進本節，再把 `headcount` 從 `null` 改為拍定的數字
+- **驗證**：
+  ```bash
+  # headcount 仍為 null 時，站上不得出現任何推算人數
+  grep -n 'headcount' src/data/future.ts
+  grep -rnE '需 *[0-9]+ *(人|名).*(判決|同意)|[0-9]+ *名大法官同意' src/ ; echo "exit=$? （1 = 0 筆，正確）"
+  ```
+  `headcount` 不是 `null` 而本節沒有對應的已拍板記錄，即為失敗
+
+---
+
 ---
 
 ## P1 — 資料有遺失風險
 
 ### P1-1　搶救內容尚未搬回試算表　🔔 明天的第一項工作
+
+> ⚠️ **2026-09-04 更正：P1-1 已完成。標題的「尚未搬回」與「🔔 明天的第一項工作」都已不成立。**
+> 回填已於 2026-09-01 結束。本檔 `:105-108` 逐項記錄查核結果，`:110` 寫明「回填工作到此結束，SSOT 內容面已無待辦」。
+> 本檔文末「已完成項目」摺疊區也列有「**P1-1** 搶救內容回填試算表」。
+> 10 格中 6 格逐字相符，d7 vibe 已更新，tldr 那格由 `site_tldr` 的結構變更取代（見 P1-5）。
+> 本節以下全部保留，記錄的是回填前的狀態。
+> 本次更正見文末「進度紀錄」的 2026-09-04 一列。
 
 - **狀態**：已備份、已擴充，**未搬回**
 - **完整清單**：[`../content-rescue/ssot-backfill.md`](../content-rescue/ssot-backfill.md) —— 共 **10 格**，含儲存格位置與可直接複製的內容
@@ -503,11 +643,60 @@ for f in $(grep -rl '[一-鿿]' src/app src/components --include='*.tsx'); do
 done | sort -rn | head -12
 ```
 
+### P1-9　`/opinion-lazybag` 的意見光譜已移除，尚未補回　🔴 發布檢查表不要漏掉
+
+- **狀態**：待 `049` 重建資料後補回
+- **做了什麼**：`065` 於 2026-09-23 把 `/opinion-lazybag` 的「大法官怎麼想的」整段移除，首頁 CTA 也不再承諾「大法官意見的光譜分佈」。captain 已核可。
+- **為什麼移除**：該段的 14 位具名大法官名單對 113憲判9 與 114憲判1 **兩個判決都不成立**。4 位（黃虹霞、吳陳鐶、蔡明誠、林俊益）不在任一合議庭；漏列 113憲判9 合議庭 5 人（含主筆蔡宗珍）；呂太郎、楊惠欽被標「不同意見」但未提出任何意見書。這是公開頁面上對真實公職人員的不實陳述。
+- **檔案沒刪**：`src/components/opinion-lazybag/StanceSpectrum.tsx` 保留，未被任何檔案 import。
+- **誰補回**：`docs/constitution-features/049-opinion-lazybag-content-provenance.md`。一手來源是 113憲判9 判決書頁面的「憲法法庭113年憲判字第9號判決主文立場表」PDF（`https://cons.judicial.gov.tw/docdata.aspx?fid=38&id=352966`）。
+- **對發布的影響**：`/opinion-lazybag` 不在 `src/data/launch-status.ts:3` 的 `PUBLIC_PAGES`，本項不擋發布。列此是為了避免發布檢查表把「意見光譜」當成既有功能。
+- **驗證**：`grep -rn 'StanceSpectrum' src/` 只應命中元件檔本身。
+
+
+---
+
+### P1-9　憲法法庭年度產能的正確口徑與數字（事實待拍板）
+
+- **狀態**：**待人工拍板** — 站上已先移除無來源數字，不要在拍板前填任何數字
+- **影響**：`/future` 的「案件持續積壓」區塊原本寫一句沒有來源的年度產能數字。該句已於 feature `066` 刪除。刪除後該段不再給年數，讀者拿不到「要多久才消化得完」的量級
+- **證據**：專案內有三個互斥的產能數字
+
+| 來源 | 數字 | 隱含的年度產能 |
+|---|---|---|
+| `src/app/future/page.tsx`（已刪除） | 約 30~40 件 | 30~40 件 |
+| `src/data/future.ts` 的 `estimatedClearanceYears: 3.4` | 473 ÷ 3.4 | 約 139 件 |
+| `src/data/future.ts` 的 `avgDaysPerCase: 120`（經 `BottleneckFunnel.tsx:35` 換算） | 473 × 120 ÷ 5 位大法官 ÷ 365 | 換算得 31.1 年 |
+| 憲法法庭判決清單實跑計數（2026-09-21 取證） | 111 年 20 則、112 年 20 則、113 年 11 則 | 11~20 則 |
+
+- **判斷**：三個站上數字彼此矛盾，且都與判決清單的實際則數對不上。根本原因是「處理量」沒有定義口徑 —— **判決**（憲判字）、**結案**（含不受理裁定）、**受理**三者相差一個量級
+- **要決定的是**：（1）站上講「處理量」時採哪一個口徑；（2）該口徑下的數字與來源；（3）`estimatedClearanceYears` 與 `avgDaysPerCase` 是否一併重設或刪除
+- **誰能做**：熟悉憲法法庭統計的人拍板口徑 → 工程師改 `future.ts` 與 `/future` 文案
+- **卡在**：需要一個人決定口徑。工程師無法代拍 —— 換一個數字只是把無來源數字換成另一個無來源數字
+- **相關**：P0-7（判決門檻的具體人數待法學確認）同屬「數字須人工拍板」類
+- **驗證**：本區塊是這條檢查的**唯一定義處**。
+  `docs/constitution-features/066-quiz-timeline-voided-quorum-present-tense.md` 的 AC6 第 2 條
+  只引用這裡，不另存一份。
+
+  ```bash
+  # 拍板前：站上不得再出現無來源的年度產能數字
+  grep -nE '每年[^。]*[0-9]+[^。]*件' src/app/future/page.tsx   # 應為 0 筆
+  ```
+
 ---
 
 ## P2 — 結構性問題（不修就會再發生一次）
 
 ### P2-1　Track 1 完全沒有把關
+
+> ⚠️ **2026-09-04 更正：P2-1 已於 2026-09-02 解決。**
+> 過濾條件已改為嚴格模式，`status` 空白不再放行。改動在 PR #32。
+> 驗證指令：`grep -n "isApproved" scripts/sync-content.mjs`。
+> `scripts/sync-content.mjs:354` 的函式是
+> `return (record.status || '').trim().toLowerCase() === 'approved';`。
+> Track 1 與 Track 2 都用它過濾，見同檔第 478、532、601 行。
+> 本節以下全部保留，記錄的是修好之前的狀態。
+> 本檔「已完成項目」摺疊區也已記為完成。本次更正見文末「進度紀錄」的 2026-09-04 一列。
 
 - **證據**：`scripts/sync-content.mjs`
 
@@ -540,6 +729,9 @@ done | sort -rn | head -12
   （附帶：`收集區` 的 h2 內容**已是改正後的訴訟權版本**，所以真放行反而會修好 h2。但「擋不住」這個機制缺陷與內容對錯無關，仍須修。）
 
 - **修法不變，且更急**：過濾改為 `row.status && row.status.toLowerCase() === 'approved'`，與 Track 2 一致
+
+> ⚠️ **2026-09-04 更正：上面這句「修法不變，且更急」已經執行完畢。**
+> 過濾條件已於 2026-09-02 改為嚴格模式，與 Track 2 一致。見本節開頭的更正段。
 
 ### P2-2　兩張 SSOT 落差巨大
 
@@ -586,6 +778,12 @@ captain 指出那些中文是寫給學者老師看的，刪掉編輯端就失去
 - **證據**：`git log -1 -- src/data/discussions.json` → 2026-05-02
 - **後果**：`收集區` 之後的所有編輯都沒有上線，包含專家對 h2 的改正
 
+> ⚠️ **2026-09-04 更正：P2-6 已不成立。sync 已於 2026-09-02 跑過。**
+> 本節自訂的驗證指令 `git log -1 -- src/data/discussions.json` 現在輸出
+> `77d9cea`（2026-09-02）「首次以修正後的產線同步內容（25 → 40 筆）」，不是原文寫的 2026-05-02。
+> 該批內容於 2026-09-03 隨 PR #33 上線，含專家對 h2 的改正。
+> 原句保留。本次更正見文末「進度紀錄」的 2026-09-04 一列。
+
 ### P2-7　殭屍分頁與備份檔名
 
 - `SSOT_Editor` 的 `工作表3` 是 `Track 1_history` 的舊複本（只有 h1–h14）
@@ -606,12 +804,30 @@ captain 指出那些中文是寫給學者老師看的，刪掉編輯端就失去
 - **暫時緩解**：Vercel 的 `TRACK_1_CSV_URL` / `TRACK_2_CSV_URL` 已改名加 `_disabled`（2026-08-31），sync 會 skip 且退出碼為 0，部署不受影響（已實測）
 - **根本解法**：[design.md](../content-pipeline/design.md) 不變式 #1 —— 部署不得執行 sync。對應施工項目 8
 
+> ⚠️ **2026-09-04 更正：P2-8 已從根本解決，不再只是「暫時緩解」。**
+> 上面「證據」引的 `"build": "node scripts/sync-content.mjs && next build"` 已不是現況。
+> `package.json` 的 `build` 現在是 `"next build"`，不含同步。改動在 PR #32，對應施工項目 8。
+> 驗證方式：`npm run build` 前後跑 `shasum -a 256 src/data/*.json`，兩次相同。
+> 2026-09-04 於 feature 041 的 worktree 實測，兩檔指紋前後皆未變。
+> 「暫時緩解」所指的 Vercel `_disabled` 環境變數已不是防線，因為部署本身不再執行同步。
+> 原句保留。本次更正見文末「進度紀錄」的 2026-09-04 一列。
+
 ### P2-9　編輯台沒有預覽介面，核可的人看不到成品
 
 - **狀態**：已納入設計，待施工
 - **問題**：核可者只能看試算表儲存格，無法看見網站呈現。這是 test 字串與佔位摘要能通過核可的根源
 - **既有的 `/preview` 路由不是解答**：它是寫死假資料的視覺風格對照頁，與實際內容無關
 - **解法**：PR 的 Vercel preview 網址（[design.md](../content-pipeline/design.md) 第五節）。已確認不需獨立 staging
+
+> ⚠️ **2026-09-04 更正：P2-9 的「待施工」已不成立，但殘留風險仍在。兩面都要看。**
+> **已不成立的部分**：解法不需要寫程式。解法就是 PR 的 Vercel 預覽網址。
+> `2026-09-03-editor-onboarding.md:381-382` 記載該流程於 2026-09-03 已實際使用：
+> captain 對 diff、看預覽網址，再把預覽連結貼進群組給沒有 GitHub 帳號的學者。
+> **仍然開著的部分**：這條路徑沒有機制保證。
+> 同一份記錄 `:453` 逐字寫「誰負責把同步錯誤訊息與 PR 預覽連結轉貼給學者。這兩個環節完全靠人記得做」。
+> 忘記轉貼，核可者就看不到成品，本節指出的根源就會重現。
+> 這違反 `../content-pipeline/design.md` 不變式 #6（約定必須可被機器驗證），尚未有對應的票。
+> 原句保留。本次更正見文末「進度紀錄」的 2026-09-04 一列。
 
 
 ### P2-10　`textbook.content` 走 `dangerouslySetInnerHTML` 且不淨化
@@ -675,6 +891,12 @@ captain 指出那些中文是寫給學者老師看的，刪掉編輯端就失去
 | 「允鍾」 | `收集區` 的 owl comment 欄標題寫「允鍾如果有靈感可以寫一句短評」 |
 | 其他 | 撰稿人選盤點、受訪學者專家名單（在本機 `憲庭加好友文件/網站書籍策劃/`）尚未盤點 |
 
+> ⚠️ **2026-09-04 更正：上表的 `憲庭加好友文件/` 已更名為 `Constitution_docs/`。**
+> captain 於 2026-09-04 更名，目的是讓路徑不含中文字元。資料夾底下的子目錄與檔名仍是中文。
+> 權威紀錄見 `00 Workspace/workspace-governance/GIT-BOUNDARIES.md`。
+> 原表格保留，路徑請自行代換。
+> 代換時要注意：更名時子目錄一併加了編號前綴。`憲庭加好友文件/網站書籍策劃/` 的現址是 `Constitution_docs/1_網站書籍策劃/`，不是 `Constitution_docs/網站書籍策劃/`。六個子目錄為 `0_會議紀錄與待辦/` 至 `5_archive/`，見 `GIT-BOUNDARIES.md:54`。
+
 ### P3-3　三處資料重複
 
 | 內容 | 位置 A | 位置 B | 建議 |
@@ -683,6 +905,9 @@ captain 指出那些中文是寫給學者老師看的，刪掉編輯端就失去
 | 聊聊紀錄 | Drive `聊聊紀錄/` | repo `docs/meetup-chats/` | 擇一 |
 | 黑客松提案 | Drive `黑客松提案文件/` | 本機 `g0v黑客松提案/` | 擇一 |
 | 讀物清單 | 本機根目錄 | 本機 `網站書籍策劃/` | 擇一 |
+
+> ⚠️ **2026-09-04 更正：上表的 `憲庭加好友文件/` 已更名為 `Constitution_docs/`。**
+> 更名時間與依據同 P3-2 的更正段。原表格保留，路徑請自行代換。
 
 ### ~~P3-4　資料夾規劃方案未定案~~ ✅ 已定案
 
@@ -710,6 +935,7 @@ captain 指出那些中文是寫給學者老師看的，刪掉編輯端就失去
 ### P3-8　🚨 發布前必須移除 noindex
 
 - **狀態**：**現在刻意保持著，不要動**（2026-09-01 確認）—— 目前就是不要讓 Google 搜尋得到。**等真的要對外發布時才移除**
+- **解除條件**（2026-09-21 加入）：`../constitution-features/056-pre-launch-checklist.md` 第三節的 gate 執行清單 `G-1` 至 `G-8` 八項全數通過。八項未全數通過，不可移除這一行。移除後在該票的 Feedback Cycles 記下執行日期與 commit SHA
 - **原狀態**：已加入（2026-08-31），**發布時必須移除**
 - **位置**：`src/app/layout.tsx` 的 `metadata.robots`
 
@@ -808,15 +1034,16 @@ git log -1 --format='%ad %s' --date=short -- src/data/discussions.json
 ### 卡在人，越早問越好
 
 4. **P0-2** 找法學協作者確認 `h2` 釋字第 272 號
-5. **P1-6** 確認網站版貓頭鷹短評是否為 AI 生成
+5. **P0-7** 找法學協作者拍板判決門檻的具體人數（L1 到 L4）—— 目前站上不顯示人數擋住
+6. **P1-6** 確認網站版貓頭鷹短評是否為 AI 生成
 
 ### 之後
 
-6. **[feature 040](../constitution-features/040-approval-content-version-binding.md)** 核可綁定內容版本（score 0.95，全 workflow 最高）。這是 P3-1 與下次正式同步的前置
-7. **P1-8** 盤點全站無 SSOT 來源的內容 —— 建議先處理 `opinion-lazybag` 那兩個檔
-8. **`docs/constitution-features/039`** 常設渲染檢查工具（機械檢查，非 AI 內容偵測）
-9. **P2-10** `dangerouslySetInnerHTML` 淨化 —— **必須在 P3-1 分享試算表之前處理**
-10. **P3-8** 發布前移除 `noindex`
+7. **[feature 040](../constitution-features/040-approval-content-version-binding.md)** 核可綁定內容版本（score 0.95，全 workflow 最高）。這是 P3-1 與下次正式同步的前置
+8. **P1-8** 盤點全站無 SSOT 來源的內容 —— 建議先處理 `opinion-lazybag` 那兩個檔
+9. **`docs/constitution-features/039`** 常設渲染檢查工具（機械檢查，非 AI 內容偵測）
+10. **P2-10** `dangerouslySetInnerHTML` 淨化 —— **必須在 P3-1 分享試算表之前處理**
+11. **P3-8** 發布前移除 `noindex`
 
 不擋任何事：P3-9 的內容品質雜項、`vibe` 下拉選單、
 文件整併第 2／4 階段、`design-assets` refit、`019` 票。
@@ -869,3 +1096,4 @@ git log -1 --format='%ad %s' --date=short -- src/data/discussions.json
 | 2026-09-03 | 038 移除 AI 生成的跨軌道連結 | PR #34 |
 | 2026-09-03 | 內容同步 25→40 筆正式上線 | PR #33 |
 | 2026-09-03 | `design.md` 第七節施工項目全部結案；P1-7 隨 038 消滅 | 本次 |
+| 2026-09-04 | 041 修正五份文件與實際行為不符之處，共 23 處追加補述；查核日更新為 2026-09-04 | 本次 |

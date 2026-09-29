@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:063:review:attempt-2:revision-1",
+  "question": "review 重審判 PASSED。下一站是 complete（terminal）——核准即進入交付流程（`pr-merge` 的 PR 仍會再問你一次）。**我建議核准。** R1／R2 都修好且作法與本票一貫原則一致（原句一字不動、追加標日期補述），【30】引文逐字對回當天重取的一手來源。reviewer 把 R1 的診斷往前推了一步：**真正的成因不是「grep 沒想到兩種寫法」，而是 AC3 第 3 條早就同時列了兩種寫法、AC7 沒有跟上——規格自身不一致，不是未知的未知。** 順這條線它另查出三處同型盲區，全部只記錄未修（AC 變更只有你能做）：S1（AC1 的人數 grep 漏「位」與中文數字）、**S2（AC4 的守門字串是阿拉伯數字 `10`，但條文自己寫「十」——與本票記載的查證陷阱直接咬合：法規資料庫顯示的正是「不得低於十人」，逐字複製貼上就會讓 AC4 通過而頁面留下未標註的失效下限）**、S3（AC6 指名一個從未存在的 `src/data/owls.json`）。這三項與 065 的 AC-5、012 的 AC-1、056 的 G-5 是同一類問題，我已另外向你提出一次性授權。",
+  "artifacts": [
+    {
+      "id": "artifact:063:review:attempt-2:revision-1:item-1",
+      "uri": "git-root://main/f31ce28b84c96b0751c2cf119ac6b765295d23a5/docs/constitution-features/063-required-for-ruling-legal-accuracy.md",
+      "rev": "sha256:235edd9f27a15347f8b956d4fb75850256aa35c8fc634fbf08fda66902110445",
+      "mediaType": "text/markdown",
+      "summary": "R1 與 R2 都只有一行的份量，但兩者都落在比這張票活得久的文件裡——第 22 行是本票第一段、下一個接手的人會讀到；P0-7 是要交到法學協作者手上的那份。兩處都修好，原句一字未動、追加標日期補述。reviewer 另行確認：P0-7 單讀可判斷（一位沒參與過本票的法學協作者能正確理解要他拍板的是什麼）；R5 是它自己上一輪記錯（本票當時只有兩個修正輪，它數的是 stage report 序號），已更正。未越界未回歸：src/ 零變動、AC 全節 sha256 三點相同、R3／R4 零變動、V7／V8／V11 與 page.tsx:201 零變動、headcount 仍為 null、AC1–AC7 重跑無回歸。仍未達成的項目原樣留存：L1／L2／L3 待法學拍板、L5 本環境無法量測、V7 已另開票 066。"
+    }
+  ]
+}

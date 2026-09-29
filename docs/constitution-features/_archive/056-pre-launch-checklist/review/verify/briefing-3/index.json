@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:056:verify:attempt-3:revision-1",
+  "question": "verify cycle 5 判 PASSED。F-9 與 F-10 都以 reviewer 提出時的同一標準驗過，且 reviewer 主動承認它在 F-10 上判斷錯誤（見摘要）。**我建議退回，再修一項：F-11。** 理由與你上次退回 F-9 時採納的完全相同，而這次更尖銳——**F-11 落在 G-5，正是本票為了防止 `015` 事故（`某學者，某大學法律系` 公開顯示四個月）而加的那道檢查。** G-5 的掃描寫 `前端工程師 [AB]`，其中那個半形空格是必要的；因此 `前端工程師A`（無空格）、全形空格、簡體 `某学者`／`某大学`、全形 `５個重點` **全部掃不到**（reviewer 逐行測了十一個字串）。**G-5 以零命中為通過，所以這是 fail-open。** 目前三個既有佔位值仍抓得到，故 reviewer 判 Deferred risk；但**若 `052` 改寫 `contributors.ts` 時把那個空格拿掉，它立刻變成抓不到**。修法與 F-9 同類：讓掃描涵蓋既有的寫法變體。這與 065 的 AC-5、012 的 AC-1、063 的 S1／S2／S3 是同一類問題，我已另外向你提出一次性授權。",
+  "artifacts": [
+    {
+      "id": "artifact:056:verify:attempt-3:revision-1:item-1",
+      "uri": "git-root://main/c873b73f94805807e9b0e4f0cd89e3f7a4990402/docs/constitution-features/056-pre-launch-checklist.md",
+      "rev": "sha256:4a679755fcd5e749af2c55db0f77d80e74d7a591504eb1feaae6c72270f98e32",
+      "mediaType": "text/markdown",
+      "summary": "F-9 雙向驗證以從文件抽出的指令完成（282B、純 ASCII、stderr 零位元組、exit 0）：誘餌放進 Out of scope 與 stage report 兩處，舊指令兩次都報 RECORDED（fail-open 重現）、新指令報 NO-RECORD；而在 Feedback Cycles 放入真實記錄、兩個誘餌仍在的同一次執行中，新指令仍報 058 RECORDED 而誘餌票 049 報 NO-RECORD——**最後這兩列正是用來排除「假修法」的**：一條永遠回 NO-RECORD 的指令會通過方向 (a) 卻悄悄殺掉那條出口。F-10 確認真的沒有歸因、沒有換上新的未證實歸因、原句逐字保留一次；reviewer 判定外部 gate 執行者不會去改原始碼（禁令置頂且粗體、錯誤字串可引用、判準改為「解法有效」＋「src/ 未變」兩項皆可量測而無需知道成因）。**reviewer 並主動承認它在 F-10 上判斷錯誤**：它 cycle-4 的檢查帶了 `2\u003e/dev/null`，使「Operation not permitted」與「不存在」無法區分；不加抑制重跑後 CloudDocs、brctl、甚至 ~/Library 本身全部回 Operation not permitted——iCloud 歸因與它自己的反駁都未經證實，「完全不歸因」的處置比它提的更好，它並自陳「我對別人用了一個自己沒做到的標準」。無越界：九項位元組比對全部 True，含 AC 區段 1622B 在五輪之間未變。"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:056:verify:attempt-5:revision-1",
+  "question": "verify cycle 7 判 PASSED，F-12 的根本修法經對抗性實證有效。**這一次我改建議核准，理由與前六次不同。** 前面每一次我建議退回，是因為找到的都是**可執行的缺陷**：F-6 主條件不可達、F-9 與 F-11 fail-open、F-12 兩份可執行副本分岔。**F-13 是第一個不是這一類的**——它是 `:215` 的「可複製貼上」展示形式，為了表格儲存格必須轉義 `\\|` 而存在，**本身不可執行**；它今天與 `:171` 逐位元相同（已驗證），風險是日後 pattern 變更時只動一份而無人察覺。reviewer 自己的用詞是「成因被**收窄**了，不是消除」，並誠實指出那份副本落在檢查範圍外（檢查只掃 fenced 區塊，它是 blockquote）。**F-14**（Polish）：自我排除依賴字面字串 `divergence-check` 出現在區塊中，故任何帶該詞的新區塊也會被排除——它自己做了示範。兩項皆不使任何 AC 失敗。本票已跑七輪、每輪都找到同類缺陷的新實例；**我認為在「可執行缺陷已全數清除、殘留只剩展示形式」這個點上收票是對的**，兩項殘留已完整記錄在票內，gate 執行者讀得到。若你仍要折進來，我會照辦——但這是我第一次認為邊際報酬已經轉負。",
+  "artifacts": [
+    {
+      "id": "artifact:056:verify:attempt-5:revision-1:item-1",
+      "uri": "git-root://main/5354519732352940aac8c0806d69bcc82f5e20fb/docs/constitution-features/056-pre-launch-checklist.md",
+      "rev": "sha256:aaf95c25438e14a420d1a604c4e9b442e6f3428ae6f4e181dd991781a010e466",
+      "mediaType": "text/markdown",
+      "summary": "最要緊的問題有實證答案：那條偵測重複清單的檢查**真的抓得到未來的分岔**。reviewer 在三個不同區段（Documentation impact、Out of scope、Risk evidence）各植入一份重複的 G 項清單，三份**全部回報 STRAY 且區段標籤正確**；並做了反向測試——放在第三節內的清單**正確地不被標記**，這排除了「一條什麼都報因而永遠不通過」的假檢查。還原後歸零。真實候選上：**零 STRAY**，一筆 AC-OWNED（AC-3 在 Acceptance criteria 內的 grep），**以已知例外的身分宣告而非藏起來**。Test plan 已無可執行清單且保留四項非重複內容（含「不執行 `npm run sync-content`」）。**implement 沒有把缺的字串補進去**——活文件中三個 G-5 pattern 為 6／6／5 個變體，那個 5 變體的落在 `原句為` 標記之後、是被移除副本的 blockquote 引文；移除副本而非對齊兩份，是對授權的正確解讀。reviewer 另就分支落後一事**查了歸屬而非採信**：`future.ts` 與 main 差 92 行但本分支從未觸碰（`merge-base..HEAD` 對該路徑的 git log 為空，而 main 上有 063 的三個 commit），自 merge-base 以來本分支在 `src/` 下只動過一行（`layout.tsx` 的綁定）；`src/data/*.json` 與 main 逐位元相同、七輪 sha256 未變；AC 區段 1622 bytes 七輪未變。方法註記一則：抽出該檢查指令需**行錨定**的 fence 解析，非貪婪正規式會被 awk 程式內的三個反引號截斷——第一次嘗試即撞到，且產生語法錯誤而非錯誤答案，**會大聲失敗**。"
+    }
+  ]
+}

@@ -1,3 +1,7 @@
+// 失效句一律 import，不在本檔手寫。唯一定義處為 src/data/ruling-threshold.ts。
+// 理由見 docs/constitution-features/066-quiz-timeline-voided-quorum-present-tense.md 第五小節。
+import { VOIDED_FLOOR_CLAUSE, VOIDED_FLOOR_SHORT } from "@/data/ruling-threshold";
+
 export interface QuizOption {
   label: string;
   text: string;
@@ -80,7 +84,7 @@ export const controversyQuiz: QuizMeta = {
       ],
       correctIndex: 2,
       explanation:
-        "這是「修法加卡人」雙殺策略的核心。表面上是「提高司法品質」，實際上搭配立法院拒絕行使大法官人事同意權，讓法庭永遠湊不到開庭人數。大法官法定員額 15 人，但 2024 年 10 月 31 日一口氣有 7 位大法官任期屆滿離任，僅剩 8 位——根本達不到 10 人門檻。",
+        `這是「修法加卡人」雙殺策略的核心。表面上是「提高司法品質」，實際上搭配立法院拒絕行使大法官人事同意權，讓法庭在新法生效後湊不到開庭人數。大法官法定員額 15 人，2024 年 10 月 31 日一口氣有 7 位大法官任期屆滿離任後僅剩 8 位，達不到修法訂下的 10 人參與評議下限。${VOIDED_FLOOR_CLAUSE}，本題問的是當時的規定。`,
     },
     {
       id: "q3",
@@ -94,7 +98,7 @@ export const controversyQuiz: QuizMeta = {
       ],
       correctIndex: 3,
       explanation:
-        "第一次提名（2024 年 12 月 24 日）和第二次提名（2025 年 7 月 25 日）均遭國民黨與民眾黨控制的立法院否決。這使得憲法法庭始終無法補足人數，違憲審查持續停擺。",
+        "第一次提名（2024 年 12 月 24 日）和第二次提名（2025 年 7 月 25 日）均遭國民黨與民眾黨控制的立法院否決。",
     },
     {
       id: "q4",
@@ -121,7 +125,7 @@ export const controversyQuiz: QuizMeta = {
       ],
       correctIndex: 1,
       explanation:
-        "蔡宗珍、楊惠欽、朱富美三位大法官拒絕參與，最終僅 5 位大法官作成判決。判決確立了「立法權不得以修法方式實質廢除違憲審查」的憲政原則。張娟芬稱之為「台灣憲政制度的不自殺聲明」。",
+        `蔡宗珍、楊惠欽、朱富美三位大法官拒絕參與，最終僅 5 位大法官作成判決。判決確立了「立法權不得以修法方式實質廢除違憲審查」的憲政原則。${VOIDED_FLOOR_SHORT}。張娟芬稱之為「台灣憲政制度的不自殺聲明」。`,
     },
   ],
 };

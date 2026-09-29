@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:041:verify:attempt-1:revision-1",
+  "question": "verify 判 PASSED。是否核可 041 進入 review？另有兩項只有 captain 能決定：(1) 最後查核日填 2026-09-04 而非 AC-4 字面的 2026-09-03；(2) 是否把已查證的 14 處額外過時敘述納入本票範圍。",
+  "artifacts": [
+    {
+      "id": "artifact:041:verify:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/b6780fb3f232714f639ff8516394c192f94239b1/docs/constitution-features/041-correct-stale-pipeline-docs.md",
+      "rev": "sha256:add53b164a9ba986f9924cec588097fedba8af47b44f72c4da1ad4b9bf2845cd",
+      "mediaType": "text/markdown",
+      "summary": "九處更正全部以追加補述完成、原句一字未改（diff 刪除行僅 5 行日期欄位）；AC-1 三項指令由 verify 獨立重跑，九處斷言與實際輸出全部相符；AC-3 距離自行量測全部 ≤9 行，未採信 implement 的腳本。淨增 99 行，落在 +90 ±40% 容差內。scope notes 第二節的 14 處額外發現確實一處未動，12 處確認過時、1 處部分過時、1 處尚未過時。三則 finding 待處置：TODO.md:700 路徑代換不完整（Polish，FO 授權 fix）、data-collection-guide.md 查核日推進但三句仍錯（Needs decision）、AC-4 日期偏離（captain 裁示）。"
+    }
+  ]
+}

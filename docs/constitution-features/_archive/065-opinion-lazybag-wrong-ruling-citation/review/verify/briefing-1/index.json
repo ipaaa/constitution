@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:065:verify:attempt-1:revision-1",
+  "question": "verify 判 PASSED，**零 finding**。要核可 065 進入 review 嗎？**我建議核准。** 這張票停止了站上對真實公職人員的不實陳述：`StanceSpectrum.tsx` 硬編 14 位具名大法官的立場，而 reviewer 自判決書末段實取合議庭名單逐一比對後確認——**黃虹霞、吳陳鐶、蔡明誠、林俊益 4 位不在任一合議庭**；**漏列 113憲判9 合議庭 5 人，含本案主筆蔡宗珍**；呂太郎與楊惠欽被標「不同意見」但不在 9 份意見書的提出人之列；林俊益那筆「程序瑕疵→條文應屬無效」與**主文一原文直接相反**（主文一：「其立法程序雖存有瑕疵⋯上開法律尚不因立法程序瑕疵而牴觸憲法」）。你核可的 AC-6（移除該段）據以成立的四項事實**全部實證成立**。元件檔保留不刪，留給 `049` 依 113憲判9 的「判決主文立場表」重建。一併更正：我先前告訴你 AC-5 的基準應由 11 改為 9，**那是錯的**——以容許空白的 regex 實測確為 **11**，design 寫的是對的，錯的是那條 grep。",
+  "artifacts": [
+    {
+      "id": "artifact:065:verify:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/3a38971e3c73d18dc073ffc46a54eed281de6ad0/docs/constitution-features/065-opinion-lazybag-wrong-ruling-citation.md",
+      "rev": "sha256:163dfeb0a0ac0ff779a921d377c8483405711265a9cc736a653ed61eed27e832",
+      "mediaType": "text/markdown",
+      "summary": "七項 AC 全部由 reviewer 獨立重跑通過，數值與 implement 回報完全一致。reviewer 自行重現了兩種盲區情境以驗證 implement 的核心主張：在副本插入 `114 年憲判字第 1 號` 時，舊固定字串 grep 回 0（全盲、誤判通過）、新 regex 回 1（抓到）；把 B11 改成別的號次時，舊寫法 9→9 仍綠、新寫法 11→10 轉紅。授權邊界未逾越——七項 AC 的要求句以 diff 逐位元比對為零差異，6 行刪除全部落在 Verified by: 與「會失敗的改動」段；本輪 src/ 零變動（六個提交的 HEAD:src 同為 6a7bad6）。另跑全 13 條路由的獨立回歸：僅 /controversy-timeline、/quiz/controversy、/quiz/perspectives 仍有 114憲判1，恰為 B4／B6×2／B10／B11 這些**正確**用法，其餘 10 條路由皆 0——無外溢。AC-4 的發現亦成立：.next/static/chunks/ 有 3 個 chunk 合法含有 114憲判1（內容全來自 B8／B9），故全域不存在斷言會恆紅，定點檢查是正確作法。一手來源自行 curl 複核：113憲判9 合議庭 15 人、主筆蔡宗珍、意見書 9 份；114憲判1 合議庭 5 人、主筆呂太郎。placeholder 掃描無命中；`049` 與 TODO.md 的追加皆零刪除、`049:39` 逐字未變；build 前後 src/data/*.json sha256 相同。"
+    }
+  ]
+}

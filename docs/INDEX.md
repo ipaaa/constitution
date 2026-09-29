@@ -1,7 +1,7 @@
 # 文件總索引
 
 **狀態**：evergreen
-**最後查核**：2026-09-03
+**最後查核**：2026-09-04
 **規則**：新增或刪除文件時，同步更新本檔。狀態定義見 [`../AGENTS.md`](../AGENTS.md)。
 
 狀態三種：
@@ -36,7 +36,7 @@ docs/
 
 | 路徑 | 用途 | 狀態 | 負責人 | 最後查核 |
 |---|---|---|---|---|
-| `AGENTS.md` | agent 與協作者的工作規範。含產線驗證與正式 SSOT 邊界 | evergreen | captain | 2026-09-03 |
+| `AGENTS.md` | agent 與協作者的工作規範。禁止事項、溝通方式、寫作與文件規則；含產線驗證與正式 SSOT 邊界 | evergreen | captain | 2026-09-23 |
 | `docs/INDEX.md` | 本檔。全部文件的索引與 workflow 現況 | evergreen | captain | 2026-09-03 |
 
 ### 專案定位
@@ -44,9 +44,9 @@ docs/
 | 路徑 | 用途 | 狀態 | 負責人 | 最後查核 |
 |---|---|---|---|---|
 | `docs/project/about.md` | 專案定位、三圈目標受眾、溝通策略 | evergreen | captain | 2026-09-01 |
-| `docs/project/architecture.md` | 過去／現在／未來三軌的資訊架構 | evergreen | captain | 2026-09-01 |
-| `docs/project/design-system.md` | 視覺美學、色彩、排版、吉祥物語言 | evergreen | captain | 2026-09-01 |
-| `docs/project/tech-stack.md` | 網站技術、SSOT、版本綁定與手動同步資料流 | evergreen | captain | 2026-09-03 |
+| `docs/project/architecture.md` | 過去／現在／未來三軌的資訊架構 | evergreen | captain | 2026-09-23 |
+| `docs/project/design-system.md` | 視覺美學、色彩、排版、吉祥物語言 | evergreen | captain | 2026-09-23 |
+| `docs/project/tech-stack.md` | 網站技術、SSOT、版本綁定與手動同步資料流；含 2026-09-21 外部資料抓取程式補述 | evergreen | captain | 2026-09-03 |
 | `docs/project/contributing.md` | Spacedock 開發流程與內容重新核可流程 | evergreen | captain | 2026-09-03 |
 
 ### 內容產線
@@ -55,14 +55,22 @@ docs/
 |---|---|---|---|---|
 | `docs/content-pipeline/design.md` | 產線的唯一規格；現行機制見〈修訂紀錄〉2026-09-03 feature 040 條目，第二至第五節為已取代的舊模型 | plan | captain | 2026-09-04 |
 | `docs/content-pipeline/operations.md` | 核可、拒絕、重新核可、同步錯誤與復原步驟；兩帳號 probe 由 feature 044 承接 | evergreen | captain | 2026-09-04 |
-| `docs/content-pipeline/data-collection-guide.md` | T3（未來軌）的資料收集流程。T1／T2 已移除，改指向 `design.md` | evergreen | captain | 2026-09-03 |
+| `docs/content-pipeline/data-collection-guide.md` | T3（未來軌）的資料收集流程。T1／T2 已移除，改指向 `design.md` | evergreen | captain | 2026-09-21 |
+| `docs/content-pipeline/approval-permission-probe.md` | 隔離測試表兩帳號 probe 記錄。核可欄位權限邊界與 `status` 公式重算的實測證據 | record | — | 2026-09-15 |
 
 ### 體檢與待辦
 
 | 路徑 | 用途 | 狀態 | 負責人 | 最後查核 |
 |---|---|---|---|---|
 | `docs/health-check/2026-08-31-content-pipeline.md` | 體檢報告。出了什麼事、為什麼會上線。**含兩則補述，先看上方** | record | — | 2026-09-01 |
-| `docs/health-check/TODO.md` | 待辦清單；含 feature 040 與多人編輯、正式同步的前置關係 | plan | captain | 2026-09-04 |
+| `docs/health-check/2026-09-03-editor-onboarding.md` | 學者編輯上稿流程稽核。開放編輯權限後還開著的洞、使用說明改寫對照、會議講稿 | record | — | 2026-09-03 |
+| `docs/health-check/TODO.md` | 待辦清單；含 feature 040 與多人編輯、正式同步的前置關係 | plan | captain | 2026-09-24 |
+
+### 驗證腳本
+
+| 路徑 | 用途 | 狀態 | 負責人 | 最後查核 |
+|---|---|---|---|---|
+| `scripts/check-voided-floor.mjs` | 檢查站上是否把已失效的 10 人參與評議下限當成現行法。對真實頁面 HTML 跑三項檢查（門檻句不得帶持續語彙／門檻須與失效及依據同窗出現／停擺敘述不得帶持續語彙）。用法：`node scripts/check-voided-floor.mjs <url>...`，全 PASS 時離開碼 0 | evergreen | — | 2026-09-24 |
 
 ### 搶救出來的內容
 
@@ -146,6 +154,19 @@ docs/
 
 ⚠️ **必須等 `design.md` 第七節第 7–10 項完成後才做。**
 現在寫的是還沒實現的流程，寫完馬上又會過時。
+
+> ⚠️ **2026-09-04 更正：第 2 階段的等待條件已解除。原句的節次也指錯了。**
+> **節次更正**：上面寫「`design.md` 第七節第 7–10 項」。編號的施工項目在**第五節**
+> （`design.md:349`「五、更新流程與施工順序」，表格在 `:403`「施工順序」）。
+> 第七節（`design.md:465`「七、本設計未處理的事項」）是一張沒有編號的表，沒有第 7–10 項。
+> 依本檔體例，原句保留不改，節次以本段更正。
+> **等待條件已解除**：第五節施工順序表的第 7–10 項都已於 2026-09-02 完成。
+> 第 7 項改寫同步程式、第 8 項把同步移出 `build`（皆 PR #32），第 9 項首次正式同步（PR #33），
+> 第 10 項封存 `SSOT_Editor`。第 2 階段現在可以開工，不再是「⏸ 待產線改造完成」。
+> **一個例外**：上表的 `docs/content-pipeline/operations.md`（新增）維持「待新增」。
+> `git ls-tree main docs/content-pipeline/` 只有 `design.md` 與 `data-collection-guide.md` 兩檔。
+> `operations.md` 只存在於 feature 040 的 worktree，尚未合併。040 合併後才需要改這一列。
+> 原表格與原句保留。
 
 ### 第 4 階段 — 防漂移檢查（captain 已核准）
 

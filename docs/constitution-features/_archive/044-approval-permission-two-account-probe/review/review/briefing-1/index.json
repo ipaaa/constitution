@@ -1,0 +1,31 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:044:review:attempt-1:revision-1",
+  "question": "review 判 PASSED。是否核可 044 進入 complete（terminal）並開始交付？另有一項跨票合併順序需 captain 決定：證據文件引用的 validateApprovalBinding 目前只存在於 feature 040 的分支，044 若先合併，main 上會出現暫時無法解析的引用。",
+  "artifacts": [
+    {
+      "id": "artifact:044:review:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/cf67603b99449b9f555979a18fb76c2902abcfed/docs/constitution-features/044-approval-permission-two-account-probe.md",
+      "rev": "sha256:3c0fd28c21380e542fc3d1d290d188b70b85170d4e977a92f9515779fdfdd786",
+      "mediaType": "text/markdown",
+      "summary": "九項 AC 全部以重現而非採信查核：從 commit 093cd01 取出 .gs 重跑離線 oracle，七個指紋、五個標題錯誤案例、五個 APPROVAL_STATUS 值逐字重現。AC-2／AC-3／AC-7 的部分達成判定經確認誠實，九項缺口全部在證據文件有對應原句、無一被淡化。證據文件作為永久 record 稱職：檔頭七項缺口經獨立清點無誇大，P2 假通過全程完整可讀，並主動警告 040 gate「approved_* 逐字不變的證據不齊」。review 明確結論：未發現任何會讓讀者高估證據強度之處。零程式改動、六道安全掃描乾淨、其他 record 文件未被改寫。三項新 finding 皆非 Material：Finding 8／9 為措辭層級 Polish 經 FO decline；Finding 10 為合併順序，需 captain 決定。"
+    }
+  ],
+  "context": [
+    {
+      "type": "Reference",
+      "id": "reference:044:review:attempt-1:revision-1:item-2",
+      "uri": "git-root://main/332c27a94235d5ab321433fcc00cefac404963de/docs/constitution-features/050-ssot-approval-deployment.md",
+      "mediaType": "text/markdown",
+      "rev": "sha256:f7213820892000a44cfb69eb6d6eea913c5c634542a78750ff47aea48d52b4a8"
+    },
+    {
+      "type": "Reference",
+      "id": "reference:044:review:attempt-1:revision-1:item-3",
+      "uri": "git-root://main/332c27a94235d5ab321433fcc00cefac404963de/docs/constitution-features/057-preserve-probe-raw-log.md",
+      "mediaType": "text/markdown",
+      "rev": "sha256:f5757f87039dcc895fbe377d2a77aad57f91b8219f0cc41744b4967423115211"
+    }
+  ]
+}

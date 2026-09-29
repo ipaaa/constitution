@@ -1,5 +1,5 @@
 **狀態**：evergreen（僅涵蓋 T3）
-**最後查核**：2026-09-03
+**最後查核**：2026-09-04（feature 041 逐處查證敘述與實際行為是否相符）
 
 # 資料收集流程說明文件
 
@@ -22,6 +22,16 @@
 
 ⚠️ **產線改造尚未完成。** 目前同步程式仍是舊版，`design.md` 第五節的施工項目
 7–10 尚未執行。在那之前不要執行 `npm run sync-content` 或 `npm run build`。
+
+> ⚠️ **2026-09-04 更正：上面兩行已不成立。**
+> `design.md` 第五節的施工項目 7 至 10 都已於 2026-09-02 完成。
+> 同步程式已改寫（PR #32），`SSOT_Editor` 已封存。
+> `npm run build` 的禁令已於 2026-09-02 解除。`build` 現在只是 `next build`，不含同步。
+> 驗證方式：`npm run build` 前後跑 `shasum -a 256 src/data/*.json`，兩次相同。
+> 2026-09-04 於 feature 041 的 worktree 實測，兩檔指紋前後皆未變。
+> `npm run sync-content` 仍然不要自己執行。它會覆寫 `src/data/*.json`。
+> 只在要發布內容時執行，且跑完必須開 PR 讓 captain 對 diff。
+> 原句保留。詳見 `design.md` 文末修訂紀錄的 2026-09-04 一則。
 
 ---
 ## T3：未來軌道（Future Track）
@@ -76,7 +86,21 @@
 
 #### 危機統計（`CRISIS_STATS`）
 
-包含 `totalPending`、`activeJustices`、`requiredForRuling`（10）、`designatedTotal`（15）、`vacantSeats`、`absentJustices` 等欄位，由其他常數自動推導。
+包含 `totalPending`、`activeJustices`、`designatedTotal`（15）、`vacantSeats`、`absentJustices` 等欄位，由其他常數自動推導。
+
+> ⚠️ **2026-09-21 更正：`requiredForRuling`（10）欄位已移除。**
+> 原句把它列為 `CRISIS_STATS` 的欄位之一，該描述自本日起不成立。
+> 移除原因：10 是憲法訴訟法第 30 條第 2 項的「參與評議人數下限」，不是同意人數；
+> 且該項已由 114 年憲判字第 1 號於 2025-12-19 宣告違憲失效。
+> 判決門檻改由 `src/data/future.ts` 的 `RULING_THRESHOLD` 承載，渲染走
+> `src/components/future/RulingThresholdNote.tsx`。
+> 具體人數（`RULING_THRESHOLD.headcount`）仍為 `null`，待法學背景者拍板。
+> 見 `docs/constitution-features/063-required-for-ruling-legal-accuracy.md`
+> 與 `docs/health-check/TODO.md` 的 P0-7。
+>
+> 本檔為 `evergreen`，描述現況，故上方欄位清單已更新。
+> 更新前的原句為：「包含 `totalPending`、`activeJustices`、`requiredForRuling`（10）、
+> `designatedTotal`（15）、`vacantSeats`、`absentJustices` 等欄位，由其他常數自動推導。」
 
 ### 誰負責更新
 
@@ -151,6 +175,12 @@
 ⚠️ 目前 Vercel 的部署**會執行同步**，這是已知缺陷，見 `design.md` 不變式 #1。
 修好之前，部署不等於安全。
 
+> ⚠️ **2026-09-04 更正：上面兩行已不成立。部署不再執行同步。**
+> `package.json` 的 `build` 現在是 `next build`。改動在 PR #32，對應 `design.md` 施工項目 8。
+> 驗證方式：`npm run build` 前後跑 `shasum -a 256 src/data/*.json`，兩次相同。
+> 2026-09-04 於 feature 041 的 worktree 實測，兩檔指紋前後皆未變。
+> `design.md` 不變式 #1 已被滿足，不再是「已知缺陷」。原句保留。
+
 ### 共通風險
 
 | 風險 | 影響軌道 | 緩解措施 |
@@ -163,6 +193,14 @@
 
 > 原表列有「`npm run build` 會在編譯時報錯」作為緩解措施。
 > **該指令現已禁止使用** —— 它會執行同步並覆蓋資料檔。改用 `npx tsc --noEmit`。
+
+> ⚠️ **2026-09-04 更正：上表與下面兩行各有一處已不成立。**
+> 「`design.md` 第四節的檢查機制。**尚未實作**」—— 已實作，改動在 PR #32。
+> `scripts/sync-content.mjs` 現在對所有列跑檢查，任一項失敗就整份中止，一個檔案都不寫。
+> 見該檔 `:13`、`:17`、`:266`、`:294`。
+> 「**該指令現已禁止使用**」（指 `npm run build`）—— 禁令已於 2026-09-02 解除。
+> `build` 現在只是 `next build`，不含同步，可安全用來檢查編譯錯誤。
+> 仍然不要自己執行 `npm run sync-content`。原句與原表格保留。
 
 ### 檔案位置一覽
 
