@@ -1,7 +1,7 @@
 ---
 id: 070
 title: 同步讀到「載入中…」快照時隨機整份中止
-status: verify
+status: review
 source: 050 AC-2 正式同步失敗（2026-09-29），captain 同日核准開票
 started: 2026-09-29T19:52:07Z
 completed:
@@ -22,6 +22,17 @@ gates:
                 id: briefing:070:verify:attempt-1:revision-1
                 digest: sha256:23e75e750efdb1f87dfaeec06ac38d3e2043410bd6b11a4a5b7cda3261c0f903
                 room-ref: '@review/verify/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:070:verify:1
+                briefing: briefing:070:verify:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-29T22:06:35.171603Z"
+                decision: approve
+                reason: 'Captain approved 070 verify in chat 2026-09-29: AC-1..AC-9 independently re-run, 040 validation byte-identical, live runs 10/10. F1 (8-fetch budget met at its edge) accepted as Deferred risk; revisit if a real sync fails with the 8-attempt message. F2 to 069.'
+              application:
+                target-stage: review
+                state: consumed
 ---
 
 `040` 合併後，正式同步可能隨機失敗：Google 發布的 CSV 有時送出公式仍在計算的舊快照，`status` 欄顯示「載入中…」，`040` 的驗證因此判整份不符而中止。不會把錯的內容推上網站，但會讓編輯看到數十筆錯誤而以為內容壞了。
