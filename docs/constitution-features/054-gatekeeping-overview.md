@@ -10,7 +10,56 @@ score:
 worktree: .worktrees/spacedock-ensign-054-gatekeeping-overview
 issue:
 pr:
-mod-block:
+mod-block: merge:pr-merge
+review-round:
+    id: round:054:review:2
+    stage: review
+    cycle: 2
+    briefing:
+        id: briefing:054:review:round-2
+        digest: sha256:07af0fa93f3b825b2387b1cf6c45b6aba4aa154e031ea7ec3118a0dd67320199
+        room-ref: '@review/review/round-2'
+gates:
+    version: 1
+    records:
+        - id: gate:054:verify
+          stage: verify
+          attempts:
+            - id: gate-attempt:054-verify-1
+              briefing:
+                id: briefing:054:verify:attempt-1:revision-1
+                digest: sha256:4a6ff51c5a6c908443f6be76221ea23c2ca49ff2c9993580c3f6ab74ae01cea3
+                room-ref: '@review/verify/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:054:verify:1
+                briefing: briefing:054:verify:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-29T20:31:38.03914Z"
+                decision: approve
+                reason: 'Captain approved 054 verify cycle 2 in chat 2026-09-29 (「全部照建議」): V1–V5 corrected, fresh reader 8/8, AGENTS.md byte-identical to approved text.'
+              application:
+                target-stage: review
+                state: consumed
+        - id: gate:054:review
+          stage: review
+          attempts:
+            - id: gate-attempt:054-review-1
+              briefing:
+                id: briefing:054:review:attempt-1:revision-1
+                digest: sha256:a0865d862ea75390bd2d2f9f64e88c3bb9f8dfbceefae4b45d3e208b345827ef
+                room-ref: '@review/review/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:054:review:1
+                briefing: briefing:054:review:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-29T20:48:17.17Z"
+                decision: approve
+                reason: 'Captain approved 054 review cycle 2 in chat 2026-09-29 (「1235照建議」): overview delivered, R1–R3 fixed, AGENTS.md as approved.'
+              application:
+                target-stage: complete
+                state: pending
 ---
 
 沒有任何一份文件回答「現在到底有哪些把關、各擋什麼、哪些缺口還開著」。但新增一份 evergreen 文件等於新增一個會過時的東西——**本票的核心不是寫那份文件，是設計讓它不過時的機制。**
