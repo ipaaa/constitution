@@ -1,7 +1,7 @@
 ---
 id: 068
 title: 門檻分析頁把已失效的 10 人／9 人門檻標為現行
-status: verify
+status: review
 source: constitution-features/067 design 新發現第 3 項（captain 2026-09-29 核准開票）
 started: 2026-09-29T17:14:59Z
 completed:
@@ -22,6 +22,17 @@ gates:
                 id: briefing:068:verify:attempt-1:revision-1
                 digest: sha256:692cdea80e0d6041b4e97ccd6c06176cde2078421714861878d412991c04209b
                 room-ref: '@review/verify/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:068:verify:1
+                briefing: briefing:068:verify:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-29T19:51:03.797909Z"
+                decision: approve
+                reason: 'Captain approved 068 verify (PASSED) in chat 2026-09-29 (「全部照建議」): 0 factual errors against primary sources, AC-1/AC-2 re-run independently, 012 guard fix verified. Findings: page.tsx:42 missing space for review to confirm; probe-counts-<desc> and guard variable-join blind spot recorded as Deferred risk; ROC narrative dates at page.tsx:62 deferred to calendar follow-up. Desktop callout clearance still pending captain visual check.'
+              application:
+                target-stage: review
+                state: consumed
 ---
 
 `/past/thresholds`（公開頁）把已失效的評議門檻當成現行法呈現。讀者會帶著錯誤的法律認知離開。
