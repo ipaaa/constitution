@@ -1,7 +1,7 @@
 ---
 id: 071
 title: 頁尾連結指向錯誤的 GitHub 與 HackMD
-status: implement
+status: verify
 source: captain 2026-09-29（聊天中直接要求開票）
 started: 2026-09-29T20:11:16Z
 completed:
@@ -216,3 +216,22 @@ Verified by: `npx tsc --noEmit` exit 0；`npx eslint --max-warnings 0 src/compon
 ### Summary
 
 頁尾實際壞掉的是 GitHub 原始碼與內容錯誤回報兩個連結（舊 repo 已 404）；HackMD 仍可開但依裁示移除。改動只限 `src/components/Footer.tsx`（淨 −5 行 ±2）。另列三項非連結問題請 captain 裁示：`© G0V CONTRIBUTORS` 署名、repo 無 LICENSE 卻自稱「開源」、快速導覽漏列三頁；本票不改。
+
+## Stage Report: implement
+
+- DONE: Change only src/components/Footer.tsx per the design: remove the HackMD link, point GitHub 原始碼 to https://github.com/ipaaa/constitution and 內容錯誤回報 to https://github.com/ipaaa/constitution/issues/new, keeping existing classes and accessible labels consistent.
+  `35180e4`：只改 `Footer.tsx`，+3／−8（淨 −5，在容許 ±2 內）。刪 HackMD `<li>`、改 2 個 `href`、import 刪 `FileText`。`aria-label`、`target`、`rel`、class 都不變。© 行、「開源」文字、快速導覽都沒動。
+- DONE: Prove AC-1..AC-6 with their stated failing changes; the end value is measured on the rendered page after hydration (dev server or jsdom-mounted probe, not SSR HTML alone): every footer external link returns an existing destination by real HTTP request and no g0v/Welcome-to-Add-C0urt or hackmd string remains site-wide.
+  量測工具：本機沙箱開不了瀏覽器（`/Applications` 不可讀）。改用 jsdom probe：對 `next start` 載入 8 頁，執行頁面自己的 JS bundle，等 `<footer>` 出現 `__reactFiber$` 鍵（即 React 已 hydrate）才讀 DOM。probe 放在 scratchpad，不進 repo。
+  AC-1／AC-2b／AC-4：8 頁（`/`、`/past`、`/present`、`/future`、`/controversy-timeline`、`/opinion-lazybag`、`/about`、`/quiz`）hydration 後，頁尾外部連結都恰為 `[ipaaa/constitution, ipaaa/constitution/issues/new]`，舊連結 0 個，站內導覽恰為 4 個路徑，頁面錯誤 0 個。失敗改動實測：退回改前程式碼重建，同一 probe 8 頁都讀到 3 個外部連結、舊連結 3 個。
+  AC-1 HTTP：`ipaaa/constitution` 200；`issues/new` 302 到登入頁、`-L` 最終 200。舊的兩個網址都是 404。站內 4 個路徑 `curl` 都是 200。
+  AC-2a：`grep -rniE 'Welcome-to-Add-C0urt|hackmd' src public` 改前 4 行，改後 0 行。
+  AC-3：`gh repo view` 回 `hasIssuesEnabled:true`、PUBLIC、未封存。`redirect_url` 含 `return_to=` 與 `ipaaa%2Fconstitution%2Fissues%2Fnew`。
+  AC-5 只驗了結構：「專案資源」剩 2 個 `<li>`，空 `<li>` 0 個，外層 class 沒改（見 diff）。jsdom 不算版面，所以 375px／1280px 截圖與 `scrollWidth` 量測**沒有做**，要留給 verify 用真瀏覽器做。
+  AC-6：`npx tsc --noEmit` exit 0；eslint `--max-warnings 0` exit 0。失敗改動實測：把 `FileText` 放回 import，eslint 報 `'FileText' is defined but never used` 並失敗。`npm run build` 成功。`src/data/*.json` 的 sha256 前後相同。
+- DONE: No regressions: full test suite (report any pre-existing failure separately), npx tsc --noEmit; do not touch the © line, LICENSE wording or quick-nav list (captain decisions pending); never run npm run sync-content.
+  `node --test tests/*.test.mjs`：101 個測試，99 通過、1 失敗、1 略過。失敗的是既有問題：`threshold-analysis.test.mjs` AC-7「寫出產線兩檔的程式不只同步程式一支」。拿掉本票改動再跑，同樣失敗（31 通過／1 失敗），與本票無關，`068` 分支已修。沒有執行 `sync-content`。
+
+### Summary
+
+頁尾現在只剩兩個外部連結，都指向 `ipaaa/constitution`，真實 HTTP 請求可以開；HackMD 已移除；全站找不到舊 repo 或 HackMD。這些結果是在 8 頁 hydration 後的 DOM 上量到的。用改前程式碼重建再量，probe 會讀到舊連結，所以這個量測分得出對錯。有一項沒做完：AC-5 的截圖版面檢查。jsdom 沒有版面引擎，這一項要留給 verify 用真瀏覽器做。本機建置時用 symlink 接上主 repo 的 `node_modules`，這個 symlink 在 `.gitignore` 內，不會進 commit。
