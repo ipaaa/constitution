@@ -28,6 +28,14 @@ gates:
               application:
                 target-stage: review
                 state: consumed
+        - id: gate:067:review
+          stage: review
+          attempts:
+            - id: gate-attempt:067-review-1
+              briefing:
+                id: briefing:067:review:attempt-1:revision-1
+                digest: sha256:3aeba07317bc0b6b8b5e933de7b3c99001d95449e523db770a87fa84aa275c34
+                room-ref: '@review/review/briefing-1'
 ---
 
 **⛔ 不得派工，直到 feature `056-pre-launch-checklist` 封存為止。** 這是 captain 2026-09-24 的明確排序：
