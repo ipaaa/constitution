@@ -243,7 +243,7 @@ curl -s https://constitution-nine.vercel.app/past -o p.html
 ### P0-2　h2 的釋字第272號內容錯誤（法律錯誤）　🔺 全清單最高優先
 
 > **2026-09-21 補述：此列在線上已消失，並加一道反向保護。原文保留。**
-> feature `056`（`../constitution-features/056-pre-launch-checklist.md`）的複驗確認：captain 清空 `status` 後，
+> feature `056`（`../constitution-features/_archive/056-pre-launch-checklist.md`）的複驗確認：captain 清空 `status` 後，
 > `scripts/sync-content.mjs:354` 的 `isApproved()` 把 `h2` 濾掉。`src/data/history.json` 40 筆內已無 `h2`。
 > 讀者現在看不到這筆錯誤。
 > 「待法學確認」仍然成立。改變的只是它不再是線上可見的錯誤，而是一道必須守住的閘門。
@@ -266,10 +266,10 @@ curl -s https://constitution-nine.vercel.app/past -o p.html
 - **卡在**：需要一位法學背景的人拍板
 - **反向保護**（2026-09-21 加入，對應 `056` 的 `G-6`）：把 `h2` 重新標成 `Approved` 之前，必須先有法學背景者的確認記錄。
   沒有記錄就重新標 `Approved`，下次同步會把錯誤內容送回線上。
-  **查驗指令以 `../constitution-features/056-pre-launch-checklist.md` 第三節標記 `# canonical: G-6` 的那一段為正本，本檔不另存副本**
+  **查驗指令以 `../constitution-features/_archive/056-pre-launch-checklist.md` 第三節標記 `# canonical: G-6` 的那一段為正本，本檔不另存副本**
   （2026-09-24 cycle 8 改；原本此處自帶一份 `node -e` 指令，見下方補述）。通過條件為印出 `G-6 PASS` 且離開碼 `0`。
   2026-09-21 曾實測 id 層輸出 `false false`。任一列回來、或 `272` 的內容以任何 id 出現，表示有人把該列重新標成 `Approved`，
-  `../constitution-features/056-pre-launch-checklist.md` 的 gate 即不通過，不可移除 noindex（見 P3-8）
+  `../constitution-features/_archive/056-pre-launch-checklist.md` 的 gate 即不通過，不可移除 noindex（見 P3-8）
 
 > **2026-09-24（cycle 8）補述：本節原本自帶一份 G-6 查驗指令，已移除並改為指向正本。原指令逐字保留於此。**
 > 原句為：「沒有記錄就重新標 `Approved`，下次同步會把錯誤內容送回線上。查驗指令如下，兩個輸出都必須是 `false`：」，其後為一個 `bash` 區塊，內容逐字為 `node -e "const a=require('./src/data/history.json');const i=a.map(x=>x.id);console.log(i.includes('h2'),i.includes('h28'))"`。
@@ -281,7 +281,7 @@ curl -s https://constitution-nine.vercel.app/past -o p.html
 > `056` 的 G-6 內容層已於 2026-09-24（cycle 9）從裸子字串 `JSON.stringify(a).includes('272')` 改為 **case-number 型樣**——
 > 容忍半形／全形數字、有無空格（半形或全形）與簡繁，並掃**所有字串欄位**、回報命中的欄位路徑。
 > 原因是裸子字串**兩個方向都錯**：漏掉全形 `釋字第２７２號`（fail-open，靜默），又會打到圖片網址裡的 `272`（fail-closed）。
-> **現行寫法一律以正本為準**，即 `../constitution-features/056-pre-launch-checklist.md` 標記 `# canonical: G-6` 的那一段；本檔仍不另存副本。
+> **現行寫法一律以正本為準**，即 `../constitution-features/_archive/056-pre-launch-checklist.md` 標記 `# canonical: G-6` 的那一段；本檔仍不另存副本。
 
 ---
 
@@ -365,7 +365,7 @@ curl -s https://constitution-nine.vercel.app/past -o p.html
 ### P0-6　`h28` 掛了 `h14` 的標題　🔺 對外可見的事實錯誤
 
 > **2026-09-21 補述：此列在線上已消失，並加一道反向保護。原文保留。**
-> feature `056`（`../constitution-features/056-pre-launch-checklist.md`）的複驗確認：`src/data/history.json` 40 筆內已無 `h28`。
+> feature `056`（`../constitution-features/_archive/056-pre-launch-checklist.md`）的複驗確認：`src/data/history.json` 40 筆內已無 `h28`。
 > 標題「對外可見」這個描述已不成立。「待補正確標題」仍然成立。
 > **反向保護見本節末的「反向保護」一條。它補在下方「解除方式」之上，不取代它。**
 > 同一次複驗另外找到一組同型缺陷：`h34`（釋字第708號）與 `h35`（釋字第710號）的 `reality.title` 一字不差，
@@ -385,10 +385,10 @@ curl -s https://constitution-nine.vercel.app/past -o p.html
 - **誰能做**：內容判斷。FO 不擬標題 —— 生一句「看起來對」的正是本專案在清的東西
 - **反向保護**（2026-09-21 加入，對應 `056` 的 `G-6`）：把 `h28` 重新標成 `Approved` 之前，必須先有確認記錄，
   記明正確 `title` 已經由具法學背景者核對過。FO 不擬標題。
-  **查驗指令與 P0-2 的「反向保護」同一條，正本在 `../constitution-features/056-pre-launch-checklist.md` 的 `# canonical: G-6`，本檔不另存副本**
+  **查驗指令與 P0-2 的「反向保護」同一條，正本在 `../constitution-features/_archive/056-pre-launch-checklist.md` 的 `# canonical: G-6`，本檔不另存副本**
   （2026-09-24 cycle 8 改；原本此處自帶一份 `node -e` 指令，見下方補述）。通過條件為印出 `G-6 PASS` 且離開碼 `0`。
   2026-09-21 曾實測 id 層輸出 `false false`。任一列回來，表示有人把該列重新標成 `Approved`，
-  `../constitution-features/056-pre-launch-checklist.md` 的 gate 即不通過，不可移除 noindex（見 P3-8）
+  `../constitution-features/_archive/056-pre-launch-checklist.md` 的 gate 即不通過，不可移除 noindex（見 P3-8）
 - **解除方式**：在 `SSOT_收集區` 補上正確 `title`，並把 `status` 改回 `Approved`。此步驟以上一條的確認記錄為前置
 
 > **2026-09-24（cycle 8）補述：本節原本自帶一份 G-6 查驗指令，已移除並改為指向正本。原指令逐字保留於此。**
@@ -401,7 +401,7 @@ curl -s https://constitution-nine.vercel.app/past -o p.html
 > `056` 的 G-6 內容層已於 2026-09-24（cycle 9）從裸子字串 `JSON.stringify(a).includes('272')` 改為 **case-number 型樣**——
 > 容忍半形／全形數字、有無空格（半形或全形）與簡繁，並掃**所有字串欄位**、回報命中的欄位路徑。
 > 原因是裸子字串**兩個方向都錯**：漏掉全形 `釋字第２７２號`（fail-open，靜默），又會打到圖片網址裡的 `272`（fail-closed）。
-> **現行寫法一律以正本為準**，即 `../constitution-features/056-pre-launch-checklist.md` 標記 `# canonical: G-6` 的那一段；本檔仍不另存副本。
+> **現行寫法一律以正本為準**，即 `../constitution-features/_archive/056-pre-launch-checklist.md` 標記 `# canonical: G-6` 的那一段；本檔仍不另存副本。
 - **驗證**：
   ```bash
   # 同步後，兩筆的 title 不應相同
@@ -428,7 +428,7 @@ curl -s https://constitution-nine.vercel.app/past -o p.html
   不加任何失效標註。**只查該站會得到「10 是對的」這個錯誤結論。**
   條文是否有效，權威在憲判主文，不在法規資料庫的顯示
 - **待拍板的四項**（編號沿用
-  `docs/constitution-features/063-required-for-ruling-legal-accuracy.md` 第五小節）：
+  `docs/constitution-features/_archive/063-required-for-ruling-legal-accuracy.md` 第五小節）：
 
 | 代號 | 待拍板問題 |
 |---|---|
@@ -537,7 +537,7 @@ captain 提出：「**我從來不想收集反方意見**」。查證後這不�
 
 ### ~~P1-7　`/future` 的「歷史脈絡」區塊對所有案件都不顯示~~ ✅ 已解決（2026-09-03）
 
-- **狀態**：**整組跨軌道連結已移除**，本項隨之消滅。見 `docs/constitution-features/038-remove-ai-generated-cross-track-links.md`（PR #34，2026-09-03 合併）
+- **狀態**：**整組跨軌道連結已移除**，本項隨之消滅。見 `docs/constitution-features/_archive/038-remove-ai-generated-cross-track-links.md`（PR #34，2026-09-03 合併）
 - **不是修好鍵值，是移除整個功能** —— captain 裁示「不要現有的 AI 生成跨軌道連結」，之後是否重做需討論
 
 <details>
@@ -675,12 +675,42 @@ done | sort -rn | head -12
 - **卡在**：需要一個人決定口徑。工程師無法代拍 —— 換一個數字只是把無來源數字換成另一個無來源數字
 - **相關**：P0-7（判決門檻的具體人數待法學確認）同屬「數字須人工拍板」類
 - **驗證**：本區塊是這條檢查的**唯一定義處**。
-  `docs/constitution-features/066-quiz-timeline-voided-quorum-present-tense.md` 的 AC6 第 2 條
+  `docs/constitution-features/_archive/066-quiz-timeline-voided-quorum-present-tense.md` 的 AC6 第 2 條
   只引用這裡，不另存一份。
 
   ```bash
   # 拍板前：站上不得再出現無來源的年度產能數字
   grep -nE '每年[^。]*[0-9]+[^。]*件' src/app/future/page.tsx   # 應為 0 筆
+  ```
+
+---
+
+### P1-10　內容查核找到的法律事實錯誤（feature `067`）　🔍 逐項待修
+
+- **狀態**：**待修**。`067` 只建查核工具，不修法律內容。下列每一項都已由工具實跑定位
+- **怎麼重跑**：`node scripts/content-audit.mjs check` 跑機器判得了的六條規則（M1–M6）。
+  有失敗時離開碼為 1。規則定義見 `scripts/content-audit.mjs`，本節只引用代號
+- **優先級**：是否把本項綁進上線條件，待 captain 決定
+  （`docs/constitution-features/systematic-chinese-content-legal-audit.md` 的 Design 第十節第 3 項）。
+  決定前不動 P3-8
+
+| # | 位置 | 錯在哪 | 規則 | 修正途徑 |
+|---|---|---|---|---|
+| 1 | `src/data/controversy-timeline.ts:152`／`:164` | `evt-09`（2024-12-20）排在 `evt-10`（2024-10-31）之前。元件不排序，`/controversy-timeline`（公開頁）依陣列順序顯示 | M4 | PR |
+| 2 | `src/components/future/RulingThresholdNote.tsx:56` | `/future`（公開頁）同一段寫「114 年 1 月 23 日」「114 年 12 月 19 日」與「2025-12-19」，民國與西元混用、未換算 | M5 | PR |
+| 3 | `src/data/threshold-analysis.ts:238` | 同一段寫「1952-04-16」「1948-09-16」與「民國 90 年 4 月」，未換算。顯示於 `/past/thresholds` | M5 | PR |
+| 4 | `src/data/controversy-timeline.ts:144`、`:156`、`:180`，`src/data/quizzes/controversy.ts:87`，`src/data/future.ts:416` | 立法院對大法官提名做了什麼，各處說法不一致：「不審查」「投票否決」「拒絕行使同意權」。哪一種正確、或是否分屬不同時點，需對照立法院議事紀錄判定 | L1（人判） | PR |
+| 5 | `src/data/threshold-analysis.ts:323-336` | 門檻期 `id: 'current'` 把已失效的第 30 條第 2 項標為現行門檻（`label: '10 人 9 人'`、`effectiveTo: null`）。`/past/thresholds` 全頁沒有任何失效敘述。`066` 的 `check-voided-floor.mjs` 當時未跑這條路由 | 無（屬 `066` 的錯誤類型） | PR，另開票。修它會動到 `tests/threshold-analysis.test.mjs` 以 `'current'` 為錨的斷言 |
+| 6 | `src/app/about/page.tsx:38` | 讀者看得到的文字請讀者去看 `about-content.md` 的舊位置。該檔已封存到 `docs/_archive/`，內容只有「（待撰寫）」。`067` 只修註解內的路徑，這一處是渲染文字，未改 | M6 | PR，需先決定文案 |
+
+- **另待 captain 決定：全站紀年慣例**。站上民國與西元兩套並存，未統一。
+  `067` 的預設建議：敘述用西元；判決字號保留民國；引用官方文字時保留民國並括號附西元。
+  逐檔盤點見 `docs/content-audit/2026-09-29-reading-list.md` 的 L4 節
+- **人讀的部分**：因果敘述、法律效果的精確度、語氣與立場，機器找不到。
+  逐檔閱讀清單見 `docs/content-audit/2026-09-29-reading-list.md` 的 H 節
+- **驗證**：
+  ```bash
+  node scripts/content-audit.mjs check ; echo "exit=$?"   # 全部修好時為 PASS、exit=0
   ```
 
 ---
@@ -933,7 +963,7 @@ captain 指出那些中文是寫給學者老師看的，刪掉編輯端就失去
 ### P3-8　🚨 發布前必須移除 noindex
 
 - **狀態**：**現在刻意保持著，不要動**（2026-09-01 確認）—— 目前就是不要讓 Google 搜尋得到。**等真的要對外發布時才移除**
-- **解除條件**（2026-09-21 加入）：`../constitution-features/056-pre-launch-checklist.md` 第三節的 gate 執行清單 `G-1` 至 `G-8` 八項全數通過。八項未全數通過，不可移除這一行。移除後在該票的 Feedback Cycles 記下執行日期與 commit SHA
+- **解除條件**（2026-09-21 加入）：`../constitution-features/_archive/056-pre-launch-checklist.md` 第三節的 gate 執行清單 `G-1` 至 `G-8` 八項全數通過。八項未全數通過，不可移除這一行。移除後在該票的 Feedback Cycles 記下執行日期與 commit SHA
 - **原狀態**：已加入（2026-08-31），**發布時必須移除**
 - **位置**：`src/app/layout.tsx` 的 `metadata.robots`
 
@@ -1095,3 +1125,4 @@ git log -1 --format='%ad %s' --date=short -- src/data/discussions.json
 | 2026-09-03 | 內容同步 25→40 筆正式上線 | PR #33 |
 | 2026-09-03 | `design.md` 第七節施工項目全部結案；P1-7 隨 038 消滅 | 本次 |
 | 2026-09-04 | 041 修正五份文件與實際行為不符之處，共 23 處追加補述；查核日更新為 2026-09-04 | 本次 |
+| 2026-09-29 | 067 建內容查核工具（`scripts/content-audit.mjs`）；新增 P1-10；本檔 11 處已封存票的路徑改指 `_archive/` | 本次 |

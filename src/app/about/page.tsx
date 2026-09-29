@@ -26,7 +26,7 @@ export default function AboutPage() {
       </section>
 
       {/* Section 1: 專案緣由 */}
-      {/* SSOT: docs/about-content.md — sync content from there */}
+      {/* SSOT: docs/_archive/about-content.md — sync content from there */}
       <section className="border-t border-gray-200 py-12 md:py-24">
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 font-serif border-l-[6px] border-gray-900 pl-6 mb-10">

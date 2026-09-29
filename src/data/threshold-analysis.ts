@@ -1,7 +1,7 @@
 /**
  * 解釋門檻與案件數量的資料模組。
  *
- * 規格見 docs/constitution-features/012-threshold-case-analysis.md。
+ * 規格見 docs/constitution-features/_archive/012-threshold-case-analysis.md。
  *
  * 本檔是**手寫**資料模組，與 src/data/discussions.json、src/data/history.json 無關。
  * 那兩個 JSON 是試算表同步的產物，不可手改。本檔的來源是

@@ -21,6 +21,7 @@ docs/
   project/             專案定位、架構、技術、協作
   content-pipeline/    內容產線：目標、規格、操作
   health-check/        2026-08 產線體檢與待辦
+  content-audit/       全站內容的法律事實查核：閱讀清單
   content-rescue/      搶救出來的內容
   meetup-chats/        會議記錄（本機限定，未進版控）
   _archive/            已過時、保留供追溯的文件
@@ -70,6 +71,14 @@ docs/
 | 路徑 | 用途 | 狀態 | 負責人 | 最後查核 |
 |---|---|---|---|---|
 | `scripts/check-voided-floor.mjs` | 檢查站上是否把已失效的 10 人參與評議下限當成現行法。對真實頁面 HTML 跑三項檢查（門檻句不得帶持續語彙／門檻須與失效及依據同窗出現／停擺敘述不得帶持續語彙）。用法：`node scripts/check-voided-floor.mjs <url>...`，全 PASS 時離開碼 0 | evergreen | — | 2026-09-24 |
+| `scripts/content-audit.mjs` | 全站中文內容的法律事實查核（feature `067`）。`check` 跑六條機器判得了的規則 M1–M6（號次存在、號次與年份配對、門檻數值、日期與順序、同段紀年混用、封存路徑），全過時離開碼 0；`reading-list` 輸出人判的 L 層與 H 層清單。只在需要時手動跑，不接 build | evergreen | — | 2026-09-29 |
+| `scripts/fetch-judgment-dockets.mjs` | 從司法院憲判字清單抓號次、判決日期與官方案名，只寫 `tests/fixtures/judgment-dockets.json`。人工執行 | evergreen | — | 2026-09-29 |
+
+### 內容查核
+
+| 路徑 | 用途 | 狀態 | 負責人 | 最後查核 |
+|---|---|---|---|---|
+| `docs/content-audit/2026-09-29-reading-list.md` | `scripts/content-audit.mjs reading-list` 的輸出快照。交給法學背景審閱者逐項勾選；讀完即封存 | plan | captain | 2026-09-29 |
 
 ### 搶救出來的內容
 
