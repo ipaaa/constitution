@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { fingerprintPublishedRow, PUBLISHED_FIELDS, SHEET_KEYS } from './content-fingerprint.mjs';
+import { VERIFIED_CASE_REFS } from '../src/data/verified-case-refs.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -68,6 +69,15 @@ const ALLOWED_VIBES = [
 ];
 
 /**
+ * stance 的允許清單。值域與定義見 feature 019 第三節 3.1。
+ *
+ * 三個值是論點取向，不是陣營。不得加入政黨名、陣營名或評價性用語
+ * （_archive/015-opposing-views-integration.md:62）。
+ * 改這個常數時，同步設定試算表的下拉選單。
+ */
+const ALLOWED_STANCES = ['支持', '質疑', '中立分析'];
+
+/**
  * 佔位與測試字串。見 AGENTS.md「不要把設計文件裡的範例當成真實內容」。
  * `test test test` 與 `某學者，某大學法律系` 都真的上線過。
  *
@@ -127,6 +137,9 @@ const TRACK_2_COLUMNS = [
   { field: 'views', aliases: ['views'], column: 'optional', value: 'optional' },
   { field: 'sticky', aliases: ['sticky'], column: 'optional', value: 'optional' },
   { field: 'full_content', aliases: ['full content', 'full_content'], column: 'optional', value: 'optional' },
+  // 兩欄 column: 'optional'：試算表還沒建這兩欄時，同步不可中止（feature 064 第五節階段一）。
+  { field: 'case_ref', aliases: ['case_ref', 'case ref'], column: 'optional', value: 'optional' },
+  { field: 'stance', aliases: ['stance'], column: 'optional', value: 'optional' },
   ...APPROVAL_COLUMNS,
 ];
 
@@ -734,6 +747,19 @@ function buildTrack2(csv, errors) {
       addError(errors, TRACK_2, rowKey(record), `views 必須是非負整數，實際為「${trunc(record.views)}」。`);
     }
     checkPlaceholders(record, ['title', 'author', 'abstract', 'owl_comment'], TRACK_2, errors);
+    // case_ref 與 stance 要嘛都填，要嘛都空白。「有字號、沒立場」的文章在 019 的頁面沒有位置。
+    const hasCase = (record.case_ref || '') !== '';
+    const hasStance = (record.stance || '') !== '';
+    if (hasCase !== hasStance) {
+      addError(errors, TRACK_2, rowKey(record), `case_ref 與 stance 必須同時填寫或同時空白。實際：case_ref「${trunc(record.case_ref) || '空白'}」、stance「${trunc(record.stance) || '空白'}」。`);
+    }
+    // 用 Object.hasOwn，不用 in。in 會讓 toString 之類的原型鍵通過。
+    if (hasCase && !Object.hasOwn(VERIFIED_CASE_REFS, record.case_ref)) {
+      addError(errors, TRACK_2, rowKey(record), `case_ref「${trunc(record.case_ref)}」不在已查證的判決字號清單內。允許的值：${Object.keys(VERIFIED_CASE_REFS).join('、')}。`);
+    }
+    if (hasStance && !ALLOWED_STANCES.includes(record.stance)) {
+      addError(errors, TRACK_2, rowKey(record), `stance「${trunc(record.stance)}」不在允許清單內。允許的值：${ALLOWED_STANCES.join('、')}。`);
+    }
   }
 
   if (errors.length > 0) return null;
@@ -753,6 +779,8 @@ function buildTrack2(csv, errors) {
     ...(record.vibe ? { vibe: record.vibe } : {}),
     sticky: (record.sticky || '').toLowerCase() === 'true',
     ...(record.full_content ? { full_content: record.full_content } : {}),
+    ...(record.case_ref ? { case_ref: record.case_ref } : {}),
+    ...(record.stance ? { stance: record.stance } : {}),
   }));
 }
 

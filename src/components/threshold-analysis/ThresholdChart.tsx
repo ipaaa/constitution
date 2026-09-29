@@ -2,11 +2,13 @@ import {
   CHART_FIRST_YEAR,
   CHART_LAST_YEAR,
   INTERIM_SEGMENT,
+  RESTORED_SEGMENT,
   SERIES_BREAK_DATE,
   type EraStat,
   type ThresholdEra,
   type YearCount,
 } from '@/data/threshold-analysis';
+import { VOIDED_FLOOR_CLAUSE } from '@/data/ruling-threshold';
 import ThresholdBand from './ThresholdBand';
 import ThresholdBoundary from './ThresholdBoundary';
 import SeriesBreakLine from './SeriesBreakLine';
@@ -97,6 +99,12 @@ export default function ThresholdChart({
         : `${s.era.label}（${s.era.effectiveFrom} 起）年均 ${s.meanPerYear.toFixed(1)} 件`,
     )
     .join('；');
+  // 已失效的時期另補一句失效依據。句子取自 ruling-threshold.ts，不在此手寫。
+  const voidedDesc = stats
+    .filter((s) => s.era.voided)
+    .map((s) => `${s.era.label}：${VOIDED_FLOOR_CLAUSE}。`)
+    .join('');
+  const fixed = eras.find((e) => e.voided);
 
   const breakX = xForDate(SERIES_BREAK_DATE);
 
@@ -112,7 +120,7 @@ export default function ThresholdChart({
         1949 至 2026 年憲法法庭解釋與判決的年度件數，底層色帶為各時期的門檻
       </title>
       <desc id="threshold-chart-desc">
-        {`${desc}。釋字序列 1949 至 2021 年共 813 件，2022-01-04 起改作成判決，兩個序列不可相加。`}
+        {`${desc}。${voidedDesc}釋字序列 1949 至 2021 年共 813 件，2022-01-04 起改作成判決，兩個序列不可相加。`}
       </desc>
 
       <defs>
@@ -154,6 +162,19 @@ export default function ThresholdChart({
           meanPerYear={null}
           x={xForDate(INTERIM_SEGMENT.effectiveFrom)}
           width={xForDate(INTERIM_SEGMENT.effectiveTo!) - xForDate(INTERIM_SEGMENT.effectiveFrom)}
+          height={PLOT_H}
+          hatched
+          selected={false}
+          dimmed={selectedEraId !== null}
+          onSelect={() => onSelectEra(null)}
+        />
+
+        {/* 2025-12-19 起的憲訴法第 30 條第 1 項。10 人 9 人失效後適用，同樣沒有釋字可計。 */}
+        <ThresholdBand
+          era={RESTORED_SEGMENT}
+          meanPerYear={null}
+          x={xForDate(RESTORED_SEGMENT.effectiveFrom)}
+          width={PAD.left + PLOT_W - xForDate(RESTORED_SEGMENT.effectiveFrom)}
           height={PLOT_H}
           hatched
           selected={false}
@@ -213,7 +234,7 @@ export default function ThresholdChart({
           />
         ))}
 
-        {/* 6. 圖右端兩段窄色帶放不下標籤，改用引線註解交代。
+        {/* 6. 圖右端三段窄色帶放不下標籤，改用引線註解交代。
             行動版連這段引線都放不下，整組只在桌機顯示；
             該段內容在下方 SeriesBoundaryNote 有完整文字版。 */}
         <g pointerEvents="none" className="hidden md:block">
@@ -234,17 +255,30 @@ export default function ThresholdChart({
             fontSize="10"
             fill="#4b5563"
           >
-            {INTERIM_SEGMENT.effectiveFrom} {INTERIM_SEGMENT.label}
+            {INTERIM_SEGMENT.effectiveFrom} {INTERIM_SEGMENT.label}／無釋字資料
           </text>
+          {fixed && (
+            <text
+              x={PAD.left + PLOT_W}
+              y={PLOT_H + 53}
+              textAnchor="end"
+              fontFamily="serif"
+              fontSize="10"
+              fill="#4b5563"
+            >
+              {fixed.effectiveFrom} {fixed.label}（{fixed.effectiveTo} 失效）／無釋字資料
+            </text>
+          )}
+          {/* 距 SVG 底緣 6px。本環境無瀏覽器可驗裁切，需人工目視。 */}
           <text
             x={PAD.left + PLOT_W}
-            y={PLOT_H + 53}
+            y={PLOT_H + 66}
             textAnchor="end"
             fontFamily="serif"
             fontSize="10"
             fill="#4b5563"
           >
-            {eras[eras.length - 1].effectiveFrom} {eras[eras.length - 1].label}／兩段皆無釋字資料
+            {RESTORED_SEGMENT.effectiveFrom} {RESTORED_SEGMENT.label}／無釋字資料
           </text>
         </g>
       </g>

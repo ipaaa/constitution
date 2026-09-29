@@ -1,16 +1,16 @@
 ---
 id: 064
 title: Track 2 新增 case_ref 與 stance 欄
-status: review
+status: complete
 source: constitution-features/019 第二節（captain 2026-09-23 核准加欄）
 started: 2026-09-29T16:52:37Z
-completed:
-verdict:
+completed: 2026-09-29T21:43:50Z
+verdict: PASSED
 score: 0.7
 worktree: .worktrees/spacedock-ensign-064-track2-case-ref-stance-columns
 issue:
-pr:
-mod-block: merge:pr-merge
+pr: pr-merge:47
+mod-block:
 gates:
     version: 1
     records:
@@ -60,7 +60,8 @@ gates:
                 reason: 'Captain approved 064 review in chat 2026-09-29 (「1235照建議」): stage-1 code matches design, 040 validation not weakened, no regressions.'
               application:
                 target-stage: complete
-                state: pending
+                state: consumed
+archived: 2026-09-29T21:43:50Z
 ---
 
 在 `Track 2_discussion` 分頁新增 `case_ref` 與 `stance` 兩個選填欄，並讓同步程式把它們帶進 `discussions.json`，使 feature `019` 的不同意見總覽頁得以成立。

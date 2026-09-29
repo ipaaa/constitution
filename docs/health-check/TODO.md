@@ -703,6 +703,12 @@ done | sort -rn | head -12
 | 5 | `src/data/threshold-analysis.ts:323-336` | 門檻期 `id: 'current'` 把已失效的第 30 條第 2 項標為現行門檻（`label: '10 人 9 人'`、`effectiveTo: null`）。`/past/thresholds` 全頁沒有任何失效敘述。`066` 的 `check-voided-floor.mjs` 當時未跑這條路由 | 無（屬 `066` 的錯誤類型） | PR，另開票。修它會動到 `tests/threshold-analysis.test.mjs` 以 `'current'` 為錨的斷言 |
 | 6 | `src/app/about/page.tsx:38` | 讀者看得到的文字請讀者去看 `about-content.md` 的舊位置。該檔已封存到 `docs/_archive/`，內容只有「（待撰寫）」。`067` 只修註解內的路徑，這一處是渲染文字，未改 | M6 | PR，需先決定文案 |
 
+> ⚠️ 2026-09-29 補述（`068`）：上表第 5 項由 `068`（`docs/constitution-features/threshold-page-voided-quorum-current.md`）修正，
+> 分支 `spacedock-ensign/threshold-page-voided-quorum-current`，合併 PR 待開。
+> 修正後該期 id 為 `fixed-floor`、終點 2025-12-19，頁面在時期卡片與「這張圖不包含什麼」一節寫明已失效；
+> `check-voided-floor.mjs` 七條路由 exit 0。
+> 同一修正使第 3 項的行號由 `:238` 移到 `:247`，內容未改，仍待修。原表保留。
+
 - **另待 captain 決定：全站紀年慣例**。站上民國與西元兩套並存，未統一。
   `067` 的預設建議：敘述用西元；判決字號保留民國；引用官方文字時保留民國並括號附西元。
   逐檔盤點見 `docs/content-audit/2026-09-29-reading-list.md` 的 L4 節

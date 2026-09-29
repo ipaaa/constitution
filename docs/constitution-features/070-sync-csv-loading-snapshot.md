@@ -1,7 +1,7 @@
 ---
 id: 070
 title: 同步讀到「載入中…」快照時隨機整份中止
-status: verify
+status: review
 source: 050 AC-2 正式同步失敗（2026-09-29），captain 同日核准開票
 started: 2026-09-29T19:52:07Z
 completed:
@@ -11,6 +11,28 @@ worktree: .worktrees/spacedock-ensign-070-sync-csv-loading-snapshot
 issue:
 pr:
 mod-block:
+gates:
+    version: 1
+    records:
+        - id: gate:070:verify
+          stage: verify
+          attempts:
+            - id: gate-attempt:070-verify-1
+              briefing:
+                id: briefing:070:verify:attempt-1:revision-1
+                digest: sha256:23e75e750efdb1f87dfaeec06ac38d3e2043410bd6b11a4a5b7cda3261c0f903
+                room-ref: '@review/verify/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:070:verify:1
+                briefing: briefing:070:verify:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-29T22:06:35.171603Z"
+                decision: approve
+                reason: 'Captain approved 070 verify in chat 2026-09-29: AC-1..AC-9 independently re-run, 040 validation byte-identical, live runs 10/10. F1 (8-fetch budget met at its edge) accepted as Deferred risk; revisit if a real sync fails with the 8-attempt message. F2 to 069.'
+              application:
+                target-stage: review
+                state: consumed
 ---
 
 `040` 合併後，正式同步可能隨機失敗：Google 發布的 CSV 有時送出公式仍在計算的舊快照，`status` 欄顯示「載入中…」，`040` 的驗證因此判整份不符而中止。不會把錯的內容推上網站，但會讓編輯看到數十筆錯誤而以為內容壞了。
@@ -470,6 +492,9 @@ Verified by: 新測試四格。
 重抓放在抓取層，040 的驗證函式與 `content-fingerprint.mjs` 逐位元組未動；入口判斷改為 realpath 比對，認不出時 `⛔ 入口判斷失敗` exit 1。唯讀實跑 10 次中有 3 次真的碰到未算完快照並自動恢復，輸出與 `src/data` 相同。
 給 FO 的旗標：(1) 與 064 合併：程式碼無衝突，合併樹上兩票測試 84/84 通過；但 `design.md` 修訂紀錄兩票都在檔尾追加，會有一處 append-append 衝突，兩則都保留即可。為了相容 064 新增的 `../src/data/verified-case-refs.mjs` import，AC-9 的符號連結改指向 repo 的 `scripts/`，而不是複製兩個檔案（AC-9(a) 字面寫的是複製），否證力不變。
 (2) verify 做 AC-7(b) 時，若 064 已先合併，`buildTrack2` 與 `content-fingerprint.mjs` 會因 064 合法地與 main 不同；請改對 merge-base `cefeeee` 比對。(3) `threshold-analysis` 的 AC-7 守衛在 main 上已經失敗，是既有問題，需要另開票或由該票處理。
+
+- DONE: FO-authorized fix from review（R1，Polish）：合併 current main 後，`operations.md` 有兩句仍描述 070 之前的行為，各追加一則日期補述，原句保留。
+  合併 main（`git merge main`）：`design.md` 修訂紀錄的 append-append 衝突保留兩則（064 在前、070 在後）。本票 frontmatter 的 `status` 取 main 的 FO 鏡像值。operations.md 在加欄程序「錯誤訊息含「載入中…」…重跑一次」與〈同步〉「同步印出多行 `實際為「載入中…」` 並中止」之後各追加補述，`git diff main` 只有這兩則是新增的 `+` 行。合併樹全套 137 項：136 過、0 失敗、1 skip。在不含 `.next` 的乾淨副本上 `npx tsc --noEmit` exit 0；worktree 內的 `.next/types/` 有並行建置留下的 `routes.d 2.ts` 重複檔，會讓 tsc 報 TS2300。那是 gitignore 的產物，未刪除。
 
 ## Stage Report: verify
 

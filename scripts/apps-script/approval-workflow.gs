@@ -5,6 +5,10 @@ const APPROVAL_FIELDS = {
   'Track 1_history': ['id', 'category', 'chapter', 'content', 'handwriting', 'year', 'title', 'ruling', 'ruling_id', 'image_url'],
   'Track 2_discussion': ['id', 'category', 'title', 'author', 'year', 'abstract', 'link', 'views', 'owl_comment', 'owl_depth_comment', 'vibe', 'sticky', 'full_content'],
 };
+/** 選填發布欄位：有值才計入指紋，空白時指紋不變。不參與序號。欄位不存在時不中止。 */
+const OPTIONAL_APPROVAL_FIELDS = {
+  'Track 2_discussion': ['case_ref', 'stance'],
+};
 const REVIEW_FIELDS = [
   'status', 'review_decision', 'review_fingerprint', 'approved_by', 'approved_at',
   'approved_fingerprint', 'current_fingerprint', 'reject_reason',
@@ -65,13 +69,17 @@ function approvalFieldsFor_(sheetKey, values) {
   return APPROVAL_FIELDS[sheetKey];
 }
 
-function approvalFingerprint_(sheetKey, values, sequence) {
+function approvalFingerprint_(sheetKey, values, sequence, optionalValues) {
   const fields = approvalFieldsFor_(sheetKey, values);
   const sourceFields = sheetKey === 'site_tldr' ? ['order', 'label', 'text', 'link'] : APPROVAL_FIELDS[sheetKey];
   const record = {};
   sourceFields.forEach(function(field, index) { record[field] = values[index]; });
   const projection = fields.map(function(field) {
     return [field, normalizeApprovalField_(field, record[field])];
+  });
+  (OPTIONAL_APPROVAL_FIELDS[sheetKey] || []).forEach(function(field, index) {
+    const value = normalizeApprovalText_(optionalValues ? optionalValues[index] : '');
+    if (value !== '') projection.push([field, value]);
   });
   if (sheetKey === 'Track 2_discussion') {
     const normalizedSequence = normalizeApprovalInteger_(sequence, 'sequence');
@@ -84,14 +92,17 @@ function approvalFingerprint_(sheetKey, values, sequence) {
     .join('');
 }
 
-/** 試算表公式：依固定欄位順序傳值。Track 2 最後一個參數必須是非空資料列序號。 */
+/**
+ * 試算表公式：依固定欄位順序傳值。Track 2 在發布欄位之後接非空資料列序號，再接選填欄位。
+ * 選填欄位排在序號之後：舊公式沒有這幾個參數，視為空白，算出與舊版相同的指紋。
+ */
 function CONTENT_FINGERPRINT(sheetKey) {
   const args = Array.prototype.slice.call(arguments, 1);
   const count = APPROVAL_FIELDS[sheetKey] ? APPROVAL_FIELDS[sheetKey].length : 4;
   const values = args.slice(0, count);
   if (values.every(function(value) { return normalizeApprovalText_(value) === ''; })) return '';
   try {
-    return approvalFingerprint_(sheetKey, values, sheetKey === 'Track 2_discussion' ? args[count] : undefined);
+    return approvalFingerprint_(sheetKey, values, sheetKey === 'Track 2_discussion' ? args[count] : undefined, args.slice(count + 1));
   } catch (error) {
     return '#FINGERPRINT! ' + error.message;
   }
@@ -127,11 +138,12 @@ function APPROVAL_STATUS(currentFingerprint, decision, reviewFingerprint, approv
 function resolveApprovalHeaders_(sheet) {
   const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getDisplayValues()[0];
   const expected = (APPROVAL_FIELDS[sheet.getName()] || ['order', 'label', 'text', 'link']).concat(REVIEW_FIELDS);
+  const optional = OPTIONAL_APPROVAL_FIELDS[sheet.getName()] || [];
   const result = {};
   headers.forEach(function(raw, index) {
     const normalized = normalizeApprovalText_(raw).toLowerCase().replace(/\s+/g, ' ');
     let best = '';
-    expected.forEach(function(field) {
+    expected.concat(optional).forEach(function(field) {
       if ((normalized === field || (normalized.indexOf(field) === 0 && HEADER_SEPARATORS.indexOf(normalized.charAt(field.length)) >= 0)) && field.length > best.length) best = field;
     });
     if (best) {
@@ -166,6 +178,11 @@ function installApprovalFormulas() {
     if (key === 'Track 2_discussion') {
       const ranges = fields.map(function(field) { const col = columnA1_(columns[field]); return col + '$2:' + col + row; });
       args = refs.concat('PUBLISHED_ROW_SEQUENCE(' + ranges.join(',') + ')');
+      // 選填欄位都還沒建時，公式與舊版逐字相同。只建了一欄時，另一欄以空字串占位。
+      const optional = OPTIONAL_APPROVAL_FIELDS[key];
+      if (optional.some(function(field) { return columns[field] != null; })) {
+        args = args.concat(optional.map(function(field) { return columns[field] != null ? columnA1_(columns[field]) + row : '""'; }));
+      }
     }
     sheet.getRange(row, columns.current_fingerprint).setFormula('=CONTENT_FINGERPRINT("' + key + '",' + args.join(',') + ')');
     sheet.getRange(row, columns.status).setFormula('=APPROVAL_STATUS(' + [
@@ -186,7 +203,11 @@ function fingerprintForSheetRow_(sheet, columns, row) {
   const fields = key === 'site_tldr' ? ['order', 'label', 'text', 'link'] : APPROVAL_FIELDS[key];
   const values = fields.map(function(field) { return sheet.getRange(row, columns[field]).getDisplayValue(); });
   let sequence;
+  let optionalValues;
   if (key === 'Track 2_discussion') {
+    optionalValues = OPTIONAL_APPROVAL_FIELDS[key].map(function(field) {
+      return columns[field] != null ? sheet.getRange(row, columns[field]).getDisplayValue() : '';
+    });
     sequence = 0;
     for (let candidate = 2; candidate <= row; candidate++) {
       const hasContent = fields.some(function(field) {
@@ -195,7 +216,7 @@ function fingerprintForSheetRow_(sheet, columns, row) {
       if (hasContent) sequence++;
     }
   }
-  return approvalFingerprint_(key, values, sequence);
+  return approvalFingerprint_(key, values, sequence, optionalValues);
 }
 
 function approveActiveRows() { reviewActiveRows_('Approved', ''); }

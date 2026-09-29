@@ -11,6 +11,7 @@ import vm from 'node:vm';
 import {
   fingerprintPayload,
   fingerprintPublishedRow,
+  OPTIONAL_PUBLISHED_FIELDS,
   PUBLISHED_FIELDS,
   SHEET_KEYS,
 } from '../scripts/content-fingerprint.mjs';
@@ -37,6 +38,8 @@ const DESIGN_PROJECTION = Object.freeze({
   track2: Object.freeze(['id', 'category', 'title', 'author', 'year', 'abstract', 'link', 'views', 'owl_comment', 'owl_depth_comment', 'vibe', 'sticky', 'full_content']),
   tldrHeading: Object.freeze(['order', 'text', 'link']),
   tldrPoint: Object.freeze(['order', 'label', 'text']),
+  // 選填發布欄位：有值才計入指紋（feature 064）。
+  track2Optional: Object.freeze(['case_ref', 'stance']),
 });
 const TLDR_HEADING = { order: '0', label: '', text: '摘要標題', link: 'https://example.test/tldr' };
 const TLDR_POINT = { order: '1', label: '重點', text: '重點內容', link: '' };
@@ -125,6 +128,26 @@ test('三個分頁的指紋投影與 design.md 的發布欄位範圍表逐字相
   assert.deepEqual(projected(SHEET_KEYS.TRACK_2, TRACK_2, 1), [...DESIGN_PROJECTION.track2, '__sequence']);
   assert.deepEqual(projected(SHEET_KEYS.SITE_TLDR, TLDR_HEADING), [...DESIGN_PROJECTION.tldrHeading]);
   assert.deepEqual(projected(SHEET_KEYS.SITE_TLDR, TLDR_POINT), [...DESIGN_PROJECTION.tldrPoint]);
+});
+
+test('Track 2 選填發布欄位與 design.md 的發布欄位範圍表逐字相同，Node 與 Apps Script 兩端都是', () => {
+  assert.deepEqual([...OPTIONAL_PUBLISHED_FIELDS[SHEET_KEYS.TRACK_2]], [...DESIGN_PROJECTION.track2Optional]);
+  const gsOptional = vm.runInContext('OPTIONAL_APPROVAL_FIELDS', loadAppsScript());
+  assert.deepEqual(Object.keys(gsOptional), [SHEET_KEYS.TRACK_2]);
+  assert.deepEqual([...gsOptional[SHEET_KEYS.TRACK_2]], [...DESIGN_PROJECTION.track2Optional]);
+  // 每個選填欄位有值時都進投影，排在 13 欄之後、__sequence 之前。
+  const filled = Object.fromEntries(DESIGN_PROJECTION.track2Optional.map(field => [field, `${field}-value`]));
+  const fields = JSON.parse(fingerprintPayload(SHEET_KEYS.TRACK_2, { ...TRACK_2, ...filled }, 1))[2].map(([field]) => field);
+  assert.deepEqual(fields, [...DESIGN_PROJECTION.track2, ...DESIGN_PROJECTION.track2Optional, '__sequence']);
+  // Apps Script 端逐欄：填一個選填欄位就改變指紋，且與 Node 相同。
+  const { CONTENT_FINGERPRINT } = loadAppsScript();
+  const blank = CONTENT_FINGERPRINT(SHEET_KEYS.TRACK_2, ...gsArgs(SHEET_KEYS.TRACK_2, TRACK_2, 1));
+  DESIGN_PROJECTION.track2Optional.forEach((field, index) => {
+    const optionalArgs = DESIGN_PROJECTION.track2Optional.map((_, i) => (i === index ? 'x' : ''));
+    const gs = CONTENT_FINGERPRINT(SHEET_KEYS.TRACK_2, ...gsArgs(SHEET_KEYS.TRACK_2, TRACK_2, 1), ...optionalArgs);
+    assert.notEqual(gs, blank, field);
+    assert.equal(gs, fingerprintPublishedRow(SHEET_KEYS.TRACK_2, { ...TRACK_2, [field]: 'x' }, 1), field);
+  });
 });
 
 test('fingerprint-v1 正規化 NFC、換行、trim、sticky、views 與 order', () => {

@@ -59,6 +59,7 @@ export default function ThresholdBoundary({
           fill={unverified ? '#b45309' : '#4b5563'}
         >
           {era.label}：{era.ruleSummary}
+          {era.voided && '（已失效）'}
         </text>
       </g>
 
