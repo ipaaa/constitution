@@ -30,7 +30,9 @@ const { default: OchreBandFactors } = await import('@/components/threshold-analy
 const { default: ChartAxes } = await import('@/components/threshold-analysis/ChartAxes');
 const { default: ThresholdBoundary } = await import('@/components/threshold-analysis/ThresholdBoundary');
 const { default: ThresholdTooltip } = await import('@/components/threshold-analysis/ThresholdTooltip');
+const { default: SeriesBoundaryNote } = await import('@/components/threshold-analysis/SeriesBoundaryNote');
 const { default: ThresholdsPage } = await import('@/app/past/thresholds/page');
+const { RULING_THRESHOLD, VOIDED_FLOOR_CLAUSE } = await import('@/data/ruling-threshold');
 
 /**
  * 整個頁面的渲染輸出，含 page.tsx 的外殼，不只元件子樹。
@@ -427,13 +429,13 @@ test('AC-2 三期件數為 79／233／501，相加等於 813', () => {
   assert.equal(statsTotal, Object.values(expected).reduce((a, n) => a + n, 0));
 });
 
-test('AC-2 三期年均為 8.3／6.7／17.3，current 期為 null', () => {
+test('AC-2 三期年均為 8.3／6.7／17.3，fixed-floor 期為 null', () => {
   // 分母用設計文件已實算的日數，並與 fixture 的日期邊界對照，確認沒有寫錯。
   const days = (a, b) => (Date.parse(b) - Date.parse(a)) / 86400000;
   assert.equal(ERA_SPAN_DAYS.rules, days('1949-01-06', '1958-07-21'));
   assert.equal(ERA_SPAN_DAYS['three-quarters'], days('1958-07-21', '1993-02-03'));
   assert.equal(ERA_SPAN_DAYS['two-thirds'], days('1993-02-03', '2021-12-25'));
-  assert.equal(ERA_SPAN_DAYS.current, null);
+  assert.equal(ERA_SPAN_DAYS['fixed-floor'], null);
   assert.equal(DAYS_PER_YEAR, 365.2425);
   assert.equal(RAW[0][2], '1949-01-06');
   assert.equal(RAW[RAW.length - 1][2], '2021-12-24');
@@ -441,7 +443,7 @@ test('AC-2 三期年均為 8.3／6.7／17.3，current 期為 null', () => {
   assert.equal(statOf('rules').meanPerYear.toFixed(1), '8.3');
   assert.equal(statOf('three-quarters').meanPerYear.toFixed(1), '6.7');
   assert.equal(statOf('two-thirds').meanPerYear.toFixed(1), '17.3');
-  assert.equal(statOf('current').meanPerYear, null);
+  assert.equal(statOf('fixed-floor').meanPerYear, null);
 });
 
 test('AC-2 EraComparisonStrip 渲染出的倍率為 0.81× 與 2.57×', () => {
@@ -635,7 +637,7 @@ test('AC-4 只有資料模組與協調者可以引用 FACTORS', () => {
 });
 
 // ---------------------------------------------------------------------------
-// AC-5 — 現行 10 人 9 人門檻在圖上看得出「沒有釋字資料可用」
+// AC-5 — 10 人 9 人門檻（2025-12-19 起已失效）在圖上看得出「沒有釋字資料可用」
 // ---------------------------------------------------------------------------
 
 const renderChart = () =>
@@ -662,18 +664,19 @@ const bandTitles = (chartHtml) => [...chartHtml.matchAll(BAND_TITLE_RE)];
  * 某一條色帶自己的渲染區段：自己的 `<title>` 起，到下一條色帶的 `<title>` 止。
  *
  * **為什麼一定要切到這個粒度。** AC-5 要求的東西在圖的子樹裡各有**兩個以上的產生點**：
- * `fill="url(#threshold-hatch)"` 有兩個發出者（`current` 期的色帶，以及 `INTERIM_SEGMENT`
- * 的色帶 —— 後者的 `hatched` 是硬寫的 `true`）；「年均 6.7 件」有兩個（該期色帶與 `<desc>`）。
+ * `fill="url(#threshold-hatch)"` 有三個發出者（`fixed-floor` 期的色帶，以及 `INTERIM_SEGMENT`、
+ * `RESTORED_SEGMENT` 的色帶 —— 後兩者的 `hatched` 是硬寫的 `true`）；「年均 6.7 件」有兩個（該期色帶與 `<desc>`）。
  * 「無釋字資料」有三個程式產生點（色帶標籤、`<desc>`、右端引線註解），
- * 目前渲染出兩個 —— 色帶標籤那一個因為 `current` 的色帶太窄而不畫，見下面的 (2)。
+ * 目前渲染出兩個 —— 色帶標籤那一個因為 `fixed-floor` 的色帶太窄而不畫，見下面的 (2)。
  *
  * 裸 `includes()` 只問「這個子樹裡有沒有」，不問「是不是該負責的那一個產生的」。
  * 該負責的那一個壞掉時，斷言由另一個產生點滿足，**假綠**。
  *
  * 三次實測，每一次舊斷言都是 27/27 全綠，本檔的新斷言都轉紅：
- *   1. `ThresholdChart` 傳給 `current` 色帶的 `hatched` 改成 `false` —— 讀者失去斜線網底。
+ *   1. `ThresholdChart` 傳給 `fixed-floor` 色帶的 `hatched` 改成 `false` —— 讀者失去斜線網底。
  *   2. `ThresholdBand` 的 `showLabel` 改成 `false` —— 圖上不再顯示年均與期間名稱。
- *   3. 右端引線註解拿掉「／兩段皆無釋字資料」—— 圖上不再寫出 `current` 期沒有資料。
+ *   3. 右端引線註解拿掉「／兩段皆無釋字資料」—— 圖上不再寫出該期沒有資料。
+ *      （068 起引線註解改為三行，各行自帶「／無釋字資料」。當時的 id 為 `current`，068 改名為 `fixed-floor`。）
  */
 function bandRegion(chartHtml, label) {
   const hits = bandTitles(chartHtml);
@@ -693,12 +696,12 @@ function bandRegion(chartHtml, label) {
 const visibleChartTexts = (chartHtml) =>
   [...chartHtml.matchAll(/<text[^>]*>([\s\S]*?)<\/text>/g)].map((m) => m[1]);
 
-test('AC-5 current 期無年均，且圖上以斜線網底與文字標明無釋字資料', () => {
-  assert.equal(statOf('current').meanPerYear, null);
-  assert.equal(statOf('current').totalCount, 0);
+test('AC-5 fixed-floor 期無年均，且圖上以斜線網底與文字標明無釋字資料', () => {
+  assert.equal(statOf('fixed-floor').meanPerYear, null);
+  assert.equal(statOf('fixed-floor').totalCount, 0);
 
   const html = renderChart();
-  const current = eraOf('current');
+  const fixed = eraOf('fixed-floor');
 
   // 色帶的 <title> 必須照這個順序出現。下面每一條都靠它定位產生者，
   // 順序或數量變了就中止 —— 不讓區段切錯之後還繼續判定。
@@ -710,6 +713,7 @@ test('AC-5 current 期無年均，且圖上以斜線網底與文字標明無釋�
       '雙三分之二（1993-02-03 起）',
       '10 人 9 人（2025-01-23 起）',
       '憲訴法原始門檻（2022-01-04 起）',
+      '憲訴法第 30 條第 1 項（2025-12-19 起）',
     ],
   );
 
@@ -718,29 +722,29 @@ test('AC-5 current 期無年均，且圖上以斜線網底與文字標明無釋�
   assert.ok(defs, '圖裡沒有 <defs>');
   assert.match(defs[0], /<pattern[^>]*id="threshold-hatch"/);
 
-  // (1) 網底必須畫在 current 期**自己**的色帶上。
-  //     整張圖有兩個發出者，只問「整張圖有沒有」時 INTERIM_SEGMENT 那個會頂替。
+  // (1) 網底必須畫在 fixed-floor 期**自己**的色帶上。
+  //     整張圖有三個發出者，只問「整張圖有沒有」時 INTERIM_SEGMENT 或 RESTORED_SEGMENT 那個會頂替。
   assert.match(
-    bandRegion(html, current.label),
+    bandRegion(html, fixed.label),
     /fill="url\(#threshold-hatch\)"/,
-    'current 期自己的色帶沒有斜線網底',
+    'fixed-floor 期自己的色帶沒有斜線網底',
   );
 
-  // (2)「無釋字資料」必須由圖上看得見的文字提供，而且要連得回 current 期。
+  // (2)「無釋字資料」必須由圖上看得見的文字提供，而且要連得回 fixed-floor 期。
   //     合格的方式有兩種，任一即可 —— 斷言追的是要求，不是某一種實作：
-  //       (a) 有一個看得見的 <text> 同時提到 current 期與「無釋字資料」；或
-  //       (b)「無釋字資料」出現在 current 期自己的色帶區段裡。
-  //     目前成立的是 (a)：圖右下的引線註解寫「2025-01-23 10 人 9 人／兩段皆無釋字資料」。
-  //     (b) 目前不成立，而且不是疏漏 —— current 期的色帶只有約 22px 寬，
+  //       (a) 有一個看得見的 <text> 同時提到 fixed-floor 期與「無釋字資料」；或
+  //       (b)「無釋字資料」出現在 fixed-floor 期自己的色帶區段裡。
+  //     目前成立的是 (a)：圖右下的引線註解第 2 行寫「2025-01-23 10 人 9 人（2025-12-19 失效）／無釋字資料」。
+  //     (b) 目前不成立，而且不是疏漏 —— fixed-floor 期的色帶只有約 20px 寬，
   //     低於 ThresholdBand 的 MIN_LABEL_WIDTH（72），因此它根本不畫標籤。
   //     日後若色帶變寬而畫出標籤，(b) 會成立，這條照樣通過。
   const namedOnChart = visibleChartTexts(html).filter(
-    (t) => t.includes('無釋字資料') && t.includes(current.label) && t.includes(current.effectiveFrom),
+    (t) => t.includes('無釋字資料') && t.includes(fixed.label) && t.includes(fixed.effectiveFrom),
   );
-  const inOwnBand = bandRegion(html, current.label).includes('無釋字資料');
+  const inOwnBand = bandRegion(html, fixed.label).includes('無釋字資料');
   assert.ok(
     namedOnChart.length > 0 || inOwnBand,
-    '圖上沒有任何看得見的文字把 current 期與「無釋字資料」連在一起（<desc> 不算，它不在圖上）',
+    '圖上沒有任何看得見的文字把 fixed-floor 期與「無釋字資料」連在一起（<desc> 不算，它不在圖上）',
   );
 
   // (3) 兩個有資料期的年均必須畫在**各自**的色帶上，不是只存在於 <desc>。
@@ -1106,7 +1110,7 @@ test('D2 2022-01-04 至 2025-01-23 的條文已逐字核對，不標未確認', 
  * 換算後的人數。c3 明文承諾「本頁不解釋這個限定語，也不把它換算成人數」，
  * 但在此之前沒有任何測試守著這句承諾，只靠人記得。
  *
- * 唯一可以出現人數的地方是現行憲訴法那一期 —— 它的條文原文本來就寫「十人」「九人」。
+ * 唯一可以出現人數的地方是 10 人 9 人那一期（2025-01-23 公布，已失效）—— 它的條文原文本來就寫「十人」「九人」。
  * 把那一期自己的字串從頁面文字裡挖掉之後，**整頁不該再剩下任何人數**。
  */
 /**
@@ -1122,7 +1126,7 @@ const HEADCOUNT_RE = /(?:[0-9０-９]+|[零〇一二兩三四五六七八九十�
 /**
  * 資料模組每一個字串葉節點的 `[欄位路徑, 值]`。
  *
- * 路徑以產生者為根（`current.label`、`three-quarters.ruleSummary`、`factors.0.uncertainty` …），
+ * 路徑以產生者為根（`fixed-floor.label`、`three-quarters.ruleSummary`、`factors.0.uncertainty` …），
  * 因為豁免要**按產生者發**，不能按字串值發。見下面的 `HEADCOUNT_EXEMPT_PATHS`。
  */
 const dataStringLeaves = (value, path = '') =>
@@ -1154,13 +1158,13 @@ const dataExportRoots = () => Object.fromEntries(Object.entries(data));
 /**
  * 唯一可以帶人數的三個欄位，**以路徑指名**。
  *
- * 這三個是現行憲訴法自己的用語，人數來自條文原文，不是換算。
+ * 這三個是 10 人 9 人那一期（2025-01-23 公布，已失效）自己的用語，人數來自條文原文，不是換算。
  * **關鍵是「按路徑」而不是「按字串值」。** 原本的豁免寫法是
  * `for (const a of allowed) residue = residue.split(a).join(' ')`，
  * 那是**全站逐字刪除、不限定產生位置**，所以豁免按字串值發、**有多重施用者**：
  * 實測把「雙四分之三」期的 `ruleSummary` 改成
  * `'總額 3/4 出席，出席人 3/4 同意（10 人 9 人）'` —— 28 pass／0 fail 全綠，
- * 因為「10 人 9 人」正是 `current.label`，被全站豁免。
+ * 因為「10 人 9 人」正是該期的 `label`（當時 id 為 `current`，068 改名為 `fixed-floor`），被全站豁免。
  * 同一個違規行為，寫成被豁免的那串字就過關，寫成「（約 11 位大法官）」就不過。
  *
  * 路徑的根是匯出名（`ERAS`），序位**由 `id` 反查**而不是寫死 —— 重排 `ERAS` 不該讓它誤紅。
@@ -1169,19 +1173,19 @@ const dataExportRoots = () => Object.fromEntries(Object.entries(data));
  * 掃描面是「要檢查哪些東西」，漏一個就是漏檢（F21）；
  * 豁免是「授權哪一個產生者可以帶人數」，那本來就該逐筆寫明、逐筆可稽核。
  * **但清單不得成為後門**，所以下面的測試對每一筆豁免再加一層限制：
- * 它帶的每一個人數，**必須逐字出自 `current` 期自己那三個欄位**。
+ * 它帶的每一個人數，**必須逐字出自 `fixed-floor` 期自己那三個欄位**。
  * 加一個路徑進豁免清單，它仍然不能寫「約 11 位大法官」。
  *
- * `SERIES_BOUNDARY_NOTES` 的 `b3-current-no-data.heading` 在清單裡，
- * 因為它用 `current.label` 指稱現行門檻（「現行 10 人 9 人條件落在釋字序列結束之後」）。
- * **那是現行憲訴法自己的用語，不是把規則期的限定語換算成人數。**
+ * `SERIES_BOUNDARY_NOTES` 的 `b3-fixed-floor-no-data.heading` 在清單裡，
+ * 因為它用該期的 `label` 指稱 10 人 9 人門檻（「10 人 9 人條件落在釋字序列結束之後」）。
+ * **那是 10 人 9 人那一期（2025-01-23 公布，已失效）自己的用語，不是把規則期的限定語換算成人數。**
  * 這一筆是本輪枚舉掃描面之後才浮出來的 —— 手寫七個根的版本從來沒掃到它。
  */
 const headcountExemptPaths = () => {
-  const i = ERAS.findIndex((e) => e.id === 'current');
-  assert.notEqual(i, -1, 'ERAS 裡沒有 current 期');
-  const n = data.SERIES_BOUNDARY_NOTES.findIndex((b) => b.id === 'b3-current-no-data');
-  assert.notEqual(n, -1, 'SERIES_BOUNDARY_NOTES 裡沒有 b3-current-no-data');
+  const i = ERAS.findIndex((e) => e.id === 'fixed-floor');
+  assert.notEqual(i, -1, 'ERAS 裡沒有 fixed-floor 期');
+  const n = data.SERIES_BOUNDARY_NOTES.findIndex((b) => b.id === 'b3-fixed-floor-no-data');
+  assert.notEqual(n, -1, 'SERIES_BOUNDARY_NOTES 裡沒有 b3-fixed-floor-no-data');
   return new Set([
     `ERAS.${i}.label`,
     `ERAS.${i}.ruleSummary`,
@@ -1217,10 +1221,10 @@ test('c3 豁免按產生者發，且掃描面自模組匯出枚舉', () => {
   }
 
   // 防空轉 3：每一筆豁免必須真的存在，而且真的帶人數。
-  // 第二層限制：它帶的每一個人數，必須逐字出自 current 期自己那三個欄位。
+  // 第二層限制：它帶的每一個人數，必須逐字出自 fixed-floor 期自己那三個欄位。
   // 這一層讓豁免清單無法成為後門 —— 加一個路徑進來，它仍然不能寫「約 11 位大法官」。
-  const current = eraOf('current');
-  const statuteWording = [current.label, current.ruleSummary, current.quotedText];
+  const fixed = eraOf('fixed-floor');
+  const statuteWording = [fixed.label, fixed.ruleSummary, fixed.quotedText];
   for (const p of exempt) {
     const hit = leaves.find(([path]) => path === p);
     assert.ok(hit, `豁免路徑不存在：${p}`);
@@ -1229,7 +1233,7 @@ test('c3 豁免按產生者發，且掃描面自模組匯出枚舉', () => {
     for (const m of found) {
       assert.ok(
         statuteWording.some((w) => w.includes(m)),
-        `豁免路徑 ${p} 帶的「${m}」不出自現行憲訴法自己的用語 —— 豁免不是這樣用的`,
+        `豁免路徑 ${p} 帶的「${m}」不出自 10 人 9 人那一期（2025-01-23 公布，已失效）自己的用語 —— 豁免不是這樣用的`,
       );
     }
   }
@@ -1241,23 +1245,23 @@ test('c3 豁免按產生者發，且掃描面自模組匯出枚舉', () => {
     assert.equal(
       m,
       null,
-      `${path} 帶了換算後的人數：${m} —— 豁免只發給 current 期自己的三個欄位，不發給字串值`,
+      `${path} 帶了換算後的人數：${m} —— 豁免只發給 fixed-floor 期自己的三個欄位，不發給字串值`,
     );
   }
 });
 
 test('c3 站上不得出現換算後的人數', () => {
-  const current = eraOf('current');
-  // 這三個字串是現行憲訴法自己的用語，人數來自條文原文，不是換算。
+  const fixed = eraOf('fixed-floor');
+  // 這三個字串是 10 人 9 人那一期（2025-01-23 公布，已失效）自己的用語，人數來自條文原文，不是換算。
   //
   // **這一條的豁免仍然是按字串值發的，而那是刻意的，範圍也已經講明。**
   // 按產生者發的那一半由上一條測試承擔（`HEADCOUNT_EXEMPT_PATHS`，按欄位路徑）。
-  // 這一條掃的是**渲染後的整站文字**，包含手寫 JSX 散文 —— 散文引用現行憲訴法自己的
+  // 這一條掃的是**渲染後的整站文字**，包含手寫 JSX 散文 —— 散文引用 10 人 9 人那一期自己的
   // 用語（期別名稱、門檻摘要、條文原文）是本頁允許的，所以對散文而言按字串值豁免就是對的。
-  // 實測過「完整文字節點才豁免」這個替代設計：**不可行**。`current.label` 在站上有 1 處
+  // 實測過「完整文字節點才豁免」這個替代設計：**不可行**。該期的 `label` 在站上有 1 處
   // 是完整文字節點、5 處是較長文字節點的子字串（例：「10 人 9 人（2025-01-23 起）」），
   // 改成只豁免完整節點會讓現況誤紅。
-  const allowed = [current.label, current.ruleSummary, current.quotedText];
+  const allowed = [fixed.label, fixed.ruleSummary, fixed.quotedText];
 
   // 整站：整頁外殼（只渲染元件的版本被 reviewer 用外殼注入打穿過）
   // ＋ 只在 hover 才出現的浮層（整頁渲染的 hoveredYear 恆為 null，浮層不在它的輸出裡）。
@@ -1272,7 +1276,7 @@ test('c3 站上不得出現換算後的人數', () => {
   assert.deepEqual(
     residue.match(HEADCOUNT_RE),
     null,
-    `除了現行憲訴法的條文原文之外，站上不得出現人數：${residue.match(HEADCOUNT_RE)}`,
+    `除了 10 人 9 人那一期（2025-01-23 公布，已失效）的條文原文之外，站上不得出現人數：${residue.match(HEADCOUNT_RE)}`,
   );
 });
 
@@ -1292,6 +1296,79 @@ test('c3 規則期的呈現完全沒有人數', () => {
   assert.deepEqual(text.match(HEADCOUNT_RE), null);
   // 挖除是有效的：規則期的條文原文確實渲染出來了，不是整塊都沒渲染。
   assert.ok(text.includes('在中央政府所在地全體大法官三分之二以上出席'));
+});
+
+// ---------------------------------------------------------------------------
+// 068 — 10 人 9 人期已於 2025-12-19 失效，站上不得把它當現行條文呈現。
+// 規格見 docs/constitution-features/threshold-page-voided-quorum-current.md 第五小節 5.2。
+// 失效日、依據與失效句都出自 src/data/ruling-threshold.ts，這四條守的是「不另寫一次」。
+// ---------------------------------------------------------------------------
+
+test('068 10 人 9 人期有終點，且終點與失效依據出自唯一定義處', () => {
+  const fixed = eraOf('fixed-floor');
+  assert.ok(fixed, 'ERAS 裡沒有 fixed-floor 期');
+  // 物件同一性，不是值相等。手寫一份相同內容的物件也會轉紅。
+  assert.equal(fixed.voided, RULING_THRESHOLD.voidedFloor, 'voided 不是 ruling-threshold.ts 的同一個物件');
+  assert.equal(fixed.effectiveTo, RULING_THRESHOLD.voidedFloor.voidedOn);
+  // id 改名的理由是「current」會讓下一位維護者再寫一次「現行」。
+  assert.equal(ERAS.some((e) => e.id === 'current'), false, 'ERAS 裡仍有 id 為 current 的時期');
+});
+
+test('068 只有 2025-12-19 起那一段是開放期間', () => {
+  const { INTERIM_SEGMENT, RESTORED_SEGMENT } = data;
+  assert.ok(RESTORED_SEGMENT, '資料模組沒有匯出 RESTORED_SEGMENT');
+  const open = [...ERAS, INTERIM_SEGMENT, RESTORED_SEGMENT].filter((e) => e.effectiveTo === null);
+  assert.deepEqual(
+    open.map((e) => e.id),
+    ['restored-2025'],
+    '開放期間（effectiveTo 為 null）不只 2025-12-19 起那一段',
+  );
+  // 與 10 人 9 人期的終點銜接，中間沒有缺口。
+  assert.equal(RESTORED_SEGMENT.effectiveFrom, eraOf('fixed-floor').effectiveTo);
+  // 條文文字由 RULING_THRESHOLD 推導，且與 2019-01-04 版逐字相同。
+  assert.equal(RESTORED_SEGMENT.quotedText, `${RULING_THRESHOLD.rule}。`);
+  assert.equal(RESTORED_SEGMENT.quotedText, INTERIM_SEGMENT.quotedText);
+});
+
+test('068 站上指稱 10 人 9 人期的句段不帶現在式', () => {
+  const label = eraOf('fixed-floor').label;
+  const PRESENT_RE = /現行|至今|目前|仍然|如今|現在/;
+  const segs = siteHtmlParts().flatMap((html) => segmentsOf(htmlToText(html)));
+  const naming = segs.filter((seg) => seg.includes(label));
+  // 防空轉：站上確實有指稱該期的句段。
+  assert.ok(naming.length > 0, `站上找不到任何含「${label}」的句段`);
+  // 已知盲區：日期列「— 至今」與 label 分屬不同句段，這一條抓不到；由上面的終點測試承擔。
+  const present = naming.filter((seg) => PRESENT_RE.test(seg));
+  assert.deepEqual(present, [], '站上有把 10 人 9 人期寫成現在式的句段');
+});
+
+test('068 失效句出現在時期卡片、邊界註記與無障礙描述', () => {
+  // (1) 時期卡片：只渲染 fixed-floor 那一格。失效句必須在收合清單之前，
+  //     也就是在按鈕本體內，行動版不用展開就看得到。
+  const tile = renderToStaticMarkup(
+    createElement(EraComparisonStrip, {
+      items: [statOf('fixed-floor')],
+      selectedEraId: null,
+      onSelectEra: () => {},
+    }),
+  );
+  const clauseAt = tile.indexOf(VOIDED_FLOOR_CLAUSE);
+  const yearsAt = tile.indexOf('id="era-years-fixed-floor"');
+  assert.notEqual(clauseAt, -1, '時期卡片沒有失效句');
+  assert.notEqual(yearsAt, -1, '時期卡片沒有逐年清單的容器');
+  assert.ok(clauseAt < yearsAt, '失效句落在行動版的收合清單裡');
+
+  // (2) 邊界註記：失效句與判決連結。
+  const note = renderToStaticMarkup(createElement(SeriesBoundaryNote));
+  assert.ok(note.includes(VOIDED_FLOOR_CLAUSE), '邊界註記沒有失效句');
+  // 網址的 `&` 在 HTML 屬性裡會轉成 `&amp;`，比對 href 時照樣轉。
+  const rulingHref = `href="${RULING_THRESHOLD.voidedFloor.rulingUrl.replaceAll('&', '&amp;')}"`;
+  assert.ok(note.includes(rulingHref), '邊界註記沒有判決連結');
+
+  // (3) 無障礙描述。
+  const desc = renderChart().match(/<desc[^>]*>([\s\S]*?)<\/desc>/);
+  assert.ok(desc, '圖裡沒有 <desc>');
+  assert.ok(desc[1].includes(VOIDED_FLOOR_CLAUSE), '<desc> 沒有失效句');
 });
 
 // ---------------------------------------------------------------------------

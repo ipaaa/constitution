@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { YEARS, type EraStat, type ThresholdEra } from '@/data/threshold-analysis';
+import { VOIDED_FLOOR_CLAUSE } from '@/data/ruling-threshold';
 
 /**
  * 時期對照條。本頁量測端值的主要裝置。
@@ -99,6 +100,11 @@ export default function EraComparisonStrip({
                       附但書 {caveats.length}
                     </span>
                   )}
+                  {era.voided && (
+                    <span className="ml-1 inline-block bg-red-50 text-[#D32F2F] text-[10px] font-bold px-1.5 py-0.5 rounded">
+                      已失效
+                    </span>
+                  )}
                 </div>
 
                 {item.meanPerYear === null ? (
@@ -128,6 +134,15 @@ export default function EraComparisonStrip({
                     <p className="font-serif text-[11px] text-gray-500 leading-relaxed mt-1">
                       {era.quotedText}
                     </p>
+                    {/*
+                      失效句緊接條文原文，兩版皆可見。句子一律取自 ruling-threshold.ts，不在此手寫。
+                      判決連結放在 SeriesBoundaryNote：整張卡片是 <button>，按鈕內不得放 <a>。
+                    */}
+                    {era.voided && (
+                      <p className="font-serif text-[11px] text-gray-700 leading-relaxed mt-1">
+                        {VOIDED_FLOOR_CLAUSE}。
+                      </p>
+                    )}
                   </div>
                 )}
                 {unverified && (

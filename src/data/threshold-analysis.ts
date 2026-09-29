@@ -23,7 +23,14 @@
  *   3'. 規則期的條文取自 A0030300 的 1952-04-16 修正版，帶三項限制（RULES_ERA_CAVEATS），
  *       **三項都必須顯示在站上**。仍然不得寫出「1/2」—— 實際條文是
  *       「三分之二以上出席＋過半數之同意」，寫 1/2 會是錯的。
+ *
+ * ⚠️ 2026-09-29 補述：規則 1 寫「起訖日一律用法規公布日」。10 人 9 人這一期的**終點**
+ * 不是法規公布日，是 114 年憲判字第 1 號的判決公告日（2025-12-19）。
+ * 該判決宣告第 30 條第 2 至 6 項違憲失效，沒有新的法規公布。
+ * 起點仍一律用法規公布日。原句保留。
  */
+
+import { RULING_THRESHOLD } from './ruling-threshold';
 
 /** 一年的案件計數。series 標明是哪個序列，兩個序列不可相加。 */
 export interface YearCount {
@@ -36,7 +43,7 @@ export interface YearCount {
 
 /** 一段門檻時期。start/end 為法規公布日，不是會議口述年份。 */
 export interface ThresholdEra {
-  id: 'rules' | 'three-quarters' | 'two-thirds' | 'current';
+  id: 'rules' | 'three-quarters' | 'two-thirds' | 'fixed-floor';
   /** 圖上與對照條顯示的名稱，例：「雙四分之三」 */
   label: string;
   /** 門檻的白話一句話，例：「總額 3/4 出席，出席人 3/4 同意」 */
@@ -45,7 +52,7 @@ export interface ThresholdEra {
   statute: string;
   /** 法規公布日 ISO。色帶起點。 */
   effectiveFrom: string;
-  /** 下一期公布日 ISO，最後一期為 null。色帶終點。 */
+  /** 本期終止日 ISO：下一期的法規公布日，或宣告本期條文失效的判決公告日。仍適用者為 null。色帶終點。 */
   effectiveTo: string | null;
   /** 條號，例：「第 13 條第 1 項」。無第一手依據時為 null。 */
   article: string | null;
@@ -63,6 +70,8 @@ export interface ThresholdEra {
    * 沒有但書的時期不帶這個欄位。
    */
   caveats?: readonly StatuteCaveat[];
+  /** 本期條文經憲法法庭宣告違憲失效時，指向 ruling-threshold.ts 的唯一定義。沒有失效的時期不帶這個欄位。 */
+  voided?: typeof RULING_THRESHOLD.voidedFloor;
   /** 色帶顏色 token，見設計文件的 `## 視覺` */
   colorToken: string;
 }
@@ -78,7 +87,7 @@ export interface StatuteCaveat {
 
 /**
  * 一段法規區間，形狀同 ThresholdEra 但不受四期的 id 限制。
- * 目前只有 INTERIM_SEGMENT 用到。
+ * 目前有 INTERIM_SEGMENT 與 RESTORED_SEGMENT 用到。
  */
 export type StatuteSegment = Omit<ThresholdEra, 'id'> & { id: string };
 
@@ -321,17 +330,19 @@ export const ERAS: readonly ThresholdEra[] = [
     colorToken: '#4E8C6A',
   },
   {
-    id: 'current',
+    id: 'fixed-floor',
     label: '10 人 9 人',
     ruleSummary: '參與評議不得低於 10 人，違憲宣告同意不得低於 9 人',
     statute: '憲法訴訟法',
     effectiveFrom: '2025-01-23',
-    effectiveTo: null,
+    // 終點是判決公告日，不是法規公布日。見檔頭 2026-09-29 補述。
+    effectiveTo: RULING_THRESHOLD.voidedFloor.voidedOn,
     article: '第 30 條第 2 項',
     quotedText:
       '前項參與評議之大法官人數不得低於十人。作成違憲之宣告時，同意違憲宣告之大法官人數不得低於九人。',
     sourceUrl: LAW_CURRENT_URL,
     evidence: 'primary-source',
+    voided: RULING_THRESHOLD.voidedFloor,
     colorToken: '#9CA3AF',
   },
 ];
@@ -341,7 +352,7 @@ export const ERAS: readonly ThresholdEra[] = [
  *
  * 憲法訴訟法 2019-01-04 公布全文、自公布後三年施行；2023-06-21 的修正未動第 30 條；
  * 2025-01-23 才改為 10 人 9 人。本段已逐字抓取 2019-01-04 版第 30 條核對，
- * 因此**不標未確認**，但該段沒有釋字資料可計，與 current 期一樣畫斜線網底。
+ * 因此**不標未確認**，但該段沒有釋字資料可計，與 10 人 9 人期一樣畫斜線網底。
  *
  * 這一段不是 ThresholdEra。四期的 id 是設計文件定死的，加第五期會改動 AC-1 的斷言。
  */
@@ -356,6 +367,28 @@ export const INTERIM_SEGMENT: StatuteSegment = {
   quotedText:
     '判決，除本法別有規定外，應經大法官現有總額三分之二以上參與評議，大法官現有總額過半數同意。',
   sourceUrl: LAW_OLD_VER('20190104'),
+  evidence: 'primary-source',
+  colorToken: '#9CA3AF',
+};
+
+/**
+ * 2025-12-19 起適用的門檻：憲法訴訟法第 30 條第 1 項。
+ *
+ * 第 2 至 6 項經 114 年憲判字第 1 號宣告違憲，自判決公告日起失其效力，
+ * 此後只剩第 1 項。條文文字與 INTERIM_SEGMENT 逐字相同（2026-09-29 以全國法規資料庫核對）。
+ * 起點與條文都由 RULING_THRESHOLD 推導，不另寫一次。
+ * 該段沒有釋字資料可計，與 INTERIM_SEGMENT 一樣畫斜線網底。
+ */
+export const RESTORED_SEGMENT: StatuteSegment = {
+  id: 'restored-2025',
+  label: '憲訴法第 30 條第 1 項',
+  ruleSummary: '現有總額 2/3 參與評議，現有總額過半數同意',
+  statute: '憲法訴訟法',
+  effectiveFrom: RULING_THRESHOLD.voidedFloor.voidedOn,
+  effectiveTo: null,
+  article: '第 30 條第 1 項',
+  quotedText: `${RULING_THRESHOLD.rule}。`,
+  sourceUrl: LAW_CURRENT_URL,
   evidence: 'primary-source',
   colorToken: '#9CA3AF',
 };
@@ -400,13 +433,13 @@ export const DAYS_PER_YEAR = 365.2425;
  * **這三個數字是設計決定，UI 不得自行推算。** 自行推算會讓四捨五入漂移。
  * 雙三分之二期止於釋字序列終點 2021-12-24，不是憲法訴訟法施行日
  * —— 之後沒有釋字可計，把空白期算進分母會壓低年均。
- * current 期為 null：該期落在釋字序列結束之後，沒有資料可算。
+ * fixed-floor 期（10 人 9 人）為 null：該期落在釋字序列結束之後，沒有資料可算。
  */
 export const ERA_SPAN_DAYS: Readonly<Record<ThresholdEra['id'], number | null>> = {
   rules: 3483,            // 1949-01-06 → 1958-07-21
   'three-quarters': 12616, // 1958-07-21 → 1993-02-03
   'two-thirds': 10552,     // 1993-02-03 → 2021-12-25
-  current: null,
+  'fixed-floor': null,
 };
 
 /** EraComparisonStrip 的一格。數字全部由 YEARS 推導，不寫死。 */
@@ -558,8 +591,8 @@ export const SERIES_BOUNDARY_NOTES: readonly { id: string; heading: string; body
     body: '2022-01-04 憲法訴訟法施行後不再作成解釋，改作成判決。釋字序列在第 813 號（2021-12-24）終止。圖上兩段長條分色，中間有一條虛線標出換軌點。',
   },
   {
-    id: 'b3-current-no-data',
-    heading: '現行 10 人 9 人條件落在釋字序列結束之後',
+    id: 'b3-fixed-floor-no-data',
+    heading: '10 人 9 人條件落在釋字序列結束之後',
     body: '該條件 2025-01-23 才公布，距釋字序列終止已三年。釋字資料無法用來評估它。圖上該段畫斜線網底，沒有年均數字。',
   },
 ];

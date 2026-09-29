@@ -1,8 +1,11 @@
 import {
+  ERAS,
   INTERIM_SEGMENT,
+  RESTORED_SEGMENT,
   SERIES_BOUNDARY_NOTES,
   type StatuteSegment,
 } from '@/data/threshold-analysis';
+import { VOIDED_FLOOR_CLAUSE } from '@/data/ruling-threshold';
 
 /**
  * 資料邊界的固定說明。
@@ -13,9 +16,14 @@ import {
 interface SeriesBoundaryNoteProps {
   /** 2022-01-04 至 2025-01-23 的過渡門檻。條文已逐字核對，附在本段最後。 */
   interim?: StatuteSegment;
+  /** 已失效時期之後適用的條文。每個已失效時期各一格，失效依據附判決連結。 */
+  restored?: StatuteSegment;
 }
 
-export default function SeriesBoundaryNote({ interim = INTERIM_SEGMENT }: SeriesBoundaryNoteProps) {
+export default function SeriesBoundaryNote({
+  interim = INTERIM_SEGMENT,
+  restored = RESTORED_SEGMENT,
+}: SeriesBoundaryNoteProps) {
   return (
     <section className="mt-10" aria-labelledby="boundary-heading">
       <h3 id="boundary-heading" className="font-serif text-lg font-bold text-gray-900 mb-1">
@@ -59,6 +67,42 @@ export default function SeriesBoundaryNote({ interim = INTERIM_SEGMENT }: Series
           </a>
         )}
       </div>
+
+      {ERAS.filter((era) => era.voided).map((era) => (
+        <div key={era.id} className="mt-3 bg-white border border-gray-200 rounded-sm p-4">
+          <h4 className="font-serif font-bold text-gray-900 text-sm mb-1">
+            {restored.effectiveFrom} 起，{era.label}不再適用
+          </h4>
+          <p className="font-serif text-sm text-gray-600 leading-relaxed">
+            {era.statute}
+            {era.article}：{VOIDED_FLOOR_CLAUSE}。此後適用{restored.statute}
+            {restored.article}：{restored.quotedText}
+            {' '}這段沒有釋字可計，圖上畫斜線網底。
+          </p>
+          <div className="mt-2 flex flex-wrap gap-x-4">
+            {era.voided && (
+              <a
+                href={era.voided.rulingUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono text-[11px] text-gray-500 underline hover:text-gray-800 inline-block"
+              >
+                憲法法庭 {era.voided.voidedBy}判決
+              </a>
+            )}
+            {restored.sourceUrl && (
+              <a
+                href={restored.sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono text-[11px] text-gray-500 underline hover:text-gray-800 inline-block"
+              >
+                全國法規資料庫 第 30 條
+              </a>
+            )}
+          </div>
+        </div>
+      ))}
     </section>
   );
 }

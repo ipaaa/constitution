@@ -1,5 +1,8 @@
 import Link from 'next/link';
 import ThresholdCaseAnalysis from '@/components/threshold-analysis/ThresholdCaseAnalysis';
+import { RULING_THRESHOLD } from '@/data/ruling-threshold';
+
+const { voidedFloor } = RULING_THRESHOLD;
 
 export const metadata = {
   title: '門檻與案件量 | Add C0urt 憲庭加好友',
@@ -36,7 +39,8 @@ export default function ThresholdsPage() {
           </p>
           <p>
             下面這張圖把兩件事放在一起：底層色帶是各時期的門檻，長條是當年實際作成的件數。
-            門檻的起訖日一律取自法規公布日，不取自任何人的口述年份。
+            門檻的起點一律取自法規公布日。10 人 9 人一期的終點 {voidedFloor.voidedOn}
+            取自憲法法庭判決公告日，當天沒有新的法規公布。都不取自任何人的口述年份。
           </p>
           <p>
             <strong className="text-gray-800">這張圖不宣告因果。</strong>
@@ -60,6 +64,10 @@ export default function ThresholdsPage() {
             門檻條文：全國法規資料庫。現行憲法訴訟法與其歷史條文為 pcode A0030159；
             規則期的《司法院大法官會議規則》為另一筆已廢止法規 pcode A0030300，
             取得的是 1952-04-16 修正後的版本。
+          </li>
+          <li>
+            門檻失效：憲法法庭 {voidedFloor.voidedBy}判決主文第一項，判決公告日 {voidedFloor.voidedOn}。
+            全國法規資料庫的第 30 條頁面仍列出已失效的第 2 至 6 項，未加標註；條文是否有效，以判決主文為準。
           </li>
           <li>
             抓取程式：<code className="font-mono text-xs">scripts/fetch-interpretation-counts.mjs</code>
