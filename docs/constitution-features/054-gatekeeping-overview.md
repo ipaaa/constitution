@@ -477,11 +477,11 @@ Semantics this may change：README review stage 多一項必要輸出（repo 外
 **AC-2（D 組，`b4807cc^` clone，050 換成含〈部署窗口記錄〉版，README 含條款）**：REJECTED，finding 同時指名 `AGENTS.md:29`、`tech-stack.md:41–42`、`design.md:650–651`。通過。n=1；D0 未重跑，比較沿用 design 的結果。
 **AC-3**：clone 上 22 個 `docs/…` 路徑逐一移入 `_archive/`：21 個讓 M6 指名總覽 1–10 筆，移回 0 筆。例外是 `docs/INDEX.md`：移走它 M6 就不掃任何 INDEX 列出的文件，0 筆，屬 M6 的結構限制。INDEX 改標 `record` 再封存 `operations.md` → 0 筆（對照 evergreen 為 5 筆）。主 checkout 的 `check` 指名總覽 0 行；與實作前相比無新增 M6（文件數 95→96，`design.md:616` 的既有一筆因插列移到 `:617`）。
 **AC-5**：第一輪 7／8，第 8 題答不出「哪些內容可以是 AI 生成」。`ea45cf0` 在第 6 章補一段明寫。第二輪 fresh agent 8／8，逐題與正本相符。
-**AC-6**：票況指令無 `NOT FOUND`；`grep -n '^### P0-2' TODO.md` 1 行（寫 `P0-99` → 0 行）。**偏離**：「1000 列」與「Apps Script 別名表」兩列沒有對應的 TODO 項，寫成「無票，也無待辦項」並連到 `050` 票的記錄段。需 FO 判斷是否另開待辦。
+**AC-6**：DONE。票況指令無 `NOT FOUND`。缺口表三列「無票」各指一個 `TODO.md` 項目，`grep -n '^### {id}' docs/health-check/TODO.md` 各命中 1 行：P0-2（:243）、P2-13（:720）、P2-14（:730）；寫 `P2-99` → 0 行。P2-13（保護範圍只到第 1000 列）與 P2-14（Apps Script 沒有欄位標題別名表）依 FO 處置在本票新增（`TODO.md` 只加兩項與進度紀錄一列，不動 050 改的 P2-12／P3-7）。改後 M6 仍 9 筆、無新增，G-7 PASS，單調句掃描 0 行。
 **AC-4、AC-7、AC-8、AC-9**：見上方兩項。
 **測試**：`approval-content-version-binding` 52/52、`content-audit` 16/16、tsc exit 0、build exit 0 且 `src/data/*.json` sha256 不變。`threshold-analysis` 31/32：`AC-7 build 指令…不得夾帶內容同步` 失敗，本票改動前（`git stash`）同樣失敗，本票沒動程式。未執行 `npm run sync-content`。實驗 clone 都在 scratchpad，未推送。
 
 ### Summary
 
 總覽 `docs/content-pipeline/gatekeeping.md` 已寫成並列入 INDEX；`AGENTS.md` (a)(b)(c)、`design.md` 不變式第 7 列依核准原文套用，G-7 仍 PASS，M6 無新增。
-需要 FO 知道的有三件事。AC-1 的 R0 首輪漏抓，第二輪抓到，design 寫的「會失敗的改動」兩輪都沒使 reviewer 失敗，因為總覽還有其他句子會被推翻。AC-5 首輪 7／8，已補第 6 章後 8／8。AC-6 有兩列缺口沒有 TODO 項可指。
+需要 FO 知道的有三件事。AC-1 的 R0 首輪漏抓，第二輪抓到，design 寫的「會失敗的改動」兩輪都沒使 reviewer 失敗，因為總覽還有其他句子會被推翻。AC-5 首輪 7／8，已補第 6 章後 8／8。AC-6 的兩列缺口已依 FO 處置新增 `TODO.md` P2-13、P2-14 並改指過去，無偏離。

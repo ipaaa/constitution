@@ -169,8 +169,8 @@ awk '/^### P3-8/{s=1;next} /^### /{s=0} s && /解除條件/' docs/health-check/T
 | `/about` 的貢獻者名單是佔位資料 | 佔位內容對外顯示 | [`docs/constitution-features/052-contributors-placeholder.md`](../constitution-features/052-contributors-placeholder.md) |
 | 兩列標題相同，同步不擋 | 讀者看到兩則看起來一樣的內容 | [`docs/constitution-features/062-h34-h35-duplicate-title.md`](../constitution-features/062-h34-h35-duplicate-title.md) |
 | 釋字第 272 號的內容需要法學確認 | 錯誤的法律內容重新上線。`056` 的 G-6 擋它回到 JSON | 無票：`docs/health-check/TODO.md` 的 P0-2 |
-| 保護範圍只到第 1000 列 | 第 1001 列之後，投稿者改得動公式欄與審核欄。升級條件：任一分頁接近 1000 列 | 無票，也無待辦項：[`docs/constitution-features/050-ssot-approval-deployment.md`](../constitution-features/050-ssot-approval-deployment.md)〈部署窗口記錄〉第二節，記為 Deferred risk |
-| Apps Script 沒有標題別名表，同步程式有 | 部署後有人改標題字串，Apps Script 可能無聲失效，同步仍通過，兩邊不會互相提醒 | 無票，也無待辦項：[`docs/constitution-features/050-ssot-approval-deployment.md`](../constitution-features/050-ssot-approval-deployment.md)〈十二、J1-J2 的處置〉 |
+| 保護範圍只到第 1000 列 | 第 1001 列之後，投稿者改得動公式欄與審核欄。升級條件：任一分頁接近 1000 列 | 無票：`docs/health-check/TODO.md` 的 P2-13 |
+| Apps Script 沒有標題別名表，同步程式有 | 部署後有人改標題字串，Apps Script 可能無聲失效，同步仍通過，兩邊不會互相提醒 | 無票：`docs/health-check/TODO.md` 的 P2-14 |
 
 **票的進度不寫在本文。** 在 repo 根目錄執行下面的指令，每個票號印一行 `status`、`verdict` 與檔案位置：
 
