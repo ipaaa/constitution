@@ -1,16 +1,16 @@
 ---
 id: 050
 title: 正式 SSOT 部署 feature 040 的審核欄位（040 合併的硬前置）
-status: review
+status: complete
 source: captain 2026-09-04（把關機制體檢最高風險項：無票、無人負責）
 started: 2026-09-07T23:15:17Z
-completed:
-verdict:
+completed: 2026-09-29T20:59:43Z
+verdict: PASSED
 score: 0.95
 worktree: .worktrees/spacedock-ensign-050-ssot-approval-deployment
 issue:
 pr: pr-merge:44
-mod-block: merge:pr-merge
+mod-block:
 gates:
     version: 1
     records:
@@ -64,7 +64,7 @@ gates:
                 reason: 'Captain approved 050 final gate in chat 2026-09-29 (「050 批准，接受親自確認」): live-SSOT deployment complete, AC-1/2/3/6 evidenced by S9 and post-merge runs; captain''s personal attestation accepted in place of AC-4 (30 cells) and AC-7 (18 cells) per-cell records with UTC time.'
               application:
                 target-stage: complete
-                state: pending
+                state: consumed
 review-round:
     id: round:050:review:8
     stage: review
@@ -73,6 +73,7 @@ review-round:
         id: briefing:050:review:round-8
         digest: sha256:08ac52abfcef67dbb764ca27eba8490878d4c4214e7bb6764733449e01ad8498
         room-ref: '@review/review/round-8'
+archived: 2026-09-29T20:59:43Z
 ---
 
 feature 040 把八個審核欄位全部改為必填。**正式試算表要先把那八欄全部建好，040 才能合併。**
