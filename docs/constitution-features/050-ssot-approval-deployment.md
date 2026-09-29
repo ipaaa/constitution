@@ -9,7 +9,7 @@ verdict:
 score: 0.95
 worktree: .worktrees/spacedock-ensign-050-ssot-approval-deployment
 issue:
-pr:
+pr: "#44"
 mod-block: merge:pr-merge
 gates:
     version: 1
