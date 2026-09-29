@@ -2683,7 +2683,7 @@ node -e 'const r=require("/tmp/hdr-now.json");for(const[k,v]of Object.entries(r)
 
 ```bash
 # $REPO 見 S3 上方的賦值那一行。
-SANDBOX="$(mktemp -d)"; mkdir -p "$SANDBOX/scripts" "$SANDBOX/src/data"
+SANDBOX="$(cd "$(mktemp -d)" && pwd -P)"; mkdir -p "$SANDBOX/scripts" "$SANDBOX/src/data"
 git -C "$REPO" show main:scripts/sync-content.mjs > "$SANDBOX/scripts/sync-content.mjs"
 node --env-file="$REPO/.env.local" "$SANDBOX/scripts/sync-content.mjs" > "$SANDBOX/out.txt" 2>&1
 echo "exit=$?"
@@ -2693,6 +2693,16 @@ grep '對不到任何預期欄位' "$SANDBOX/out.txt" | grep -q 'review_decision
   || echo "⛔ 沒有出現預期的標題錯誤（窗口未打開）"
 shasum -a 256 "$SANDBOX/src/data/"*.json | sed 's#/.*/##'
 ```
+
+> ⚠️ **2026-09-29 更正（授權者 `person:captain`，2026-09-29 裁決「同意」，經 FO 轉述）：上方指令的 `SANDBOX` 那一行已改為 `pwd -P` 形式，與 AC-6 相同。**
+> **原行逐字為**：`SANDBOX="$(mktemp -d)"; mkdir -p "$SANDBOX/scripts" "$SANDBOX/src/data"`
+> **原因**：040 合併後，main 的 `sync-content.mjs:824` 只在 `path.resolve(process.argv[1]) === __filename` 時執行 `main()`。
+> macOS 的 `mktemp -d` 回傳 `/var/folders/…`，`__filename` 解析為 `/private/var/folders/…`，兩者不等。
+> 程式不做任何事就以 exit 0 結束，印不出任何訊息——一個假通過（2026-09-29 實測）。
+> `pwd -P` 把暫存路徑解析成真實路徑，兩者相等，程式才會真的執行。
+> 「程式安靜結束卻顯示成功」這個程式缺陷由 feature 070 修正（captain 2026-09-29 核准），本票不改程式。
+> **本指令仍只複製 `sync-content.mjs` 一個檔。** 040 合併後少了 `content-fingerprint.mjs` 會以 `ERR_MODULE_NOT_FOUND` 中止。
+> 本次授權只涵蓋 `pwd -P`，這一行未補。要在合併後使用本指令，改用 AC-6 的指令。
 
 ##### 怎麼讀這兩條指令——**這張表寫的是判準，不會過期**
 
@@ -3703,7 +3713,7 @@ probe 完成了（044，2026-09-21，PASSED），所以這句話**不再擋住�
   改成把 main 的程式複製到暫存目錄再跑；它的輸出路徑是相對於自己的位置算的，
   所以會寫進暫存目錄底下的 `src/data/`，碰不到 repo：
   ```bash
-  SANDBOX="$(mktemp -d)"; mkdir -p "$SANDBOX/scripts" "$SANDBOX/src/data"
+  SANDBOX="$(cd "$(mktemp -d)" && pwd -P)"; mkdir -p "$SANDBOX/scripts" "$SANDBOX/src/data"
   git -C "$REPO" show main:scripts/sync-content.mjs > "$SANDBOX/scripts/sync-content.mjs"
   git -C "$REPO" show main:scripts/content-fingerprint.mjs > "$SANDBOX/scripts/content-fingerprint.mjs"
   node --env-file="$REPO/.env.local" "$SANDBOX/scripts/sync-content.mjs" > "$SANDBOX/out.txt" 2>&1
@@ -3736,6 +3746,16 @@ probe 完成了（044，2026-09-21，PASSED），所以這句話**不再擋住�
 > **原指令的複製區只有一行，逐字為**：
 > `git -C "$REPO" show main:scripts/sync-content.mjs > "$SANDBOX/scripts/sync-content.mjs"`
 > 該行仍在原位，未改一字。AC-6 其餘文字未動。
+>
+> ⚠️ **2026-09-29 第二次 `Verified by:` 更正（授權者 `person:captain`，2026-09-29 裁決「同意」，經 FO 轉述）。**
+> 上方指令區塊第一行的 `SANDBOX` 賦值改為 `SANDBOX="$(cd "$(mktemp -d)" && pwd -P)"`。
+> **原行逐字為**：`SANDBOX="$(mktemp -d)"; mkdir -p "$SANDBOX/scripts" "$SANDBOX/src/data"`
+> **原因**：040 合併後，main 的 `sync-content.mjs:824` 只在 `path.resolve(process.argv[1]) === __filename` 時執行 `main()`。
+> macOS 的 `mktemp -d` 回傳 `/var/folders/…`，`__filename` 解析為 `/private/var/folders/…`，兩者不等。
+> 程式不做任何事就以 exit 0 結束，印不出任何訊息——一個假通過（2026-09-29 實測）。
+> `pwd -P` 把暫存路徑解析成真實路徑，兩者相等，程式才會真的執行。
+> 「程式安靜結束卻顯示成功」這個程式缺陷由 feature 070 修正（captain 2026-09-29 核准），本票不改程式。
+> AC-6 其餘文字未動。第十六節的指令二同步更正。
 
 **AC-7　反向對照 B：以責任編輯身分，B 類那六個審核欄必須改得到。18 格逐格成立。**
 
@@ -7932,3 +7952,96 @@ exit 0；逐字印出 40 筆與 16 筆兩行；sandbox 內兩檔 sha256 為 `4d1
 ### Summary
 
 AC-2 已通過：實際同步 exit 0，內容逐字未變。AC-6 修正後在合併後的 main 上成立，但票內指令在 macOS 上會假通過，`pwd -P` 的修正待授權。實作後文件義務全部執行，只追加不改寫；`AGENTS.md` 的過時句留給 054。本分支已兩次對齊 main，除本票與五個文件外與 main 相同。
+
+## 部署窗口記錄（續四）：captain 2026-09-29 裁決的處置（AC-6 `pwd -P`、S7 時間、AC-4／AC-7 記錄）
+
+### 一、AC-6 指令改為 `pwd -P`，照原文重跑——**通過**
+
+captain 2026-09-29 裁決「同意」（經 FO 轉述）。AC-6 與第十六節指令二的 `SANDBOX` 行改為
+`SANDBOX="$(cd "$(mktemp -d)" && pwd -P)"`，兩處各加更正框，逐字保留原行。
+程式缺陷（入口判斷遇到 `/var` 符號連結時安靜以 exit 0 結束）由 feature 070 修正，本票不改程式。
+
+**重跑方式**：以 `awk` 從本票 AC-6 的指令區塊逐字抽出，不經人手重打，接著執行。時間 `2026-09-29T20:08:46Z`。
+
+- `exit=0`。
+- 逐字印出 `✅ 檢查通過，已寫入 src/data/history.json（40 筆）` 與 `✅ 檢查通過，已寫入 src/data/discussions.json（16 筆，含 tldr）`。
+- sandbox 內 `history.json` `4d1992e3…cea3b`、`discussions.json` `4071978a…3162`，與部署前基準相同。
+- `⛔ 沒有出現預期的標題錯誤` 一行在合併後是預期結果（窗口已關）。
+
+**AC-6 合併後的要求（exit 0）成立。**
+第十六節指令二仍只複製一個檔，本次授權未涵蓋補那一行，已在其更正框寫明，並指向 AC-6 的指令。
+
+**揭露一次誤跑**：第一次抽取指令時 `awk` 的起點抓錯，抽到的是 AC-3 的 id 比對區塊。
+它因 `OUT` 未設定而以 `ENOENT` 失敗，只讀、不寫、不碰試算表。第二次以行號定位 AC-6 區塊後才是上面的結果。
+
+### 二、S7 完成時間
+
+**captain 不記得 S7 的完成時間**（captain 2026-09-29，經 FO 轉述）。本票不推估。
+AC-4 與 AC-7 要求的 UTC 時間因此從缺。
+
+### 三、AC-4（30 格）與 AC-7（18 格）的記錄
+
+**性質：captain 本人的證言，不是逐格證據。** 內容（captain 2026-09-29，經 FO 轉述）：
+
+- captain 親自測了 S7-b 的全部 30 格，使用投稿者帳號，每一格都與預期相符。
+- captain 親自測了 S7-d 的全部 18 格，使用責任編輯帳號，每一格都與預期相符。
+- 沒有保留逐格記錄。
+
+**與 AC 條文的差距，照實列出**：AC-4 與 AC-7 的「記錄要求」寫明要 UTC 時間、逐格結果、角色。
+本票有角色、有 captain 對全部格數的證言；**沒有 UTC 時間，沒有逐格記錄**。
+最後一道 gate 以「captain 本人證言」呈現這兩條，由 captain 在 gate 上裁決是否接受。
+
+### 四、README「repo 外步驟之後重判文件影響」條款的執行（`34663fd`）
+
+條款要求三件事，逐項對應：
+
+1. **`不更新` 各筆是否仍成立**：已於〈續三〉第三節重判。`AGENTS.md` 已不成立，交由 054；`docs/project/` 仍成立。
+2. **`實作後更新` 各筆的條件是否成立而未做**：五列全部成立，全部已做（`5f0bbff`，見〈續三〉第二節）。
+3. **列舉 evergreen 與 plan 文件中仍描述「尚未」的句子**：以列舉型指令掃描，範圍為 `AGENTS.md`、`CLAUDE.md` 與 `docs/`（排除 `constitution-features/` 與各 `_archive/`）：
+
+```bash
+# 在 050 的 worktree 根目錄執行。只讀。
+grep -rnE '尚未部署|尚未套用|未套用|probe 尚未|probe 完成前|尚未合併|040 合併(前|之前)|尚未執行' \
+  AGENTS.md CLAUDE.md docs --include=*.md \
+  | grep -v '^docs/constitution-features/' | grep -v '^docs/_archive/' | grep -v '^docs/.*/_archive/'
+```
+
+判定（2026-09-29 本分支 `c32d6bb` 之後的工作區，歷史讀數）：
+
+| 命中 | 判定 |
+|---|---|
+| `AGENTS.md:29` | **仍為假，未補述。** 由 feature 054 以 captain 核准的文字處理，本票不動 |
+| `docs/project/tech-stack.md:41-42` | 已有 054 的 ⚠️ 補述（`b4807cc`） |
+| `operations.md:5`、`:16`、`:139` | 已有本票的 ⚠️ 補述 |
+| `design.md:5`、`:669-670` | 已有 054 的 ⚠️ 補述 |
+| `design.md:640` | 位於修訂紀錄「2026-09-03 — 核可將綁定內容版本（尚未實作）」內，是有日期的歷史條目；後續修訂紀錄已說明現況。不補 |
+| `design.md:738` | 本身是 054 補述的一部分，引用原句 |
+| `data-collection-guide.md:24` | 指的是施工項目 7–10，與本票無關；已有 2026-09-04 更正 |
+| `INDEX.md:177` | 已有本票的 ⚠️ 補述 |
+| `TODO.md:890` | 已有本票的 ⚠️ 補述（`:905`） |
+
+**唯一仍為假而未補述的是 `AGENTS.md:29`，已指定由 054 處理。**
+
+### 五、另一處需要 FO 知道的事
+
+main checkout 的工作區有未提交的改動：`docs/content-pipeline/operations.md`（+14 行，標為「feature 070 design」的補述）與
+`docs/constitution-features/sync-csv-loading-snapshot.md`。那不是本票寫的。
+本分支也改了 `operations.md`（〈正式 SSOT 部署〉與四則補述）。兩者之後合併時，`:62` 一帶可能需要人工對齊。
+
+## Stage Report: review (deployment window, captain rulings 2026-09-29)
+
+- DONE: AC-6 指令改為 `pwd -P`（AC-6 與第十六節），保留原行並加更正框；照原文重跑
+  `20:08:46Z` 以 `awk` 逐字抽出執行：exit 0、40／16 兩行逐字、sha256 同基準。指向 feature 070。第十六節仍缺 `content-fingerprint.mjs` 一行，已註明。一次抽取誤跑（AC-3 區塊，唯讀失敗）已揭露。
+- DONE: 記錄 S7 完成時間為「captain 不記得」，不推估
+  見〈續四〉第二節。
+- DONE: 記錄 AC-4／AC-7 為 captain 本人證言，不當作逐格證據
+  見〈續四〉第三節；列出與 AC 記錄要求的差距（無 UTC 時間、無逐格記錄），交最後 gate 裁決。
+- DONE: README「repo 外步驟之後重判文件影響」條款
+  三件事逐項對應；列舉型掃描留指令、附判定表。唯一未補的是 `AGENTS.md:29`，歸 054。
+- DONE: 最後 gate 是否就緒的判定
+  見 Summary。
+
+### Summary
+
+AC-1、AC-2、AC-3、AC-6 都有工程重現的證據，全部成立。AC-4、AC-5、AC-7 只有 captain 本人證言，沒有 UTC 時間與逐格記錄，這一點要在 gate 上明白呈現。實作後文件義務已全部完成，README 條款的三件事已執行，唯一殘留的假句 `AGENTS.md:29` 歸 054。
+**判定：050 可以進最後 gate。** gate 上要 captain 裁決的只有一件事：是否接受以本人證言代替 AC-4／AC-7 要求的逐格記錄。
