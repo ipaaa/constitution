@@ -531,3 +531,16 @@ REJECTED。檔頭 AGENTS (a)(b)(c) 與核准文字逐字相同，symlink 完整�
 ### Summary
 
 依 FO 處置修了 V1–V5，只動 `gatekeeping.md` 第 4、5、7、8 章與 `design.md` 第 7 列。AC-5 重跑 8／8，第 7 題不再把閱讀清單列為上線條件。本 commit 一併帶上 FO 在工作區改的 frontmatter `status: implement`，本輪沒有改 frontmatter。
+
+## Stage Report: verify (cycle 2)
+
+- DONE: Re-check V1–V5 against canonical sources
+  V1：第 7 章改成「P3-8 的條件用指令印出」。現在印出 1 行，只有 `056` 那一條，文字與 P3-8「（2026-09-21 加入）」相符。`067` 的 `check` 寫成 captain 決定綁入、施工單 `069`，並寫明「出現在指令輸出裡才算條件」，與 `069` 票 :21、:50-59 相符。閱讀清單寫明不是 P3-8 的條件。V2：新寫法是「具名的佔位掃描自 2026-09-02 refit（`1eff0e2`）起才寫進 `verify`」。`git log -S'Placeholder scan' --all -- docs/constitution-features/README.md` 只有 `1eff0e2`，相符。V4：:181 的檔名那句已刪除，指令不依賴檔名。V5：:100 改為「不再只憑 `status = Approved` 放行；`status` 決定一列要不要檢查」，與 `sync-content.mjs` 的 `isApproved`／`validateApprovalBinding` 相符，也與 `design.md` :651 一致。
+- DONE: Re-run AC-5 with a new fresh agent (target 8/8; Q7 must not list the reading list as a P3-8 condition)
+  這次用新的 fresh agent，副本改名為 `overview.md`，只讀一個檔，不執行指令，得 **8／8**。第 7 題答 `056` 的 G-1 至 G-8、完整清單在 `056` 第三節，另補一句「自 `069` 起加入 `067` 的 `check`」。**沒有列閱讀清單**。其餘七題逐題對照正本，與 cycle 1 的判定相同。
+- DONE: Confirm design.md row 7 byte-identical to (b), AGENTS.md unchanged from 3fe06a9, G-7 PASS, content-audit no new failures
+  第 7 列與 (b) 提案三行串接後的字串相同，`diff` 無輸出。`design.md` 對 `657e015` 只有新增，刪除行數為 0；對 `8026f4a` 只換了第 7 列那一行。修訂紀錄寫「與第 5 條相同」，現在成立。`git diff 3fe06a9 HEAD -- AGENTS.md CLAUDE.md` 無輸出，`CLAUDE.md` 仍是 mode `120000`。G-7 依正本抽出執行，得 `G-7 PASS [place1=1/1 place2=1 place3=1]`，exit 0。`content-audit check` 的輸出與 cycle 1 逐字相同（M4=1、M5=2、M6=9，96 份文件），指名總覽的行數為 0。單調句掃描 0 行。
+
+### Summary
+
+PASSED。V1、V2、V4、V5 已依正本修正，V3 的第 7 列已與 (b) 逐字相同。新的 fresh reader 得 8／8，第 7 題沒有把閱讀清單當成 P3-8 條件。`AGENTS.md` 自核准版本起未再變動，G-7 通過，`content-audit` 沒有新增失敗。本輪沒有新 finding。V6（交 `064`）與 V7（`050` 合併時的兩處保留兩邊的衝突）依 FO 處置，未重判。
