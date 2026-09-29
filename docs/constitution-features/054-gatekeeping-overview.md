@@ -566,3 +566,16 @@ PASSED。V1、V2、V4、V5 已依正本修正，V3 的第 7 列已與 (b) 逐字
 ### Summary
 
 REJECTED，只因 R1。本票一封存，總覽第 198 行自己的連結就會讓 M6 多一筆失敗，第 9 章寫的自查也會失敗。修法是改一行，已實測有效。其餘都通過：更新機制已交付，三條指令輸出與文件所述相符。AC-1 獨立重演再抓到一次，累計 5 次抓到 4 次。`AGENTS.md` 只有核准的三處。G-7、tests、tsc、build 沒有回歸。R2、R3 是可以一起修的 Polish。R4、R5 是給合併與 `064` 的提醒。
+
+## Stage Report: implement (cycle 3)
+
+- DONE: R1 — `gatekeeping.md:198` 的自連結改為 `docs/constitution-features/_archive/054-gatekeeping-overview.md`。
+  clone 上 `content-audit.mjs check`：封存前 M6=9、指名 `gatekeeping.md` 0 行；`git mv` 054 進 `_archive/` 後 M6=9、0 行；第 9 章自查兩次都無輸出。對照：封存後改回舊路徑 → M6=10，指名 `gatekeeping.md:199`。
+- DONE: R2 — 本票〈Documentation impact〉的 `docs/health-check/TODO.md` 由〈不更新〉移到〈實作後更新〉。
+  新列：「| `docs/health-check/TODO.md` | FO 對 AC-6 的處置（implement cycle 1） | 新增 P2-13、P2-14 與進度紀錄一列。P3-8 由 `069` 修改，本票以指令讀出；P2-12 的過時句不屬本票 |」。
+- DONE: R3 — 第 4 章第一次出現「指紋」處前加一條：「指紋是依發布內容算出的代碼，內容改一個字，代碼就不同。」
+  `gatekeeping.md:99`。單調句掃描 0 行，G-7 PASS，`git diff --quiet 3fe06a9 -- AGENTS.md` 成立。
+
+### Summary
+
+依 FO 處置修了 R1–R3。R4 不動，R5 依處置不在本票處理。自連結改指封存後的路徑，封存前後 M6 都不指名總覽。本 commit 一併帶上 FO 在工作區改的 frontmatter `status: implement`。
