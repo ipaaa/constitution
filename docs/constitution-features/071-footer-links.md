@@ -1,7 +1,7 @@
 ---
 id: 071
 title: 頁尾連結指向錯誤的 GitHub 與 HackMD
-status: implement
+status: verify
 source: captain 2026-09-29（聊天中直接要求開票）
 started: 2026-09-29T20:11:16Z
 completed:
@@ -331,3 +331,26 @@ Verified by: hydration 後，在 AC-2b 的 8 頁上各自檢查：
 ### Summary
 
 頁尾「專案資源」現在有 3 項：GitHub 原始碼、內容錯誤回報（GitHub）、Email 回報（`constitution.owl@gmail.com`）。8 頁 hydration 後量到的地址完全正確。地址拼錯或缺少 Email 連結時，檢查都會失敗。**請 FO／captain 注意：** 加入 Email 後，原 AC-4 的選擇器會多選到 `mailto:`，原 AC-5 的「2 項」變成 3 項；我沒有改寫原 AC，只在 AC 節末追加補述。AC-5 的截圖版面檢查仍要由 verify 用真瀏覽器做。量測時發現 cycle 1 留下一個 `next start` 孤兒程序占住 port 3071。我已停掉它，改用全新啟動的伺服器重量，結果相同。
+
+## Stage Report: verify (cycle 2)
+
+- DONE: Verify the footer against the captain's ruling: exactly mailto:constitution.owl@gmail.com (character-by-character, captain-confirmed spelling), the two GitHub links unchanged and reachable by real HTTP, no HackMD or old repo site-wide; placeholder scan over the diff.
+  驗證對象：`b46c031`（HEAD `da2ef23` 只多了報告）。`Footer.tsx` 內地址以 `od -c` 逐字元比對為 `c o n s t i t u t i o n . o w l @ g m a i l . c o m`，與 captain 確認的拼法相同；`href`、可見文字、`aria-label` 三處都用同一地址。`src` 內另一個 email 是 `PresentDetail.tsx:32` 的 `volunteer@addcourt.tw`，不屬本票。`gmail.com` 有 MX 紀錄；信箱本身是否存在，無法用 HTTP 驗證。
+  未登入 `curl`：`ipaaa/constitution` 200；`issues/new` 302 到 `github.com/login?return_to=…ipaaa%2Fconstitution%2Fissues%2Fnew`，`-L` 最終 200；舊 repo 404。`gh repo view`：Issues 已開、PUBLIC、未封存。
+  `grep -rniE 'Welcome-to-Add-C0urt|hackmd' src public` 0 行。建置產物 `.next/server/app/index.html` 含新地址，`hackmd`／舊 repo 0 筆。
+  佔位字串掃描：`git diff main HEAD -- src` 的新增行中，`某學者|某大學法律系|test|lorem ipsum|快速了解最新判決的5個重點` 0 筆。
+- DONE: Independently re-run the hydration measurement on at least three pages with your own probe and confirm the failing changes are detected (misspelled address, missing email link, old footer); judge implement's note that original AC-4's selector and AC-5's item count no longer match the 3-item footer — AC wording is the captain's, so report it as Needs decision rather than rewriting.
+  量測工具：自寫 jsdom probe（scratchpad `071v3/footprobe.cjs`，不進 repo），不沿用前兩輪的 probe。對 `next start` 取 8 頁，執行頁面自己的 JS，等 `footer a` 出現 `__reactFiber$` 鍵才讀 DOM。檢查項目：`mailto:` 恰 1 個且等於正確地址、可見文字與 `aria-label` 含地址、`http` 連結恰為兩個 GitHub 網址、站內導覽恰 4 個、舊連結 0、「專案資源」3 項、空 `<li>` 0。
+  hydration 判定分得出來：probe 初版缺 `TextEncoder`／`ReadableStream`，React 沒跑起來，8 頁都判「未 hydrate」並失敗。補上後才通過。
+  候選版本：8/8 通過，頁面錯誤 0，exit 0。四個版本都從 `git archive HEAD` 建在 scratchpad，port 3371–3374。
+  失敗改動實測（同一 probe）：地址改 `ow1` → 8/8 失敗（mailto 不符、文字／aria 不符），exit 1。刪 Email `<li>` → 8/8 失敗（mailto 0 個、「專案資源」2 項），exit 1。換回 `main` 的舊頁尾 → 8/8 失敗（外部連結 3 個含 HackMD 與舊 repo、舊連結 3 個），exit 1。
+  建置方式註記：scratchpad 副本的 `node_modules` 是 symlink，Turbopack 拒絕（`Symlink node_modules is invalid`），所以四個副本都用 `next build --webpack`。worktree 本身用預設的 `npm run build`（Turbopack）另外建置，exit 0。
+  Needs decision（AC 文字屬 captain，我沒有改）：(1) 實測原 AC-4 選擇器 `footer a:not([href^="http"])` 在候選版本回傳 5 項，第一項是 `mailto:`，依原文判定會失敗；站內導覽本身沒變，`footer a[href^="/"]` 恰為 4 個路徑。(2) 原 AC-5「『專案資源』欄只有 2 項」現為 3 項，依原文判定會失敗。(3) 容許範圍「淨 −5 ±2」只涵蓋 cycle 1；實測相對 `main` 為 +7／−7，淨 0。implement 的補述內容正確。建議 captain 核准以補述改寫這三處。
+- DONE: Judge AC-5 layout honestly (no working browser: state the 375px/1280px check remains for the captain); confirm scope held (only Footer.tsx code change; © line, 開源 wording, quick-nav untouched; tsc, eslint, build pass; only the known pre-existing test failure); sync-content never run.
+  **375px 與 1280px 的畫面沒有人看過。** `/Applications` 內找不到可用瀏覽器，jsdom 不算版面。可量的部分：「專案資源」3 項、空 `<li>` 0、外層 class 沒有變動行。
+  Deferred risk（給 captain 看畫面時留意）：新項目的可見文字「Email 回報：constitution.owl@gmail.com」是整段不斷行的長字串，連結用 `flex` 不換行。375px 時內容寬約 327px，我估計剛好放得下，但沒有量過。頁尾有 `overflow-hidden`，放不下時會被截斷，不會出現橫向捲動。768px 左右的平板寬度，兩欄並排也會變擠。升級為 Material 的條件：captain 在手機上看到地址被截斷。
+  範圍：`git diff main HEAD --stat` 只有 `Footer.tsx`（+7／−7）與本 entity。改動行是 import 與「專案資源」三個 `<li>`；© 行、「開源」文字、快速導覽都在未變動的上下文內。`npx tsc --noEmit` exit 0；`npx eslint --max-warnings 0 src/components/Footer.tsx` exit 0；`npm run build` exit 0。`src/data/*.json` 的 sha256 建置前後相同，且與 `main` 無差異。`node --test tests/*.test.mjs`：101 個，99 過、1 失敗、1 略過。唯一失敗是已知的 `threshold-analysis.test.mjs` AC-7「build 指令與寫出產線檔的程式都不得夾帶內容同步」，`068` 已修，不算本票問題。本階段沒有執行 `sync-content`。
+
+### Summary
+
+**判定：PASSED。** 頁尾現在有三個回報管道：GitHub 原始碼、GitHub 回報、Email `constitution.owl@gmail.com`。地址逐字元正確，兩個 GitHub 連結實測可開，全站沒有 HackMD 或舊 repo。我自寫的 probe 在 8 頁都通過；地址拼錯、少了 Email、換回舊頁尾三種改動都會被抓出來。需要 captain 決定一件事：原 AC-4、AC-5 與容許範圍的文字已不符現況，建議照 implement 的補述改寫。需要 captain 自己看一件事：手機與電腦上的頁尾外觀，特別是長 Email 地址在手機上有沒有被截斷。
