@@ -615,6 +615,7 @@ Problem 第一句寫「`/past/thresholds`（公開頁）」。原句保留。實
   反向改動（每次都已還原）都會讓 (4) 轉紅：F1 在 `scripts/check-voided-floor.mjs` 寫入 `src/data/history.json`；F2 在 `src/data/launch-status.ts` 同樣寫入（另一條 AC-7 閉包測試也紅）；F3 在新測試檔以 `path.join(ROOT, 'src', 'data', 'discussions.json')` 寫入。
 - DONE: 實作後更新文件（Documentation impact）
   `b5497df`：`docs/INDEX.md` 補上七條路由與 LaunchGate 放行條件；`design-system.md` 第 35 節由兩段改為三段；`TODO.md` P1-10 追加補述，原表保留，並記下第 3 項的行號移位。
+- DONE: 【FO 授權 Polish 修正，來自 review】`page.tsx:42` 的 `{voidedFloor.voidedOn}` 後補上 `{' '}`。渲染結果為「終點 2025-12-19 取自憲法法庭判決」；全套 105／104 pass／0 fail／1 skip；`tsc` exit 0（`5940a12`）
 
 ### 發現（交 FO）
 
