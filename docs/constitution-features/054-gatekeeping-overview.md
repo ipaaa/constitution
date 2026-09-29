@@ -642,3 +642,22 @@ REJECTED，只因 R1。本票一封存，總覽第 198 行自己的連結就會�
 ### Summary
 
 PASSED。R1 已修好：模擬封存前後，M6 都停在 9，沒有一行指名總覽，第 9 章自查無輸出。R2、R3 依授權完成，自 `c01e361` 起沒有其他候選改動。G-7 通過，`AGENTS.md` 自核准版起未變。本輪沒有新 finding。R4 在合併時由 FO 處理，R5 由後合併的那張票處理，兩項依處置未重判。
+
+## Stage Report: review (merge reconcile)
+
+- DONE: Merge `main` into branch spacedock-ensign/054-gatekeeping-overview and resolve ONLY the two conflicts per review finding R4: docs/INDEX.md keeps 050's two updated dates plus 054's new row; docs/content-pipeline/design.md revision log keeps both entries, with 050's entry placed directly after 054's design-stage entry and before the invariant #7 entry. No other content change.
+  合併 commit `fabf4ea`（parents `780869f`、main `341848e`）。只有這兩個檔衝突，本票 frontmatter 沒有衝突。`INDEX.md` 保留 main 那兩列的 2026-09-29，再加上總覽那一列。`design.md` 的 main 端除了 050，還多了 064、070 兩則，R4 寫的時候還沒有。處理方式：main 的四則照原順序保留（054 design、050、064、070），本票不變式 #7 那則接在最後。050 仍緊接在 054 design 那則之後，也在 #7 之前。`git diff main` 只有本票新增的內容，兩端文字都沒有改。
+- FAILED: Prove the merged candidate: content-audit check shows 0 lines naming gatekeeping.md and no new failures vs main; 056 G-7 prints PASS; ch.9 self-check prints nothing; npx tsc --noEmit exits 0; AGENTS.md diff vs main is exactly the three captain-approved (a)(b)(c) additions.
+  失敗兩項：content-audit 與第 9 章自查。main 上 M6=18，合併後 M6=26，其中 6 行指名總覽。第 9 章自查印出 6 行。其餘通過：G-7 印 `G-7 PASS [place1=1/1 place2=1 place3=1]`，exit 0。tsc exit 0。`AGENTS.md` 與 main 相比只多 (a)(b)(c) 三處，與 `3fe06a9` 相同。M4=1、M5=2 與 main 相同。
+- DONE: End with a clear PASSED or REJECTED verdict on the reconciled candidate, naming the new HEAD SHA.
+  見 Summary。
+
+### Findings（唯讀，未動候選）
+
+- **R6（050 已封存，本票連結失效）**：`050` 已在 main 封存（`60a240f`）。本票有 5 行仍指向 `docs/constitution-features/050-ssot-approval-deployment.md`：`gatekeeping.md` :47、:92、:117，以及 `TODO.md` :734、:745（本票 `09d496e` 新增的 P2-13、P2-14）。M6 因此多 8 行。
+  四欄證據：使用者是跟著總覽找正本的人，照正常流程閱讀。害處是 5 個連結打不開。受影響的是本票自己寫的保持正確機制：第 9 章自查應無輸出。觸發證據是上面的實測。提議：Material，屬本票。修法是把 5 行改指 `_archive/050-ssot-approval-deployment.md`。
+  另外，`gatekeeping.md:92` 寫「`050` 封存後，保護範圍的正本移到 operations.md」，現在條件已成立。這句要不要改寫，是 R5 的範圍（後合併者重判第 4、5 章），需要 FO 決定。
+
+### Summary
+
+REJECTED，HEAD `fabf4ea`（本報告 commit 在其上）。依 R4 解決了合併衝突，也沒有改到其他內容。候選被退，是因為 main 在本票核准後封存了 `050`，本票 5 行連結隨之失效（R6）。第 9 章自查與「相對 main 無新失敗」兩項因此不成立。G-7、tsc、`AGENTS.md` 都通過。沒有推送，也沒有執行 `sync-content`。
