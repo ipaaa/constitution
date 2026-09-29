@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Github, FileText, AlertCircle } from 'lucide-react';
+import { Github, AlertCircle, Mail } from 'lucide-react';
 import { LAUNCHED_PAGES } from '@/data/launch-status';
 
 export default function Footer() {
@@ -24,18 +24,18 @@ export default function Footer() {
             <h5 className="font-bold text-gray-900 mb-4 tracking-wider uppercase text-xs">專案資源 (Resources)</h5>
             <ul className="space-y-3 font-medium">
               <li>
-                <a href="https://g0v.hackmd.io/njOKlAIVQcmCgomNMr9cUg?view" target="_blank" rel="noopener noreferrer" aria-label="HackMD 協作共筆（開啟新分頁）" className="hover:text-blue-600 transition-colors flex items-center gap-2">
-                  <FileText size={16} aria-hidden="true" /> HackMD 協作共筆
-                </a>
-              </li>
-              <li>
-                <a href="https://github.com/g0v/Welcome-to-Add-C0urt" target="_blank" rel="noopener noreferrer" aria-label="GitHub 原始碼（開啟新分頁）" className="hover:text-blue-600 transition-colors flex items-center gap-2">
+                <a href="https://github.com/ipaaa/constitution" target="_blank" rel="noopener noreferrer" aria-label="GitHub 原始碼（開啟新分頁）" className="hover:text-blue-600 transition-colors flex items-center gap-2">
                   <Github size={16} aria-hidden="true" /> GitHub 原始碼
                 </a>
               </li>
               <li>
-                <a href="https://github.com/g0v/Welcome-to-Add-C0urt/issues/new" target="_blank" rel="noopener noreferrer" aria-label="內容錯誤回報（開啟新分頁）" className="hover:text-red-500 transition-colors flex items-center gap-2">
+                <a href="https://github.com/ipaaa/constitution/issues/new" target="_blank" rel="noopener noreferrer" aria-label="內容錯誤回報（開啟新分頁）" className="hover:text-red-500 transition-colors flex items-center gap-2">
                   <AlertCircle size={16} aria-hidden="true" /> 內容錯誤回報 (Feedback)
+                </a>
+              </li>
+              <li>
+                <a href="mailto:constitution.owl@gmail.com" aria-label="以 Email 回報內容錯誤（constitution.owl@gmail.com）" className="hover:text-red-500 transition-colors flex items-center gap-2">
+                  <Mail size={16} aria-hidden="true" /> Email 回報：constitution.owl@gmail.com
                 </a>
               </li>
             </ul>
