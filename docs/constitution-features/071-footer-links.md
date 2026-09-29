@@ -10,7 +10,7 @@ score: 0.8
 worktree: .worktrees/spacedock-ensign-071-footer-links
 issue:
 pr:
-mod-block:
+mod-block: merge:pr-merge
 gates:
     version: 1
     records:
@@ -41,6 +41,17 @@ gates:
                 id: briefing:071:review:attempt-1:revision-1
                 digest: sha256:b4262b8b9e622c895ed0c55d070896666df3504535868aa8c479dcc6b29b114b
                 room-ref: '@review/review/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:071:review:1
+                briefing: briefing:071:review:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-29T20:48:18.039626Z"
+                decision: approve
+                reason: 'Captain approved 071 review in chat 2026-09-29 (「1235照建議」): footer links to ipaaa/constitution, HackMD removed.'
+              application:
+                target-stage: complete
+                state: pending
 ---
 
 全站頁尾的外部連結有多處錯誤。captain 2026-09-29 裁示：原始碼一律指向 `https://github.com/ipaaa/constitution`；不列 HackMD；「內容錯誤回報」也指向正確的 GitHub。
