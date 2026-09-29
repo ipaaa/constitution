@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { TERM_EVENTS, REFERENCE_DATE, FAILED_NOMINATIONS, JUSTICES } from '@/data/future';
 import JusticeCountdown from './JusticeCountdown';
 import JusticeSeatGrid from './JusticeSeatGrid';
@@ -83,7 +84,7 @@ function buildDataPoints(): DataPoint[] {
 // 現行有效的第 30 條第 1 項給的是「現有總額」的比例，不是固定席次，
 // 因此在席次折線圖上畫不出對應的水平線。虛線與標籤已移除，
 // 門檻敘述改由 RulingThresholdNote 單一來源負責。
-// 見 docs/constitution-features/063-required-for-ruling-legal-accuracy.md
+// 見 docs/constitution-features/_archive/063-required-for-ruling-legal-accuracy.md
 
 // Year markers for X axis
 const YEAR_MARKS = [2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032];
@@ -390,8 +391,17 @@ export default function JusticeTermTimeline() {
         )}
 
         {/* Bottom label */}
-        <div className="mt-2 text-[10px] font-mono text-gray-400 uppercase tracking-widest">
-          Justice Seat Count / 大法官席次變化折線圖
+        <div className="mt-2 flex flex-wrap items-baseline justify-between gap-2">
+          <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest">
+            Justice Seat Count / 大法官席次變化折線圖
+          </span>
+          {/* 上面那條 10 人門檻線只是現行條件。門檻改過四次，另一頁畫了全部四次。 */}
+          <Link
+            href="/past/thresholds"
+            className="text-xs font-serif underline text-gray-500 hover:text-gray-900"
+          >
+            這條 10 人門檻是怎麼來的？看 1949 年以來的四次門檻變動
+          </Link>
         </div>
       </div>
 

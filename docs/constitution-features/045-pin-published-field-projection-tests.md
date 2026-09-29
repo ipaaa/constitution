@@ -3,7 +3,7 @@ id: 045
 title: 把發布欄位投影釘死在測試裡，避免覆蓋率靜默縮小
 status: design
 source: verify finding F3 (feature 040 cycle 2)，FO 授權 fix，2026-09-04
-started:
+started: 2026-09-29T19:52:07Z
 completed:
 verdict:
 score:

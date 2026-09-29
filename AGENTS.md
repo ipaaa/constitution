@@ -23,7 +23,11 @@ node scripts/sync-content.mjs
 同步仍然只在有人明確要發布內容時才執行，而且**跑完必須開 PR 讓 captain 對 diff**，
 不可直接提交。流程見 `docs/content-pipeline/design.md` 第五節。
 
-驗證改動可用 `npx tsc --noEmit`、`npm run dev`、`npm run build`。
+驗證改動可用 `node --test tests/approval-content-version-binding.test.mjs`、
+`npx tsc --noEmit`、`npm run dev`、`npm run build`。
+
+正式 SSOT 尚未套用核可版本綁定。兩帳號隔離 probe 完成前，不得部署
+`scripts/apps-script/` 到正式 SSOT。不得補造 probe 證據。
 
 ### 2. 不要手改 `src/data/*.json`
 
@@ -31,6 +35,15 @@ node scripts/sync-content.mjs
 手改的內容在下次 sync 時會消失。過去已經發生兩次。
 
 要改內容，改試算表。
+
+**`src/data/` 底下的 `.ts` 檔不在這條禁令內，可以改。**
+`src/data/threshold-analysis.ts`、`controversy-timeline.ts`、`future.ts` 等都是手寫資料模組，
+與試算表同步無關。以 `threshold-analysis.ts` 為例，來源是
+`cons.judicial.gov.tw`（案件計數）與 `law.moj.gov.tw`（門檻條文），
+由 `scripts/fetch-interpretation-counts.mjs` 人工抓取後人工審閱寫入。
+
+判斷方式：**副檔名是 `.json` 就不要手改，是 `.ts` 就可以。**
+`scripts/fetch-interpretation-counts.mjs` 也不寫 `src/data/`，它只寫 `tests/fixtures/`。
 
 ### 3. 不要把設計文件裡的範例當成真實內容
 
@@ -49,6 +62,8 @@ robots: { index: false, follow: false },
 
 現在刻意保持。網站尚未對外發布，不要讓搜尋引擎收錄。
 正式發布時才移除。追蹤項目見 `docs/health-check/TODO.md` 的 P3-8。
+移除前必須通過 `docs/constitution-features/_archive/056-pre-launch-checklist.md` 的上線前檢查清單。
+該票第三節的 gate 執行清單 G-1 至 G-8 八項全數通過，才可移除這一行。
 
 ---
 

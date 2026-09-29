@@ -1,43 +1,82 @@
-> # ⚠️ 資料流章節已過時（2026-09-01）
->
-> **本文稱 JSON 檔 commit 進 repo 即為 SSOT。這是錯的。**
->
-> 真實情況：Google 試算表是唯一真相，`scripts/sync-content.mjs` 產生 JSON，
-> **`src/data/*.json` 是產物，不得手改**。
->
-> 本文描述的 Python 爬蟲腳本不存在於 repo 中。
->
-> 技術選型章節（Next.js / Tailwind / TypeScript）仍然正確。
-> 正確的資料流見 [`../content-pipeline/design.md`](../content-pipeline/design.md)。
+# 技術架構與資料流
+
+**狀態**：evergreen
+**最後查核**：2026-09-03
+
+## 網站技術
+
+- 框架：Next.js App Router。
+- 語言：TypeScript。
+- UI：React 19 與 Tailwind CSS 4。
+- 部署：Vercel 靜態與伺服器端建置產物。
+
+網站不使用獨立 Backend API 或關聯式資料庫。
+頁面直接讀取 repo 內的靜態 JSON。
+
+## 內容資料流
+
+Google 試算表 `SSOT_收集區` 是 Track 1、Track 2 與 `site_tldr` 的唯一真相。
+`src/data/history.json` 與 `src/data/discussions.json` 是同步產物。不要手改。
+
+```text
+Google Sheet SSOT
+  → 公式計算 current_fingerprint 與 status
+  → Review 選單保存核可決定與內容指紋
+  → scripts/sync-content.mjs 手動抓取三份 CSV
+  → Node 重算 fingerprint-v1 並驗證完整核可紀錄
+  → src/data/*.json
+  → PR diff 與 Vercel 預覽
+  → 合併後部署
+```
+
+`scripts/content-fingerprint.mjs` 固定發布欄位與正規化規格。
+`scripts/apps-script/approval-workflow.gs` 提供對應的試算表公式與審核操作。
+`scripts/sync-content.mjs` 只接受與目前內容相符的完整核可紀錄。
+
+同步失敗時不更新任何 JSON。部署不執行同步。
+`npm run build` 只執行 Next.js build。
+
+## 部署邊界
+
+repo 已實作核可版本綁定。正式 SSOT 尚未套用。
+兩帳號隔離 probe 完成前，不得部署 Apps Script 到正式 SSOT。
+受保護欄位的 trigger 寫入能力尚未證明。現行機制不依賴 trigger。
+
+> ⚠️ **2026-09-29 補述：上面前兩句已不成立。**
+> 正式 SSOT 已於 2026-09-29 套用核可版本綁定（feature 050 部署窗口 S1–S9）。
+> 兩帳號隔離 probe 已於 2026-09-21 完成（feature 044，`verdict: PASSED`）。
+> 證據見 [`../content-pipeline/design.md`](../content-pipeline/design.md) 修訂紀錄「2026-09-29 — 正式 SSOT 已套用核可版本綁定（feature 050）」。
+> 第三句（trigger 寫入能力）本補述未查證，維持原樣。原句保留。
+
+完整規格見 [`../content-pipeline/design.md`](../content-pipeline/design.md)。
+操作步驟見 [`../content-pipeline/operations.md`](../content-pipeline/operations.md)。
+
 
 ---
 
-# 4. 技術架構與資料流 (Tech Stack & Data Flow)
+## 📎 補述（2026-09-21）：第二支人工執行的外部資料抓取程式
 
-為了讓 `Add C0urt 憲庭加好友` 能在低維護成本下長期營運，並乘載可能因為時事引發的瞬間高流量，我們採取 **「無伺服器架構 (Serverless)」** 與 **「資料驅動靜態網站 (Data-driven SSG)」** 的策略。
+> 2026-09-29 合併註記：本則補述寫於 feature 040 改寫本文之前。
+> 文中「上面『資料流動路徑』第 1 點」與「檔頭的警告」指改寫前的舊版，
+> 已由 feature 040 移除，可於 git 歷史查閱。補述原文保留。
 
-## 🏗️ 前端技術堆疊 (Frontend Stack)
+上面「資料流動路徑」第 1 點說的 Python 爬蟲不存在，這點檔頭的警告已經講了。
+以下補記實際存在的抓取程式，共兩支，**都不進 `npm run build`**。
 
-*   **核心框架**：`Next.js` (App Router 機制)
-    *   選用原因：支援靜態網站生成 (Static Site Generation, SSG)，載入速度極快，且有利於 SEO 與社群媒體爬蟲解析 Open Graph (OG) 標籤，對於我們這種需要被大量轉發的資訊懶人包網站至關重要。
-*   **樣式與切版**：`Tailwind CSS` (v4)
-    *   選用原因：Utility-first 能極速構建複雜的 Dashboard (軌道二/三) 與網格佈局。配合我們建立的 `Design System`，可大幅減少自定義 CSS 的維護成本。
-*   **語言**：`TypeScript`
-    *   選用原因：確保資料結構（特別是複雜的憲法判決 JSON）在組件間傳遞的安全性。
-*   **圖表與動畫**：
-    *   軌道三的漏斗圖/資料儀表板：推薦使用 `D3.js` 或 `@nivo` 系列圖表庫。
-    *   轉場動畫：可使用 `Framer Motion` 點綴滾動視差特效。
+| 程式 | 抓什麼 | 寫到哪 | 何時執行 |
+|---|---|---|---|
+| `scripts/sync-content.mjs` | Google 試算表 SSOT | `src/data/discussions.json`、`src/data/history.json` | 人工執行 `npm run sync-content`，跑完必須開 PR 讓 captain 對 diff |
+| `scripts/fetch-interpretation-counts.mjs` | `cons.judicial.gov.tw` 的釋字與憲判字清單 | `tests/fixtures/interpretation-dates.json` | 人工執行，只在需要重新核對計數時跑 |
 
-## 🗄️ 資料流架構：以靜態 JSON 為核心
+`fetch-interpretation-counts.mjs` 的三條界線：
 
-我們決定**不建置**傳統的 Backend API Server 或關聯式資料庫 (如 PostgreSQL)。
+1. **不進 `build`。** `package.json` 的 `build` 仍然只有 `next build`。
+2. **不碰 `src/data/*.json`。** 它只寫 `tests/fixtures/`。
+   網站實際讀的是手寫的 `src/data/threshold-analysis.ts`，那支程式不會改它。
+3. **必須用 Node 的 `fetch` 或 `curl` 寫，不可用 Python。**
+   `cons.judicial.gov.tw` 的 TLS 憑證缺少 Subject Key Identifier 擴充欄位，
+   Python 的 `urllib` 會以 `CERTIFICATE_VERIFY_FAILED` 拒絕連線。
+   這不是某台機器的設定問題，任何用 OpenSSL 預設信任鏈的機器都會失敗。
 
-### 資料流動路徑 (Data Workflow)
-
-1.  **資料擷取 (Data Extraction)**：由後端/爬蟲志工編寫 Python 腳本，定期（例如每晚）從司法院網站與相關新聞源抓取最新案件與判決。
-2.  **資料淨化與標註 (Data Refining & Tagging)**：爬取下來的原始資料，經過法律志工的整理，加上符合民眾痛點的「生活化標籤 (Tags)」(例如：`勞工`, `婚姻平權`), 最終輸出為乾淨的 `JSON` 檔案。
-3.  **儲存為 SSOT (Single Source of Truth)**：這些 `JSON` 檔案直接被 Commit 進入 GitHub Repository 中（例如 `src/data/cases.json`）。
-4.  **靜態建置 (Build & Deploy)**：當 GitHub 發現資料檔更新時，觸發 CI/CD 流程。Next.js 會讀取最新的 JSON，將所有頁面預先渲染 (Pre-render) 為純 HTML/CSS。
-5.  **全球分發 (CDN)**：靜態檔案部署至 Vercel 或 GitHub Pages，由全球 CDN 節點分發給末端使用者，達到零首屏延遲與無限併發能力。
-
-這套架構確保了專案可以永遠免費託管，且不會因為資料庫連線超載而當機。
+重新抓取的結果可用 `THRESHOLD_LIVE=1 node --test tests/threshold-analysis.test.mjs` 與已提交的
+fixture 比對。未設該環境變數時該測試跳過，`node --test` 不連外部網站。

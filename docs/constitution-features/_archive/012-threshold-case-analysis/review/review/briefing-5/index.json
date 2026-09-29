@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:012:review:attempt-5:revision-1",
+  "question": "012 第十一輪：review cycle 9 依硬性收斂判準判 PASSED。是否核准交付？注意三項驗證項仍未達成且只有 captain 能完成：AC-3 朗讀測試（3 名非法學受測者、三道不提示的問題）、D5 視覺檢查（本環境無可用無頭瀏覽器）、c3 的法學解讀（需法學背景審閱者拍板）。核准不豁免這三項。",
+  "artifacts": [
+    {
+      "id": "artifact:012:review:attempt-5:revision-1:item-1",
+      "uri": "git-root://main/f01254ad59da1d5ca21ccf4dbeaf95affd854733/docs/constitution-features/012-threshold-case-analysis.md",
+      "rev": "sha256:614ed3f17a637765e05c6a96e9cda2233c2984c06f557b91b42327f3acc679e5",
+      "mediaType": "text/markdown",
+      "summary": "十輪 implement／九輪 review／六輪 verify。頁面內容本身早在 cycle 2 就被逐字核對過（五段條文自行 curl 皆 VERBATIM、AC-2 每個數字自 813 筆原始日期獨立重算），之後九輪修的全是同一件事：檢查的涵蓋面對不上它宣稱保護的東西。三個維度依序被發現——空間（F8／F12：只渲染元件不渲染整頁）、形狀（F4／F9：詞彙表只認一種寫法）、狀態（M2：ThresholdTooltip 只在 hover 時渲染，而它是門檻用語最密集的地方，一次打穿三條站級守衛）。最後四輪的產出是方法：Q3「它比的是不是該比的那個對象」三種載體（肯定式的多重滿足者、否定式的多重施用者、以及被掃描的面本身是一份名單），姊妹票 056 同日獨立到達同一結論。F20 是 AC-7 的 Verified by 有一句假宣稱，活了八輪，成因是 AC-7 一條自動守衛都沒有；現已補三條並逐項寫下五項守不到的東西。F21 修根：掃描面由手寫七個根改為 Object.entries 推導，而枚舉一上線就浮出手寫版從來沒掃過的路徑。reviewer 另量到一項未解：豁免的第二層對它自己那三個來源欄位是自我指涉的（只改 current.quotedText 的人數即全綠），判定為參照來源未被釘住而非修法缺陷。AC-3、D5、c3 三項維持未達成。"
+    }
+  ]
+}

@@ -2,9 +2,13 @@
 
 **狀態**：plan（施工完成後改為 evergreen 或封存）
 **定案日期**：2026-08-31
-**最後修訂**：2026-09-03（新增 feature 040 未實作修訂，見文末修訂紀錄）
+**最後修訂**：2026-09-03（feature 040 已完成 repo 實作；正式 SSOT 尚未部署）
+**補述日期**：2026-09-04（第二至第五節加註取代說明，原文未改寫）
 **最後查核**：2026-09-04（feature 041 逐處查證敘述與實際行為是否相符）
 **施工前置**：已全部完成或取消。**工程可開工。**
+
+> ⚠️ **2026-09-29 補述**：上面「最後修訂」一行的「正式 SSOT 尚未部署」已不成立。
+> 見文末修訂紀錄「2026-09-29 — 正式 SSOT 已套用核可版本綁定（feature 050）」。原句保留。
 
 **出了什麼事**：[`../health-check/2026-08-31-content-pipeline.md`](../health-check/2026-08-31-content-pipeline.md)
 **還有什麼要做**：[`../health-check/TODO.md`](../health-check/TODO.md)
@@ -20,6 +24,14 @@
 - 想知道**做什麼**：看第五節（施工順序）
 - 想知道**為什麼這樣設計**：看第一節到第四節
 - 想知道**哪些規則不能破**：看第六節（不變式）
+- 想知道**現在怎麼核可**：看最後一節《修訂紀錄》的「2026-09-03 — feature 040 repo 實作完成」
+
+> ⚠️ **補述（2026-09-04，feature 040）**：核可機制已改版。
+> **現行規格是「公式衍生 `status` ＋ 同步端內容指紋」**，寫在最後一節《修訂紀錄》的
+> 「2026-09-03 — feature 040 repo 實作完成」。
+> 第二節到第五節記錄的是被取代的舊模型，只供追溯。
+> 那幾節裡「人把 `status` 改成 `Approved`」與「同步只收 `status = Approved`」的敘述都已失效。
+> 依 record 原則保留原文，不改寫。**要照做請以現行規格為準。**
 
 ---
 
@@ -134,6 +146,10 @@
 
 ## 二、試算表要長怎樣
 
+> ⚠️ **補述（2026-09-04，feature 040）**：本節的欄位表已不完整，`status` 的填法也已被取代。
+> 三個分頁另有八個審核欄位。`status` 與 `current_fingerprint` 由公式產生，人不得輸入。
+> 現行規格見〈修訂紀錄〉的「2026-09-03 — feature 040 repo 實作完成」。原文保留供追溯。
+
 ### 分頁
 
 | 分頁 | 放什麼 |
@@ -242,6 +258,14 @@
 
 ## 三、誰來把關
 
+> ⚠️ **補述（2026-09-04，feature 040）**：**本節的直接 `status` 核可模型已被取代。**
+> 現在沒有人能把 `status` 改成 `Approved`。`status` 由公式依內容指紋產生。
+> 編輯台改用試算表的 Review 選單核可，選單寫入核可紀錄與當時的內容指紋。
+> 保護範圍改為保護六個審核欄位（`review_decision`、`review_fingerprint`、`approved_by`、
+> `approved_at`、`approved_fingerprint`、`reject_reason`），不是保護 `status`。
+> 同步不只憑 `status = Approved` 放行，還獨立重算並比對三份指紋。
+> 現行規格見〈修訂紀錄〉的「2026-09-03 — feature 040 repo 實作完成」。原文保留供追溯。
+
 **編輯台的職責是「只核可，不改內容」。所以把關用欄位做，不用檔案搬運做。**
 
 ```
@@ -277,6 +301,14 @@
 ## 四、檢查機制
 
 > 這是本次唯一新增的常設檢查，已於 2026-08-31 取得明確核可。
+
+> ⚠️ **補述（2026-09-04，feature 040）**：本節的檢查有一條已經改了，其餘仍然成立，但已不是全部。
+>
+> - **已改**：下面〈檢查什麼〉的「`status` 必須是 `Approved`／`Rejected`／空白其中之一」不再正確。
+>   現行值域多一個 `Needs review`，而且四個值都由公式產生，不由人輸入。
+> - **已加**：同步另外要求八個審核欄位齊備，並重算內容指紋比對。任一列不符即整份中止。
+>
+> 現行規格見〈修訂紀錄〉的「2026-09-03 — feature 040 repo 實作完成」。
 
 ### 為什麼需要
 
@@ -347,6 +379,13 @@
 ---
 
 ## 五、更新流程與施工順序
+
+> ⚠️ **補述（2026-09-04，feature 040）**：**下圖第②步已被取代。**
+> 編輯台不再手改 `status`，改用試算表的 Review 選單核可或拒絕。
+> 選單寫入 `review_decision`、`approved_by`、`approved_at` 與兩份內容指紋。
+> 第③步的同步會重算指紋。核可後內容被改過，該列的 `status` 自動變成 `Needs review`，同步整份中止。
+> 施工順序第 4 項的保護範圍也隨之改為保護六個審核欄位，不是保護 `status`。
+> 現行規格見〈修訂紀錄〉的「2026-09-03 — feature 040 repo 實作完成」。原文保留供追溯。
 
 ### 內容更新流程（做完之後長這樣）
 
@@ -493,6 +532,15 @@ staging 顯示的是「目前所有已核可內容」，那是另一個問題。
 > 欄位定義、白名單驗證與 projection 三處；在那之前該指令零命中即為正確狀態。
 > 本則為提案記錄，不是決定。第二節的欄位表與第五節的施工順序表**在核可前不得改動**。
 
+> ⚠️ **2026-09-29 補述：上面「待 captain 核可」已不成立，但「尚未實作」仍成立。**
+> captain 已於 2026-09-23 核准加欄。施工單改為
+> [`../constitution-features/064-track2-case-ref-stance-columns.md`](../constitution-features/064-track2-case-ref-stance-columns.md)，
+> 目前在 design 階段。**試算表未新增任何欄位，同步程式未改。**
+> `064` 的 design 決定兩欄要進入 feature `040` 的內容指紋（有值才計入），並在 `040` 合併之後施工。
+> 第二節欄位表與第五節施工順序表仍不改，等實作後再寫。
+> 驗證目標不變：在 `064` 實作合併前，`grep -c "case_ref" scripts/sync-content.mjs` 為 `0`。
+> 原文保留。本次補述見文末修訂紀錄「2026-09-29 — `019` 兩欄已核准，交由 `064` 施工」。
+
 ---
 
 ## 修訂紀錄
@@ -582,6 +630,35 @@ feature 040 實作後才會取代該模型。保留原文，避免把預定行�
 **驗證目標**：逐一改動三個分頁的發布欄位時，公式顯示 `Needs review`，同步以非零退出碼中止，
 且不改寫任何 `src/data/*.json`。完整欄位、正規化與驗收規格見 feature 040。
 
+**補述（同日稍後）**：repo 實作已完成，見下一則修訂。
+本則的「目前現況」只記錄實作前的狀態，不再是現況。
+
+### 2026-09-03 — feature 040 repo 實作完成
+
+**這則修訂取代本文第二至第五節的直接 `status` 核可模型。** 舊文保留供追溯。
+
+repo 現在包含下列唯一現行機制：
+
+- `scripts/content-fingerprint.mjs` 固定三個分頁的發布欄位與 `fingerprint-v1` 正規化。
+- `scripts/apps-script/approval-workflow.gs` 產生目前指紋與衍生狀態，並提供核可及拒絕操作。
+- `scripts/sync-content.mjs` 要求八個審核欄位，並獨立重算及比對三份指紋。
+- Track 2 指紋包含非空資料列序號。移動列後必須重新核可。
+- 同步先完成全部驗證，再以可復原的兩檔寫入程序更新 JSON。
+
+`status` 不再由人直接輸入。它只由公式產生 `Approved`、`Rejected`、`Needs review` 或空白。
+同步不再只憑 `status = Approved` 放行。
+
+網站 JSON shape、手動同步與 PR 預覽流程不變。自動同步仍停用。
+
+**部署狀態**：正式 SSOT 尚未套用新欄位、公式或 Apps Script。
+兩帳號隔離 probe 尚未執行。受保護欄位的 trigger 寫入能力仍為 `UNPROVEN`。
+現行正確性不依賴 trigger。部署與復原步驟見 [`operations.md`](operations.md)。
+
+> ⚠️ **2026-09-29 補述：上面〈部署狀態〉前兩句已不成立。**
+> 正式 SSOT 已於 2026-09-29 套用八個審核欄位、公式與 Apps Script（feature 050 部署窗口 S1–S9）。
+> 兩帳號隔離 probe 已於 2026-09-21 完成（feature 044，`verdict: PASSED`）。
+> 第三句「trigger 寫入能力仍為 `UNPROVEN`」本補述未查證，維持原樣。
+> 原句保留。本次補述見文末修訂紀錄「2026-09-29 — 正式 SSOT 已套用核可版本綁定（feature 050）」。
 
 ### 2026-09-04 —— 修正與實際行為不符的敘述
 
@@ -605,7 +682,7 @@ feature 040 實作後才會取代該模型。保留原文，避免把預定行�
 - `git log --oneline -- src/data/history.json` → `77d9cea`（2026-09-02）為首次正式同步。
 - captain 於 2026-09-03 回報 `status` 保護範圍已設定。
 
-**施工單**：[`../constitution-features/041-correct-stale-pipeline-docs.md`](../constitution-features/041-correct-stale-pipeline-docs.md)
+**施工單**：[`../constitution-features/_archive/041-correct-stale-pipeline-docs.md`](../constitution-features/_archive/041-correct-stale-pipeline-docs.md)
 
 ### 2026-09-21 — 記錄 `019` 提出的兩個 Track 2 欄位（提案，未核可）
 
@@ -624,3 +701,35 @@ feature 040 實作後才會取代該模型。保留原文，避免把預定行�
 本提案的對象是「標記已核可文章的屬性」。`019` 的 `## Design` 第二節有兩案對照表。
 
 **施工單**：[`../constitution-features/019-opposing-views-overview-page.md`](../constitution-features/019-opposing-views-overview-page.md)
+
+### 2026-09-29 — `019` 兩欄已核准，交由 `064` 施工
+
+**起因**：2026-09-21 的提案記錄寫「待 captain 核可」。captain 已於 2026-09-23 核准加欄。
+不補述的話，本文會繼續說它還沒被核准。
+
+**改了什麼**：第七節 `📌` 提案記錄下方追加一則補述。
+
+**沒有改什麼**：2026-09-21 的 `📌` 記錄與修訂紀錄原文一字未改。
+第二節欄位表、第五節施工順序表仍未改動。
+
+**現況**：已核准、**尚未實作**。規格與施工順序在 `064` 的 `## Design`。
+與 feature `040` 的關係：兩欄有值時計入內容指紋，空白時指紋不變，既有核可不受影響。
+
+**施工單**：[`../constitution-features/064-track2-case-ref-stance-columns.md`](../constitution-features/064-track2-case-ref-stance-columns.md)
+
+### 2026-09-29 — 正式 SSOT 已套用核可版本綁定（feature 050）
+
+**起因**：〈2026-09-03 — feature 040 repo 實作完成〉的「部署狀態」寫「正式 SSOT 尚未套用」。
+feature 050 已於 2026-09-29 在正式試算表執行部署窗口 S1–S9。不補述的話，本文會繼續說它還沒部署。
+
+**改了什麼**：檔頭與〈部署狀態〉下方各追加一則 ⚠️ 補述。
+
+**沒有改什麼**：原句一字未改。第二節欄位表與第五節施工順序表未動。
+那兩處的更新列在 feature 050 的 `## Documentation impact`〈實作後更新〉，由 050 負責。
+
+**依據的證據**：feature 050 票〈部署窗口記錄：S7／S8 回報與 S9 執行結果（2026-09-29）〉第三節。
+S9 在 `2026-09-29T18:22:35Z` 以 040 的同步程式唯讀讀取正式表：exit 0，輸出與部署前逐字相同。
+該程式要求八個審核欄位並重算比對三份指紋。任一欄缺少或指紋不符，同步即中止。
+044 的結論：`grep -m2 -E '^(status|verdict):' docs/constitution-features/_archive/044-approval-permission-two-account-probe.md`。
+
+**施工單**：feature `054`（本補述是其 design 階段〈現在更新〉的一筆）。

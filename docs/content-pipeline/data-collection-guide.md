@@ -95,7 +95,7 @@
 > 判決門檻改由 `src/data/future.ts` 的 `RULING_THRESHOLD` 承載，渲染走
 > `src/components/future/RulingThresholdNote.tsx`。
 > 具體人數（`RULING_THRESHOLD.headcount`）仍為 `null`，待法學背景者拍板。
-> 見 `docs/constitution-features/063-required-for-ruling-legal-accuracy.md`
+> 見 `docs/constitution-features/_archive/063-required-for-ruling-legal-accuracy.md`
 > 與 `docs/health-check/TODO.md` 的 P0-7。
 >
 > 本檔為 `evergreen`，描述現況，故上方欄位清單已更新。
@@ -213,7 +213,7 @@
 
 > **跨軌道連結已移除。** 原本這裡列的 `src/data/cross-track-links.ts` 與
 > `src/components/CrossTrackLinks.tsx` 已於 2026-09-03 刪除，兩個檔案都不存在了。
-> 移除原因與證據見 `docs/constitution-features/038-remove-ai-generated-cross-track-links.md`。
+> 移除原因與證據見 `docs/constitution-features/_archive/038-remove-ai-generated-cross-track-links.md`。
 > 之後是否重做尚未決定。
 
 

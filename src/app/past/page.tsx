@@ -419,6 +419,30 @@ export default function PastTrack() {
         </div>
       </section>
 
+      {/* 另一條看歷史的路：不看個案，看制度。連到門檻與案件量的長條圖。 */}
+      <section
+        className="bg-[var(--color-textbook-bg)] bg-paper-texture px-6 pb-16 md:pb-24"
+        aria-label="延伸閱讀：門檻與案件量"
+      >
+        <div className="max-w-2xl mx-auto">
+          <Link
+            href="/past/thresholds"
+            className="block border border-black/15 bg-white/60 p-6 hover:bg-white transition-colors"
+          >
+            <div className="font-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
+              Data · 制度視角
+            </div>
+            <h3 className="font-serif font-black text-xl md:text-2xl text-[var(--color-textbook-text)] mb-2">
+              通過一件解釋，要多少人同意？
+            </h3>
+            <p className="font-serif text-sm md:text-base text-[var(--color-textbook-text)]/70 leading-relaxed">
+              大法官的表決門檻改過四次。把四個時期的門檻疊在 1949 年以來的案件量上，
+              曲線會告訴你哪一段最少、哪一段最多，以及這張圖看不出來的部分。
+            </p>
+          </Link>
+        </div>
+      </section>
+
       {/* Sticky Search Bar — sits below the 72px Navbar */}
       <div
         ref={searchRef}

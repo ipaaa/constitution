@@ -13,6 +13,7 @@ graph TD
 
     Past -.-> P1[互動式課本年表]
     Past -.-> P2[經典釋憲案對比]
+    Past -.-> P3["/past/thresholds<br>門檻與案件量"]
     
     Present -.-> PR1[焦點判決 TL;DR]
     Present -.-> PR2[學者/NGO/影音迴響]
@@ -29,6 +30,12 @@ graph TD
 *   **介面佈局**：高保真度的 Split-Screen (左右分屏) 佈局，強烈對比。
     *   **左側 (The Theory)**：高中《公民與社會》教科書的懷舊視覺，解釋法條。
     *   **右側 (The Reality)**：全螢幕的高對比歷史現場照片與衝擊文案（現代感）。
+*   **附屬頁面 `/past/thresholds`（門檻與案件量）**：
+    *   軌道一之下的獨立路由，不走 scroll-telling，採資料視覺化。
+    *   內容是 1949–2026 的年度案件量長條圖，圖底以色帶標示四個時期的表決門檻。
+    *   資料來源為司法院公開資料與全國法規資料庫，不經內容產線的試算表 SSOT。
+    *   入口有兩個：`/past` 的前言之後，以及 `/future` 的大法官席次時間軸下方。
+    *   元件在 `src/components/threshold-analysis/`，資料在 `src/data/threshold-analysis.ts`。
 
 ### 📰 軌道二：現在 - 憲庭熱搜榜 (Trending Now)
 *   **定位**：提供倡議青年的「彈藥庫」，防範資訊焦慮的去中心化一站式集散地。

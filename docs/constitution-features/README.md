@@ -150,6 +150,7 @@ An independent reviewer examines the implementation against the design spec. Thi
   - Code quality assessment (types, conventions, reusability)
   - Any regressions or broken functionality identified
   - 依實際交付行為檢查 `## Documentation impact` 每一筆：必要更新已完成、`record` 文件未被改寫，而且 `docs/INDEX.md` 符合文件新增或刪除結果
+  - **repo 外步驟之後重判文件影響。** 本票若在 review 期間或之後執行了只在 repo 外生效的步驟（例如正式試算表部署、Vercel 設定），呈交最後一道 gate 前，依執行後的事實重判 `## Documentation impact`：`不更新` 各筆是否仍成立；`實作後更新` 各筆的條件是否已成立而未做；並列舉 evergreen 與 plan 文件中仍描述該步驟「尚未」發生的句子。已到期的文件更新在本票 PR 合併前完成，不得留給下一張票。（captain 2026-09-29 核准，出處 feature `054` design 第 1.2 節）
   - Clear PASSED or REJECTED verdict with rationale
 - **Good:** Tests each acceptance criterion individually, checks mobile and desktop behavior, verifies data flow end-to-end
 - **Bad:** Rubber-stamping without actually reading the diff, rejecting on style preferences not in the design spec, scope-creeping new requirements into the review
@@ -337,3 +338,4 @@ The gate reads reviewer findings from here. Cycle 3 escalates to the captain.}
 ## 修訂紀錄
 
 - **2026-09-07（FO）** —— 三處移除已失效的 `npm run build` 禁令。PR #32 已於 2026-09-02 把內容同步移出 build，`AGENTS.md:19` 記載解禁。原敘述的理由（「build 會執行同步」）在該日之後不成立，且 `implement` stage 定義會由 `dispatch show-stage-def` 原封不動發給每一個 worker —— feature 040 的 implement 報告即以此為由 SKIP 了 `npm run build`，而同票的 verify 與 review 都實際執行了它。禁令因此改為只涵蓋 `npm run sync-content`。本檔為 FO 操作的流程文件，依寫入契約由 FO 直接修訂。
+- **2026-09-29（FO）** —— `review` stage 的 Outputs 新增「repo 外步驟之後重判文件影響」一條。出處：feature `054` design 第 1.2 節的實驗 E2（`050` 部署後三處文件轉為錯誤而無人重判；加此條款重演後全部找到）。條款文字由 captain 於 2026-09-29 核准。

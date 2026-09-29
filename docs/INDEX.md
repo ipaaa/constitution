@@ -21,6 +21,7 @@ docs/
   project/             專案定位、架構、技術、協作
   content-pipeline/    內容產線：目標、規格、操作
   health-check/        2026-08 產線體檢與待辦
+  content-audit/       全站內容的法律事實查核：閱讀清單
   content-rescue/      搶救出來的內容
   meetup-chats/        會議記錄（本機限定，未進版控）
   _archive/            已過時、保留供追溯的文件
@@ -36,7 +37,7 @@ docs/
 
 | 路徑 | 用途 | 狀態 | 負責人 | 最後查核 |
 |---|---|---|---|---|
-| `AGENTS.md` | agent 與協作者的工作規範。禁止事項、溝通方式、寫作與文件規則 | evergreen | captain | 2026-09-01 |
+| `AGENTS.md` | agent 與協作者的工作規範。禁止事項、溝通方式、寫作與文件規則；含產線驗證與正式 SSOT 邊界 | evergreen | captain | 2026-09-23 |
 | `docs/INDEX.md` | 本檔。全部文件的索引與 workflow 現況 | evergreen | captain | 2026-09-03 |
 
 ### 專案定位
@@ -44,16 +45,17 @@ docs/
 | 路徑 | 用途 | 狀態 | 負責人 | 最後查核 |
 |---|---|---|---|---|
 | `docs/project/about.md` | 專案定位、三圈目標受眾、溝通策略 | evergreen | captain | 2026-09-01 |
-| `docs/project/architecture.md` | 過去／現在／未來三軌的資訊架構 | evergreen | captain | 2026-09-01 |
-| `docs/project/design-system.md` | 視覺美學、色彩、排版、吉祥物語言 | evergreen | captain | 2026-09-01 |
-| `docs/project/tech-stack.md` | ⚠️ 技術選型正確，**資料流章節已過時**，檔頭有警告 | evergreen | captain | 2026-09-01 |
-| `docs/project/contributing.md` | ⚠️ 角色分工正確，**任務認領流程已過時** | evergreen | captain | 2026-09-01 |
+| `docs/project/architecture.md` | 過去／現在／未來三軌的資訊架構 | evergreen | captain | 2026-09-23 |
+| `docs/project/design-system.md` | 視覺美學、色彩、排版、吉祥物語言 | evergreen | captain | 2026-09-23 |
+| `docs/project/tech-stack.md` | 網站技術、SSOT、版本綁定與手動同步資料流；含 2026-09-21 外部資料抓取程式補述 | evergreen | captain | 2026-09-03 |
+| `docs/project/contributing.md` | Spacedock 開發流程與內容重新核可流程 | evergreen | captain | 2026-09-03 |
 
 ### 內容產線
 
 | 路徑 | 用途 | 狀態 | 負責人 | 最後查核 |
 |---|---|---|---|---|
-| `docs/content-pipeline/design.md` | 產線的**唯一**規格文件；含 feature 040 已定案但尚未實作的核可版本綁定方向 | plan | captain | 2026-09-04 |
+| `docs/content-pipeline/design.md` | 產線的唯一規格；現行機制見〈修訂紀錄〉2026-09-03 feature 040 條目，第二至第五節為已取代的舊模型 | plan | captain | 2026-09-04 |
+| `docs/content-pipeline/operations.md` | 核可、拒絕、重新核可、同步錯誤與復原步驟；兩帳號 probe 由 feature 044 承接 | evergreen | captain | 2026-09-04 |
 | `docs/content-pipeline/data-collection-guide.md` | T3（未來軌）的資料收集流程。T1／T2 已移除，改指向 `design.md` | evergreen | captain | 2026-09-21 |
 | `docs/content-pipeline/approval-permission-probe.md` | 隔離測試表兩帳號 probe 記錄。核可欄位權限邊界與 `status` 公式重算的實測證據 | record | — | 2026-09-15 |
 
@@ -63,7 +65,21 @@ docs/
 |---|---|---|---|---|
 | `docs/health-check/2026-08-31-content-pipeline.md` | 體檢報告。出了什麼事、為什麼會上線。**含兩則補述，先看上方** | record | — | 2026-09-01 |
 | `docs/health-check/2026-09-03-editor-onboarding.md` | 學者編輯上稿流程稽核。開放編輯權限後還開著的洞、使用說明改寫對照、會議講稿 | record | — | 2026-09-03 |
-| `docs/health-check/TODO.md` | 待辦清單；含 feature 040 與多人編輯、正式同步的前置關係 | plan | captain | 2026-09-21 |
+| `docs/health-check/TODO.md` | 待辦清單；含 feature 040 與多人編輯、正式同步的前置關係 | plan | captain | 2026-09-24 |
+
+### 驗證腳本
+
+| 路徑 | 用途 | 狀態 | 負責人 | 最後查核 |
+|---|---|---|---|---|
+| `scripts/check-voided-floor.mjs` | 檢查站上是否把已失效的 10 人參與評議下限當成現行法。對真實頁面 HTML 跑三項檢查（門檻句不得帶持續語彙／門檻須與失效及依據同窗出現／停擺敘述不得帶持續語彙）。用法：`node scripts/check-voided-floor.mjs <url>...`，全 PASS 時離開碼 0 | evergreen | — | 2026-09-24 |
+| `scripts/content-audit.mjs` | 全站中文內容的法律事實查核（feature `067`）。`check` 跑六條機器判得了的規則 M1–M6（號次存在、號次與年份配對、門檻數值、日期與順序、同段紀年混用、封存路徑），全過時離開碼 0；`reading-list` 輸出人判的 L 層與 H 層清單。只在需要時手動跑，不接 build | evergreen | — | 2026-09-29 |
+| `scripts/fetch-judgment-dockets.mjs` | 從司法院憲判字清單抓號次、判決日期與官方案名，只寫 `tests/fixtures/judgment-dockets.json`。人工執行 | evergreen | — | 2026-09-29 |
+
+### 內容查核
+
+| 路徑 | 用途 | 狀態 | 負責人 | 最後查核 |
+|---|---|---|---|---|
+| `docs/content-audit/2026-09-29-reading-list.md` | `scripts/content-audit.mjs reading-list` 的輸出快照。交給法學背景審閱者逐項勾選；讀完即封存 | plan | captain | 2026-09-29 |
 
 ### 搶救出來的內容
 

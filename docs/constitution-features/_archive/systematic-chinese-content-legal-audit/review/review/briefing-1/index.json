@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:067:review:attempt-1:revision-1",
+  "question": "Approve 067 review (PASSED) and deliver to merge?",
+  "artifacts": [
+    {
+      "id": "artifact:067:review:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/726b53bba7648afb16fcbb4ccb52f3df0802cfa6/docs/constitution-features/systematic-chinese-content-legal-audit.md",
+      "rev": "sha256:d93f6b7037313aa955e1b7e356f5f7625775921175be1b7ffe28b5ec54a5d1e3",
+      "mediaType": "text/markdown",
+      "summary": "Independent review PASSED: no regressions (48/49 tests pass, 1 skipped live; tsc 0; noindex kept; 056 G-7 PASS; 066 check unchanged), code's M/L/H boundary matches the design, every Documentation-impact row done or correctly conditional, no record/archive rewrites. Seven non-Material findings: R1 extractor blind spot on inline elements (Deferred risk, 8/387 texts, none legal), R2 archiving 067 will make M6 flag 5 of its own old paths (Deferred risk, fix at/after archive), R3–R7 Polish. Approval routes to the pr-merge ceremony; PR body shown before any push."
+    }
+  ]
+}
