@@ -9,7 +9,7 @@ verdict:
 score: 0.8
 worktree: .worktrees/spacedock-ensign-071-footer-links
 issue:
-pr:
+pr: "#46"
 mod-block: merge:pr-merge
 gates:
     version: 1
