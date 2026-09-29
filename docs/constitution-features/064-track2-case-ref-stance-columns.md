@@ -3,7 +3,7 @@ id: 064
 title: Track 2 新增 case_ref 與 stance 欄
 status: design
 source: constitution-features/019 第二節（captain 2026-09-23 核准加欄）
-started:
+started: 2026-09-29T16:52:37Z
 completed:
 verdict:
 score: 0.7
