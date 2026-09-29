@@ -493,6 +493,15 @@ staging 顯示的是「目前所有已核可內容」，那是另一個問題。
 > 欄位定義、白名單驗證與 projection 三處；在那之前該指令零命中即為正確狀態。
 > 本則為提案記錄，不是決定。第二節的欄位表與第五節的施工順序表**在核可前不得改動**。
 
+> ⚠️ **2026-09-29 補述：上面「待 captain 核可」已不成立，但「尚未實作」仍成立。**
+> captain 已於 2026-09-23 核准加欄。施工單改為
+> [`../constitution-features/064-track2-case-ref-stance-columns.md`](../constitution-features/064-track2-case-ref-stance-columns.md)，
+> 目前在 design 階段。**試算表未新增任何欄位，同步程式未改。**
+> `064` 的 design 決定兩欄要進入 feature `040` 的內容指紋（有值才計入），並在 `040` 合併之後施工。
+> 第二節欄位表與第五節施工順序表仍不改，等實作後再寫。
+> 驗證目標不變：在 `064` 實作合併前，`grep -c "case_ref" scripts/sync-content.mjs` 為 `0`。
+> 原文保留。本次補述見文末修訂紀錄「2026-09-29 — `019` 兩欄已核准，交由 `064` 施工」。
+
 ---
 
 ## 修訂紀錄
@@ -624,3 +633,18 @@ feature 040 實作後才會取代該模型。保留原文，避免把預定行�
 本提案的對象是「標記已核可文章的屬性」。`019` 的 `## Design` 第二節有兩案對照表。
 
 **施工單**：[`../constitution-features/019-opposing-views-overview-page.md`](../constitution-features/019-opposing-views-overview-page.md)
+
+### 2026-09-29 — `019` 兩欄已核准，交由 `064` 施工
+
+**起因**：2026-09-21 的提案記錄寫「待 captain 核可」。captain 已於 2026-09-23 核准加欄。
+不補述的話，本文會繼續說它還沒被核准。
+
+**改了什麼**：第七節 `📌` 提案記錄下方追加一則補述。
+
+**沒有改什麼**：2026-09-21 的 `📌` 記錄與修訂紀錄原文一字未改。
+第二節欄位表、第五節施工順序表仍未改動。
+
+**現況**：已核准、**尚未實作**。規格與施工順序在 `064` 的 `## Design`。
+與 feature `040` 的關係：兩欄有值時計入內容指紋，空白時指紋不變，既有核可不受影響。
+
+**施工單**：[`../constitution-features/064-track2-case-ref-stance-columns.md`](../constitution-features/064-track2-case-ref-stance-columns.md)
