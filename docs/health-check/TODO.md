@@ -902,6 +902,13 @@ captain 指出那些中文是寫給學者老師看的，刪掉編輯端就失去
   以免協作者或責任編輯修改內容後沿用舊核可
 - **尚待完成**：完成條件 4 由 feature 044 承接。captain 確認後才能執行完成條件 5
 
+> ⚠️ **2026-09-29 補述：本項的「正式 SSOT 未套用」與「尚待完成」已不成立。原句與標題保留。**
+> 完成條件 4：feature 044 已於 2026-09-21 完成兩帳號 probe，`verdict: PASSED`。
+> 完成條件 5：feature 050 已於 2026-09-29 把欄位、公式與保護範圍套到正式 SSOT，並逐列重新核可 59 列。
+> 040 已於 PR #43 合併（merge commit `e98ed02`）。同日在 main 實際同步一次：exit 0，40 筆與 16 筆，`src/data/` 無 diff。
+> 五項完成條件全部成立。本項的標題「🟡 repo 實作完成」依本檔體例不改，以本補述為準。
+> 證據見 [`050-ssot-approval-deployment.md`](../constitution-features/050-ssot-approval-deployment.md)〈部署窗口記錄（續二）〉。
+
 ---
 
 ## P3 — 協作與資料整理
@@ -992,6 +999,13 @@ captain 指出那些中文是寫給學者老師看的，刪掉編輯端就失去
 - **設計意圖**：Track 1「課本 vs 現實」對照結構中的課本章節
 - **選項**：正式廢除（移除欄位與渲染），或補齊 42 筆
 - **不宜維持現狀**：半數有值半數沒有，是最糟的狀態
+
+> ⚠️ **2026-09-29 補述（feature 050）：`chapter` 欄現在有技術用途。原文保留。**
+> feature 050 為了 Apps Script 在正式 SSOT 的 `Track 1_history` 建了一個 `chapter` 欄，部署時全欄空白。
+> `chapter` 是 Track 1 內容指紋的欄位之一：見 `scripts/content-fingerprint.mjs:11` 與 `scripts/apps-script/approval-workflow.gs:5`。
+> Apps Script 找不到它就不安裝公式。
+> **所以「正式廢除」要連程式一起改。** 只刪試算表的欄，核可公式與同步會失敗。
+> 「補齊」的話，填值會改變指紋，該列要重新核可。
 
 
 ### P3-9　首次同步發現的內容品質雜項
