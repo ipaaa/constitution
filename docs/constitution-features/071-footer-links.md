@@ -370,3 +370,17 @@ Verified by: hydration 後，在 AC-2b 的 8 頁上各自檢查：
 ### Summary
 
 **判定：PASSED。** 頁尾現在有三個回報管道：GitHub 原始碼、GitHub 回報、Email `constitution.owl@gmail.com`。地址逐字元正確，兩個 GitHub 連結實測可開，全站沒有 HackMD 或舊 repo。我自寫的 probe 在 8 頁都通過；地址拼錯、少了 Email、換回舊頁尾三種改動都會被抓出來。需要 captain 決定一件事：原 AC-4、AC-5 與容許範圍的文字已不符現況，建議照 implement 的補述改寫。需要 captain 自己看一件事：手機與電腦上的頁尾外觀，特別是長 Email 地址在手機上有沒有被截斷。
+
+## Stage Report: review (cycle 2)
+
+- DONE: Review the rework diff (email reporting item) against the captain's ruling: exact mailto:constitution.owl@gmail.com, visible label and aria-label consistent with the other links, no target=_blank on mailto, classes unchanged; small-change fast path applies.
+  `b46c031` 只在「專案資源」加 1 個 `<li>` 與 import `Mail`。`href` 恰為 `mailto:constitution.owl@gmail.com`；可見文字「Email 回報：constitution.owl@gmail.com」、`aria-label`「以 Email 回報內容錯誤（constitution.owl@gmail.com）」，格式與另兩項一致（中文說明＋括號補充）。沒有 `target`／`rel`，正確。`className` 與「內容錯誤回報」逐字相同（`hover:text-red-500 …`），外層 grid／flex class 沒有變動行。
+- DONE: Confirm the captain-approved AC addendum (AC-4 selector, AC-5 three items, +7/−7 tolerance) matches the delivered footer, and ## Documentation impact still holds.
+  自寫 jsdom probe（scratchpad `071r2/rprobe.cjs`，不進 repo）對 `next start` 量 8 頁，hydration 以 `__reactFiber$` 判定：`footer a[href^="/"]` 恰為 4 個導覽路徑；原 AC-4 選擇器回 5 項（首項 `mailto:`），與補述相符；「專案資源」3 項；`http` 連結恰為兩個 GitHub 網址；舊連結 0；頁面錯誤 0。8/8 通過，exit 0。失敗改動：地址改 `ow1` 重建，8/8 失敗，exit 1。`git diff main --stat`：`Footer.tsx` +7／−7，符合補述容許。
+  Documentation impact 仍成立：除 `_archive` 內的 `record` 文件外，`docs/` 沒有描述回報管道或地址的文件；本票未新增或刪除文件，`docs/INDEX.md` 不需更新；本票沒有 repo 外步驟。
+- DONE: Confirm no regressions (tsc, eslint, build; full suite should now be 0 fail after merging current main, which contains 068's fix) and end with a clear PASSED or REJECTED verdict; note the 375px email-label visual check was approved without explicit confirmation.
+  先把 `main`（`dfa6170`）一般 merge 進分支，無衝突（`9f77791`）；合併後與 `main` 的差異只剩 `Footer.tsx` 與本 entity 的 `status` 欄（frontmatter 屬 FO，未改）。worktree 內 `node --test tests/*.test.mjs`：122 個，121 過、0 失敗、1 略過，exit 0（`threshold-analysis` AC-7 已由 `068` 修好）。`npx tsc --noEmit` exit 0；`npx eslint --max-warnings 0 src/components/Footer.tsx` exit 0；`npm run build`（Turbopack）exit 0，產物只含新地址與兩個 GitHub 網址、`hackmd` 0 筆；`src/data/*.json` sha256 建置前後相同，且與 `main` 無差異。建置在 scratchpad 副本進行，因為 captain 的 3071 預覽伺服器從本 worktree 執行，不能覆寫它的 `.next`。HTTP：兩個 GitHub 網址 `-L` 皆 200，`issues/new` 轉登入頁且帶 `return_to=…ipaaa%2Fconstitution%2Fissues%2Fnew`；Issues 已開、PUBLIC。**375px 手機畫面上長 Email 地址是否被截斷，至今沒有人實際看過；captain 核准時未明確確認此項。**
+
+### Summary
+
+**判定：PASSED。** Email 回報完全照 captain 裁示：地址逐字正確、標示與另兩項一致、`mailto:` 不開新分頁、class 未改。captain 核准的 AC 補述（導覽改用 `a[href^="/"]`、「專案資源」3 項、+7／−7）與實際頁尾相符。合併最新 `main` 後全部測試 0 失敗，型別、lint、建置都通過。唯一未確認的是手機寬度的外觀。3071 未動；本 reviewer 用的 3471 伺服器已停止。
