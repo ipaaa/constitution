@@ -545,3 +545,26 @@ Surface 陳述事實、非 finding：12 檔／+1046 −89／淨 +957，對 estim
 PASSED。四項授權修正逐一以反向改動重現可失敗性，沒有一項是恆真或自我回報。AC-5 以獨立於 `tests/` 的六個 sync 級場景重新判定成立，且同一支腳本在舊程式下確實會失敗，證明判定有鑑別力。
 「非空資料列」的定義在 spec、Node、Apps Script 公式端與選單端四處一致，並以 `node:vm` 實跑取得同一組序號與同一份指紋，F6 原本「重新核可也解不開」的傷害在兩端同時關閉。
 越界檢查全部乾淨：`record` 文件與 `_archive` 未動、probe 檔未建立、`src/data` sha256 不變、網站資料 shape 未變、F4／F5 依授權未處理。build 與 tsc 皆 exit 0。建議進入交付。
+
+## Stage Report: review (merge reconciliation)
+
+同階段衝突處理，不是新一輪審查。captain 2026-09-29 的交付核可維持待決。
+
+- DONE: Bring branch spacedock-ensign/040-approval-content-version-binding up to date with local main by a normal `git merge main` (no rebase, no force, no history rewrite), resolving the four content conflicts — docs/INDEX.md, docs/constitution-features/040-approval-content-version-binding.md, docs/content-pipeline/design.md, docs/project/tech-stack.md — so both sides' current content survives; for 040's entity file keep main's frontmatter (gates/mod-block/review-round) exactly.
+  合併提交 `17f04d7`（父提交 `a51b5d9` 與 main `93177e8`）。各衝突區塊處理如下：
+  - `docs/INDEX.md` AGENTS.md 列：合併兩邊用途文字，採 main 的查核日 2026-09-23。
+  - `docs/INDEX.md` 專案定位列：architecture／design-system 採 main 日期；tech-stack／contributing 採 040 用途文字，tech-stack 註明含 2026-09-21 補述。
+  - `docs/INDEX.md` 內容產線列：design.md／operations.md 採 040；data-collection-guide 採 main 日期 09-21；保留 main 新增的 approval-permission-probe.md 列。
+  - `docs/INDEX.md` 體檢列：採 main 整段（editor-onboarding 列、TODO 09-24、「驗證腳本」表）。
+  - 040 票檔：main 的版本逐位元組採用。兩邊本文完全相同，只差 main 多一筆 review attempt-2 gate 紀錄。`git hash-object` 與 `main:` blob 同為 `6e552fa`。
+  - `design.md` 檔頭：保留 040 的「最後修訂」「補述日期」，加入 main 的「最後查核」。
+  - `design.md` 修訂紀錄：040 的 2026-09-03 實作條目在前，接 main 的 09-04／09-21／09-29 條目，依時間排序。
+  - `tech-stack.md`：保留 040 改寫版與「部署邊界」；接上 main 的 2026-09-21 補述原文。補述前加一則合併註記，說明它指向的「資料流動路徑」與檔頭警告已被 040 移除。舊版結尾句不保留，因 040 已改寫該段。
+- DONE: Prove the reconciled branch still delivers what was approved: node --test tests/approval-content-version-binding.test.mjs passes (52), npx tsc --noEmit exits 0, and git diff a51b5d9..HEAD touches only the merged-in main content plus conflict resolutions — no change to scripts/, tests/ or src/ beyond what main itself brought.
+  `node --test`：52 pass、0 fail。040 的五個程式檔（approval-workflow.gs、appsscript.json、content-fingerprint.mjs、sync-content.mjs、測試檔）與 `a51b5d9` 逐位元組相同。其餘 scripts/tests/src 與 main 相同（`git diff main HEAD` 只列 040 自身檔案）。tsc 注意：直接跑 `npx tsc --noEmit` 退出碼 2，原因是 gitignore 的 `.next/types/` 內有 Finder 複本 `routes.d 2.ts`、`validator 2.ts`，不屬於 repo。以暫存 tsconfig 排除這兩個複本後退出碼 0。暫存檔已刪除。
+- DONE: Report the new HEAD SHA, each conflict hunk's resolution in one line, and confirm src/data/*.json untouched and npm run sync-content never run; do not push, open a PR, or merge into main.
+  合併提交 `17f04d7`。`src/data/*.json` 的 sha256 在合併前後相同，與 `a51b5d9` 也相同。未執行 `npm run sync-content`。未 push、未開 PR、未動 main。
+
+### Summary
+
+已把 main 合併進 040 分支，四個文件衝突都保留兩邊內容，程式碼沒有 main 以外的改動。待處理：`tech-stack.md` 的「部署邊界」、`design.md` 的「部署狀態」、`AGENTS.md:29` 仍寫「正式 SSOT 尚未套用」。feature 050 部署後這三處已過時。這項更新屬於 050 或交付後的文件工作，本次合併未改動。

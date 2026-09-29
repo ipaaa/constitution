@@ -885,9 +885,9 @@ captain 指出那些中文是寫給學者老師看的，刪掉編輯端就失去
   **所以 `curl` 對本站無效** —— 抓到的是 33KB 空殼，一個字的內容都沒有。
   要驗畫面只能用真實瀏覽器，或伺服器端渲染元件
 
-### P2-12　核可沒有綁定內容版本
+### P2-12　核可沒有綁定內容版本　🟡 repo 實作完成
 
-- **狀態**：設計已定案，尚未實作。正式 SSOT 未套用新欄位或公式
+- **狀態**：Node、Apps Script 與 fixture 測試已完成。正式 SSOT 未套用新欄位或公式
 - **問題**：現行同步只檢查 `status = Approved`。核可後修改同列發布內容時，舊核可仍可通過
 - **設計**：[`040-approval-content-version-binding.md`](../constitution-features/040-approval-content-version-binding.md)
   採公式衍生 `status`，並由同步端獨立重算 SHA-256 指紋
@@ -896,9 +896,11 @@ captain 指出那些中文是寫給學者老師看的，刪掉編輯端就失去
   2. 發布欄位變更後顯示 `Needs review`，舊核可無法同步
   3. 欠缺紀錄、偽造狀態及錯誤指紋都讓同步整份中止，且不改寫 JSON
   4. 在隔離測試表完成兩帳號 probe，保存不含帳號與正式 SSOT URL 的證據
+     —— 2026-09-04 captain 裁決移出本項，改由 feature `044-approval-permission-two-account-probe` 承接
   5. captain 確認後才把欄位與公式套到正式 SSOT，並重新核可既有列
 - **前置關係**：P3-1 開放多人編輯前必須完成本項與 P2-10。下次正式同步前也必須完成本項，
   以免協作者或責任編輯修改內容後沿用舊核可
+- **尚待完成**：完成條件 4 由 feature 044 承接。captain 確認後才能執行完成條件 5
 
 ---
 
