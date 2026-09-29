@@ -503,12 +503,17 @@ AC-1 能否達成取決於編輯判斷，design 無法保證：16 篇中沒有�
 | AC-7 | `fingerprintForSheetRow_` 不讀新欄；安裝公式不附加新欄；序號計入新欄 | 各 1 項失敗 |
 | AC-8 | 兩個展開寫在 `full_content` 之前 | 1 項失敗（AC-8） |
 | AC-9 | 兩端同時刪 `stance` | 4 項失敗，含釘住測試：`actual: ['case_ref'] expected: ['case_ref', 'stance']` |
-| AC-9 | 同上，且字面清單改從 `OPTIONAL_PUBLISHED_FIELDS` 匯入 | 釘住測試**不再失敗**（其他 3 項仍失敗）。證明字面清單是必要的 |
+| AC-9 | 兩端同時刪 `case_ref` | 5 項失敗，含釘住測試：`actual: ['stance'] expected: ['case_ref', 'stance']` |
+| AC-9 | 兩端同時刪 `stance`，且字面清單改從 `OPTIONAL_PUBLISHED_FIELDS` 匯入 | 釘住測試**不再失敗**（其他 3 項仍失敗）。證明字面清單是必要的 |
 | AC-13 | 白名單匯出名改 `VERIFIED_CASE_REF` | 47 項失敗，`SyntaxError: ... does not provide an export named 'VERIFIED_CASE_REFS'` |
 
 **AC-3 的反向改動寫錯了一半。** design 寫「把 `（` 從 `HEADER_SEPARATORS` 移除」會失敗。
 實測不會失敗：3.1 表的標題在 `case_ref` 與 `（` 之間有一個半形空白，解析靠的是空白。
 所以改用「刪半形空白」當反向改動，兩端都會失敗。程式與測試不需改。
+
+**測試擋不住的情況（沿用 `045` 的結論）**：同一個改動若同時改掉所有地方，測試會全數通過。所有地方是指 `design.md` 的〈發布欄位範圍〉表、`DESIGN_PROJECTION.track2Optional`、兩支程式，以及 `tests/track2-case-ref-stance.test.mjs` 內的欄名字面值。
+這種改動只能靠 PR 審查擋下。審查時看 diff 有沒有動到〈發布欄位範圍〉表。
+兩欄沒有併入 `DESIGN_PROJECTION.track2`。原因是「有值才計入」：放進去，字面清單比對與同步測試都會失敗（`045` design，`8fe7235`）。
 
 ### 指紋等值（050 的核可不必重做）
 
@@ -562,9 +567,9 @@ captain 2026-09-29 決定：責任編輯填 `case_ref`／`stance`，captain 在�
 - DONE: Implement design §三 3.2–3.5 on current main (040 merged, 050 deployed): the case_ref/stance flat optional columns in sync-content.mjs and approval-workflow.gs, the shared src/data/verified-case-refs.mjs whitelist, the both-or-neither rule, and the "count only when filled" fingerprint extension — with blank rows' fingerprints byte-identical to today (050's approvals must not need redoing). Also create design.md's missing 「發布欄位範圍」 table that 045 found the tests cite (now including the two new columns).
   `b1a298d`（程式＋測試）、`6da1442`（`design.md` 第二節新增〈發布欄位範圍〉，含選填列；`operations.md` 加階段二步驟）。15 篇真實資料列的 Node／Apps Script 指紋改動前後 30 值逐字相同，公式字串也相同。
 - DONE: Prove the 13 ACs each with their stated failing change, especially the fingerprint parity (blank-row fingerprints unchanged, filled-row changes trigger Needs review in both Node and Apps Script) and AC-9's pinning of the two new columns; run the no-write sync (CONTENT_OUTPUT_DIR temp, retry past transient 載入中… snapshots) to show today's output stays byte-identical to src/data.
-  見〈實作記錄〉反向改動表。每條測試過的 AC 都會被它的反向改動打紅。AC-3 的「刪 `（`」測不出來，因為標題裡有半形空白；改用「刪空白」，兩端都會紅。AC-9：兩端同時刪 `stance`，釘住測試失敗；清單改成匯入後，那個測試就不會紅。AC-10 以 curl 對照兩筆來源，結果相符。改動 caseName 後比對顯示不符。不落地同步第一次就 exit 0，兩份輸出的 sha256 都與 `src/data` 相同，沒有遇到「載入中…」。AC-1、AC-11、AC-12 及 AC-2 (b) 的合併前後比對留待後續階段，各自的檢查指令已寫在表內。
+  見〈實作記錄〉反向改動表。每條測試過的 AC 都會被它的反向改動打紅。AC-3 的「刪 `（`」測不出來，因為標題裡有半形空白；改用「刪空白」，兩端都會紅。AC-9：兩端同時刪 `case_ref`，或同時刪 `stance`，釘住測試都會失敗。同時改掉所有地方時測試擋不住，只能靠 PR 審查，見〈實作記錄〉；清單改成匯入後，那個測試就不會紅。AC-10 以 curl 對照兩筆來源，結果相符。改動 caseName 後比對顯示不符。不落地同步第一次就 exit 0，兩份輸出的 sha256 都與 `src/data` 相同，沒有遇到「載入中…」。AC-1、AC-11、AC-12 及 AC-2 (b) 的合併前後比對留待後續階段，各自的檢查指令已寫在表內。
 - DONE: No regressions: full test suite 0 fail and tsc pass; never run npm run sync-content, never edit the live spreadsheet (adding the columns is the captain's stage 2); record that stance values are to be filled by the 責任編輯 with captain reviewing the sync PR diff (captain decision 2026-09-29).
-  `node --test`：118 tests，116 pass，1 fail，1 skipped。唯一的 fail 是 `threshold-analysis.test.mjs:1549` 的 AC-7 寫檔掃描。它在改動前的 main 上就失敗（101/99/1）。原因是 040 的測試檔被列為寫出產線檔的程式，不是本票造成，已回報 team-lead。本票新增 0 個失敗。`npx tsc --noEmit` exit 0；`npm run build` exit 0，建置前後 `src/data/*.json` 的 sha256 相同。沒有跑 sync-content，也沒有碰試算表。captain 的決定已寫進 `design.md` 修訂紀錄與 `operations.md`。
+  `node --test`：118 tests，116 pass，1 fail，1 skipped。唯一的 fail 是 `threshold-analysis.test.mjs:1549` 的 AC-7 寫檔掃描。它在改動前的 main 上就失敗（101/99/1）。原因是 040 的測試檔被列為寫出產線檔的程式，不是本票造成，已回報 team-lead。修正在 068 分支 `84962bb`，截至本報告尚未併入 main（main `381ff04`），所以本分支沒有合併 main。本票新增 0 個失敗。`npx tsc --noEmit` exit 0；`npm run build` exit 0，建置前後 `src/data/*.json` 的 sha256 相同。沒有跑 sync-content，也沒有碰試算表。captain 的決定已寫進 `design.md` 修訂紀錄與 `operations.md`。
 
 ### Summary
 
