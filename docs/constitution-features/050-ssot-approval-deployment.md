@@ -7707,3 +7707,74 @@ S9 寫的條件是「步驟 8 與 AC-3 兩者都通過才做步驟 9」。兩者
 ### Summary
 
 依步驟 8 原文在 040 worktree 執行不落地同步，接著跑 AC-3 比對。AC-1、AC-2、AC-3 全部通過：輸出與部署前逐字相同，40／16 筆，id 清單一致。captain 回報的 S7／S8 結果已入票，三項未確認事項標為待確認。另記錄開放範圍被改寫成 1000 列的行為（Deferred risk），以及 AC-4／AC-7 逐格記錄尚未入票。步驟 9 在工程面已放行，合併仍須經 040 gate 由 captain 核准。
+
+## 部署窗口記錄（續）：captain 確認事項、AC-2 實際同步、AC-6 合併後檢查（2026-09-29）
+
+040 已合併（PR #43，merge commit `e98ed02`）。main 與 origin/main 同為 `8a3d8d1`，工作區乾淨，
+`scripts/sync-content.mjs` 與 `e98ed02` 相同。captain 於 2026-09-29 授權跑實際同步（原話：「跑」，經 FO 轉述）。
+
+### 一、captain 確認事項（來源：captain 2026-09-29 對話，經 FO 轉述）
+
+| 項目 | 狀態 |
+|---|---|
+| S7-a：12 個範圍全部選「限制」 | **已確認**（captain 回報） |
+| 第二個 Google 帳號已從共用名單移除 | **已確認**（captain 回報） |
+| S7 完成時間（UTC） | **仍待確認** |
+| AC-4（30 格）／AC-7（18 格）的逐格記錄 | **仍未入票** |
+
+### 二、AC-2：實際同步——**未通過，exit 1，未寫入任何檔案**
+
+在 repo 根目錄 main 上執行 `npm run sync-content` 一次，時間 `2026-09-29T19:04:58Z`。
+
+- exit code：**1**。
+- 輸出：`❌ 驗證失敗，未寫入任何檔案：`，接著 36 行，`Track 2` 的 `d8`、`d9`、`d11`–`d44` 各一行：
+  `status 必須是 Approved、Rejected、Needs review 或空白，實際為「載入中…」。`，最後一行 `共 36 項錯誤。請修正 SSOT 後重試。`
+- AC-2 要求的兩行（40 筆、16 筆）**沒有出現**。
+- 之後 `git status --short` 無輸出；`git diff --stat src/data/` 無輸出；
+  `src/data/*.json` sha256 仍為 `4d1992e3…cea3b`／`4071978a…3162`。**`src/data/` 未變動。**
+
+**成因（已實測，唯讀）**：`status` 是 Apps Script 自訂函式 `APPROVAL_STATUS`（`scripts/apps-script/approval-workflow.gs:115`）。
+「載入中…」是 Google 自訂函式計算中的顯示值。發布版 CSV 在不同次抓取間**時好時壞**：
+以 `curl` 連抓 `Track 2` 的發布 CSV，`19:06:04`–`19:06:14Z` 間六次得到 `0／0／0／36／36／0` 行「載入中」。
+得到 0 行的那一份，`d8`–`d17` 為 `Approved`、`d18`–`d44` 為 `Needs review`，與 S8 回報一致。
+`Track 1` 與 `site_tldr` 在單次抓取中為 0 行。
+**結論：正式表的內容正確；Google 發布版 CSV 的部分快取仍留著計算中的快照。** 040 的驗證擋下了它，沒有寫入。這是閘門照設計運作。
+
+**另一次不落地執行（揭露）**：`19:05:40Z` 以 main 的程式加 `CONTENT_OUTPUT_DIR` 指向暫存目錄跑一次，結果相同（exit 1、36 項），未產生檔案。
+
+### 三、AC-6 合併後檢查——**指令本身無法執行**
+
+照 AC-6 的 sandbox 指令原文跑一次（`19:06:23Z`）：exit 1，但原因是
+`ERR_MODULE_NOT_FOUND: …/scripts/content-fingerprint.mjs`。
+040 合併後，main 的 `sync-content.mjs:4` 會 import 同目錄的 `./content-fingerprint.mjs`（來自 `b75c98c`）。
+AC-6 的指令只複製 `sync-content.mjs` 一個檔，所以程式在讀試算表之前就中止。
+**這個結果不證明也不否證 AC-6。** 修正方式是同時複製 `content-fingerprint.mjs`。
+修正指令等於改 AC-6 的 `Verified by:`，本節不改，待 FO 授權。
+等效的檢查（main 的程式、輸出導到暫存目錄）即上一節的不落地執行，結果為 exit 1，成因同 AC-2。
+
+### 四、未越界
+
+- `src/data/` 未變動（sha256 與 `git status` 為證）。main 上未提交任何東西。
+- 未重跑實際同步。授權是「跑一次」，失敗後停下回報。
+- 對試算表只有讀取（發布版 CSV）。未記任何 email。
+
+### 五、下一步建議（待 FO／captain 裁定）
+
+1. **稍後再跑一次實際同步。** 先以不落地形式連跑數次，全部 exit 0 且 sha256 相符後，再跑 `npm run sync-content`。
+   預期仍為 exit 0、`src/data/` 無 diff。
+2. **修正 AC-6 的 sandbox 指令**，加一行複製 `content-fingerprint.mjs`，再重跑。
+3. **記一筆 Deferred risk**：發布版 CSV 的快取會讓同步隨機失敗。失敗是安全的（不寫入），但編輯台會看到 36 行錯誤而誤以為內容壞了。
+   升級條件：同步在十分鐘以上的間隔仍反覆失敗。
+
+## Stage Report: review (deployment window, AC-2／AC-6)
+
+- DONE: Record the captain's confirmations in the 050 ticket (S7-a all 12 ranges 「限制」, second account removed, S7 completion time pending), commit on the 050 branch.
+  見上節第一節，標為 captain 回報；S7 時間與逐格記錄標為待確認。
+- FAILED: AC-2: run the real sync once on the main checkout; expected exit 0 with the 40／16 lines and no diff.
+  `19:04:58Z` exit 1，36 項 `status` 為「載入中…」；成因為 Google 發布版 CSV 快取不一致（curl 六次得 0／0／0／36／36／0）。`src/data/` 未變動。
+- FAILED: If the ticket defines a post-merge check under AC-6, run it too and record the result.
+  照原文跑，`ERR_MODULE_NOT_FOUND`（缺 `content-fingerprint.mjs`），指令本身在合併後無法執行；修正待授權。
+
+### Summary
+
+captain 的兩項確認已入票。AC-2 的實際同步 exit 1，未寫入：Google 發布版 CSV 的部分快取仍回傳計算中的「載入中…」，040 的驗證擋下。正式表內容本身正確。AC-6 的 sandbox 指令在合併後缺 `content-fingerprint.mjs`，無法執行。兩項都待 FO／captain 決定是否重跑與是否修正指令。
