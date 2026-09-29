@@ -11,6 +11,17 @@ worktree: .worktrees/spacedock-ensign-064-track2-case-ref-stance-columns
 issue:
 pr:
 mod-block:
+gates:
+    version: 1
+    records:
+        - id: gate:064:verify
+          stage: verify
+          attempts:
+            - id: gate-attempt:064-verify-1
+              briefing:
+                id: briefing:064:verify:attempt-1:revision-1
+                digest: sha256:dbbf2a88ff7457fe95c38fabdb3fa1755516114ff8762144329eb3f2d574856c
+                room-ref: '@review/verify/briefing-1'
 ---
 
 在 `Track 2_discussion` 分頁新增 `case_ref` 與 `stance` 兩個選填欄，並讓同步程式把它們帶進 `discussions.json`，使 feature `019` 的不同意見總覽頁得以成立。

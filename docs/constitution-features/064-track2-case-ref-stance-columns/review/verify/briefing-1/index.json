@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:064:verify:attempt-1:revision-1",
+  "question": "Approve 064 verify (PASSED) and advance to review?",
+  "artifacts": [
+    {
+      "id": "artifact:064:verify:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/55ed89f3454233f8b32f47f89ba901ab35b43e2a/docs/constitution-features/064-track2-case-ref-stance-columns.md",
+      "rev": "sha256:978148cd054024ff9e29d4ae301320cbbb9a654ac1d9c07fcb450a197e9f692a",
+      "mediaType": "text/markdown",
+      "summary": "Independent verify PASSED: both case_ref whitelist entries match 憲法法庭 pages verbatim; stance values match design; placeholder scan clean. Fingerprint parity re-run on 20 real rows — identical, so 050's approvals stand. 20 deliberate breakages across AC-2..AC-9 and AC-13 all caught (both AC-9 both-sides removals included). No-write syncs (old and new code, resolved paths) byte-identical to src/data. Only failing test is the pre-existing threshold-analysis AC-7(4), fixed on 068's branch (118/117/0 with it). Live sheet untouched (21 columns). FO-authorized doc fixes after verify: F1 exact pwd -P command for deferred AC-2(b)/AC-12, F3 table note wording. F2 test gap recorded as Deferred risk. Captain decision: accept test LOC over design tolerance (293 vs 240 new-file lines; +23 vs +5 on 040's test)."
+    }
+  ]
+}
