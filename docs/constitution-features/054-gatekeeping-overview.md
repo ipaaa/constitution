@@ -1,7 +1,7 @@
 ---
 id: 054
 title: 內容把關機制現況總覽，以及讓它不過時的機制
-status: implement
+status: verify
 source: captain 2026-09-04（把關機制體檢；captain 明確要求本票須設計更新機制）
 started: 2026-09-29T18:59:22Z
 completed:
@@ -442,6 +442,8 @@ Semantics this may change：README review stage 多一項必要輸出（repo 外
 
 ### Feedback Cycles
 
+- 2026-09-29 captain 核准措辭（「全部照建議」，經 FO 轉述）：`## Design` 第三節 (a)、(b)、(c) 照提案原文套用；(b) 第 5 條逐字同時作為 `design.md` 第六節不變式第 7 列；候選規則「把關總覽跟著把關變動」不採用。README 條款由 FO 於 `34663fd` 套用。
+
 ## Stage Report: design
 
 - DONE: Design the update mechanism first (the ticket's primary deliverable, per the captain's 2026-09-04 requirement), climbing the cheapest-falsifiable ladder in the ticket; demonstrate by an actual exercise whether a ticket that changes gatekeeping but omits the overview doc from Documentation impact gets caught by the existing review stage.
@@ -455,3 +457,31 @@ Semantics this may change：README review stage 多一項必要輸出（repo 外
 
 更新機制分三層，全用既有守衛：現有 review 擋票內漏列（E1 實測，不加新規則）；review stage 加一條「repo 外步驟之後重判文件影響」補 `050` 形狀的洞（E2）；總覽連結寫 `docs/…` 讓 `067` 的 M6 抓失效（E3），而 `069` 會把 M6 綁進上線條件。不新增常設檢查。
 另發現：`AGENTS.md` 的第三類禁令原句在 repo 找不到出處，措辭交 captain 定案；`operations.md` 四處、`TODO.md` P2-12、`INDEX.md` 兩處同屬過時，不在本票範圍，已回報 FO。
+
+## Stage Report: implement
+
+- DONE: Write docs/content-pipeline/gatekeeping.md per the design's ten chapters — per-role flow, A/B/C column permissions, the live approval-binding rule, pre-launch checks, defense and gap tables — linking to canonical sources with docs/… paths (M6-protected), with ticket status and P3-8 conditions produced by the design's commands, never prose; every gap points to a real ticket or says 無票 with its TODO item; human-only defenses labelled explicitly.
+  `22ac14b`、`ea45cf0`：196 行，第 0–9 章。AC-4 (a) 票況指令 exit 0、12 行無 `NOT FOUND`（改 `062`→`999` 印 `999 NOT FOUND`）；(b) 單調句掃描 0 行（加「043 尚未完成」→1 行）。AC-7：防線表 12 列，「機械或人工」只用三值；`機械` 列實跑：binding test exit 0（52/52）、`content-audit check` exit 1（既有 M4／M5／M6 共 12 筆，無 `gatekeeping.md`）、`check-voided-floor` 對 `/future`、`/past` exit 0、`threshold-analysis` test exit 1（見下）、`056` G-6／G-7 PASS、G-8 build 與 tsc exit 0、noindex grep 印 `noindex, nofollow`。
+- DONE: Apply the captain-approved AGENTS.md changes verbatim from the design (a/b/c) and design.md §六 invariant row 7 plus its revision entry; register gatekeeping.md in docs/INDEX.md. README not edited.
+  `22ac14b`。AC-9：`diff` AGENTS 第 5 條全文 vs 本票提案、(a) 補述 vs 提案、第 5 條前兩句 vs `design.md` 第 7 列，三者皆無輸出；核准記錄見 `### Feedback Cycles`。AC-8：`git diff 8a3d8d1 -- AGENTS.md tech-stack.md design.md | grep -c '^-[^-]'` = 0。另依〈實作後更新〉在 `contributing.md`〈內容協作〉加一行指向總覽。
+- DONE: Prove AC-1..AC-9 each with its stated Verified by and failing change; content-audit shows no new M6 hits; 056's G-7 still PASS; tests and tsc pass; never run npm run sync-content.
+  逐項如下。**AC-1 與 AC-5 各有一次首輪未過，照實列出。**
+
+**AC-1（真實 repo clone、本票檔移除、候選為 043 形狀：同步加筆數下降中止；fresh reviewer 只給 review stage 定義）**：
+- 第一輪（候選弄壞 3 個既有測試）：R0 REJECTED，但**未指名總覽**，finding 全在測試回歸與 AC 缺漏。**未通過。**
+- 第二輪（候選修正為測試全過、附 AC）：R0b REJECTED，finding 1 指名 `gatekeeping.md:117` 與 `:162` 被推翻、且未列入 Documentation impact。**通過。**
+- 對照 C（兩輪）：都沒有漏列 finding；只指出總覽改寫的內容不夠準（C2：筆數比對抓不到「刪一列加一列」）。
+- 會失敗的改動 F（刪掉兩句）：**預期未發生，兩輪都仍指名總覽。** F1 從第 5 章「擋什麼」的檢查清單找到；F2 發現第 1 章「改過未重核可的列不會寫進 JSON」也被候選推翻（候選讓這種情況整份中止）。總覽中會被推翻的句子不只 design 點名的兩句。
+- 結論：擋得住，但不確定。n=4 的 R0 類中 1 次漏。第一輪的漏發生在 reviewer 被更大的缺陷吸走注意時。
+
+**AC-2（D 組，`b4807cc^` clone，050 換成含〈部署窗口記錄〉版，README 含條款）**：REJECTED，finding 同時指名 `AGENTS.md:29`、`tech-stack.md:41–42`、`design.md:650–651`。通過。n=1；D0 未重跑，比較沿用 design 的結果。
+**AC-3**：clone 上 22 個 `docs/…` 路徑逐一移入 `_archive/`：21 個讓 M6 指名總覽 1–10 筆，移回 0 筆。例外是 `docs/INDEX.md`：移走它 M6 就不掃任何 INDEX 列出的文件，0 筆，屬 M6 的結構限制。INDEX 改標 `record` 再封存 `operations.md` → 0 筆（對照 evergreen 為 5 筆）。主 checkout 的 `check` 指名總覽 0 行；與實作前相比無新增 M6（文件數 95→96，`design.md:616` 的既有一筆因插列移到 `:617`）。
+**AC-5**：第一輪 7／8，第 8 題答不出「哪些內容可以是 AI 生成」。`ea45cf0` 在第 6 章補一段明寫。第二輪 fresh agent 8／8，逐題與正本相符。
+**AC-6**：DONE。票況指令無 `NOT FOUND`。缺口表三列「無票」各指一個 `TODO.md` 項目，`grep -n '^### {id}' docs/health-check/TODO.md` 各命中 1 行：P0-2（:243）、P2-13（:720）、P2-14（:730）；寫 `P2-99` → 0 行。P2-13（保護範圍只到第 1000 列）與 P2-14（Apps Script 沒有欄位標題別名表）依 FO 處置在本票新增（`TODO.md` 只加兩項與進度紀錄一列，不動 050 改的 P2-12／P3-7）。改後 M6 仍 9 筆、無新增，G-7 PASS，單調句掃描 0 行。
+**AC-4、AC-7、AC-8、AC-9**：見上方兩項。
+**測試**：`approval-content-version-binding` 52/52、`content-audit` 16/16、tsc exit 0、build exit 0 且 `src/data/*.json` sha256 不變。`threshold-analysis` 31/32：`AC-7 build 指令…不得夾帶內容同步` 失敗，本票改動前（`git stash`）同樣失敗，本票沒動程式。未執行 `npm run sync-content`。實驗 clone 都在 scratchpad，未推送。
+
+### Summary
+
+總覽 `docs/content-pipeline/gatekeeping.md` 已寫成並列入 INDEX；`AGENTS.md` (a)(b)(c)、`design.md` 不變式第 7 列依核准原文套用，G-7 仍 PASS，M6 無新增。
+需要 FO 知道的有三件事。AC-1 的 R0 首輪漏抓，第二輪抓到，design 寫的「會失敗的改動」兩輪都沒使 reviewer 失敗，因為總覽還有其他句子會被推翻。AC-5 首輪 7／8，已補第 6 章後 8／8。AC-6 的兩列缺口已依 FO 處置新增 `TODO.md` P2-13、P2-14 並改指過去，無偏離。
