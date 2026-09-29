@@ -22,6 +22,10 @@ gates:
                 id: briefing:064:verify:attempt-1:revision-1
                 digest: sha256:dbbf2a88ff7457fe95c38fabdb3fa1755516114ff8762144329eb3f2d574856c
                 room-ref: '@review/verify/briefing-1'
+              withdrawal:
+                by: agent:first-officer
+                at: "2026-09-29T20:22:22.190147Z"
+                reason: 'Stale: the latest stage-report section is ''implement (verify fixes)'' appended after verify, so the verify gate would present the wrong section (ac-scan empty). Relocating those lines into the implement report, then re-preparing.'
 ---
 
 在 `Track 2_discussion` 分頁新增 `case_ref` 與 `stance` 兩個選填欄，並讓同步程式把它們帶進 `discussions.json`，使 feature `019` 的不同意見總覽頁得以成立。
