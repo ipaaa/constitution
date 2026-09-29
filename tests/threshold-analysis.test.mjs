@@ -1652,9 +1652,15 @@ test('AC-7 build 指令與寫出產線檔的程式都不得夾帶內容同步', 
   const PROD_RE = /discussions\.json|history\.json/;
   const scanned = ['src', 'scripts', 'tests'].flatMap(walkFiles).filter((f) => /\.(mjs|js|ts|tsx)$/.test(f));
   assert.ok(scanned.length > 0, '掃描面是空的');
+  //     `tests/` 底下的檔案另加一個條件：原始碼也要指到正式位置 `src/data`。
+  //     測試在暫存目錄建同名檔當 fixture（040 的 approval-content-version-binding）不是寫產線檔；
+  //     測試若以 `src/data/…` 或 `path.join(…, 'src', 'data', …)` 指向正式位置，照樣算。
+  //     `src/` 與 `scripts/` 的條件不變。
+  const PROD_DIR_RE = /src['"]?\s*[,/]\s*['"]?data\b/;
   const writers = scanned.filter((f) => {
     const src = stripComments(fs.readFileSync(path.join(ROOT, f), 'utf8'));
-    return WRITE_RE.test(src) && PROD_RE.test(src);
+    if (!(WRITE_RE.test(src) && PROD_RE.test(src))) return false;
+    return !f.startsWith('tests/') || PROD_DIR_RE.test(src);
   });
   assert.deepEqual(writers, ['scripts/sync-content.mjs'], '寫出產線兩檔的程式不只同步程式一支');
 
