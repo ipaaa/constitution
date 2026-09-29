@@ -10,7 +10,7 @@ score:
 worktree: .worktrees/spacedock-ensign-054-gatekeeping-overview
 issue:
 pr:
-mod-block:
+mod-block: merge:pr-merge
 review-round:
     id: round:054:review:2
     stage: review
@@ -49,6 +49,17 @@ gates:
                 id: briefing:054:review:attempt-1:revision-1
                 digest: sha256:a0865d862ea75390bd2d2f9f64e88c3bb9f8dfbceefae4b45d3e208b345827ef
                 room-ref: '@review/review/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:054:review:1
+                briefing: briefing:054:review:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-29T20:48:17.17Z"
+                decision: approve
+                reason: 'Captain approved 054 review cycle 2 in chat 2026-09-29 (「1235照建議」): overview delivered, R1–R3 fixed, AGENTS.md as approved.'
+              application:
+                target-stage: complete
+                state: pending
 ---
 
 沒有任何一份文件回答「現在到底有哪些把關、各擋什麼、哪些缺口還開著」。但新增一份 evergreen 文件等於新增一個會過時的東西——**本票的核心不是寫那份文件，是設計讓它不過時的機制。**
