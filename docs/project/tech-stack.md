@@ -42,6 +42,12 @@ repo 已實作核可版本綁定。正式 SSOT 尚未套用。
 兩帳號隔離 probe 完成前，不得部署 Apps Script 到正式 SSOT。
 受保護欄位的 trigger 寫入能力尚未證明。現行機制不依賴 trigger。
 
+> ⚠️ **2026-09-29 補述：上面前兩句已不成立。**
+> 正式 SSOT 已於 2026-09-29 套用核可版本綁定（feature 050 部署窗口 S1–S9）。
+> 兩帳號隔離 probe 已於 2026-09-21 完成（feature 044，`verdict: PASSED`）。
+> 證據見 [`../content-pipeline/design.md`](../content-pipeline/design.md) 修訂紀錄「2026-09-29 — 正式 SSOT 已套用核可版本綁定（feature 050）」。
+> 第三句（trigger 寫入能力）本補述未查證，維持原樣。原句保留。
+
 完整規格見 [`../content-pipeline/design.md`](../content-pipeline/design.md)。
 操作步驟見 [`../content-pipeline/operations.md`](../content-pipeline/operations.md)。
 

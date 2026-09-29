@@ -7,6 +7,9 @@
 **最後查核**：2026-09-04（feature 041 逐處查證敘述與實際行為是否相符）
 **施工前置**：已全部完成或取消。**工程可開工。**
 
+> ⚠️ **2026-09-29 補述**：上面「最後修訂」一行的「正式 SSOT 尚未部署」已不成立。
+> 見文末修訂紀錄「2026-09-29 — 正式 SSOT 已套用核可版本綁定（feature 050）」。原句保留。
+
 **出了什麼事**：[`../health-check/2026-08-31-content-pipeline.md`](../health-check/2026-08-31-content-pipeline.md)
 **還有什麼要做**：[`../health-check/TODO.md`](../health-check/TODO.md)
 
@@ -651,6 +654,12 @@ repo 現在包含下列唯一現行機制：
 兩帳號隔離 probe 尚未執行。受保護欄位的 trigger 寫入能力仍為 `UNPROVEN`。
 現行正確性不依賴 trigger。部署與復原步驟見 [`operations.md`](operations.md)。
 
+> ⚠️ **2026-09-29 補述：上面〈部署狀態〉前兩句已不成立。**
+> 正式 SSOT 已於 2026-09-29 套用八個審核欄位、公式與 Apps Script（feature 050 部署窗口 S1–S9）。
+> 兩帳號隔離 probe 已於 2026-09-21 完成（feature 044，`verdict: PASSED`）。
+> 第三句「trigger 寫入能力仍為 `UNPROVEN`」本補述未查證，維持原樣。
+> 原句保留。本次補述見文末修訂紀錄「2026-09-29 — 正式 SSOT 已套用核可版本綁定（feature 050）」。
+
 ### 2026-09-04 —— 修正與實際行為不符的敘述
 
 **起因**：本文仍有六處描述 2026-09-02 改動前的狀態。試算表編輯權限已開放給協作者。
@@ -707,3 +716,20 @@ repo 現在包含下列唯一現行機制：
 與 feature `040` 的關係：兩欄有值時計入內容指紋，空白時指紋不變，既有核可不受影響。
 
 **施工單**：[`../constitution-features/064-track2-case-ref-stance-columns.md`](../constitution-features/064-track2-case-ref-stance-columns.md)
+
+### 2026-09-29 — 正式 SSOT 已套用核可版本綁定（feature 050）
+
+**起因**：〈2026-09-03 — feature 040 repo 實作完成〉的「部署狀態」寫「正式 SSOT 尚未套用」。
+feature 050 已於 2026-09-29 在正式試算表執行部署窗口 S1–S9。不補述的話，本文會繼續說它還沒部署。
+
+**改了什麼**：檔頭與〈部署狀態〉下方各追加一則 ⚠️ 補述。
+
+**沒有改什麼**：原句一字未改。第二節欄位表與第五節施工順序表未動。
+那兩處的更新列在 feature 050 的 `## Documentation impact`〈實作後更新〉，由 050 負責。
+
+**依據的證據**：feature 050 票〈部署窗口記錄：S7／S8 回報與 S9 執行結果（2026-09-29）〉第三節。
+S9 在 `2026-09-29T18:22:35Z` 以 040 的同步程式唯讀讀取正式表：exit 0，輸出與部署前逐字相同。
+該程式要求八個審核欄位並重算比對三份指紋。任一欄缺少或指紋不符，同步即中止。
+044 的結論：`grep -m2 -E '^(status|verdict):' docs/constitution-features/_archive/044-approval-permission-two-account-probe.md`。
+
+**施工單**：feature `054`（本補述是其 design 階段〈現在更新〉的一筆）。
