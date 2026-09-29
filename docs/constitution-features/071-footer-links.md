@@ -248,3 +248,17 @@ Verified by: `npx tsc --noEmit` exit 0；`npx eslint --max-warnings 0 src/compon
 ### Summary
 
 **判定：PASSED。** 頁尾兩個外部連結都指向 `ipaaa/constitution`，真實請求可開；HackMD 已移除。全站原始碼與 8 頁 hydration 後的畫面都找不到舊 repo 或 HackMD。同一 probe 對改前版本會量到舊連結，所以結果可信。還剩兩件事要告訴 captain。第一，375px／1280px 的外觀沒有實際看過，請 captain 自己看一眼。第二，沒有 GitHub 帳號的讀者無法回報錯誤。
+
+## Stage Report: review
+
+- DONE: Review the Footer.tsx diff against the design: link targets, accessible labels, target/rel attributes, removed import, and layout classes unchanged; small-change fast path applies — scale checks to the diff.
+  `git diff 1234c5e HEAD -- src` 只動 `Footer.tsx`（+3／−8，淨 −5，在 ±2 容許內）。HackMD `<li>` 整段刪除；兩個 `href` 改為 `ipaaa/constitution` 與 `…/issues/new`；import 只刪 `FileText`。兩個保留連結的 `aria-label`、`target="_blank"`、`rel="noopener noreferrer"`、`className` 逐字未變。外層 grid／flex class 沒有任何變動行。與設計第五節四項改動逐一相符，沒有多改。
+- DONE: Check the ## Documentation impact rows (none expected) and that © line, 開源 wording and quick-nav are untouched.
+  分支只動 `Footer.tsx` 與本 entity；`docs/INDEX.md` 0 行變動，沒有新增或刪除文件，所以不需更新索引。「現在更新／實作後更新：無」成立：本票沒有 repo 外步驟。`record` 文件都沒被改寫。`© … G0V CONTRIBUTORS` 行、「這是一個開源的公民科技專案」、快速導覽 4 個 `<li>` 都在未變動的上下文內。
+- DONE: Confirm no regressions (tsc, eslint, build, the known pre-existing test failure only) and end with a clear PASSED or REJECTED verdict; note that the 375px/1280px visual check was approved by the captain without explicit confirmation.
+  本 reviewer 重跑：`npx tsc --noEmit` exit 0；`npx eslint --max-warnings 0 src/components/Footer.tsx` exit 0；`npm run build` exit 0，產出的 `.next/server/app/index.html` 只含 `ipaaa/constitution` 與 `…/issues/new`，`hackmd` 0 筆；`grep -rniE 'Welcome-to-Add-C0urt|hackmd' src public` 0 行；`src/data` 對合併基準 0 差異。`node --test tests/*.test.mjs`：101 個，99 過、1 失敗、1 略過。唯一失敗是已知的 `threshold-analysis.test.mjs` AC-7（檢查同步程式清單，檔內無 footer 字樣，與本 diff 無關）。HTTP 重測：`ipaaa/constitution` 200；`issues/new` 302 → `github.com/login?return_to=…ipaaa%2Fconstitution%2Fissues%2Fnew`，`-L` 200；舊 repo 404。`gh repo view`：Issues 已開、PUBLIC、未封存。hydration 後 DOM 量測未重做，採信 implement 與 verify 兩份各自獨立的 probe（皆附改前版本對照）。**375px／1280px 外觀至今沒有任何人實際看過；captain 在 verify gate 核准時並未明確確認此項。**
+- 觀察（非本票缺陷）：`git merge-tree HEAD main` 在本 entity 檔有衝突，來源是 `main` 上的 FO 記帳（`status`、`gates:`）與分支上的 stage report 同時修改同一檔。`Footer.tsx` 在 `main` 上自合併基準後沒有變動，程式碼合併無衝突。合併時由 FO 處理 entity 檔。
+
+### Summary
+
+**判定：PASSED。** diff 只改 `Footer.tsx`，四項改動與設計完全一致，無障礙屬性、新分頁屬性與版面 class 都保留；tsc、eslint、build 皆通過，測試只有已知的無關失敗，新連結實測可開。請 captain 知悉兩件事：頁尾在手機與電腦上的外觀仍未有人實際看過；沒有 GitHub 帳號的讀者無法使用「內容錯誤回報」。
