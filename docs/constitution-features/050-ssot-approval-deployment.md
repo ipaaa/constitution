@@ -3659,6 +3659,7 @@ probe 完成了（044，2026-09-21，PASSED），所以這句話**不再擋住�
   ```bash
   SANDBOX="$(mktemp -d)"; mkdir -p "$SANDBOX/scripts" "$SANDBOX/src/data"
   git -C "$REPO" show main:scripts/sync-content.mjs > "$SANDBOX/scripts/sync-content.mjs"
+  git -C "$REPO" show main:scripts/content-fingerprint.mjs > "$SANDBOX/scripts/content-fingerprint.mjs"
   node --env-file="$REPO/.env.local" "$SANDBOX/scripts/sync-content.mjs" > "$SANDBOX/out.txt" 2>&1
   echo "exit=$?"   # AC-6（窗口已開）必須是 1；S3 重用這段時必須是 0
   grep '對不到任何預期欄位' "$SANDBOX/out.txt" | grep -q 'review_decision' \
@@ -3680,6 +3681,15 @@ probe 完成了（044，2026-09-21，PASSED），所以這句話**不再擋住�
   改用含中文說明的真實標題後，引號內就多了說明字串——這正是上面那個 `grep` 判準要吸收的差異。
 - **這一項的用意**：讓「產線停擺窗口」變成可觀測的事實，而不是口頭承諾。
   合併 040 之前若有人跑了 main 的同步並看到錯誤，本票已經寫明那是預期的。
+
+> ⚠️ **2026-09-29 `Verified by:` 更正（授權者 `person:captain`，2026-09-29 裁決「全部照建議」，經 FO 轉述；一次性授權，只加一行）。**
+> 上方指令區塊新增第三行
+> `git -C "$REPO" show main:scripts/content-fingerprint.mjs > "$SANDBOX/scripts/content-fingerprint.mjs"`。
+> **原因**：040 合併後（`e98ed02`），main 的 `sync-content.mjs:4` 會 import 同目錄的 `./content-fingerprint.mjs`。
+> 原指令只複製一個檔，程式在讀試算表之前就以 `ERR_MODULE_NOT_FOUND` 中止（2026-09-29 實測）。
+> **原指令的複製區只有一行，逐字為**：
+> `git -C "$REPO" show main:scripts/sync-content.mjs > "$SANDBOX/scripts/sync-content.mjs"`
+> 該行仍在原位，未改一字。AC-6 其餘文字未動。
 
 **AC-7　反向對照 B：以責任編輯身分，B 類那六個審核欄必須改得到。18 格逐格成立。**
 
@@ -7778,3 +7788,52 @@ AC-6 的指令只複製 `sync-content.mjs` 一個檔，所以程式在讀試算�
 ### Summary
 
 captain 的兩項確認已入票。AC-2 的實際同步 exit 1，未寫入：Google 發布版 CSV 的部分快取仍回傳計算中的「載入中…」，040 的驗證擋下。正式表內容本身正確。AC-6 的 sandbox 指令在合併後缺 `content-fingerprint.mjs`，無法執行。兩項都待 FO／captain 決定是否重跑與是否修正指令。
+
+## 部署窗口記錄（續二）：AC-2 重跑、AC-6 修正後重跑（2026-09-29）
+
+captain 於 2026-09-29 裁決「全部照建議」（經 FO 轉述）。main 的 `scripts/` 與 merge commit `e98ed02` 相同。
+執行時 main 為 `8f40f86`，比 origin/main（`8a3d8d1`）多 9 個本機提交，9 個全部只動 `docs/`，`scripts`／`src`／`package.json` 零差異。
+
+### 一、AC-2 重跑——**通過**
+
+**先跑不落地版**（main 的程式、`CONTENT_OUTPUT_DIR` 指向暫存目錄），目標連續 3 次 exit 0 且兩檔與 `src/data/` 逐字相同：
+
+| 次 | UTC | exit | 與基準逐字相同 | 「載入中」行數 | 連續通過 |
+|---|---|---|---|---|---|
+| 1 | 19:51:32 | 1 | 否 | 36 | 0 |
+| 2 | 19:51:49 | 0 | 是 | 0 | 1 |
+| 3 | 19:52:01 | 0 | 是 | 0 | 2 |
+| 4 | 19:52:07 | 0 | 是 | 0 | 3 |
+
+**接著在 main checkout 的 repo 根目錄跑 `npm run sync-content` 一次**，`2026-09-29T19:52:11Z`：
+
+- exit code：**0**。
+- 逐字輸出：`✅ 檢查通過，已寫入 src/data/history.json（40 筆）`、`✅ 檢查通過，已寫入 src/data/discussions.json（16 筆，含 tldr）`。
+- 之後 `git status --short` 無輸出；`git diff --stat src/data/` 無輸出。
+- `src/data/history.json` sha256 `4d1992e3…cea3b`，`discussions.json` `4071978a…3162`，與部署前基準相同。
+
+**AC-2 成立。** 實際同步在正式表上成功一次，內容逐字未變。main 上未提交任何東西。
+
+### 二、AC-6 修正後重跑——**照票原文是假通過；修正檔案路徑後通過**
+
+照更正後的 AC-6 指令原文跑一次（`19:52:21Z`）：**exit 0，但沒有任何輸出，也沒有產生任何檔案。**
+
+**成因（已查證）**：main 的 `sync-content.mjs:824` 只在 `path.resolve(process.argv[1]) === __filename` 時執行 `main()`。
+macOS 的 `mktemp -d` 回傳 `/var/folders/…`，而 `__filename` 由 `import.meta.url` 解析為 `/private/var/folders/…`（`/var` 是符號連結）。
+兩者不相等，`main()` 從未被呼叫，程式直接以 exit 0 結束。
+**這正是步驟 8 提醒過的形狀：「exit 0 但什麼都不做」的假通過。** 040 合併前 main 的程式沒有這道判斷，所以 AC-6 在窗口期間的 exit 1 是真的。
+
+**診斷用的等效執行**（把 `SANDBOX` 換成 `"$(cd "$(mktemp -d)" && pwd -P)"`，其餘相同，`19:52:32Z`）：
+exit 0；逐字印出 40 筆與 16 筆兩行；sandbox 內兩檔 sha256 為 `4d1992e3…cea3b`／`4071978a…3162`，與基準相同。
+`✅ 出現預期的標題錯誤` 那一行印 ⛔，這在合併後是預期的（窗口已關）。
+**AC-6 合併後的要求（exit 0）以此成立。**
+
+**本輪未改這一處**：授權範圍只有「加一行複製 `content-fingerprint.mjs`」。
+`SANDBOX` 那一行要改成 `pwd -P` 形式，才能讓 AC-6 的指令本身不再假通過。此修正待 FO／captain 授權。
+同一段指令也出現在第十六節的指令二（`mktemp -d`，只複製一個檔），兩個缺陷在該處同樣存在，本輪未動。
+
+### 三、未越界
+
+- `src/data/` 未變動；main 上未提交；同步只讀試算表。
+- AC-6 只加授權的一行與更正框；AC-1 至 AC-5、AC-7 未動。
+- 未改 `scripts/`。CSV 快取問題由 FO 另開票（main 上已有 `sync-csv-loading-snapshot.md`），本票不修程式。
