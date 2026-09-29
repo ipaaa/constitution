@@ -9,7 +9,7 @@ verdict:
 score: 0.8
 worktree: .worktrees/spacedock-ensign-070-sync-csv-loading-snapshot
 issue:
-pr:
+pr: "#48"
 mod-block: merge:pr-merge
 gates:
     version: 1
