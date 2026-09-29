@@ -1,13 +1,13 @@
 ---
 id: 054
 title: 內容把關機制現況總覽，以及讓它不過時的機制
-status: design
+status: implement
 source: captain 2026-09-04（把關機制體檢；captain 明確要求本票須設計更新機制）
 started: 2026-09-29T18:59:22Z
 completed:
 verdict:
 score:
-worktree:
+worktree: .worktrees/spacedock-ensign-054-gatekeeping-overview
 issue:
 pr:
 mod-block:
