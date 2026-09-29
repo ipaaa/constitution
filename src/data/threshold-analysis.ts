@@ -374,7 +374,7 @@ export const INTERIM_SEGMENT: StatuteSegment = {
 /**
  * 2025-12-19 起適用的門檻：憲法訴訟法第 30 條第 1 項。
  *
- * 第 2 至 6 項經 114 年憲判字第 1 號宣告違憲，自判決公告日起失其效力，
+ * 第 2 至 6 項經 114 年憲判字第 1 號宣告違憲，自判決公告日起失效（失效句的定義見 ruling-threshold.ts），
  * 此後只剩第 1 項。條文文字與 INTERIM_SEGMENT 逐字相同（2026-09-29 以全國法規資料庫核對）。
  * 起點與條文都由 RULING_THRESHOLD 推導，不另寫一次。
  * 該段沒有釋字資料可計，與 INTERIM_SEGMENT 一樣畫斜線網底。
