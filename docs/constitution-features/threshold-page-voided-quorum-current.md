@@ -1,7 +1,7 @@
 ---
 id: 068
 title: 門檻分析頁把已失效的 10 人／9 人門檻標為現行
-status: implement
+status: verify
 source: constitution-features/067 design 新發現第 3 項（captain 2026-09-29 核准開票）
 started: 2026-09-29T17:14:59Z
 completed:
@@ -593,3 +593,35 @@ Problem 第一句寫「`/past/thresholds`（公開頁）」。原句保留。實
 ### Summary
 
 以一手來源確認 10 人 9 人下限自 2025-12-19 起失效，設計把該期改成有終點的歷史期、補上此後適用的第 30 條第 1 項，失效句一律引用 `ruling-threshold.ts`，行動版由時期卡片與邊界註記承擔。`012` 測試為機械改名加四條新守衛，原型已驗證全綠且 `066` 檢查由 FAIL 轉 PASS。端值以可重跑的 hydration 探針量測，因本機無可用瀏覽器；桌機引線註解是否裁切須 captain 目視。
+
+## Stage Report: implement
+
+- DONE: Build what the design specifies on top of current main (067 merged): the 10-attendance/9-agreement era ends 2025-12-19 as `fixed-floor` with `voided`, RESTORED_SEGMENT for 第 30 條第 1 項, voiding text only via ruling-threshold.ts, and the mobile/desktop presentation — no legal wording invented outside the design.
+  `bba2811`、`0209abb`，基底 `30bb68c`（含 `94ffa3f`／067 與 PR #43／040）。與設計不同的一處：`RESTORED_SEGMENT` 的 JSDoc 原本照設計寫「起失其效力」，這會讓 AC-5 的 grep 命中，改為「起失效（定義見 ruling-threshold.ts）」。這段是程式註解，不是頁面文字。
+- DONE: Prove AC-1 (end value) with the design's hydration probe on both mobile and desktop variants against the recorded main baseline, and AC-2..AC-7 each with its stated failing change; 066's check-voided-floor passes all seven routes with the floor-number count ≥ 1, and 067's `content-audit.mjs check` does not gain new failures (note whether M5's threshold-analysis.ts finding moves or resolves).
+  AC-1：探針（sha256 `56e4ee…99ea`，與設計相符）兩版輸出相同。main 為 N1–N3＝0、N4＝1、N5＝1；候選版為 N1＝3／3／3（卡片、邊界註記、`<desc>`）、N2＝1、N3＝1、N4＝0、N5＝0、「判決公告日」＝2。SSR 對照 0 字元，掛載後 6035 字元。
+  AC-2：兩份 LaunchGate 放行副本，port 3268 為 main、3269 為候選。main 上 `/past/thresholds` 檢查 2 FAIL，下限數字 16 次，exit 1。候選版七條路由全 PASS，`/past/thresholds` 下限數字 24 次，exit 0。腳本與 main `cmp` 相同。
+  AC-3：`grep "'2025-12-19'"` 為 0。以下改動會讓 T-A 轉紅：`effectiveTo: null`（T-B 也紅）、手抄一份 `voided` 物件。第二個開放期間會讓 T-B 轉紅（D2 也紅）。
+  AC-4：37 tests／36 pass／0 fail／1 skip（含下方 FO 授權修正；修正前為 35 pass／1 fail，那條是既存問題）。四個反向改動各自讓以下測試轉紅：`hatched` 改 false → `AC-5 fixed-floor 期…斜線網底…`；b3 body 加「（約 11 位大法官）」→ `c3 豁免按產生者發…`，另外 `c3 站上不得出現換算後的人數` 也紅；b3 加回「現行」→ T-C；卡片拿掉失效句 → T-D。
+  AC-5：「起失其效力」4 筆，全部在 `ruling-threshold.ts`。import 清單新增 4 檔，另有 `page.tsx`。在卡片手寫一次失效句後，ruling-threshold.ts 以外出現 1 筆命中。
+  AC-6：`page.tsx` 為 0 筆；`threshold-analysis.ts` 的原句仍為 1 筆；檔頭補述 2026-09-29 在 :27。把頁面文案改回原句後，page.tsx 回到 1 筆。
+  AC-7：兩個 json 與 fixture 的 sha256 未變（`4071978a…3162`／`4d1992e3…ea3b`／`b141f5c5…7c88`）。noindex 仍在。`headcount: null`。在 `RESTORED_SEGMENT.ruleSummary` 寫「至少 11 人」後，c3 豁免測試轉紅。
+  content-audit：前後皆為 M4＝1、M5＝2、M6＝9，沒有新增失敗。M5 的 threshold-analysis.ts 發現**移位、未解決**：:238 → :247，文字相同。
+- DONE: No regressions: node --test 'tests/*.test.mjs' and npx tsc --noEmit pass (exclude untracked Finder duplicates under .next/types if present, and say so); flag the desktop callout clearance (6px to SVG bottom) for captain visual check; never run npm run sync-content.
+  `tsc --noEmit` exit 0。worktree 沒有 `.next/`，所以沒有排除任何檔。全套測試：main 101／99 pass／1 fail／1 skip；候選版 105／104 pass／0 fail／1 skip（既存的 1 fail 由下一項的授權修正消除）。**需 captain 目視**：桌機引線註解第三行在 `PLOT_H + 66`，距 SVG 底緣 6px。本機沒有可用瀏覽器，無法判斷是否被裁切。整個過程未執行 `sync-content`。
+- DONE: 【FO 授權修正，不在 068 原始範圍】012 AC-7 第 (4) 點誤報：040 測試在暫存目錄寫同名檔，被判為產線寫入者
+  `tests/threshold-analysis.test.mjs` 的 AC-7 (4) 對 `tests/` 底下的檔案多加一個條件：原始碼也要指向 `src/data`，比對用 `/src['"]?\s*[,/]\s*['"]?data\b/`。這比整個排除 `tests/` 更窄；`src/`、`scripts/` 的條件不變；未動 040 的測試檔。
+  修正前後：012 套件由 main `30bb68c` 的 31 pass／1 fail／1 skip，變成本分支的 36 pass／0 fail／1 skip。全套由 1 fail 變為 0 fail。
+  反向改動（每次都已還原）都會讓 (4) 轉紅：F1 在 `scripts/check-voided-floor.mjs` 寫入 `src/data/history.json`；F2 在 `src/data/launch-status.ts` 同樣寫入（另一條 AC-7 閉包測試也紅）；F3 在新測試檔以 `path.join(ROOT, 'src', 'data', 'discussions.json')` 寫入。
+- DONE: 實作後更新文件（Documentation impact）
+  `b5497df`：`docs/INDEX.md` 補上七條路由與 LaunchGate 放行條件；`design-system.md` 第 35 節由兩段改為三段；`TODO.md` P1-10 追加補述，原表保留，並記下第 3 項的行號移位。
+
+### 發現（交 FO）
+
+1. **（已由上方「FO 授權修正」一項處理。）main 上 012 套件有一條既存失敗，與本票無關，已於施工中回報。** 失敗的是 `AC-7 build 指令與寫出產線檔的程式都不得夾帶內容同步` 第 (4) 點。040（PR #43）的 `tests/approval-content-version-binding.test.mjs:96-97,342-343` 在 temp 目錄寫入 `history.json`／`discussions.json`，被 012 的 regex 掃到。提案分類：Material、不屬本票（Needs decision）。FO 之後授權在本票修正，見上方 DONE 項。
+2. **AC-2 與 AC-1 對「卡片沒有失效句」都假性通過。** 卡片拿掉失效句後，邊界註記與 `<desc>` 仍在 150 字窗內提供失效句，所以 `check-voided-floor` 檢查 2 仍為 PASS（6 筆，exit 0）。探針的 N1 也仍為 2，因為探針把 `<desc>` 算成可見。這個情況目前只有 T-D 擋得住（見 AC-4 R4）。設計列給 AC-2 的「會失敗的改動」其實不會讓 AC-2 失敗。候選版本身沒有這個缺陷。
+3. 改動量 +287／−69（11 檔，含文件 3 檔）。設計估計 +235／−40，容許 ±40%。刪除行數超出容許，主因是測試裡 `current` 相關註解的改寫。
+
+### Summary
+
+10 人 9 人期改名為 `fixed-floor`，終點由 `RULING_THRESHOLD` 推導為 2025-12-19。新增 `RESTORED_SEGMENT`，頁面在卡片、邊界註記、`<desc>` 與桌機引線註解四處寫明失效。失效句一律 import 自 `ruling-threshold.ts`。AC-1 至 AC-7 都已實跑，含各自會失敗的改動；兩個例外見發現 2，另有一個測試盲點。012 套件原本唯一的 fail 是 040 帶進 main 的既存問題，經 FO 授權後已在本票收窄守衛修正，現為 0 fail。桌機引線註解第三行是否被裁切，要交 captain 目視確認。
