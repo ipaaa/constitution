@@ -507,4 +507,4 @@ Verified by: 新測試四格。
 
 ### Summary
 
-PASSED。AC-1 至 AC-9 全部由我獨立重跑通過，AC-8 也通過（10／10 exit 0，輸出與 `src/data` 相同，6 次實際重抓）。18 項否證演練都讓對應測試失敗，還原後全綠。040 的 16 個函式與 `content-fingerprint.mjs` 對 `cefeeee` 逐位元組相同。入口修正讓 `/var` 路徑與符號連結路徑正常執行；認不出入口時 exit 1。F1 記錄一次用到第 8 次才成功的實跑，屬 Deferred risk，交由 FO 或 captain 決定是否調整重抓預算。
+PASSED。AC-1 至 AC-9 全部由我獨立重跑通過，AC-8 也通過（10／10 exit 0，輸出與 `src/data` 相同，6 次實際重抓）。14 項否證演練都讓對應測試失敗，還原後全綠。另一項（只在衍生欄內改成子字串比對）不會讓測試失敗，但行為與原本等價，見報告內的觀察。040 的 16 個函式與 `content-fingerprint.mjs` 對 `cefeeee` 逐位元組相同。入口修正讓 `/var` 路徑與符號連結路徑正常執行；認不出入口時 exit 1。F1 記錄一次用到第 8 次才成功的實跑，屬 Deferred risk，交由 FO 或 captain 決定是否調整重抓預算。
