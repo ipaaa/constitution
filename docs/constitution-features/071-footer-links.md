@@ -33,6 +33,11 @@ gates:
               application:
                 target-stage: review
                 state: consumed
+            - id: gate-attempt:071-verify-2
+              briefing:
+                id: briefing:071:verify:attempt-2:revision-1
+                digest: sha256:bca261b09dc6e4c5910fbddf2d1be6a686e15a7b14a3178f88844d7552045376
+                room-ref: '@review/verify/briefing-2'
         - id: gate:071:review
           stage: review
           attempts:
