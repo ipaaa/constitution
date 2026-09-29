@@ -451,6 +451,7 @@ Semantics this may change：README review stage 多一項必要輸出（repo 外
 ### Feedback Cycles
 
 - 2026-09-29 captain 核准措辭（「全部照建議」，經 FO 轉述）：`## Design` 第三節 (a)、(b)、(c) 照提案原文套用；(b) 第 5 條逐字同時作為 `design.md` 第六節不變式第 7 列；候選規則「把關總覽跟著把關變動」不採用。README 條款由 FO 於 `34663fd` 套用。
+- Cycle 1: REJECTED — verify（`8026f4a`）判 V1（第 7 章把 L／H 閱讀清單寫成 P3-8 條件，AC-5 7/8）、V2（:119 無出處日期）Material。FO 授權 V1–V5 fix（V3 依 captain 2026-09-29 核准記錄「逐字」補齊 `design.md` 第 7 列，不改 `AGENTS.md`），V6 decline for 054（交 `064`：後合併者重判總覽），V7 無動作。implement cycle 2 修正於 `f916c94`，fresh agent AC-5 8/8。round 記錄：`review/verify/round-1`。
 
 ## Stage Report: design
 
@@ -493,3 +494,61 @@ Semantics this may change：README review stage 多一項必要輸出（repo 外
 
 總覽 `docs/content-pipeline/gatekeeping.md` 已寫成並列入 INDEX；`AGENTS.md` (a)(b)(c)、`design.md` 不變式第 7 列依核准原文套用，G-7 仍 PASS，M6 無新增。
 需要 FO 知道的有三件事。AC-1 的 R0 首輪漏抓，第二輪抓到，design 寫的「會失敗的改動」兩輪都沒使 reviewer 失敗，因為總覽還有其他句子會被推翻。AC-5 首輪 7／8，已補第 6 章後 8／8。AC-6 的兩列缺口已依 FO 處置新增 `TODO.md` P2-13、P2-14 並改指過去，無偏離。
+
+## Stage Report: verify
+
+- FAILED: Verify every factual claim in docs/content-pipeline/gatekeeping.md against its canonical source: per-role flow, the A/B/C protection classes and ranges (050), the approval-binding rule (040/operations.md), pre-launch checks (056 G-1..G-8, P3-8), and each defense/gap row's cited ticket or TODO item; flag any sentence that misstates or goes stale, with the correct value.
+  已查核：第 1 章對照 `sync-content.mjs:358-427`（`isApproved`、`validateApprovalBinding`），`Needs review` 列不寫進 JSON 屬實。第 2 至 4 章對照 `050` 步驟 6、7、S7-b（27 格擋、3 格可改，`:3655-3657`）、S7-d 18 格、〈部署窗口記錄〉第二節，以及 `approval-permission-probe.md` 的 P1、P7 與〈過程發現〉一、二；拒絕必填原因見 `.gs:204`。第 5 章：`PLACEHOLDER_PATTERNS` 5 組（`sync-content.mjs:69-75`），`056` G-1 至 G-8 分類，`067` 的 M1–M6、L、H（`## Design` 第二、三、十節），`check-voided-floor.mjs` 出自 `066`（`5eff145`）。第 6 章對照 `data-collection-guide.md` T3 SOP（:116-141）。第 8 章 9 張票的 title 與缺口列相符；`039` 的 title 寫明「非 AI 內容偵測」。**共 4 筆不符，列於下方 V1、V2、V4、V5。**
+- FAILED: Confirm AGENTS.md (a)(b)(c) and design.md §六 row 7 are byte-identical to the captain-approved wording in 054's design, the symlink is intact, and no other AGENTS.md line changed; re-run AC-4 (ticket-status command, 0 NOT FOUND) and AC-6 (every 無票 row resolves to a TODO heading).
+  AGENTS 的 (a)、(b) 分別與 `3fe06a9` 第 253–255、260–264 行的提案比對，`diff` 皆無輸出。提案文字自 design commit `b4807cc` 起沒有改過。(c) 那一列 `grep -c` 得 1。`AGENTS.md` 只有新增 11 行、刪除 0 行。`CLAUDE.md` 是 mode `120000`，指向 `AGENTS.md`。AC-4：exit 0，12 行，沒有 `NOT FOUND`；在併入 main 的 clone 上重跑也一樣。AC-6：P0-2 在 :243，P2-13 在 :720，P2-14 在 :730，各命中 1 行。**不符的一項是 V3：`design.md` 第 7 列只有 (b) 的前兩句，不是逐字的完整 (b)。**
+- FAILED: Independently re-run AC-5 with a fresh agent that has not seen the ticket (the captain's four questions answered only from gatekeeping.md) and AC-3's M6 protection on at least three archived paths; placeholder scan; confirm 056 G-7 PASS and content-audit shows no new failures.
+  AC-5：只給 fresh agent 一份檔案的副本，結果 **7／8**。第 7 題列出 `067` 的 `check` 與閱讀清單，當成移除 noindex 的條件；正本 P3-8 只有 `056` 那一條（見 V1）。AC-3 在 clone 上封存 5 條路徑：`050` 票得 6 筆（:47、:92、:116），`operations.md` 5 筆，`043` 2 筆，`approval-permission-probe.md` 2 筆，`TODO.md` 12 筆；全部移回後都是 0 筆。佔位掃描：diff 的新增行只在引述事故（`某學者，某大學法律系`）與測試檔名時命中，`src/` 零變動。單調句掃描 0 行。G-7 依正本抽出執行（1018 B），結果 `G-7 PASS [place1=1/1 place2=1 place3=1]`，exit 0。`content-audit check`：main 與 worktree 都是 M4=1、M5=2、M6=9，差別只有 `TODO.md` 行號位移 21 行，沒有新增失敗。
+
+### Findings（唯讀，未動候選）
+
+- **V1（Material，本票可修）**：第 7 章 :150–154 把 `067` 的 `check` 與 L／H 閱讀清單寫成「條件引用的檢查」。正本 `TODO.md` P3-8（:986）的解除條件只有 `056` 那一條，用第 7 章自己的 `awk` 指令就能印出。`069`（design）依 captain 2026-09-29「要綁」的決定，只加 `check`（`069` 票 :21、:50-59），**閱讀清單從來不是 P3-8 的條件**。captain 的受眾會把這段讀成 noindex 的前置條件，fresh reader 第 7 題就是這樣讀的。建議修法：分成兩段，一段寫「P3-8 的條件用指令印出」，另一段寫「captain 2026-09-29 決定把 `check` 綁進 P3-8，施工單 `069`」，並寫明閱讀清單不是 P3-8 的條件。修法沿用單調句規則，不寫「尚未」。
+- **V2（Material，本票可修）**：第 5 章 :119 寫「擋不到 2026-05-01 之前上線的內容」，這個日期在 repo 內找不到出處。`verify` stage 由 `565cd93`（2026-04-30）加入。具名的佔位掃描由 `1eff0e2`（2026-09-02 refit）加入。workflow 在 2026-09-02 之前休眠（見 `AGENTS.md`〈實作方式〉）。正確的邊界是「不走 workflow 的改動」。如果要寫日期，佔位掃描的日期是 2026-09-02。
+- **V3（Needs decision，captain 措辭）**：`design.md` 第 7 列等於 (b) 的前兩句，缺「要加內容，寫進試算表並走核可。」與指向總覽的那一句。核准記錄（`### Feedback Cycles`）寫「(b) 第 5 條逐字同時作為…第 7 列」。修訂紀錄 :742 也寫「與 `AGENTS.md` 第 5 條相同」。有兩條路：第 7 列補上缺的句子，或把修訂紀錄與核准記錄改成「取前兩句」並由 captain 確認。兩條路都不改 `AGENTS.md`。
+- **V4（Polish，併入 main 就過時）**：:181 寫「`067` 與 `069` 的檔名沒有編號前綴」。main 的 `be77290` 已把 `069` 改名為 `069-content-audit-followups.md`，所以 `069` 那一半不成立。指令本身不受影響。
+- **V5（Polish）**：第 4 章 :100 寫「同步不信任試算表顯示的 `status`」。實際上 `status` 決定這一列要不要檢查（`isApproved`；`approval-permission-probe.md`〈過程發現〉一）。`design.md` :651 的寫法「同步不再只憑 `status = Approved` 放行」較準確。
+- **V6（Deferred risk，交 FO）**：`064` 分支在 `sync-content.mjs` 新增 `case_ref` 允許清單、`stance` 允許清單與兩欄成對的檢查。這是新的防線，第 5 章 :117 沒有列出。`064` 的 base 沒有總覽，所以它的 Documentation impact 列不到總覽。升級為 Material 的條件：兩票都合併，而後合併的那一張沒有重判總覽。
+- **V7（資訊，050 合併時）**：在 clone 上試併 `050` 分支，`docs/INDEX.md` 與 `design.md` 修訂紀錄各有一處兩邊都新增的衝突，保留兩邊即可解決，`TODO.md` 自動合併。`050` 封存時，M6 會指名總覽 :47、:92、:116 與 `TODO.md` 的 P2-13、P2-14，這是設計好的行為。屆時 :92 的正本改指 `operations.md`〈正式 SSOT 部署〉〈保護範圍（12 個）〉，這一節由 `050` 新增。
+- 另記：`tests/threshold-analysis.test.mjs` 31／32，main 上一樣失敗，與本票無關。binding test 52／52，exit 0。
+
+### Summary
+
+REJECTED。檔頭 AGENTS (a)(b)(c) 與核准文字逐字相同，symlink 完整。AC-3、AC-4、AC-6、G-7 都通過，佔位掃描乾淨，`content-audit` 沒有新增失敗。退件理由有兩項。V1：第 7 章把不在 P3-8 裡的檢查寫成移除 noindex 的條件，fresh reader 的第 7 題因此答錯，AC-5 只得 7／8。V2：:119 的日期沒有出處。V3 要 captain 定案 `design.md` 第 7 列是否要逐字。V4 至 V7 是 Polish、延後風險或合併時的提醒。
+
+## Stage Report: implement (cycle 2)
+
+- DONE: V1 — 第 7 章改成兩段：(1) P3-8 的解除條件以 `awk` 指令印出，並指向 `056` G-1 至 G-8；(2) captain 2026-09-29 決定把 `content-audit.mjs check` 綁進 P3-8，施工單 `069`，以指令輸出為準。另寫明 L／H 閱讀清單不是 P3-8 的條件。
+  AC-5 用沒看過兩張票的 fresh agent 重跑，只給 `gatekeeping.md`：8／8。第 7 題明寫「`067` 的閱讀清單不是條件」。
+- DONE: V2 — 第 5 章 verify 那一列的擋不到什麼改成「不走 workflow 的改動。具名的佔位掃描自 2026-09-02 refit（`1eff0e2`）起才寫進 `verify` 的輸出」。
+  `grep -c 2026-05-01` = 0。
+- DONE: V3 — `design.md` 第六節第 7 列改為 (b) 的完整三句本文，逐字。
+  本票提案 (b) 去掉標題後的三行接成一行，與第 7 列 `diff` 無輸出。`git diff --quiet 3fe06a9 -- AGENTS.md` 成立，`AGENTS.md` 未動。修訂紀錄「與第 5 條相同」因此成立。
+- DONE: V4 — 第 8 章刪掉「`067` 與 `069` 的檔名沒有編號前綴」。
+  指令保留。
+- DONE: V5 — 第 4 章改為「同步不再只憑 `status = Approved` 放行。`status` 決定一列要不要檢查；被檢查的列，同步自己重算指紋…」。
+  與 `design.md` :651 一致。
+- DONE: 檢查。
+  G-7 PASS（place1=1/1、place2=1、place3=1）。`content-audit check` 仍是 M4=1、M5=2、M6=9，指名 `gatekeeping.md` 0 行，沒有新增失敗。單調句掃描 0 行。
+- SKIPPED: V6 由 FO 帶到 `064`；V7 無需動作。
+  依 FO 處置。
+
+### Summary
+
+依 FO 處置修了 V1–V5，只動 `gatekeeping.md` 第 4、5、7、8 章與 `design.md` 第 7 列。AC-5 重跑 8／8，第 7 題不再把閱讀清單列為上線條件。本 commit 一併帶上 FO 在工作區改的 frontmatter `status: implement`，本輪沒有改 frontmatter。
+
+## Stage Report: verify (cycle 2)
+
+- DONE: Re-check V1–V5 against canonical sources
+  V1：第 7 章改成「P3-8 的條件用指令印出」。現在印出 1 行，只有 `056` 那一條，文字與 P3-8「（2026-09-21 加入）」相符。`067` 的 `check` 寫成 captain 決定綁入、施工單 `069`，並寫明「出現在指令輸出裡才算條件」，與 `069` 票 :21、:50-59 相符。閱讀清單寫明不是 P3-8 的條件。V2：新寫法是「具名的佔位掃描自 2026-09-02 refit（`1eff0e2`）起才寫進 `verify`」。`git log -S'Placeholder scan' --all -- docs/constitution-features/README.md` 只有 `1eff0e2`，相符。V4：:181 的檔名那句已刪除，指令不依賴檔名。V5：:100 改為「不再只憑 `status = Approved` 放行；`status` 決定一列要不要檢查」，與 `sync-content.mjs` 的 `isApproved`／`validateApprovalBinding` 相符，也與 `design.md` :651 一致。
+- DONE: Re-run AC-5 with a new fresh agent (target 8/8; Q7 must not list the reading list as a P3-8 condition)
+  這次用新的 fresh agent，副本改名為 `overview.md`，只讀一個檔，不執行指令，得 **8／8**。第 7 題答 `056` 的 G-1 至 G-8、完整清單在 `056` 第三節，另補一句「自 `069` 起加入 `067` 的 `check`」。**沒有列閱讀清單**。其餘七題逐題對照正本，與 cycle 1 的判定相同。
+- DONE: Confirm design.md row 7 byte-identical to (b), AGENTS.md unchanged from 3fe06a9, G-7 PASS, content-audit no new failures
+  第 7 列與 (b) 提案三行串接後的字串相同，`diff` 無輸出。`design.md` 對 `657e015` 只有新增，刪除行數為 0；對 `8026f4a` 只換了第 7 列那一行。修訂紀錄寫「與第 5 條相同」，現在成立。`git diff 3fe06a9 HEAD -- AGENTS.md CLAUDE.md` 無輸出，`CLAUDE.md` 仍是 mode `120000`。G-7 依正本抽出執行，得 `G-7 PASS [place1=1/1 place2=1 place3=1]`，exit 0。`content-audit check` 的輸出與 cycle 1 逐字相同（M4=1、M5=2、M6=9，96 份文件），指名總覽的行數為 0。單調句掃描 0 行。
+
+### Summary
+
+PASSED。V1、V2、V4、V5 已依正本修正，V3 的第 7 列已與 (b) 逐字相同。新的 fresh reader 得 8／8，第 7 題沒有把閱讀清單當成 P3-8 條件。`AGENTS.md` 自核准版本起未再變動，G-7 通過，`content-audit` 沒有新增失敗。本輪沒有新 finding。V6（交 `064`）與 V7（`050` 合併時的兩處保留兩邊的衝突）依 FO 處置，未重判。
