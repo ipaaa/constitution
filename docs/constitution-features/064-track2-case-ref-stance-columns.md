@@ -653,3 +653,26 @@ captain 2026-09-29 決定：責任編輯填 `case_ref`／`stance`，captain 在�
 ### Summary
 
 在 base、分支與拋棄式 worktree 上獨立重跑全部檢查：一手來源、指紋等值（20 列）、20 個反向改動、`tsc`、`build`，以及兩次不落地同步。所有 implement 的數字都重現成功。發現三項，都不阻擋：延後 AC-2 (b)／AC-12 缺逐字指令（F1，附指令）、一個 fail-closed 的測試缺口（F2）、一處文字誤差（F3）。行數超標需 captain 在 gate 認可。
+
+## Stage Report: review
+
+- DONE: Review the diff against the design for what verify did not own: code quality of sync-content.mjs, content-fingerprint.mjs, approval-workflow.gs and verified-case-refs.mjs (types/JSDoc conventions, no weakening of 040's approval validation, Node/Apps Script parity kept readable), and whether the extra test lines are justified rather than duplicated.
+  程式改動逐行對照 design 3.2–3.5，全部相符。JSDoc 與 `ALLOWED_VIBES` 的註解形式一致；白名單與 `OPTIONAL_PUBLISHED_FIELDS` 皆 `Object.freeze`。`040` 的檢查沒有被放寬：`validateApprovalBinding` 未動；`resolveApprovalHeaders_` 仍對缺欄與重複欄 throw；`reviewActiveRows_` 在「新程式、舊公式、已填值」時因 `fingerprintForSheetRow_` 與公式值不符而 throw（`approval-workflow.gs:247`），fail closed。兩端的附加規則在 `content-fingerprint.mjs:72-75` 與 `approval-workflow.gs:80-83` 各四行，結構對稱，可讀。另外親自重跑三個反向改動（在拋棄式 worktree，改完即還原）：`Object.hasOwn`→`in` 使 AC-4 失敗 1 項；`CONTENT_FINGERPRINT` 把選填參數移到序號前使 3 項失敗（含 AC-7(c)(d) 與 040 兩端一致測試）；兩個展開移到 `full_content` 前使 AC-8 失敗 1 項。多出的測試行有必要：假分頁測試（公式安裝、`fingerprintForSheetRow_`）是那兩個 GS 反向改動唯一會失敗的測試。R2 記錄了輔助函式重複，屬於 Polish。
+- DONE: Check every ## Documentation impact row against delivered behavior (design.md 發布欄位範圍 table, operations.md stage-2 steps and new error messages, the captain's stance-filling decision recorded), record docs untouched, INDEX consistency; apply the README clause only if an out-of-repo step ran (none should have).
+  現在更新兩筆都已完成。對 `docs/content-pipeline/` 的 diff 只有一行刪除：`operations.md` 的 `node --test` 指令加上新測試檔；2026-09-21 那則補述逐字未改。實作後更新：〈發布欄位範圍〉表與本 PR 同時交付（`design.md:257`），內容與 `DESIGN_PROJECTION` 及程式相符。`operations.md`〈Track 2 加兩欄〉的 9 步與 design 第五節階段二相符，三則錯誤訊息與 `sync-content.mjs` 的字串前綴逐字相同。captain 決定的填值分工已寫入 `design.md` 修訂紀錄與 `operations.md`。第二節欄位表、第五節、`data-collection-guide.md` 與 INDEX 日期依第九節排在階段二，目前未改，時點正確。不更新清單中的六份文件，本分支都沒有 diff。本票沒有新增或刪除文件，INDEX 不需改。repo 外步驟：沒有執行，所以 README 條款不適用。
+- DONE: Identify regressions (full suite with 068's 012 fix considered, tsc, build, no-write sync byte-identical, 056 G-7, content-audit no new failures) and end with a clear PASSED or REJECTED verdict; note for the FO that 054's gatekeeping.md does not yet list 064's new checks (whichever of 054/064 merges second must update it).
+  完整測試：分支 118/116/1 fail/1 skip。唯一的 fail 是 `threshold-analysis` AC-7。在拋棄式 worktree 套用 068 的 `84962bb` 後為 118/117/0/1。`npm run build` exit 0；接著 `npx tsc --noEmit` exit 0；前後 `src/data/*.json` 的 sha256 相同。不落地同步於 `2026-09-29T20:34:16Z` 執行，`pwd -P` 路徑，分支與 main 各跑一次：兩次都 exit 0，`discussions.json` 為 `4071978a…3162`，`history.json` 為 `4d1992e3…ea3b`，與 `src/data` 相同；主 repo 的 `src/data` 未變。056 G-7 印出 `G-7 PASS [place1=1/1 place2=1 place3=1]`。`content-audit check` 的分支與 main 結果相同，都是 `M4=1 M5=2 M6=9`，唯一差異是 `design.md` 的 M6 行號因新增段落而位移，沒有新失敗。沒有執行 sync-content，也沒有碰試算表。**給 FO**：`054` 的 `docs/content-pipeline/gatekeeping.md:117`〈同步前置檢查〉沒有列出本票的三個新中止條件，測試指令也缺 `tests/track2-case-ref-stance.test.mjs`。`054` 與 `064` 較晚合併的一方要補上。
+
+### Findings
+
+- **R1（Polish）** Node 的 alias `case ref`（空白）在 Apps Script 沒有對應。GS 只比對欄名本身。若標題誤打成 `case ref （…）`，Node 解析得到，GS 解析不到。結果是：公式不含該欄，填值後同步以「與目前發布內容不符」中止。這是 fail closed，但錯誤訊息不指向標題。design 3.3 規定了這個 alias；040 的 `full content` 也有同型不對稱。`operations.md` 第 2 步要求逐字輸入，所以沒有觸發路徑。不建議本票修。
+- **R2（Polish）** `tests/track2-case-ref-stance.test.mjs` 重寫了 `loadAppsScript`、`csvCell`、`toCsv`、`approve`，040 測試檔已有同名函式，但簽名不同。抽成共用模組要動 040 的測試檔，超出本票範圍。不阻擋。
+- verify 的 F2（GS 序號迴圈計入選填欄時沒有測試會失敗）維持 FO 的延後決定，不重列。
+
+### Verdict: PASSED
+
+程式與 design 3.2–3.5 相符，沒有放寬 040 的核可檢查，兩端 parity 可讀。親自重跑的三個反向改動都讓對應測試失敗。文件影響各筆都依時點處理。回歸檢查全部乾淨：套用 068 修正後 0 fail，tsc、build、不落地同步逐位元組相同，G-7 PASS，content-audit 無新失敗。R1、R2 都是 Polish。
+
+### Summary
+
+獨立審查 064 階段一的程式與文件，對照 design 逐項比對，並自行重跑三個反向改動與全部回歸檢查。結果都與 implement 和 verify 的記錄一致。兩項 Polish 不阻擋交付。另提醒 FO：054 的 gatekeeping.md 尚未列入本票的三個新同步檢查。
