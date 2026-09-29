@@ -9,7 +9,7 @@ verdict:
 score: 0.7
 worktree: .worktrees/spacedock-ensign-064-track2-case-ref-stance-columns
 issue:
-pr:
+pr: "#47"
 mod-block: merge:pr-merge
 gates:
     version: 1
