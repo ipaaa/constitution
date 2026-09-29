@@ -11,6 +11,17 @@ worktree: .worktrees/spacedock-ensign-070-sync-csv-loading-snapshot
 issue:
 pr:
 mod-block:
+gates:
+    version: 1
+    records:
+        - id: gate:070:verify
+          stage: verify
+          attempts:
+            - id: gate-attempt:070-verify-1
+              briefing:
+                id: briefing:070:verify:attempt-1:revision-1
+                digest: sha256:23e75e750efdb1f87dfaeec06ac38d3e2043410bd6b11a4a5b7cda3261c0f903
+                room-ref: '@review/verify/briefing-1'
 ---
 
 `040` 合併後，正式同步可能隨機失敗：Google 發布的 CSV 有時送出公式仍在計算的舊快照，`status` 欄顯示「載入中…」，`040` 的驗證因此判整份不符而中止。不會把錯的內容推上網站，但會讓編輯看到數十筆錯誤而以為內容壞了。
