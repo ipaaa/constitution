@@ -10,7 +10,7 @@ score: 0.7
 worktree: .worktrees/spacedock-ensign-064-track2-case-ref-stance-columns
 issue:
 pr:
-mod-block:
+mod-block: merge:pr-merge
 gates:
     version: 1
     records:
@@ -50,6 +50,17 @@ gates:
                 id: briefing:064:review:attempt-1:revision-1
                 digest: sha256:1ed13a078942239b85c89018ce00ee2f0f1fa30f2c3c60560d5cac5ed8dc4726
                 room-ref: '@review/review/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:064:review:1
+                briefing: briefing:064:review:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-29T20:48:17.675029Z"
+                decision: approve
+                reason: 'Captain approved 064 review in chat 2026-09-29 (「1235照建議」): stage-1 code matches design, 040 validation not weakened, no regressions.'
+              application:
+                target-stage: complete
+                state: pending
 ---
 
 在 `Track 2_discussion` 分頁新增 `case_ref` 與 `stance` 兩個選填欄，並讓同步程式把它們帶進 `discussions.json`，使 feature `019` 的不同意見總覽頁得以成立。
