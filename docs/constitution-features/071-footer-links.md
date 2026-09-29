@@ -11,6 +11,17 @@ worktree: .worktrees/spacedock-ensign-071-footer-links
 issue:
 pr:
 mod-block:
+gates:
+    version: 1
+    records:
+        - id: gate:071:verify
+          stage: verify
+          attempts:
+            - id: gate-attempt:071-verify-1
+              briefing:
+                id: briefing:071:verify:attempt-1:revision-1
+                digest: sha256:3cfb0186fdc6ad252b63b6500e23420f316f943188bb1e28e908b39eb7e66284
+                room-ref: '@review/verify/briefing-1'
 ---
 
 全站頁尾的外部連結有多處錯誤。captain 2026-09-29 裁示：原始碼一律指向 `https://github.com/ipaaa/constitution`；不列 HackMD；「內容錯誤回報」也指向正確的 GitHub。
