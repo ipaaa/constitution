@@ -46,7 +46,7 @@ docs/
 |---|---|---|---|---|
 | `docs/project/about.md` | 專案定位、三圈目標受眾、溝通策略 | evergreen | captain | 2026-09-01 |
 | `docs/project/architecture.md` | 過去／現在／未來三軌的資訊架構 | evergreen | captain | 2026-09-23 |
-| `docs/project/design-system.md` | 視覺美學、色彩、排版、吉祥物語言 | evergreen | captain | 2026-09-23 |
+| `docs/project/design-system.md` | 視覺美學、色彩、排版、吉祥物語言 | evergreen | captain | 2026-09-29 |
 | `docs/project/tech-stack.md` | 網站技術、SSOT、版本綁定與手動同步資料流；含 2026-09-21 外部資料抓取程式補述 | evergreen | captain | 2026-09-03 |
 | `docs/project/contributing.md` | Spacedock 開發流程與內容重新核可流程 | evergreen | captain | 2026-09-03 |
 
@@ -71,7 +71,7 @@ docs/
 
 | 路徑 | 用途 | 狀態 | 負責人 | 最後查核 |
 |---|---|---|---|---|
-| `scripts/check-voided-floor.mjs` | 檢查站上是否把已失效的 10 人參與評議下限當成現行法。對真實頁面 HTML 跑三項檢查（門檻句不得帶持續語彙／門檻須與失效及依據同窗出現／停擺敘述不得帶持續語彙）。用法：`node scripts/check-voided-floor.mjs <url>...`，全 PASS 時離開碼 0 | evergreen | — | 2026-09-24 |
+| `scripts/check-voided-floor.mjs` | 檢查站上是否把已失效的 10 人參與評議下限當成現行法。對真實頁面 HTML 跑三項檢查（門檻句不得帶持續語彙／門檻須與失效及依據同窗出現／停擺敘述不得帶持續語彙）。用法：`node scripts/check-voided-floor.mjs <url>...`，全 PASS 時離開碼 0。已知須涵蓋七條路由：`/future`、`/controversy-timeline`、`/quiz/controversy`、`/quiz/pending`、`/quiz/rights`、`/quiz/perspectives`、`/past/thresholds`。須對 LaunchGate 已放行的副本執行（作法見 `docs/constitution-features/_archive/066-quiz-timeline-voided-quorum-present-tense.md` 第 8.1 小節）；未放行時 client component 頁面渲染不出內容，輸出「下限數字出現 0 次」而假性通過。有門檻內容的路由 N 必須 ≥ 1 | evergreen | — | 2026-09-29 |
 | `scripts/content-audit.mjs` | 全站中文內容的法律事實查核（feature `067`）。`check` 跑六條機器判得了的規則 M1–M6（號次存在、號次與年份配對、門檻數值、日期與順序、同段紀年混用、封存路徑），全過時離開碼 0；`reading-list` 輸出人判的 L 層與 H 層清單。只在需要時手動跑，不接 build | evergreen | — | 2026-09-29 |
 | `scripts/fetch-judgment-dockets.mjs` | 從司法院憲判字清單抓號次、判決日期與官方案名，只寫 `tests/fixtures/judgment-dockets.json`。人工執行 | evergreen | — | 2026-09-29 |
 
