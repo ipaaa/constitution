@@ -150,6 +150,21 @@
 > 三個分頁另有八個審核欄位。`status` 與 `current_fingerprint` 由公式產生，人不得輸入。
 > 現行規格見〈修訂紀錄〉的「2026-09-03 — feature 040 repo 實作完成」。原文保留供追溯。
 
+> ⚠️ **2026-09-29 補述（feature 050）：正式 SSOT 已建好八個審核欄位與 `chapter`。下方三張欄位表不改，實際欄位如下。**
+> 讀取時間 2026-09-29，來源為發布版 CSV 的標題列。**這是歷史讀數**，現況以試算表第一列為準。
+>
+> | 分頁 | 欄數 | 比下方欄位表多出的欄 |
+> |---|---|---|
+> | `Track 1_history` | 18 | `chapter`，以及 `review_decision`、`review_fingerprint`、`approved_fingerprint`、`current_fingerprint` |
+> | `Track 2_discussion` | 21 | `owl_depth_comment`、`full_content`，以及 `review_decision`、`review_fingerprint`、`approved_fingerprint`、`current_fingerprint` |
+> | `site_tldr` | 12 | 八個審核欄位中除 `status` 以外的七欄 |
+>
+> 八個審核欄位是 `status`、`review_decision`、`review_fingerprint`、`approved_by`、
+> `approved_at`、`approved_fingerprint`、`current_fingerprint`、`reject_reason`。
+> `status` 與 `current_fingerprint` 由公式產生。其餘六欄由 `Review` 選單寫入，只有責任編輯可改。
+> `chapter` 在 2026-09-29 部署時全欄空白。它是 Track 1 內容指紋的欄位之一，Apps Script 要求它存在。欄位位置與保護範圍見 [`operations.md`](operations.md)〈正式 SSOT 部署〉。
+> 原表保留。
+
 ### 分頁
 
 | 分頁 | 放什麼 |
@@ -456,6 +471,7 @@ staging 顯示的是「目前所有已核可內容」，那是另一個問題。
 | 8   | **把同步移出 build**                    | 工程     | 7   | ✅ 2026-09-02（PR #32，已於 main 實測 build 前後 sha256 不變） |
 | 9   | 跑完整同步 → 開 PR → 對 diff → 合併         | 工程＋編輯台 | 7,8 | 🟢 **下一步** —— captain 決定程式與內容分開 PR |
 | 10  | 封存 `SSOT_Editor`                   | 人工     | 9   | ✅ 2026-09-02 改名為 `_已封存_SSOT_Editor_20260902` |
+| 11  | 正式 SSOT 套用核可版本綁定（feature 050） | 人工＋工程 | 7   | ✅ 2026-09-29（部署窗口 S1–S9；040 於 PR #43 合併） |
 
 > ⚠️ **2026-09-04 更正：上表第 4 項的狀態已不成立。**
 > `status` 保護範圍已設定完成，不是「等有協作者再設」。
@@ -733,3 +749,20 @@ S9 在 `2026-09-29T18:22:35Z` 以 040 的同步程式唯讀讀取正式表：exi
 044 的結論：`grep -m2 -E '^(status|verdict):' docs/constitution-features/_archive/044-approval-permission-two-account-probe.md`。
 
 **施工單**：feature `054`（本補述是其 design 階段〈現在更新〉的一筆）。
+
+### 2026-09-29 — 第二節欄位表與第五節施工順序表的補述（feature 050）
+
+**起因**：feature 050 的 `## Documentation impact`〈實作後更新〉列了本文兩處：
+第二節欄位表補上八個審核欄位與 `chapter`，第五節施工順序表追加 050。條件「部署完成後」已成立。
+
+**改了什麼**：第二節檔首補述下方追加一則 ⚠️ 補述，列出三個分頁實際多出的欄。
+第五節施工順序表追加第 11 列。
+
+**沒有改什麼**：三張欄位表與施工順序表原有各列一字未改。
+上一則修訂紀錄（feature 054）已補的檔頭與〈部署狀態〉兩則補述，本次不重複。
+
+**依據的證據**：2026-09-29 讀取三個分頁發布版 CSV 的標題列（18／21／12 欄）。
+同日在 main 實際同步一次：exit 0，40 筆與 16 筆，`src/data/` 無 diff。
+記錄見 feature 050 票〈部署窗口記錄（續二）〉。
+
+**施工單**：feature `050`。
