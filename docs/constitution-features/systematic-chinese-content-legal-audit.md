@@ -427,3 +427,26 @@ M6 的路徑修復必須等 `check` 先證明抓得到（AC-7），所以放在�
 ### Summary
 
 **建議：PASSED。** 分支上的每一筆法律事實都比對過司法院與全國法規資料庫的一手頁面，沒有發現錯誤：58 則憲判字（號次、案名、日期）、門檻 10／9，以及閱讀清單內 35 個釋字日期。shipped 資料檔沒有佔位內容。AC-1 至 AC-10 都能以 AC 寫明的改動弄紅，並已實際重跑。三個種子在真實 repo 上都被抓到，AC-3 也在 `06ddfb1` 重現了 `065` 的錯誤。沒有 Material 發現。captain 在 gate 要決定兩件事：是否接受超出容差的 1,267 行，以及 `/about:38` 的文案怎麼改。
+
+## Stage Report: review
+
+- DONE: Review the diff against the design spec for what verify did not own: code quality of content-audit.mjs, units.mjs and fetch-judgment-dockets.mjs (types/JSDoc, conventions, no any-equivalents, reusability), whether the M/L/H boundary in code matches the design's, and whether the +1,267 LOC (accepted by the captain) hides duplication worth flagging — do not re-run verify's 18 AC mutations; spot-reproduce only an AC whose evidence you doubt.
+  界線：`rules` 恰印 M1–M6；L1–L4、H 的產出與第三、六節一致；L3 從 `check-voided-floor.mjs` 以 AST 讀出 `FLOOR_NUM`／`FLOOR_WORD`／`COURT`（皆無 `g` 旗標，`.test()` 無狀態問題），沒有第二份型樣。慣例：與 `fetch-interpretation-counts.mjs`、`check-voided-floor.mjs` 相同，無 JSDoc 型別，零 `@param`／`@typedef`，不是退步。`registerHooks` 的 Node 版本需求沿用既有的 `tests/tsx-loader.mjs`，不是新依賴。LOC：4 檔共 1,267 行（`wc -l`），重複約 50 行，見發現 R3，超額主要是真功能，沒有藏大量重複。AC 證據沒有可疑處，未重跑突變。
+- DONE: Check every ## Documentation impact row against actual delivered behavior: required updates done, record documents not rewritten, docs/INDEX.md consistent with added docs (e.g. docs/content-audit/), TODO P1-10 accurate.
+  INDEX：目錄樹加 `content-audit/`，腳本表加兩列（evergreen），新增「內容查核」表一列（plan）。TODO：P1-10 六列含 M4、M5、L1、`/past/thresholds`、`/about:38`，另記紀年慣例。P3-8 只改路徑，因為第十節第 3 項 captain 尚未拍板，符合該列的完成條件。被改的 `design.md`（plan）、`data-collection-guide.md`（evergreen）、`TODO.md`（plan）、`AGENTS.md` 都不是 `record`，`_archive/**` 與 workflow 票零改動。`threshold-analysis.test.mjs` 在「不更新」表內卻改了 `:141` 一行，已經過 FO 授權，verify 也記錄了，不列為發現。快照檔頭有 commit `a96c7c7` 與重跑指令。唯一不準處見 R4。
+- DONE: Identify regressions or broken functionality (existing tests, tsc, noindex, 056's G-7, 066's check-voided-floor) and end with a clear PASSED or REJECTED verdict stating whether delivery can proceed.
+  本分支實跑：`node --test tests/*.test.mjs` 49 項，48 過、0 失敗、1 略過（`THRESHOLD_LIVE`）。`rm -rf .next && npx tsc --noEmit` 離開碼 0。`layout.tsx:9` 仍有 noindex。`G-7` 正本（`_archive/056…:283-291`）印 `G-7 PASS [place1=1/1 place2=1 place3=1]`。`check-voided-floor.mjs`、`interpretation-dates.json`、`package.json` 與 `main` 無差異。兩個 `.json` 的 sha256 為 `4071978a…3162`、`4d1992e3…ea3b`。`check` 離開碼 1，`M4=1 M5=2 M6=1`，符合預期。`src/` 的改動都在註解內，含 `about/page.tsx:29` 的 JSX 註解。沒有回歸。
+
+### 發現（皆非 Material）
+
+- **R1 抽取器盲區（Deferred risk）。** 行內元素（`span`、`a`、`Link` 等）若直接出現在 `{cond && …}` 或 `.map` 內，它的文字不會成為單元。原因：`paragraphs()` 遇到非簡單運算式就跳過，`visit` 又不把行內元素當段落根（`units.mjs:311-315`、`:335`）。探測程式比對全部含中文的 `JsxText`：387 個中漏 8 個，分布在 4 檔，例如 `TrackCards.tsx:59`「開始探索」、`EraComparisonStrip.tsx:94`「未確認」。今日漏掉的 8 個都沒有號次、年份或門檻，M 層沒有因此少報。AC-9 以檔為單位，仍然成立。設計第八節的殘留風險只寫了 `⟦⟧`，沒有寫這個洞。升級條件：被漏掉的文字含號次、紀年或門檻句。
+- **R2 封存本票後 M6 會報本票自己的檔（Deferred risk，觸發條件是正常流程）。** 我在 `git archive` 副本上把本票移到 `_archive/`，再跑 `check --root`，M6 從 1 變 6。新增的 5 處是 `content-audit.mjs:5`、`:454`（這一行寫在產生器內，之後每份快照都會帶舊路徑）、`fetch-judgment-dockets.mjs:4`、`TODO.md:694`、快照 `:4`。另有 `units.mjs:4`、`content-audit.test.mjs:8` 同樣指向舊路徑，但不在 M6 範圍。建議：封存本票的同一個 commit 改這 7 處，再跑 `check`，確認 M6 回到 1。
+- **R3 重複（Polish）。** `fetch-judgment-dockets.mjs:32-45` 的 `getText` 與 `fetch-interpretation-counts.mjs:39-52` 只差 User-Agent，是逐字複製。本檔已經從那支程式 import `JUDGMENT_URL`，`getText` 可以一起 export。`@/` 路徑解析寫了四次，副檔名清單各不相同：`tsx-loader.mjs` 的 `resolveFile`、`units.mjs:40-43`（沒有 `index.tsx`）、`units.mjs:212-216`（只試 `.ts`）、`content-audit.mjs:385-389`。`key`／`object`／`array` 的推導在 `units.mjs:120-128`、`:179-188`、`:351-365` 寫了三次。
+- **R4 TODO 變更紀錄的數字錯（Polish）。** `TODO.md` 末列寫「本檔 11 處已封存票的路徑改指 `_archive/`」。實際是 12 處：`git diff --numstat` 為 +43／−12，其中新增的 P1-10 與變更紀錄共 31 行，所以路徑改動是 12 行。這 12 行是 9 處 `../` 路徑，加上 `:431`、`:540`、`:678`。
+- **R5 fixture 的日期檢查形同虛設（Polish）。** `fetch-judgment-dockets.mjs:69` 用 `Date.parse` 驗「合法日曆日」。`Date.parse('2025-02-30T00:00:00Z')` 實測回傳數值，不是 NaN，所以不合法的日期也會過關。`content-audit.mjs:108` 的 `isCalendarDay` 才是正確寫法。今日 58 筆已由 verify 逐筆對過一手來源，沒有造成實害。
+- **R6 M2 範圍比設計窄，沒有列為偏離（Polish）。** 設計第六節寫「一個欄位含號次」。程式只認「整個值就是號次」的欄位（`content-audit.mjs:172`）。原因記在測試 `:62-69`，是為了避開 `discussions.json` 的誤報，但 implement 的偏離清單沒有列出這一項。像「114憲判1：國會職權修法違憲」這種帶敘述的標籤，M2 不會看。
+- **R7 測試留下暫存目錄（Polish）。** `tempRoot()` 用 `mkdtempSync` 建目錄，但從不刪除。本機 `$TMPDIR` 已累積 119 個 `content-audit-*`。
+
+### Summary
+
+**建議：PASSED，可以交付。** 沒有回歸：既有測試、tsc、noindex、`G-7`、`066` 的檢查都維持原狀。程式的 M／L／H 界線與設計一致。Documentation impact 每一列都已完成，或者依條件正確地還沒做。`record` 文件與封存檔都沒有被改寫。七項發現中，R1、R2 是 Deferred risk，其餘是 Polish，都不影響 value AC。R2 的觸發條件就是封存本票這個正常步驟，建議 FO 在封存 commit 內一併改掉那 7 處舊路徑。
