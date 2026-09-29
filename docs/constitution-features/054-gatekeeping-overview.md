@@ -1,7 +1,7 @@
 ---
 id: 054
 title: 內容把關機制現況總覽，以及讓它不過時的機制
-status: verify
+status: implement
 source: captain 2026-09-04（把關機制體檢；captain 明確要求本票須設計更新機制）
 started: 2026-09-29T18:59:22Z
 completed:
@@ -509,3 +509,18 @@ Semantics this may change：README review stage 多一項必要輸出（repo 外
 ### Summary
 
 REJECTED。檔頭 AGENTS (a)(b)(c) 與核准文字逐字相同，symlink 完整。AC-3、AC-4、AC-6、G-7 都通過，佔位掃描乾淨，`content-audit` 沒有新增失敗。退件理由有兩項。V1：第 7 章把不在 P3-8 裡的檢查寫成移除 noindex 的條件，fresh reader 的第 7 題因此答錯，AC-5 只得 7／8。V2：:119 的日期沒有出處。V3 要 captain 定案 `design.md` 第 7 列是否要逐字。V4 至 V7 是 Polish、延後風險或合併時的提醒。
+
+## Stage Report: implement (cycle 2)
+
+- DONE: V1 — 第 7 章改成兩段：(1) P3-8 的解除條件以 `awk` 指令印出，並指向 `056` G-1 至 G-8；(2) captain 2026-09-29 決定把 `content-audit.mjs check` 綁進 P3-8，施工單 `069`，以指令輸出為準。另寫明 L／H 閱讀清單不是 P3-8 的條件。
+  AC-5 用沒看過兩張票的 fresh agent 重跑，只給 `gatekeeping.md`：8／8。第 7 題明寫「`067` 的閱讀清單不是條件」。
+- DONE: V2 — 第 5 章 verify 那一列的擋不到什麼改成「不走 workflow 的改動。具名的佔位掃描自 2026-09-02 refit（`1eff0e2`）起才寫進 `verify` 的輸出」。`grep -c 2026-05-01` = 0。
+- DONE: V3 — `design.md` 第六節第 7 列改為 (b) 的完整三句本文，逐字。本票提案 (b) 去掉標題後的三行接成一行，與第 7 列 `diff` 無輸出。`git diff --quiet 3fe06a9 -- AGENTS.md` 成立，`AGENTS.md` 未動。修訂紀錄「與第 5 條相同」因此成立。
+- DONE: V4 — 第 8 章刪掉「`067` 與 `069` 的檔名沒有編號前綴」，指令保留。
+- DONE: V5 — 第 4 章改為「同步不再只憑 `status = Approved` 放行。`status` 決定一列要不要檢查；被檢查的列，同步自己重算指紋…」，與 `design.md` :651 一致。
+- DONE: 檢查。G-7 PASS（place1=1/1、place2=1、place3=1）。`content-audit check` 仍是 M4=1、M5=2、M6=9，指名 `gatekeeping.md` 0 行，沒有新增失敗。單調句掃描 0 行。
+- SKIPPED: V6 由 FO 帶到 `064`；V7 無需動作。依 FO 處置。
+
+### Summary
+
+依 FO 處置修了 V1–V5，只動 `gatekeeping.md` 第 4、5、7、8 章與 `design.md` 第 7 列。AC-5 重跑 8／8，第 7 題不再把閱讀清單列為上線條件。本 commit 一併帶上 FO 在工作區改的 frontmatter `status: implement`，本輪沒有改 frontmatter。

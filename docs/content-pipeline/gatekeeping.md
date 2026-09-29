@@ -97,7 +97,7 @@
 - 責任編輯自己改內容也一樣失效。
 - 只改 B 類審核欄，不會讓核可失效。
 - Track 2 的指紋含資料列的序號。在 Track 2 插入或刪除一列，其後各列都要重新核可。
-- 同步不信任試算表顯示的 `status`。它自己重算指紋，與 `review_fingerprint`、`approved_fingerprint`、`current_fingerprint` 三份比對。
+- 同步不再只憑 `status = Approved` 放行。`status` 決定一列要不要檢查；被檢查的列，同步自己重算指紋，與 `review_fingerprint`、`approved_fingerprint`、`current_fingerprint` 三份比對。
 - 2026-09-29 起，正式試算表套用這套機制（feature `050` 部署窗口 S1–S9）。
 
 正本：[`docs/content-pipeline/design.md`](design.md) 修訂紀錄〈2026-09-03 — feature 040 repo 實作完成〉與〈2026-09-29 — 正式 SSOT 已套用核可版本綁定（feature 050）〉。
@@ -116,7 +116,7 @@
 | 試算表保護範圍 A／B／C | 投稿者改公式欄、審核欄與標題列 | 擁有者手改公式欄；整列刪除；第 1001 列之後的列 | `人工（有記錄）`：由 captain 設定，Google 試算表執行。repo 內沒有可重跑的檢查。有效性靠 captain 以投稿者帳號做的行為測試，記在 `050` 票 S7 | [`docs/constitution-features/050-ssot-approval-deployment.md`](../constitution-features/050-ssot-approval-deployment.md) 步驟 6 |
 | 同步前置檢查 | 缺欄或標題對不上、`status` 值不合法、已核可列的必填欄空白、`id` 重複、核可後 0 筆、5 組已知佔位字串。任一項失敗，整份不寫 | 刪掉少數幾列：同步只在核可後 0 筆時中止，筆數下降時照常寫出。兩列標題相同。內容是 AI 生成或編造的 | `機械`：`node --test tests/approval-content-version-binding.test.mjs`（檢查本身在 `scripts/sync-content.mjs`，只在發布時執行） | [`docs/content-pipeline/operations.md`](operations.md)〈同步〉與〈錯誤與復原〉 |
 | PR 的 JSON diff 與預覽審閱 | 同步產生的兩個 JSON 裡看得見的錯：少了一筆、多了測試字串、畫面壞掉 | 不經同步的內容。看起來合理但事實錯誤的內容 | `人工`：由 captain | [`docs/content-pipeline/operations.md`](operations.md)〈同步〉 |
-| workflow `verify` 階段的事實查核與佔位掃描 | 走 `constitution-features` workflow 的票，其 diff 裡的事實錯誤與設計文件範例值 | 不走 workflow 的改動。2026-05-01 之前上線的內容 | `人工`：由 verify 階段的 fresh agent | [`docs/constitution-features/README.md`](../constitution-features/README.md) 的 `verify` stage |
+| workflow `verify` 階段的事實查核與佔位掃描 | 走 `constitution-features` workflow 的票，其 diff 裡的事實錯誤與設計文件範例值 | 不走 workflow 的改動。具名的佔位掃描自 2026-09-02 refit（`1eff0e2`）起才寫進 `verify` 的輸出，之前的票沒有這一項 | `人工`：由 verify 階段的 fresh agent | [`docs/constitution-features/README.md`](../constitution-features/README.md) 的 `verify` stage |
 | `056` 上線前 gate 的機械項 G-1、G-2、G-5–G-8 | 指定票的結論、佔位字串、釋字第 272 號回到線上、`noindex` 綁定、建置與型別 | 清單以外的內容錯誤 | `機械`：各項指令在 `056` 票第三節〈Gate 執行清單〉 | [`docs/constitution-features/_archive/056-pre-launch-checklist.md`](../constitution-features/_archive/056-pre-launch-checklist.md) 第三節 |
 | `056` 上線前 gate 的人工項 G-3、G-4 | Vercel 的實際設定；三項明確接受的風險 | — | `人工（有記錄）`：由 captain，簽字記在 `056` 票的 `### Feedback Cycles` | 同上 |
 | `067` 內容查核 M 層 | 號次不存在、號次與年份不配、門檻數值漂移、日期順序倒退、同段紀年混用、文件路徑指向已封存的檔 | 佔位字串與釋字第 272 號（那是 `056` 的 G-5、G-6）。需要理解語意的錯誤 | `機械`：`node scripts/content-audit.mjs check`，全過時離開碼 0 | [`docs/constitution-features/_archive/systematic-chinese-content-legal-audit.md`](../constitution-features/_archive/systematic-chinese-content-legal-audit.md) `## Design` 第三節 |
@@ -141,17 +141,17 @@
 
 ## 7. 上線前檢查
 
-移除 `noindex` 的條件寫在 `docs/health-check/TODO.md` 的 P3-8。本文不抄條件，用下面的指令印出（在 repo 根目錄執行）：
+**一、P3-8 的解除條件以下列指令印出。** 條件寫在 `docs/health-check/TODO.md` 的 P3-8。本文不抄條件。在 repo 根目錄執行：
 
 ```bash
 awk '/^### P3-8/{s=1;next} /^### /{s=0} s && /解除條件/' docs/health-check/TODO.md
 ```
 
-條件引用的檢查：
+指令印出的每一條都是移除 `noindex` 的條件。2026-09-21 加入的那一條指向 `056` 的 G-1 至 G-8：八項全數通過才可移除。完整清單與每一項的指令在 [`docs/constitution-features/_archive/056-pre-launch-checklist.md`](../constitution-features/_archive/056-pre-launch-checklist.md) 第三節〈Gate 執行清單〉。
 
-- **`056` 的 G-1 至 G-8**：八項全數通過才可移除 `noindex`。完整清單與每一項的指令在 [`docs/constitution-features/_archive/056-pre-launch-checklist.md`](../constitution-features/_archive/056-pre-launch-checklist.md) 第三節〈Gate 執行清單〉。
-- **`067` 的 `check`（M 層）**：`node scripts/content-audit.mjs check`。
-- **`067` 的閱讀清單（L 層、H 層）**：由學者讀。見第 5 章。
+**二、`067` 的 `check`。** captain 於 2026-09-29 決定把 `node scripts/content-audit.mjs check` 綁進 P3-8，施工單是 feature `069`。這一條以 P3-8 的正本為準：它出現在上面指令的輸出裡，才算條件。
+
+**`067` 的閱讀清單（L 層、H 層）不是 P3-8 的條件。** 它是交給學者的人工查核，見第 5 章。
 
 **分工**：`067` 不掃佔位字串，也不管釋字第 272 號。那兩項是 `056` 的 G-5 與 G-6。
 
@@ -178,7 +178,7 @@ awk '/^### P3-8/{s=1;next} /^### /{s=0} s && /解除條件/' docs/health-check/T
 for n in 039 042 043 047 049 050 051 052 053 062 067 069; do f=$(grep -l "^id: $n\$" docs/constitution-features/*.md docs/constitution-features/_archive/*.md 2>/dev/null | head -1); if [ -n "$f" ]; then echo "$n $(grep -m1 '^status:' "$f") $(grep -m1 '^verdict:' "$f") $f"; else echo "$n NOT FOUND"; fi; done
 ```
 
-指令以 frontmatter 的 `id:` 找檔，不靠檔名。`067` 與 `069` 的檔名沒有編號前綴。
+指令以 frontmatter 的 `id:` 找檔，不靠檔名。
 缺口表新增或刪除一列時，同步修改這條指令的票號清單。
 
 ## 9. 本文怎麼保持正確
