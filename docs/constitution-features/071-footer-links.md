@@ -10,7 +10,7 @@ score: 0.8
 worktree: .worktrees/spacedock-ensign-071-footer-links
 issue:
 pr:
-mod-block:
+mod-block: merge:pr-merge
 gates:
     version: 1
     records:
@@ -73,6 +73,17 @@ gates:
                 id: briefing:071:review:attempt-2:revision-1
                 digest: sha256:2762bdd5a51a5d14644d055d69ec88d919557885f1347d7c555230916f686c6f
                 room-ref: '@review/review/briefing-2'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:071:review:2
+                briefing: briefing:071:review:attempt-2:revision-1
+                by: person:captain
+                at: "2026-09-29T22:14:45.097059Z"
+                decision: approve
+                reason: 'Captain approved 071 review (rework) in chat 2026-09-29: email item per ruling, AC addendum matches, 0 test failures after merging main. 375px email-label visual check not explicitly confirmed.'
+              application:
+                target-stage: complete
+                state: pending
 ---
 
 全站頁尾的外部連結有多處錯誤。captain 2026-09-29 裁示：原始碼一律指向 `https://github.com/ipaaa/constitution`；不列 HackMD；「內容錯誤回報」也指向正確的 GitHub。
