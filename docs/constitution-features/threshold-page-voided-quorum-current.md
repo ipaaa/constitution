@@ -1,13 +1,13 @@
 ---
 id: 068
 title: 門檻分析頁把已失效的 10 人／9 人門檻標為現行
-status: design
+status: implement
 source: constitution-features/067 design 新發現第 3 項（captain 2026-09-29 核准開票）
 started: 2026-09-29T17:14:59Z
 completed:
 verdict:
 score: 0.85
-worktree:
+worktree: .worktrees/spacedock-ensign-threshold-page-voided-quorum-current
 issue:
 pr:
 mod-block:
