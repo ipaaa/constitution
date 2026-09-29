@@ -1,10 +1,11 @@
 ---
 title: 全站生成中文內容的系統性法律事實查核
-status: design
+status: implement
 score: 0.9
 source: FO 2026-09-24，captain 指示「等 056 收斂後開」
 id: 067
 started: 2026-09-29T16:52:37Z
+worktree: .worktrees/spacedock-ensign-systematic-chinese-content-legal-audit
 ---
 
 **⛔ 不得派工，直到 feature `056-pre-launch-checklist` 封存為止。** 這是 captain 2026-09-24 的明確排序：
