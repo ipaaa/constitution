@@ -7883,3 +7883,52 @@ exit 0；逐字印出 40 筆與 16 筆兩行；sandbox 內兩檔 sha256 為 `4d1
 - `src/data/` 未變動；main 上未提交；同步只讀試算表。
 - AC-6 只加授權的一行與更正框；AC-1 至 AC-5、AC-7 未動。
 - 未改 `scripts/`。CSV 快取問題由 FO 另開票（main 上已有 `sync-csv-loading-snapshot.md`），本票不修程式。
+
+## 部署窗口記錄（續三）：分支對齊與實作後文件更新（2026-09-29）
+
+### 一、分支對齊（FO 授權的同階段對齊）
+
+- 第一次：以一般 `git merge` 把本機 main（`657e015`）併入本分支，得 `f25a5c9`。
+  唯一衝突是本票。**解法：frontmatter 逐位元組取 main（含 `gates:`），本文取本分支。** 兩者以 `cmp` 確認。
+- 第二次：main 前進到 `8779ca9`，同樣方式併入，得 `c32d6bb`，無衝突。
+- 驗證：`git diff --stat main HEAD` 排除本票後，只剩本節第二段列出的五個文件。main 帶進來的其餘內容與 main 逐位元組相同。
+- 未 push、未動 main、未 rebase、未 force。
+
+### 二、〈實作後更新〉逐列執行（commit `5f0bbff`）
+
+| 文件 | 做了什麼 |
+|---|---|
+| `docs/content-pipeline/operations.md` | 新增〈正式 SSOT 部署〉一節：欄位位置、12 個保護範圍、1000 列限制、行為驗收、新增欄位時的順序。對過時的四句（`:5` 未部署、`:12` probe 但書、`:41` 前提、`:79` probe 尚未執行）各追加 ⚠️ 補述，原句保留。另記 `載入中…` 的暫時性失敗並指向 `sync-csv-loading-snapshot` 票。`最後查核` 改為 2026-09-29 |
+| `docs/content-pipeline/design.md` | 第二節檔首補述下方追加 ⚠️ 補述，列出三個分頁實際多出的欄（依 2026-09-29 發布版 CSV 標題列：18／21／12 欄）。第五節施工順序表追加第 11 列。文末追加修訂紀錄。054 已補的兩則（`b4807cc`）未重複 |
+| `docs/health-check/TODO.md` | P2-12 追加補述：完成條件 4、5 已成立，040 已合併，實際同步通過；標題不改。P3-7 追加補述：`chapter` 有技術用途，廢除要連程式一起改 |
+| `docs/health-check/2026-09-03-editor-onboarding.md` | `record` 文件，原文未動。文末新增〈補述〉：第 261 行 `reject_reason` 已解決；第 423–434 行順序正確但漏了「建欄當下舊 main 就同步不了」 |
+| `docs/INDEX.md` | 第 2 階段「一個例外」段落後追加補述：`operations.md` 已隨 040 進 main。四份被更新文件的 `最後查核` 改為 2026-09-29 |
+
+本票〈實作後更新〉原寫的 `editor-onboarding.md` 行號（第 261 行、第 425-430 行）有漂移：`reject_reason` 那句實在第 261 行（相符），順序那段實為第 423–434 行。補述以實際行號為準。
+`git diff main HEAD` 中五個文件的刪除行只有 `最後查核` 日期欄（INDEX 四列、operations.md 一行）。沒有刪任何原句。
+
+### 三、〈不更新〉兩列重判
+
+| 文件 | 原判 | 重判 |
+|---|---|---|
+| `AGENTS.md` | 不更新 | **判斷已不成立。** main 的 `AGENTS.md` 第 1 條現寫「正式 SSOT 尚未套用核可版本綁定。兩帳號隔離 probe 完成前，不得部署…」，這兩句已是假的。**本票不動它**：feature 054 帶有 captain 核准的替換文字，由 054 執行。 |
+| `docs/project/` 全部 | 不更新 | **維持不更新。** `tech-stack.md` 的過時句 054 已補述（`b4807cc`）。`contributing.md` 描述的 Review 選單與重新核可流程在部署後成立。`architecture.md` 無相關敘述。 |
+
+`docs/INDEX.md`：本輪沒有新增或刪除文件，不需新增索引列。
+
+## Stage Report: review (deployment window, AC-2 retry／AC-6／docs)
+
+- DONE: AC-2 retry：不落地版連續 3 次通過後，實際同步一次
+  不落地 4 次得 `1／0／0／0`（第 1 次 36 行「載入中」）；`19:52:11Z` `npm run sync-content` exit 0，40／16 兩行逐字，`src/data/` 無 diff、sha256 同基準。main 上未提交。
+- DONE: AC-6 一次性 `Verified by:` 修正並重跑
+  加一行複製 `content-fingerprint.mjs`，更正框保留原行。照原文重跑為假通過（`/var` 與 `/private/var` 不等，`main()` 未執行，exit 0 無輸出）；以 `pwd -P` 等效執行 exit 0、40／16、sha256 同基準。`pwd -P` 修正超出授權，待 FO／captain 決定。
+- DONE: 實作後文件更新（operations.md、design.md、editor-onboarding、TODO P2-12／P3-7、INDEX）與〈不更新〉兩列重判
+  `5f0bbff`；只有追加與 `最後查核` 日期，原句全留。`AGENTS.md` 重判為需要更新，但交由 054；`docs/project/` 維持不更新。
+- DONE: 合併 main 進本分支並記錄解法
+  `f25a5c9`（main `657e015`，本票取 main 的 frontmatter＋本分支本文）、`c32d6bb`（main `8779ca9`，無衝突）。排除本票後與 main 的差異只有五個文件。新 HEAD 見本報告的 commit。
+- DONE: CSV 快取問題不在本票修程式
+  `scripts/` 零變動；operations.md 只記現象並指向 FO 開的票。
+
+### Summary
+
+AC-2 已通過：實際同步 exit 0，內容逐字未變。AC-6 修正後在合併後的 main 上成立，但票內指令在 macOS 上會假通過，`pwd -P` 的修正待授權。實作後文件義務全部執行，只追加不改寫；`AGENTS.md` 的過時句留給 054。本分支已兩次對齊 main，除本票與五個文件外與 main 相同。
