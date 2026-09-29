@@ -9,7 +9,7 @@ verdict:
 score: 0.85
 worktree: .worktrees/spacedock-ensign-threshold-page-voided-quorum-current
 issue:
-pr:
+pr: "#45"
 mod-block: merge:pr-merge
 gates:
     version: 1
