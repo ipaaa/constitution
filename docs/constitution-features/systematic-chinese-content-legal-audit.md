@@ -374,8 +374,8 @@ M6 的路徑修復必須等 `check` 先證明抓得到（AC-7），所以放在�
 - DONE: Prove every AC-1..AC-10 with its stated failing change; the end value is that running the tool on the real repo surfaces the known seeds (controversy-timeline.ts:156/:180 and quizzes/controversy.ts:87, RulingThresholdNote.tsx:55, the archived-063/056 paths) and AC-3 reproduces 065's error from 06ddfb1.
   實跑 `check`（離開碼 1）：`M1=0 M2=0 M3=0 M4=1 M5=2 M6=1`。M4 報 `evt-09`→`evt-10`（`controversy-timeline.ts:164`）；M5 報 `RulingThresholdNote.tsx:56` 與 `threshold-analysis.ts:238`。修復前 M6 報 24 處，含 `data-collection-guide.md:98`、`TODO.md:431`、`layout.tsx:8`、`AGENTS.md:61`、TODO 的 9 處 `../` 相對路徑，另新發現 `038`／`041` 三處；`operations.md` 未被報。修復後 `G-7 PASS [place1=1/1 place2=1 place3=1]`。AC-3：`--root` 指向 `06ddfb1` 的 worktree，M2 報 `src/app/present/page.tsx:18`（year 2024，114憲判1 作成於 2025-12-19）；本分支 M2 為 0。AC-8：快照的 L1-a 組同時含 `:156`、`:180`、`quizzes/controversy.ts:87`。
   測試逐項對應的會失敗改動（每一項都實際改壞再跑，皆轉紅後還原）：AC-1 在 M 層加佔位字串規則／把 272 列禁／把「目前、仍」加進 M3；AC-2 拿掉 NFKC、`憲判` 必須帶 `字`、上限寫死 813；AC-3 `.tsx` 不抽物件常值；AC-4 期望值寫死 10／9；AC-5 拿掉順序檢查；AC-6 `.tsx` 不代入 `@/data` 識別字；AC-7 路徑只認 `docs/` 開頭；AC-9 H 節只列公開檔。AC-8 以 CLI 驗：詞彙群拿掉「同意權」時 `:87` 掉出組外。
-- FAILED: No regressions: npx tsc --noEmit and existing tests pass; never run npm run sync-content.
-  `rm -rf .next && npx tsc --noEmit` 通過；兩個 `.json` 的 sha256 與基準相同（`4071978a…3162`、`4d1992e3…ea3b`）；`interpretation-dates.json`、`threshold-analysis.test.mjs`、`check-voided-floor.mjs` 與 `a5786cc` 無差異；noindex 仍在；未執行 sync。**但 `node --test tests/threshold-analysis.test.mjs` 失敗**：`SPEC_PATH`（`:141`）讀 `012` 封存前的路徑，`ENOENT`。這在未改動的 `d187d9e` 上同樣失敗，不是本分支造成。暫時把該路徑改為 `_archive/` 後，基準與本分支都是 32 過、0 失敗，改動已還原。設計把該檔列為不更新，故未修，記入 TODO P1-10 第 7 項。
+- DONE: No regressions: npx tsc --noEmit and existing tests pass; never run npm run sync-content.
+  `rm -rf .next && npx tsc --noEmit` 通過。`node --test 'tests/*.test.mjs'`：49 項，48 過、0 失敗、1 略過（`THRESHOLD_LIVE` 線上比對）；其中 `threshold-analysis.test.mjs` 為 33 項，32 過、0 失敗、1 略過。該檔原本整份失敗：`:141` 的 `SPEC_PATH` 讀 `012` 封存前的路徑（`ENOENT`）。未改動的基準 `d187d9e` 同樣失敗，屬既有問題，不是回歸。經 FO 授權，只把該路徑改為 `_archive/`，未動任何斷言或測試邏輯。兩個 `.json` 的 sha256 與基準相同（`4071978a…3162`、`4d1992e3…ea3b`）；`interpretation-dates.json` 與 `check-voided-floor.mjs` 與 `a5786cc` 無差異；noindex 仍在；未執行 sync。
 
 ### 偏離與待 FO 判斷
 
@@ -383,7 +383,7 @@ M6 的路徑修復必須等 `check` 先證明抓得到（AC-7），所以放在�
 2. **AC-7「修復後 M6 零失敗」未達成，剩 1 處**：`src/app/about/page.tsx:38` 是渲染在 `/about` 上的讀者文字，不是註解。設計限定 `src/` 只改註解、不改執行期輸出，因此未改。記入 TODO P1-10 第 6 項。改不改需要一個文案決定。
 3. **AC-8 的「漏掉否決」不會使 AC-8 失敗**：`:180` 的句子另含「提名」，仍會入組。「漏掉同意權」會失敗（已實測）。
 4. **超出 LOC 容差**：新增約 +1,267 行（含註解），估計 +750 ±35%（上限約 1,012）。多出的部分在 JSX 段落切分、`--root` 的解析掛鉤、H 層的路由 import 圖。
-5. **M6 的掃描範圍漏了 `tests/`**：第 3 項的斷路徑就在 `tests/`。擴大範圍屬規格變更，未做。
+5. **M6 的掃描範圍漏了 `tests/`**：`threshold-analysis.test.mjs:141` 的斷路徑就在 `tests/`，已依 FO 授權手動修復。M6 未擴大範圍，擴大屬規格變更，留給 verify 判斷。
 
 ### Summary
 

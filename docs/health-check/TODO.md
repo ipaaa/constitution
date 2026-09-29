@@ -702,7 +702,6 @@ done | sort -rn | head -12
 | 4 | `src/data/controversy-timeline.ts:144`、`:156`、`:180`，`src/data/quizzes/controversy.ts:87`，`src/data/future.ts:416` | 立法院對大法官提名做了什麼，各處說法不一致：「不審查」「投票否決」「拒絕行使同意權」。哪一種正確、或是否分屬不同時點，需對照立法院議事紀錄判定 | L1（人判） | PR |
 | 5 | `src/data/threshold-analysis.ts:323-336` | 門檻期 `id: 'current'` 把已失效的第 30 條第 2 項標為現行門檻（`label: '10 人 9 人'`、`effectiveTo: null`）。`/past/thresholds` 全頁沒有任何失效敘述。`066` 的 `check-voided-floor.mjs` 當時未跑這條路由 | 無（屬 `066` 的錯誤類型） | PR，另開票。修它會動到 `tests/threshold-analysis.test.mjs` 以 `'current'` 為錨的斷言 |
 | 6 | `src/app/about/page.tsx:38` | 讀者看得到的文字請讀者去看 `about-content.md` 的舊位置。該檔已封存到 `docs/_archive/`，內容只有「（待撰寫）」。`067` 只修註解內的路徑，這一處是渲染文字，未改 | M6 | PR，需先決定文案 |
-| 7 | `tests/threshold-analysis.test.mjs:141` | `SPEC_PATH` 指向 `012` 封存前的路徑，整份測試在讀檔時就失敗（`ENOENT`）。改成 `_archive/` 路徑後 32 項通過、0 項失敗。`067` 的 M6 不掃 `tests/`，這一處是實跑 `012` 測試時發現的 | 無 | PR，另開票（`012` 的網子，`067` 不改） |
 
 - **另待 captain 決定：全站紀年慣例**。站上民國與西元兩套並存，未統一。
   `067` 的預設建議：敘述用西元；判決字號保留民國；引用官方文字時保留民國並括號附西元。

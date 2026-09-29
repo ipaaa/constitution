@@ -138,7 +138,7 @@ const SCANNED_SOURCES = [
 const stripComments = (src) =>
   src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^[ \t]*\/\/.*$/gm, '');
 
-const SPEC_PATH = 'docs/constitution-features/012-threshold-case-analysis.md';
+const SPEC_PATH = 'docs/constitution-features/_archive/012-threshold-case-analysis.md';
 const SPEC = fs.readFileSync(path.join(ROOT, SPEC_PATH), 'utf8');
 
 /**
