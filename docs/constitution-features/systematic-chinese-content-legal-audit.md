@@ -6,6 +6,17 @@ source: FO 2026-09-24，captain 指示「等 056 收斂後開」
 id: 067
 started: 2026-09-29T16:52:37Z
 worktree: .worktrees/spacedock-ensign-systematic-chinese-content-legal-audit
+gates:
+    version: 1
+    records:
+        - id: gate:067:verify
+          stage: verify
+          attempts:
+            - id: gate-attempt:067-verify-1
+              briefing:
+                id: briefing:067:verify:attempt-1:revision-1
+                digest: sha256:0b580cc14d1da66eb579e41a5fab4f2bb820b6825e9889a283b98d55b3140f87
+                room-ref: '@review/verify/briefing-1'
 ---
 
 **⛔ 不得派工，直到 feature `056-pre-launch-checklist` 封存為止。** 這是 captain 2026-09-24 的明確排序：

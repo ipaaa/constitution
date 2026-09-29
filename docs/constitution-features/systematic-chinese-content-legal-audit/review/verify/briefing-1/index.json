@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:067:verify:attempt-1:revision-1",
+  "question": "Approve 067 verify (PASSED) and advance to review?",
+  "artifacts": [
+    {
+      "id": "artifact:067:verify:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/4fd07850602837fb71b79d3f63980b68be07cf22/docs/constitution-features/systematic-chinese-content-legal-audit.md",
+      "rev": "sha256:0a151f3f414a068efac812f0ba2fab916fc4f71349a3bd33ad084a02620b22c9",
+      "mediaType": "text/markdown",
+      "summary": "Independent verify re-ran the audit tool and checked every shipped legal fact against 司法院／全國法規資料庫 primary pages: 58 憲判 rulings, the 10/9 threshold, 35 釋字 dates — 0 errors. AC-1..AC-10 each turned red under a stated failing change (17/18 mutations; the 18th is the declared AC-8 deviation, AC-8 still falsifiable). No Material findings. Two captain decisions: accept +1,267 LOC over the ~1,012 ceiling; wording for /about:38 archived path."
+    }
+  ]
+}
