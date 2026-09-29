@@ -54,8 +54,8 @@ docs/
 
 | 路徑 | 用途 | 狀態 | 負責人 | 最後查核 |
 |---|---|---|---|---|
-| `docs/content-pipeline/design.md` | 產線的唯一規格；現行機制見〈修訂紀錄〉2026-09-03 feature 040 條目，第二至第五節為已取代的舊模型 | plan | captain | 2026-09-04 |
-| `docs/content-pipeline/operations.md` | 核可、拒絕、重新核可、同步錯誤與復原步驟；兩帳號 probe 由 feature 044 承接 | evergreen | captain | 2026-09-04 |
+| `docs/content-pipeline/design.md` | 產線的唯一規格；現行機制見〈修訂紀錄〉2026-09-03 feature 040 條目，第二至第五節為已取代的舊模型 | plan | captain | 2026-09-29 |
+| `docs/content-pipeline/operations.md` | 核可、拒絕、重新核可、同步錯誤與復原步驟；兩帳號 probe 由 feature 044 承接 | evergreen | captain | 2026-09-29 |
 | `docs/content-pipeline/data-collection-guide.md` | T3（未來軌）的資料收集流程。T1／T2 已移除，改指向 `design.md` | evergreen | captain | 2026-09-21 |
 | `docs/content-pipeline/approval-permission-probe.md` | 隔離測試表兩帳號 probe 記錄。核可欄位權限邊界與 `status` 公式重算的實測證據 | record | — | 2026-09-15 |
 
@@ -64,8 +64,8 @@ docs/
 | 路徑 | 用途 | 狀態 | 負責人 | 最後查核 |
 |---|---|---|---|---|
 | `docs/health-check/2026-08-31-content-pipeline.md` | 體檢報告。出了什麼事、為什麼會上線。**含兩則補述，先看上方** | record | — | 2026-09-01 |
-| `docs/health-check/2026-09-03-editor-onboarding.md` | 學者編輯上稿流程稽核。開放編輯權限後還開著的洞、使用說明改寫對照、會議講稿 | record | — | 2026-09-03 |
-| `docs/health-check/TODO.md` | 待辦清單；含 feature 040 與多人編輯、正式同步的前置關係 | plan | captain | 2026-09-24 |
+| `docs/health-check/2026-09-03-editor-onboarding.md` | 學者編輯上稿流程稽核。開放編輯權限後還開著的洞、使用說明改寫對照、會議講稿 | record | — | 2026-09-29 |
+| `docs/health-check/TODO.md` | 待辦清單；含 feature 040 與多人編輯、正式同步的前置關係 | plan | captain | 2026-09-29 |
 
 ### 驗證腳本
 
@@ -176,6 +176,11 @@ docs/
 > `git ls-tree main docs/content-pipeline/` 只有 `design.md` 與 `data-collection-guide.md` 兩檔。
 > `operations.md` 只存在於 feature 040 的 worktree，尚未合併。040 合併後才需要改這一列。
 > 原表格與原句保留。
+
+> ⚠️ **2026-09-29 補述：上方「040 合併後才需要改這一列」的條件已成立，`operations.md` 已在 main。**
+> feature 040 已於 PR #43 合併（merge commit `e98ed02`），`operations.md` 隨之進入 main。
+> 它在上方〈文件〉表已有一筆索引。上表「（新增）」那一列可視為完成。
+> 2026-09-29 feature 050 在該檔新增〈正式 SSOT 部署〉一節，並對過時的四句追加補述。原句保留。
 
 ### 第 4 階段 — 防漂移檢查（captain 已核准）
 

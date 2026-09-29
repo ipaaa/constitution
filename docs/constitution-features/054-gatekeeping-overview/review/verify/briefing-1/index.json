@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:054:verify:attempt-1:revision-1",
+  "question": "Approve 054 verify (cycle 2 PASSED) and advance to review?",
+  "artifacts": [
+    {
+      "id": "artifact:054:verify:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/cf493600cfd1d95e176deeab60d4b0f8f75c008b/docs/constitution-features/054-gatekeeping-overview.md",
+      "rev": "sha256:c56971f0091a7793fc9f61d220d33c4530aed9763812cae29600259ee46124fe",
+      "mediaType": "text/markdown",
+      "summary": "Cycle 1 rejected on V1 (reading list presented as a P3-8 condition; fresh reader 7/8) and V2 (unsourced date). FO authorized V1–V5 fix, V6 carried to 064, V7 no action. Re-verify PASSED: V1–V5 corrected against canonical sources; a new fresh reader answered the captain's 8 questions from gatekeeping.md alone, 8/8, Q7 correct. design.md §六 row 7 now byte-identical to approved (b); AGENTS.md (a)(b)(c) byte-identical to captain-approved text and unchanged since; symlink intact. AC-3/4/6 pass, 056 G-7 PASS, content-audit no new failures. Known limit recorded: the existing review caught an overview omission in 1 of 2 AC-1 rounds."
+    }
+  ]
+}
