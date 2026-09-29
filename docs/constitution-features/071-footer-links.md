@@ -1,13 +1,13 @@
 ---
 id: 071
 title: 頁尾連結指向錯誤的 GitHub 與 HackMD
-status: design
+status: implement
 source: captain 2026-09-29（聊天中直接要求開票）
 started: 2026-09-29T20:11:16Z
 completed:
 verdict:
 score: 0.8
-worktree:
+worktree: .worktrees/spacedock-ensign-071-footer-links
 issue:
 pr:
 mod-block:
