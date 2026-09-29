@@ -470,3 +470,41 @@ Verified by: 新測試四格。
 重抓放在抓取層，040 的驗證函式與 `content-fingerprint.mjs` 逐位元組未動；入口判斷改為 realpath 比對，認不出時 `⛔ 入口判斷失敗` exit 1。唯讀實跑 10 次中有 3 次真的碰到未算完快照並自動恢復，輸出與 `src/data` 相同。
 給 FO 的旗標：(1) 與 064 合併：程式碼無衝突，合併樹上兩票測試 84/84 通過；但 `design.md` 修訂紀錄兩票都在檔尾追加，會有一處 append-append 衝突，兩則都保留即可。為了相容 064 新增的 `../src/data/verified-case-refs.mjs` import，AC-9 的符號連結改指向 repo 的 `scripts/`，而不是複製兩個檔案（AC-9(a) 字面寫的是複製），否證力不變。
 (2) verify 做 AC-7(b) 時，若 064 已先合併，`buildTrack2` 與 `content-fingerprint.mjs` 會因 064 合法地與 main 不同；請改對 merge-base `cefeeee` 比對。(3) `threshold-analysis` 的 AC-7 守衛在 main 上已經失敗，是既有問題，需要另開票或由該票處理。
+
+## Stage Report: verify
+
+- DONE: Independently re-run AC-1..AC-9 against fixtures including each stated failing change, and confirm by diff against merge-base cefeeee that 040's 16 validation functions and content-fingerprint.mjs are byte-for-byte unchanged (AC-7(b)); verify the retry trigger is exact-match only (載入中… / Loading... / #NAME?) and a genuine fingerprint mismatch still fetches once and aborts the whole sync with the unchanged message.
+  `node --test tests/approval-content-version-binding.test.mjs`：67／67 通過。AC-7(b)：`git diff cefeeee -- scripts/content-fingerprint.mjs` 0 行；以兩種擷取法（到下一個頂層宣告、到第 0 欄 `}`）比對 16 個函式，16／16 相同；同一腳本在改一個字（`實際為`→`實際是`）後報 5 個 DIFF，證明比對有鑑別力。main 已含 064，所以依指示對 `cefeeee` 比對，未對 main。整份 diff 只動 CONFIG、`report` 結尾句、`fetchCSV` 注入參數、新抓取區塊、`main()` 一行、檔尾入口；`addError`、`rowKey`、欄位常數等被驗證函式呼叫的輔助程式也未動。AC-7(c)：測試檔 diff 沒有 `-` 行。
+  觸發條件：`PENDING_FORMULA_VALUES.includes(record[field])` 只掃 `DERIVED_FIELDS`；`toRecords` 已 trim，符合「去掉頭尾空白後完全等於」。
+  否證演練在 scratchpad 複本執行（`git archive HEAD`，worktree 未改動），每項改壞、跑測試、還原：
+  重抓上限 1 → AC-1/2/4/5/6(a) 失敗；上限 2 → AC-1/2/6(a) 失敗；上限 9 → AC-1/2 與間隔單元測試失敗（證明「恰 8 次」被量到）。
+  拿掉投影比對 → 只有 AC-5 失敗。重抓後改採先前的未算完快照 → AC-1/5/6(a) 失敗。
+  用盡時把快照交給驗證 → AC-2 失敗；拿掉結尾句分支 → AC-2、AC-5 失敗。
+  改成掃所有欄 → AC-6(b) 失敗；清單拿掉 `#NAME?` → AC-6(a) 失敗。
+  算完的快照也一直重抓 → AC-3（請求次數 >1）、AC-4 等失敗。在 `checkStatusValues` 放行 `載入中…` → AC-7(a) 失敗。
+  入口改回字串比對 → AC-9(a)(b)(c) 失敗；mismatch 當 import → AC-9(c) 失敗；一律執行 → AC-9(c)(d) 失敗。還原後 67／67。
+  觀察（不列 finding）：只在衍生欄內改成子字串比對，測試不會失敗。三個清單值不會出現在正常指紋或 `#FINGERPRINT! …` 裡，所以行為等價，無害。
+- DONE: Re-run the read-only live check yourself (several no-write syncs with pwd -P temp paths): every successful run byte-identical to src/data, any retry visible in stderr, and no run that exits 0 without writing both files; confirm the entry-point fix makes a symlinked or /var invocation fail loudly instead of silently exiting 0.
+  10 次唯讀實跑（`node --env-file=<repo>/.env.local scripts/sync-content.mjs`，`CONTENT_OUTPUT_DIR` 為 `pwd -P` 暫存目錄，21:36:02Z–21:42:00Z）：10／10 exit 0，兩個 JSON 的 sha256 都等於 `src/data`，每次都印 `🚀 Starting Content Sync...` 與兩行 `✅ 檢查通過`，stderr 皆 0 byte。6 次發生重抓（重抓 7、1、1、2、1、3 次）。重抓通知依設計印在 **stdout**，不是 stderr；checklist 寫 stderr 與設計不符，以設計為準。
+  入口判斷（`/var/folders/…` 暫存目錄，三個 CSV 網址為空）：`cefeeee` 的程式複製到 `/var` 路徑 → exit 0、零輸出（重現原缺陷）；本分支複製到 `/var` 路徑、經符號連結目錄執行 → 兩者都 exit 1，stderr `環境變數未設定`；另一個也叫 `sync-content.mjs` 的檔案匯入本程式 → exit 1，stderr `⛔ 入口判斷失敗`。
+  `git status --short src/data` 在 repo 與 worktree 都沒有輸出。
+- DONE: Check the operations.md and design.md updates against delivered behavior (070 link fixed, messages match code verbatim), placeholder scan over the diff, tsc and build pass, only the known pre-existing test failure; confirm no sync-content run and no spreadsheet write.
+  operations.md〈同步〉連結改為 `070-sync-csv-loading-snapshot.md`，檔案存在。新補述的四句訊息都與程式字串逐字相符（重抓通知、`第 N 次抓到算完的發布版`、`發布版連續 8 次都還沒算完`、`重抓期間發布內容改變了`、結尾 `…不是內容錯誤。等 5 分鐘後重試。`）。間隔 10/10/20/30/45/60/90 與 265 秒上限都相符。原句都保留，只有連結那一行被改，這一行是 checklist 要求的修正。design.md 修訂紀錄的描述與 diff 相符。
+  佔位資料掃描：diff 的 `+` 行沒有 `某學者`、`某大學法律系`、`lorem ipsum`、`快速了解最新判決的5個重點`。`test` 只出現在測試檔的 `test(`、`t.test(` 與 fixture 網址 `example.test`。`src/` 零變動，沒有資料檔。
+  `npx tsc --noEmit` exit 0。`npm run build` exit 0，前後 `src/data/*.json` 的 sha256 相同。全套 `node --test tests/*.test.*`：116 項，114 過、1 skip、1 失敗；失敗的是 `threshold-analysis` 的 AC-7，是已知問題，由 068 修正。
+  本階段沒有執行 `npm run sync-content`。對試算表只做唯讀 GET：10 次同步，以及 14 次 `curl` 探測。
+
+### Findings
+
+- F1（Deferred risk，交 FO）：重抓預算在實測中用到最後一次。實跑第 1 次（21:36:02Z 起）連續 7 次拿到 `Track 2` 36 列 `載入中…`，第 8 次才成功，共等 265 秒。
+  - 使用者與流程：編輯發布內容時執行同步。
+  - 可觀察的傷害：若第 8 次也是未算完快照，同步會失敗，編輯要等 5 分鐘重跑。錯的內容不會上線，零寫入，訊息也正確指出不是內容錯誤。
+  - 相關 AC 或邊界：影響 AC-8 的「10 次全部 exit 0」。design 的重播是 0／240 失敗，當時最長連續 6 次（約 60 秒），且 design 已註明「不能證明 8 次一定夠」。040 的邊界沒有受影響。
+  - 觸發證據：本次實跑記錄。之後 14 次 `curl` 探測（21:43–21:45Z）有 3 次未算完，沒有再出現長段。
+  - 升級為 Material 的條件：真實同步因 `快照  發布版連續 8 次` 失敗，或重跑後仍失敗。
+  - 次數與間隔是 captain 核准的規格值。是否調整由 captain 決定，本票不改。
+- F2（Polish）：spacedock 完成時會把票移到 `_archive/`，operations.md 指向 `070-…` 的連結屆時會失效。`050` 的連結（operations.md:39）已經是這種狀況，所以這是既有的通用模式，不是 070 造成的。
+
+### Summary
+
+PASSED。AC-1 至 AC-9 全部由我獨立重跑通過，AC-8 也通過（10／10 exit 0，輸出與 `src/data` 相同，6 次實際重抓）。14 項否證演練都讓對應測試失敗，還原後全綠。另一項（只在衍生欄內改成子字串比對）不會讓測試失敗，但行為與原本等價，見報告內的觀察。040 的 16 個函式與 `content-fingerprint.mjs` 對 `cefeeee` 逐位元組相同。入口修正讓 `/var` 路徑與符號連結路徑正常執行；認不出入口時 exit 1。F1 記錄一次用到第 8 次才成功的實跑，屬 Deferred risk，交由 FO 或 captain 決定是否調整重抓預算。
