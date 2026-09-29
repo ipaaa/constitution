@@ -35,6 +35,8 @@ Google 試算表是內容唯一真相。不要手改 `src/data/*.json`。
 
 詳細操作見 [`../content-pipeline/operations.md`](../content-pipeline/operations.md)。
 
+各角色能改什麼、有哪些把關與缺口，見 [`docs/content-pipeline/gatekeeping.md`](../content-pipeline/gatekeeping.md)。
+
 ## 驗證指令
 
 ```bash
