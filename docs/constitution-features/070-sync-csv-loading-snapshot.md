@@ -1,13 +1,13 @@
 ---
 id: 070
 title: 同步讀到「載入中…」快照時隨機整份中止
-status: design
+status: implement
 source: 050 AC-2 正式同步失敗（2026-09-29），captain 同日核准開票
 started: 2026-09-29T19:52:07Z
 completed:
 verdict:
 score: 0.8
-worktree:
+worktree: .worktrees/spacedock-ensign-070-sync-csv-loading-snapshot
 issue:
 pr:
 mod-block:
