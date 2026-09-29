@@ -1,16 +1,16 @@
 ---
 id: 071
 title: 頁尾連結指向錯誤的 GitHub 與 HackMD
-status: review
+status: complete
 source: captain 2026-09-29（聊天中直接要求開票）
 started: 2026-09-29T20:11:16Z
-completed:
-verdict:
+completed: 2026-09-29T22:19:45Z
+verdict: PASSED
 score: 0.8
 worktree: .worktrees/spacedock-ensign-071-footer-links
 issue:
 pr: pr-merge:46
-mod-block: merge:pr-merge
+mod-block:
 gates:
     version: 1
     records:
@@ -83,7 +83,8 @@ gates:
                 reason: 'Captain approved 071 review (rework) in chat 2026-09-29: email item per ruling, AC addendum matches, 0 test failures after merging main. 375px email-label visual check not explicitly confirmed.'
               application:
                 target-stage: complete
-                state: pending
+                state: consumed
+archived: 2026-09-29T22:19:45Z
 ---
 
 全站頁尾的外部連結有多處錯誤。captain 2026-09-29 裁示：原始碼一律指向 `https://github.com/ipaaa/constitution`；不列 HackMD；「內容錯誤回報」也指向正確的 GitHub。
