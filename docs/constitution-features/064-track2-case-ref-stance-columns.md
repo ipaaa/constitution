@@ -1,7 +1,7 @@
 ---
 id: 064
 title: Track 2 新增 case_ref 與 stance 欄
-status: implement
+status: verify
 source: constitution-features/019 第二節（captain 2026-09-23 核准加欄）
 started: 2026-09-29T16:52:37Z
 completed:
@@ -574,3 +574,28 @@ captain 2026-09-29 決定：責任編輯填 `case_ref`／`stance`，captain 在�
 ### Summary
 
 兩欄照 design 3.2–3.5 實作。兩欄空白時指紋不變：050 的核可不必重做，舊公式配新程式算出同值。有人填值而公式未更新時，同步中止。design.md 補上 045 查出缺少的〈發布欄位範圍〉表。偏離 design 的有三處。第一，AC-3 的反向改動改用「刪半形空白」。第二，測試行數超出容許範圍，多出的是 Apps Script 假分頁測試，有三個反向改動只有它們抓得到。第三，INDEX 最後查核日未更新。另有一個 main 既有的測試失敗，待 FO 決定由誰修。
+
+## Stage Report: verify
+
+- DONE: Verify every factual value the branch ships against primary sources: each case_ref in src/data/verified-case-refs.mjs (ruling number, case name, decision date) against 憲法法庭 judgment pages, and the stance value list against design §三; run the placeholder scan over every new file and added line.
+  2026-09-29 以 `curl` 讀 `cons.judicial.gov.tw` 兩頁。`id=352966`：判決字號 `113年憲判字第9號【立法院職權行使法等案】`，判決日期 113年10月25日，案號 113年度憲立字第1號。`id=355485`：`114年憲判字第1號【憲法訴訟法修正案】`，114年12月19日，案號 114年度憲立字第1號。檔內鍵、`caseName`、`date`、`source` 四項逐字相符。`ALLOWED_STANCES` 與本票 3.1、`019` 第 3.1 節（`019-…md:107,116-118`）逐字相同，無政黨名、陣營名。佔位掃描涵蓋全部新增行與 `verified-case-refs.mjs`：無 `某學者`／`某大學法律系`／`lorem ipsum`／`快速了解…`。`test` 命中全在測試檔（`node:test`、`test(`、`RegExp.test`、`example.test` fixture 網址），沒有進入發布檔。`src/data/*.json` 對 main 無 diff。
+- DONE: Independently re-run the fingerprint parity claim (blank-row Node and Apps Script fingerprints byte-identical before/after for all 15 discussions + tldr, so 050's approvals stand), AC-4..AC-9 each under its failing change, and one no-write sync (CONTENT_OUTPUT_DIR temp; retry past 載入中… snapshots) proving output byte-identical to src/data.
+  指紋：base `8779ca9` 對分支，`discussions.json` 16 筆當 Track 2 列比 6 種算法（Node 舊／新／新＋空欄、GS 舊、GS 新＋舊公式、GS 新＋空欄）。另把 tldr 還原成 4 列 `site_tldr` 比 4 種算法。20 列 0 不符。反向改動（在拋棄式 worktree 改完即還原）：AC-4 `warn`／`in` 各 1 項失敗；AC-5 1 項；AC-6 1 項；AC-7 Node 不附加／無條件附加各 5 項，GS 參數排序號前 4 項，`fingerprintForSheetRow_` 不讀新欄 1 項，安裝公式不附加 1 項，Node 序號計入新欄 1 項；AC-8 1 項；AC-9 刪 `stance` 4 項，刪 `case_ref` 5 項，刪 `stance`＋清單改匯入 3 項（釘住測試不再紅）；AC-2 `required` 20 項；AC-3 `caseref` 9 項；AC-13 47 項。全部與 implement 的表一致。不落地同步：`2026-09-29T20:16:11Z`，路徑經 `pwd -P`，分支與 base 同時各跑一次。第一次就兩者 exit 0 且各寫出 2 檔。四份輸出與 `src/data` 的 sha256 都相同（`discussions.json` `4071978a…3162`、`history.json` `4d1992e3…ea3b`）。前後 `src/data/*.json` 不變。
+- DONE: Judge implement's deviations (AC-3 failing-change substitution, test LOC over tolerance, INDEX last-checked not updated) and confirm the deferred ACs (AC-1, AC-2(b), AC-11, AC-12) each carry an exact runnable check for their stage; the one failing test (threshold-analysis AC-7 (4)) must be the pre-existing one fixed on 068's branch, not new; confirm no sync-content run and no spreadsheet edit.
+  AC-3：重現刪 `（` 0 項失敗、刪空白 Node 9 項／GS 3 項。替代合理，因為 `operations.md` 第 2 步要求逐字輸入含空白的標題。行數超標：接受。GS 安裝公式與 `fingerprintForSheetRow_` 的反向改動只有多出的假分頁測試抓得到（已重現）。行數是 design 訂的容許值，放寬要 captain 在 gate 認可。INDEX：不算偏離。第九節把 INDEX 日期與 `data-collection-guide.md` 同列在「階段二完成時」。延後 AC：AC-1 有逐字 `node -e` 指令；AC-11 有四格手動程序；AC-2 (b) 與 AC-12 只有程序描述，**沒有逐字指令**，見 F1。唯一失敗：`threshold-analysis.test.mjs:1549`。base `8779ca9` 同樣失敗（101/99/1）。分支套上 068 分支（`threshold-page-voided-quorum-current`）的 `84962bb` 後為 118/117/0，失敗 0。不是本票造成。沒有跑 sync-content：`src/data` 對 main 無 diff，main 自 09-28 起無 `src/data/*.json` commit。沒有動試算表：正式表 `Track 2_discussion` 標題唯讀讀回為 21 欄（A=id … U=current_fingerprint），沒有 `case_ref`／`stance`。`npx tsc --noEmit` exit 0；`npm run build` exit 0，前後 sha256 相同。
+
+### Findings
+
+- **F1（延後風險，建議本票修）** AC-2 (b) 與 AC-12 延後到階段一／二，但延後表沒有逐字的不落地同步指令，也沒寫「必須寫出兩檔」。已重現 ticket 070 的陷阱：從 `/tmp/…` 符號連結路徑執行 `sync-content.mjs`，exit 0，沒有輸出，也沒有訊息。延後表的條件是「exit 0 且 sha256 相同」。操作者比對不存在的檔案時，這條件寫法不夠明確。建議在延後表補上下列指令，只改文件：
+  `OUT=$(mktemp -d); OUT=$(cd "$OUT" && pwd -P); REPO=$(pwd -P); CONTENT_OUTPUT_DIR="$OUT" node --env-file=.env.local "$REPO/scripts/sync-content.mjs"; test -s "$OUT/discussions.json" && shasum -a 256 "$OUT"/*.json`
+  失敗條件：`test -s` 不成立。
+- **F2（測試缺口，非阻擋）** 把 GS `fingerprintForSheetRow_` 的序號迴圈改成計入選填欄，0 項測試失敗。實害受限：`approval-workflow.gs:247` 會比對公式值並 throw，核可會被拒，不會放行（fail closed）。觸發條件是某列只填 `case_ref`／`stance`，且位在已核可列之上。
+- **F3（文字，非阻擋）** `design.md` 新表的註記寫「前三列抄自 `040`」。實際抄了四列（第 1、2、4、5 列）。四列逐字相符。
+
+### Verdict: PASSED
+
+白名單兩筆與一手來源逐字相符。`stance` 值域正確，佔位掃描乾淨。指紋等值、各 AC 的反向改動與不落地同步都已獨立重跑，結果與 implement 一致。沒有新失敗，沒有執行同步，也沒有動試算表。F1 是文件補強。它影響的是延後 AC 的執行品質，不影響本分支交付的程式或資料，所以不構成退回理由。修不修由 FO 決定。
+
+### Summary
+
+在 base、分支與拋棄式 worktree 上獨立重跑全部檢查：一手來源、指紋等值（20 列）、20 個反向改動、`tsc`、`build`，以及兩次不落地同步。所有 implement 的數字都重現成功。發現三項，都不阻擋：延後 AC-2 (b)／AC-12 缺逐字指令（F1，附指令）、一個 fail-closed 的測試缺口（F2）、一處文字誤差（F3）。行數超標需 captain 在 gate 認可。
