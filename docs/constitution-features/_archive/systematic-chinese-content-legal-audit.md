@@ -1,6 +1,6 @@
 ---
 title: 全站生成中文內容的系統性法律事實查核
-status: review
+status: complete
 score: 0.9
 source: FO 2026-09-24，captain 指示「等 056 收斂後開」
 id: 067
@@ -46,9 +46,12 @@ gates:
                 reason: 'Captain approved review (PASSED) in chat 2026-09-29: no regressions, design-conformant, docs impact complete; R1/R2 deferred (R2 fixed right after archive), R3-R7 Polish. Captain also decided: site calendar = 西元; H-layer read first by legal reviewer on the three PUBLIC_PAGES sources; bind check into P3-8 as a second 解除條件 (manual, not CI) — recorded for post-merge follow-up.'
               application:
                 target-stage: complete
-                state: pending
-mod-block: merge:pr-merge
+                state: consumed
+mod-block:
 pr: pr-merge:42
+verdict: PASSED
+completed: 2026-09-29T18:57:44Z
+archived: 2026-09-29T18:57:44Z
 ---
 
 **⛔ 不得派工，直到 feature `056-pre-launch-checklist` 封存為止。** 這是 captain 2026-09-24 的明確排序：
