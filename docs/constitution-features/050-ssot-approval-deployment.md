@@ -10,7 +10,7 @@ score: 0.95
 worktree: .worktrees/spacedock-ensign-050-ssot-approval-deployment
 issue:
 pr:
-mod-block:
+mod-block: merge:pr-merge
 gates:
     version: 1
     records:
@@ -54,6 +54,17 @@ gates:
                 id: briefing:050:review:attempt-2:revision-1
                 digest: sha256:da74450470eca06b29e840803167c1993e57bd100ed2ae944304c64f03434ec8
                 room-ref: '@review/review/briefing-2'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:050:review:2
+                briefing: briefing:050:review:attempt-2:revision-1
+                by: person:captain
+                at: "2026-09-29T20:12:13.998644Z"
+                decision: approve
+                reason: 'Captain approved 050 final gate in chat 2026-09-29 (「050 批准，接受親自確認」): live-SSOT deployment complete, AC-1/2/3/6 evidenced by S9 and post-merge runs; captain''s personal attestation accepted in place of AC-4 (30 cells) and AC-7 (18 cells) per-cell records with UTC time.'
+              application:
+                target-stage: complete
+                state: pending
 review-round:
     id: round:050:review:8
     stage: review
