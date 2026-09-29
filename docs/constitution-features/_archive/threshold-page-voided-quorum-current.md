@@ -1,16 +1,16 @@
 ---
 id: 068
 title: 門檻分析頁把已失效的 10 人／9 人門檻標為現行
-status: review
+status: complete
 source: constitution-features/067 design 新發現第 3 項（captain 2026-09-29 核准開票）
 started: 2026-09-29T17:14:59Z
-completed:
-verdict:
+completed: 2026-09-29T21:44:02Z
+verdict: PASSED
 score: 0.85
 worktree: .worktrees/spacedock-ensign-threshold-page-voided-quorum-current
 issue:
 pr: pr-merge:45
-mod-block: merge:pr-merge
+mod-block:
 gates:
     version: 1
     records:
@@ -51,7 +51,8 @@ gates:
                 reason: 'Captain approved 068 review in chat 2026-09-29 (「全部照建議」): review PASSED, Polish space fix applied. Captain did not explicitly report the desktop callout 6px visual check; approval given per FO recommendation.'
               application:
                 target-stage: complete
-                state: pending
+                state: consumed
+archived: 2026-09-29T21:44:02Z
 ---
 
 `/past/thresholds`（公開頁）把已失效的評議門檻當成現行法呈現。讀者會帶著錯誤的法律認知離開。
