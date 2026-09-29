@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:071:verify:attempt-2:revision-1",
+  "question": "Approve 071 verify (rework cycle, PASSED) and advance to review?",
+  "artifacts": [
+    {
+      "id": "artifact:071:verify:attempt-2:revision-1:item-1",
+      "uri": "git-root://main/4804c6aa5c48abab88036d600fadbbaff535a4bf/docs/constitution-features/071-footer-links.md",
+      "rev": "sha256:2d67fa2479ea204b04e1c2824ba2ee9a7822c806b054e48958f116eef659b5d9",
+      "mediaType": "text/markdown",
+      "summary": "Rework per captain 2026-09-29: added email reporting option mailto:constitution.owl@gmail.com (spelling captain-confirmed, verified character by character; href, visible text and aria-label consistent). Independent verify PASSED with its own hydration probe on 8 pages; misspelled address, missing email and old footer each fail the probe. GitHub links reachable; no HackMD/old repo; only Footer.tsx changed (+7/−7 vs main); tsc, eslint, build pass. Needs decision: original AC-4 selector, AC-5 item count (2→3) and the LOC tolerance no longer match — recommend approving implement's dated addendum as the rewording. Deferred risk: the long email label may be clipped at 375px (overflow-hidden) — captain visual check on the preview."
+    }
+  ]
+}

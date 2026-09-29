@@ -33,6 +33,22 @@ gates:
               application:
                 target-stage: review
                 state: consumed
+            - id: gate-attempt:071-verify-2
+              briefing:
+                id: briefing:071:verify:attempt-2:revision-1
+                digest: sha256:bca261b09dc6e4c5910fbddf2d1be6a686e15a7b14a3178f88844d7552045376
+                room-ref: '@review/verify/briefing-2'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:071:verify:2
+                briefing: briefing:071:verify:attempt-2:revision-1
+                by: person:captain
+                at: "2026-09-29T22:06:35.544093Z"
+                decision: approve
+                reason: Captain approved 071 verify (rework cycle) in chat 2026-09-29, including implement's dated addendum rewording AC-4 selector, AC-5 item count (3) and LOC tolerance (+7/−7). Captain did not explicitly report the 375px email-label visual check.
+              application:
+                target-stage: review
+                state: consumed
         - id: gate:071:review
           stage: review
           attempts:

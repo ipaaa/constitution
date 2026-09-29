@@ -16,6 +16,16 @@ export const PUBLISHED_FIELDS = Object.freeze({
   ]),
 });
 
+/**
+ * 選填發布欄位。有值才計入指紋，空白時 payload 與只有 PUBLISHED_FIELDS 時逐位元組相同。
+ * 這樣加欄不會讓既有核可失效；填了值的列則必須重新核可。
+ * 不參與 Track 2 的資料列序號：publishedRowSequences 只看 PUBLISHED_FIELDS。
+ * 規格見 docs/constitution-features/064-track2-case-ref-stance-columns.md 第二節方案 C。
+ */
+export const OPTIONAL_PUBLISHED_FIELDS = Object.freeze({
+  [SHEET_KEYS.TRACK_2]: Object.freeze(['case_ref', 'stance']),
+});
+
 const INTEGER_PATTERN = /^\d+$/;
 
 export function normalizeText(value) {
@@ -59,6 +69,10 @@ function normalizeField(field, value) {
 
 export function fingerprintPayload(sheetKey, record, sequence) {
   const projection = fieldsForRow(sheetKey, record).map(field => [field, normalizeField(field, record[field])]);
+  for (const field of OPTIONAL_PUBLISHED_FIELDS[sheetKey] || []) {
+    const value = normalizeText(record[field]);
+    if (value !== '') projection.push([field, value]);
+  }
   if (sheetKey === SHEET_KEYS.TRACK_2) {
     if (!Number.isSafeInteger(sequence) || sequence < 1) {
       throw new TypeError('Track 2 指紋需要從 1 起算的非空資料列序號。');

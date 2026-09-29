@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:070:verify:attempt-1:revision-1",
+  "question": "Approve 070 verify (PASSED) and advance to review?",
+  "artifacts": [
+    {
+      "id": "artifact:070:verify:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/04bb966ee8ca35d7b2fc230c1998080c10c228ff/docs/constitution-features/070-sync-csv-loading-snapshot.md",
+      "rev": "sha256:10e5c6b133fbeacec3db900f4ae5123e396aa1d28acc17103159b4d552c433e5",
+      "mediaType": "text/markdown",
+      "summary": "Independent verify PASSED: AC-1..AC-9 re-run on fixtures; 14 falsifying changes each turn their test red. 040's 16 validation functions and content-fingerprint.mjs byte-identical to merge-base cefeeee. Re-fetch triggers only on exact 載入中… / Loading... / #NAME?; a genuine mismatch fetches once and aborts with the unchanged message. Live read-only: 10/10 exit 0 byte-identical to src/data, 6 real re-fetches. Entry-point fix: /var and symlinked paths run; unrecognized entry exits 1 instead of silent 0. F1 Deferred risk: one live run needed all 8 fetches (7 unfinished, ~265 s) — the budget was met at its edge; promote if a real sync fails with the 8-attempt message. F2 Polish: operations.md link to 070 will go stale on archive (general pattern, 069 territory)."
+    }
+  ]
+}
