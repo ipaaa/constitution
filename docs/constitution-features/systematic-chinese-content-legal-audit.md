@@ -1,6 +1,6 @@
 ---
 title: 全站生成中文內容的系統性法律事實查核
-status: verify
+status: review
 score: 0.9
 source: FO 2026-09-24，captain 指示「等 056 收斂後開」
 id: 067
@@ -17,6 +17,17 @@ gates:
                 id: briefing:067:verify:attempt-1:revision-1
                 digest: sha256:0b580cc14d1da66eb579e41a5fab4f2bb820b6825e9889a283b98d55b3140f87
                 room-ref: '@review/verify/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:067:verify:1
+                briefing: briefing:067:verify:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-29T18:22:56.090514Z"
+                decision: approve
+                reason: 'Captain approved verify (PASSED) in chat 2026-09-29: 0 factual errors against primary sources, every AC falsifiable. Accepts +1,267 LOC over the ~1,012 ceiling; /about:38 archived-path wording deferred to TODO P1-10 item 6.'
+              application:
+                target-stage: review
+                state: consumed
 ---
 
 **⛔ 不得派工，直到 feature `056-pre-launch-checklist` 封存為止。** 這是 captain 2026-09-24 的明確排序：
