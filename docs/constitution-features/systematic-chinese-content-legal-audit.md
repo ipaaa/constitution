@@ -1,6 +1,6 @@
 ---
 title: 全站生成中文內容的系統性法律事實查核
-status: verify
+status: review
 score: 0.9
 source: FO 2026-09-24，captain 指示「等 056 收斂後開」
 id: 067
