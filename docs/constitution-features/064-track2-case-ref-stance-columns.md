@@ -584,6 +584,8 @@ captain 2026-09-29 決定：責任編輯填 `case_ref`／`stance`，captain 在�
 - DONE: Judge implement's deviations (AC-3 failing-change substitution, test LOC over tolerance, INDEX last-checked not updated) and confirm the deferred ACs (AC-1, AC-2(b), AC-11, AC-12) each carry an exact runnable check for their stage; the one failing test (threshold-analysis AC-7 (4)) must be the pre-existing one fixed on 068's branch, not new; confirm no sync-content run and no spreadsheet edit.
   AC-3：重現刪 `（` 0 項失敗、刪空白 Node 9 項／GS 3 項。替代合理，因為 `operations.md` 第 2 步要求逐字輸入含空白的標題。行數超標：接受。GS 安裝公式與 `fingerprintForSheetRow_` 的反向改動只有多出的假分頁測試抓得到（已重現）。行數是 design 訂的容許值，放寬要 captain 在 gate 認可。INDEX：不算偏離。第九節把 INDEX 日期與 `data-collection-guide.md` 同列在「階段二完成時」。延後 AC：AC-1 有逐字 `node -e` 指令；AC-11 有四格手動程序；AC-2 (b) 與 AC-12 只有程序描述，**沒有逐字指令**，見 F1。唯一失敗：`threshold-analysis.test.mjs:1549`。base `8779ca9` 同樣失敗（101/99/1）。分支套上 068 分支（`threshold-page-voided-quorum-current`）的 `84962bb` 後為 118/117/0，失敗 0。不是本票造成。沒有跑 sync-content：`src/data` 對 main 無 diff，main 自 09-28 起無 `src/data/*.json` commit。沒有動試算表：正式表 `Track 2_discussion` 標題唯讀讀回為 21 欄（A=id … U=current_fingerprint），沒有 `case_ref`／`stance`。`npx tsc --noEmit` exit 0；`npm run build` exit 0，前後 sha256 相同。
 
+驗證範圍：分支 HEAD `1007a50`（含 implement 補記的兩端刪除實驗）。反向改動的拋棄式 worktree 即由此 HEAD 建立；兩端刪 `case_ref`（5 項失敗）與兩端刪 `stance`（4 項失敗）兩項都已親自重跑，結果與 `1007a50` 的記錄相同。
+
 ### Findings
 
 - **F1（延後風險，建議本票修）** AC-2 (b) 與 AC-12 延後到階段一／二，但延後表沒有逐字的不落地同步指令，也沒寫「必須寫出兩檔」。已重現 ticket 070 的陷阱：從 `/tmp/…` 符號連結路徑執行 `sync-content.mjs`，exit 0，沒有輸出，也沒有訊息。延後表的條件是「exit 0 且 sha256 相同」。操作者比對不存在的檔案時，這條件寫法不夠明確。建議在延後表補上下列指令，只改文件：
