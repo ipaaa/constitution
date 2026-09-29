@@ -9,7 +9,7 @@ score: 0.95
 worktree: .worktrees/spacedock-ensign-040-approval-content-version-binding
 issue:
 pr:
-mod-block:
+mod-block: merge:pr-merge
 id: 040
 gates:
     version: 1
@@ -67,6 +67,17 @@ gates:
                 id: briefing:040:review:attempt-2:revision-1
                 digest: sha256:b362febf6cec6fe3289c8d43c320b54f40e744d246280efa37ba99acc7e3c07d
                 room-ref: '@review/review/briefing-2'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:040:review:2
+                briefing: briefing:040:review:attempt-2:revision-1
+                by: person:captain
+                at: "2026-09-29T18:47:24.588863Z"
+                decision: approve
+                reason: 'Captain approved 040 review attempt-2 in chat 2026-09-29: the 2026-09-05 hold''s resume condition is met — 050 S1–S8 done on the live sheet and S9 proved 040 code (a51b5d9) reproduces production byte-identically (sha256, diff, 40/16, id lists). S7-a mode and second-account removal not yet confirmed by captain at approval time.'
+              application:
+                target-stage: complete
+                state: pending
 review-round:
     id: round:040:review:1
     stage: review
@@ -77,7 +88,7 @@ review-round:
         room-ref: '@review/review/round-1'
 ---
 
-讓 SSOT 的核可結果綁定被核可的內容版本。核可後只要發布欄位被修改，該列必須顯示 `Needs review`，而且同步程式必須拒絕沿用舊核可。
+		讓 SSOT 的核可結果綁定被核可的內容版本。核可後只要發布欄位被修改，該列必須顯示 `Needs review`，而且同步程式必須拒絕沿用舊核可。
 
 ## Problem
 
