@@ -1,7 +1,7 @@
 ---
 id: 054
 title: 內容把關機制現況總覽，以及讓它不過時的機制
-status: verify
+status: review
 source: captain 2026-09-04（把關機制體檢；captain 明確要求本票須設計更新機制）
 started: 2026-09-29T18:59:22Z
 completed:
@@ -30,6 +30,17 @@ gates:
                 id: briefing:054:verify:attempt-1:revision-1
                 digest: sha256:4a6ff51c5a6c908443f6be76221ea23c2ca49ff2c9993580c3f6ab74ae01cea3
                 room-ref: '@review/verify/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:054:verify:1
+                briefing: briefing:054:verify:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-29T20:31:38.03914Z"
+                decision: approve
+                reason: 'Captain approved 054 verify cycle 2 in chat 2026-09-29 (「全部照建議」): V1–V5 corrected, fresh reader 8/8, AGENTS.md byte-identical to approved text.'
+              application:
+                target-stage: review
+                state: consumed
 ---
 
 沒有任何一份文件回答「現在到底有哪些把關、各擋什麼、哪些缺口還開著」。但新增一份 evergreen 文件等於新增一個會過時的東西——**本票的核心不是寫那份文件，是設計讓它不過時的機制。**
