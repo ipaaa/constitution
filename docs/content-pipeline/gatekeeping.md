@@ -135,7 +135,9 @@
 | T3 生成內容與圖表 | 未來軌，以 `src/data/future.ts` 為主 | 依收集流程由 captain 提供案號、agent 修改、workflow 的 `verify` 查核、captain 看預覽。不經試算表，不經核可版本綁定 | [`docs/content-pipeline/data-collection-guide.md`](data-collection-guide.md) T3 |
 | 其餘內容 | 上面兩類以外的一切：寫死在元件裡的中文、其他 `src/data/*.ts` | **不得有 AI 生成的內容。** 明文在 [`AGENTS.md`](../../AGENTS.md)「絕對不要做的事」第 5 條與 [`docs/content-pipeline/design.md`](design.md) 第六節不變式第 7 條 | [`docs/health-check/TODO.md`](../health-check/TODO.md) P1-8 |
 
-**第三類沒有機械檢查。** 資料層沒有來源欄位，無法用程式分辨一段內容是誰寫的。對應的缺口見第 8 章。
+**AI 生成的內容能放在哪裡**：只能放在前兩類。也就是經責任編輯核可的試算表內容，或依收集流程收集並經審閱的 T3 內容與圖表。第三類不得有。
+
+**沒有機械檢查。** 資料層沒有來源欄位，無法用程式分辨一段內容是誰寫的。第三類的禁令只靠人守。對應的缺口見第 8 章。
 
 ## 7. 上線前檢查
 
