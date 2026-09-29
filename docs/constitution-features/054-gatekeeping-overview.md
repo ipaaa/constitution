@@ -444,6 +444,7 @@ Semantics this may change：README review stage 多一項必要輸出（repo 外
 
 - 2026-09-29 captain 核准措辭（「全部照建議」，經 FO 轉述）：`## Design` 第三節 (a)、(b)、(c) 照提案原文套用；(b) 第 5 條逐字同時作為 `design.md` 第六節不變式第 7 列；候選規則「把關總覽跟著把關變動」不採用。README 條款由 FO 於 `34663fd` 套用。
 - Cycle 1: REJECTED — verify（`8026f4a`）判 V1（第 7 章把 L／H 閱讀清單寫成 P3-8 條件，AC-5 7/8）、V2（:119 無出處日期）Material。FO 授權 V1–V5 fix（V3 依 captain 2026-09-29 核准記錄「逐字」補齊 `design.md` 第 7 列，不改 `AGENTS.md`），V6 decline for 054（交 `064`：後合併者重判總覽），V7 無動作。implement cycle 2 修正於 `f916c94`，fresh agent AC-5 8/8。round 記錄：`review/verify/round-1`。
+- Cycle 2: REJECTED — review（`c01e361`）判 R1 Material（`gatekeeping.md:198` 自連結在 054 封存後使 M6 由 9 變 10）。FO 授權 R1–R3 fix（R1 改指 `_archive/` 路徑；R2 `TODO.md` 移到〈實作後更新〉；R3 第 4 章加一句「指紋」說明），R4 無動作（合併時由 FO 處理），R5 decline for 054（後合併者重判總覽第 4、5 章）。implement cycle 3 修正於 `3cdddd7`，clone 上封存前後 M6 皆 9、不指名總覽。round 記錄：`review/review/round-2`。
 
 ## Stage Report: design
 
