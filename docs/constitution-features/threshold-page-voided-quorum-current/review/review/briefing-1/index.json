@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:068:review:attempt-1:revision-1",
+  "question": "Approve 068 review (PASSED) and deliver to merge?",
+  "artifacts": [
+    {
+      "id": "artifact:068:review:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/aeeee184d01e2f6ff46e32eff9f62350bca6a84a/docs/constitution-features/threshold-page-voided-quorum-current.md",
+      "rev": "sha256:2f3e5c84aad3f6dc92cf7abd5c2a6e5dd6be1eaab44dcf5fb1c646dcdb85add2",
+      "mediaType": "text/markdown",
+      "summary": "Independent review PASSED: types complete, no any, Tailwind consistent, design 4.1–4.5 implemented with no invented legal text; FO-authorized 012 AC-7(4) narrowing judged the right shape. Docs impact rows match delivered behavior. No regressions: 104/105 tests pass (0 fail, 1 skip), tsc 0, noindex kept, 056 G-7 PASS, content-audit unchanged. Review's Polish (page.tsx:42 missing space) fixed by implement at 5940a12. TODO P1-10 PR-number note handed to 069. Desktop callout 6px clearance pending captain visual check on the local preview."
+    }
+  ]
+}
