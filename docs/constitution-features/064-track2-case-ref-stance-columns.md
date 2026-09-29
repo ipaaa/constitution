@@ -591,6 +591,11 @@ captain 2026-09-29 決定：責任編輯填 `case_ref`／`stance`，captain 在�
 
 兩欄照 design 3.2–3.5 實作。兩欄空白時指紋不變：050 的核可不必重做，舊公式配新程式算出同值。有人填值而公式未更新時，同步中止。design.md 補上 045 查出缺少的〈發布欄位範圍〉表。偏離 design 的有三處。第一，AC-3 的反向改動改用「刪半形空白」。第二，測試行數超出容許範圍，多出的是 Apps Script 假分頁測試，有三個反向改動只有它們抓得到。第三，INDEX 最後查核日未更新。另有一個 main 既有的測試失敗，待 FO 決定由誰修。
 
+- DONE: FO-authorized fix from verify (F1) — give the deferred AC-2 (b) and AC-12 checks an exact, ready-to-paste command (verify's `pwd -P` command; fails if `discussions.json` isn't written).
+  〈留到後續階段的 AC〉表兩列改為引用新增的「不落地同步指令」區塊。區塊內逐字放入 verify 的指令、失敗條件，以及 AC-2 (b) 合併前程式的 `git worktree` 做法。`operations.md`〈Track 2 加兩欄〉第 9 步後也加了同一指令。實跑時第一次遇到 `#NAME?` 暫態快照，指令沒印出 sha256，失敗有被抓到。重跑後 main 與本分支都印出與 `src/data` 相同的 sha256。F2 依 FO 決定維持延後風險，不改。
+- DONE: FO-authorized fix from verify (F3) — correct 「前三列抄自 040」 to four rows in the design.md 發布欄位範圍 note.
+  改為「第 1、2、4、5 列（共四列）」。修訂紀錄的同一說法一併改正。以 `diff` 比對這四列與 `_archive/040-…md` 的表，逐字相同。只改文件，程式未改。
+
 ## Stage Report: verify
 
 - DONE: Verify every factual value the branch ships against primary sources: each case_ref in src/data/verified-case-refs.mjs (ruling number, case name, decision date) against 憲法法庭 judgment pages, and the stance value list against design §三; run the placeholder scan over every new file and added line.
@@ -617,14 +622,3 @@ captain 2026-09-29 決定：責任編輯填 `case_ref`／`stance`，captain 在�
 ### Summary
 
 在 base、分支與拋棄式 worktree 上獨立重跑全部檢查：一手來源、指紋等值（20 列）、20 個反向改動、`tsc`、`build`，以及兩次不落地同步。所有 implement 的數字都重現成功。發現三項，都不阻擋：延後 AC-2 (b)／AC-12 缺逐字指令（F1，附指令）、一個 fail-closed 的測試缺口（F2）、一處文字誤差（F3）。行數超標需 captain 在 gate 認可。
-
-## Stage Report: implement (verify fixes)
-
-- DONE: F1 — give the deferred AC-2 (b) and AC-12 checks an exact, ready-to-paste command (verify's `pwd -P` command; fails if `discussions.json` isn't written).
-  〈留到後續階段的 AC〉表兩列改為引用新增的「不落地同步指令」區塊。區塊內逐字放入 verify 的指令、失敗條件，以及 AC-2 (b) 合併前程式的 `git worktree` 做法。`operations.md`〈Track 2 加兩欄〉第 9 步後也加了同一指令。實跑時第一次遇到 `#NAME?` 暫態快照，指令沒印出 sha256，失敗有被抓到。重跑後 main 與本分支都印出與 `src/data` 相同的 sha256。
-- DONE: F3 — correct 「前三列抄自 040」 to four rows in the design.md 發布欄位範圍 note.
-  改為「第 1、2、4、5 列（共四列）」。修訂紀錄的同一說法一併改正。以 `diff` 比對這四列與 `_archive/040-…md` 的表，逐字相同。
-
-### Summary
-
-只改文件，程式沒有改。F2 依 FO 決定維持延後風險，不改。實跑時遇到的 `#NAME?` 快照與 ticket 070 的「載入中…」同屬暫態，已寫進兩份文件的重跑條件。
