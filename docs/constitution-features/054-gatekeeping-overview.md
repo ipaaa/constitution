@@ -11,6 +11,14 @@ worktree: .worktrees/spacedock-ensign-054-gatekeeping-overview
 issue:
 pr:
 mod-block:
+review-round:
+    id: round:054:verify:1
+    stage: verify
+    cycle: 1
+    briefing:
+        id: briefing:054:verify:round-1
+        digest: sha256:7af48eac67c9ebb8046211158ca77e8910fd8d0f4a719bd978d663950317b20b
+        room-ref: '@review/verify/round-1'
 ---
 
 沒有任何一份文件回答「現在到底有哪些把關、各擋什麼、哪些缺口還開著」。但新增一份 evergreen 文件等於新增一個會過時的東西——**本票的核心不是寫那份文件，是設計讓它不過時的機制。**
