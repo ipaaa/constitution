@@ -614,7 +614,7 @@ feature 040 實作後才會取代該模型。保留原文，避免把預定行�
 - `git log --oneline -- src/data/history.json` → `77d9cea`（2026-09-02）為首次正式同步。
 - captain 於 2026-09-03 回報 `status` 保護範圍已設定。
 
-**施工單**：[`../constitution-features/041-correct-stale-pipeline-docs.md`](../constitution-features/041-correct-stale-pipeline-docs.md)
+**施工單**：[`../constitution-features/_archive/041-correct-stale-pipeline-docs.md`](../constitution-features/_archive/041-correct-stale-pipeline-docs.md)
 
 ### 2026-09-21 — 記錄 `019` 提出的兩個 Track 2 欄位（提案，未核可）
 

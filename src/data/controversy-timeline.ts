@@ -1,5 +1,5 @@
 // 失效句一律 import，不在本檔手寫。唯一定義處為 src/data/ruling-threshold.ts。
-// 理由見 docs/constitution-features/066-quiz-timeline-voided-quorum-present-tense.md 第五小節。
+// 理由見 docs/constitution-features/_archive/066-quiz-timeline-voided-quorum-present-tense.md 第五小節。
 import { VOIDED_FLOOR_SHORT } from '@/data/ruling-threshold';
 
 /** Category tags for filtering and visual differentiation */

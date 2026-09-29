@@ -458,7 +458,7 @@ export const CRISIS_STATS = {
 
 // `RULING_THRESHOLD` 已移到 `src/data/ruling-threshold.ts`，那裡是門檻文案的唯一定義處。
 // 這裡保留 re-export，讓既有的 `from '@/data/future'` import 不必改。
-// 搬移的理由見 docs/constitution-features/066-quiz-timeline-voided-quorum-present-tense.md 第五小節；
+// 搬移的理由見 docs/constitution-features/_archive/066-quiz-timeline-voided-quorum-present-tense.md 第五小節；
 // 門檻本身的法律依據與待拍板事項見 docs/constitution-features/_archive/063-required-for-ruling-legal-accuracy.md 第五小節。
 export { RULING_THRESHOLD } from './ruling-threshold';
 

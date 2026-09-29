@@ -7,7 +7,7 @@
 // 都必須 import 這裡的常數，不得自行手寫一次。
 // 手寫過的地方會各自漂移：`063` 修好 `/future` 之後，同一個法律錯誤仍留在
 // `/controversy-timeline` 與 `/quiz/*`，就是因為那些文案是各自手寫的副本。
-// 見 docs/constitution-features/066-quiz-timeline-voided-quorum-present-tense.md 第五小節。
+// 見 docs/constitution-features/_archive/066-quiz-timeline-voided-quorum-present-tense.md 第五小節。
 //
 // 為什麼獨立成一個模組，而不是留在 `src/data/future.ts`：
 // `controversy-timeline.ts` 原本不 import 任何模組。讓它 import `future.ts`
