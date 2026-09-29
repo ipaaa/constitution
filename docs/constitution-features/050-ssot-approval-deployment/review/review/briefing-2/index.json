@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:050:review:attempt-2:revision-1",
+  "question": "Approve 050 (live-SSOT deployment of 040's approval fields) and deliver to merge?",
+  "artifacts": [
+    {
+      "id": "artifact:050:review:attempt-2:revision-1:item-1",
+      "uri": "git-root://main/e890824328e6d3de9c737986a876dd8b3f93d5c6/docs/constitution-features/050-ssot-approval-deployment.md",
+      "rev": "sha256:6d8fa1fd425c4580532f562209b57d134aeda28cc3d19c7df78bd0007648afec",
+      "mediaType": "text/markdown",
+      "summary": "Deployment complete on the live sheet 2026-09-29. Captain did S1–S8 (columns, formulas + Review menu, 12 protected ranges all 限制, 59 rows re-approved, second account removed). Engineering S9: no-write sync byte-identical (AC-1), id lists identical (AC-3); after 040 merged, real npm run sync-content exit 0 with 40/16 and zero diff (AC-2, after retrying past transient 載入中… CSV snapshots → ticket 070); AC-6 re-run with the captain-approved pwd -P command passes. Due documentation updates done (operations.md, design.md, TODO P2-12/P3-7, editor-onboarding addendum, INDEX) under the new README out-of-repo re-judgment clause; AGENTS.md:29 handled by 054. Gate decision: accept captain's personal attestation for AC-4 (30 cells) and AC-7 (18 cells) in place of per-cell records with UTC time (none kept). Known leftovers: §十六 second command still copies one file (annotated); possible operations.md merge alignment with 070's pending edits."
+    }
+  ]
+}
