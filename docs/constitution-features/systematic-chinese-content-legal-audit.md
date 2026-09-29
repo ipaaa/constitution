@@ -36,6 +36,18 @@ gates:
                 id: briefing:067:review:attempt-1:revision-1
                 digest: sha256:3aeba07317bc0b6b8b5e933de7b3c99001d95449e523db770a87fa84aa275c34
                 room-ref: '@review/review/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:067:review:1
+                briefing: briefing:067:review:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-29T18:40:51.32885Z"
+                decision: approve
+                reason: 'Captain approved review (PASSED) in chat 2026-09-29: no regressions, design-conformant, docs impact complete; R1/R2 deferred (R2 fixed right after archive), R3-R7 Polish. Captain also decided: site calendar = 西元; H-layer read first by legal reviewer on the three PUBLIC_PAGES sources; bind check into P3-8 as a second 解除條件 (manual, not CI) — recorded for post-merge follow-up.'
+              application:
+                target-stage: complete
+                state: pending
+mod-block: merge:pr-merge
 ---
 
 **⛔ 不得派工，直到 feature `056-pre-launch-checklist` 封存為止。** 這是 captain 2026-09-24 的明確排序：
