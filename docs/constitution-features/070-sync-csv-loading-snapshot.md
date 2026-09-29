@@ -493,6 +493,9 @@ Verified by: 新測試四格。
 給 FO 的旗標：(1) 與 064 合併：程式碼無衝突，合併樹上兩票測試 84/84 通過；但 `design.md` 修訂紀錄兩票都在檔尾追加，會有一處 append-append 衝突，兩則都保留即可。為了相容 064 新增的 `../src/data/verified-case-refs.mjs` import，AC-9 的符號連結改指向 repo 的 `scripts/`，而不是複製兩個檔案（AC-9(a) 字面寫的是複製），否證力不變。
 (2) verify 做 AC-7(b) 時，若 064 已先合併，`buildTrack2` 與 `content-fingerprint.mjs` 會因 064 合法地與 main 不同；請改對 merge-base `cefeeee` 比對。(3) `threshold-analysis` 的 AC-7 守衛在 main 上已經失敗，是既有問題，需要另開票或由該票處理。
 
+- DONE: FO-authorized fix from review（R1，Polish）：合併 current main 後，`operations.md` 有兩句仍描述 070 之前的行為，各追加一則日期補述，原句保留。
+  合併 main（`git merge main`）：`design.md` 修訂紀錄的 append-append 衝突保留兩則（064 在前、070 在後）。本票 frontmatter 的 `status` 取 main 的 FO 鏡像值。operations.md 在加欄程序「錯誤訊息含「載入中…」…重跑一次」與〈同步〉「同步印出多行 `實際為「載入中…」` 並中止」之後各追加補述，`git diff main` 只有這兩則是新增的 `+` 行。合併樹全套 137 項：136 過、0 失敗、1 skip。在不含 `.next` 的乾淨副本上 `npx tsc --noEmit` exit 0；worktree 內的 `.next/types/` 有並行建置留下的 `routes.d 2.ts` 重複檔，會讓 tsc 報 TS2300。那是 gitignore 的產物，未刪除。
+
 ## Stage Report: verify
 
 - DONE: Independently re-run AC-1..AC-9 against fixtures including each stated failing change, and confirm by diff against merge-base cefeeee that 040's 16 validation functions and content-fingerprint.mjs are byte-for-byte unchanged (AC-7(b)); verify the retry trigger is exact-match only (載入中… / Loading... / #NAME?) and a genuine fingerprint mismatch still fetches once and aborts the whole sync with the unchanged message.
@@ -530,3 +533,32 @@ Verified by: 新測試四格。
 ### Summary
 
 PASSED。AC-1 至 AC-9 全部由我獨立重跑通過，AC-8 也通過（10／10 exit 0，輸出與 `src/data` 相同，6 次實際重抓）。14 項否證演練都讓對應測試失敗，還原後全綠。另一項（只在衍生欄內改成子字串比對）不會讓測試失敗，但行為與原本等價，見報告內的觀察。040 的 16 個函式與 `content-fingerprint.mjs` 對 `cefeeee` 逐位元組相同。入口修正讓 `/var` 路徑與符號連結路徑正常執行；認不出入口時 exit 1。F1 記錄一次用到第 8 次才成功的實跑，屬 Deferred risk，交由 FO 或 captain 決定是否調整重抓預算。
+
+## Stage Report: review
+
+- DONE: Review the diff against the design for what verify did not own: code quality and readability of findPendingCells / fetchSettledCSV / resolveEntry and the report branch in sync-content.mjs (conventions, no loosening of 040's validation, bounded loop clearly terminating, waits and limits named not magic), and whether the new tests are necessary rather than duplicated.
+  `sync-content.mjs` 對 `cefeeee` 只有 6 個 hunk（CONFIG、`report` 結尾句、`fetchCSV` 注入參數、新抓取區塊、`main()` 一行、檔尾入口），合併 main 後對 main 仍是同樣 6 個 hunk；16 個不可動函式沒有落在任何 hunk 內，`content-fingerprint.mjs` 對 main 0 行。
+  `findPendingCells` 沿用 `parseCSVRows`／`buildColumnMap`／`toRecords`／`rowKey`，不另寫解析器；空 CSV 先回 `null`，避開 `buildColumnMap` 讀 `rows[0]`。重抓條件是 `PENDING_FORMULA_VALUES.includes` 只掃 `DERIVED_FIELDS`，完全相等。被採用的快照原樣交給 `buildTrack1/2`、`buildSiteTldr`，040 沒有被放寬。
+  迴圈的最後一輪（`attempt === MAX_FETCH_ATTEMPTS`）每一條分支都 `return`，不會跑出迴圈；上限、間隔、未算完值、錯誤鍵都是具名常數。等待只能由 `CONTENT_SYNC_RETRY_DELAY_SCALE` 縮放，無效值退回 1，不影響次數。`resolveEntry` 三態與規格逐條相符。註解密度與中文風格和本檔既有區段一致。
+  測試：15 項新測試（9 個 top-level、6 個 subtest）各對一條 AC。`fetchSettledCSV` 間隔單元測試不是重複：子程序測試把等待設為 0，只有它量得到 10/10/20/30/45/60/90 秒與「網路錯誤只抓 1 次」。AC-9(a) 重跑一次直接執行的基準，比 AC-1 多花一次子程序，可接受。暫存目錄不清除，與既有 `runSync` 慣例相同。
+- DONE: Check every ## Documentation impact row against delivered behavior (operations.md 〈同步〉/〈錯誤與復原〉/〈驗證〉, design.md revision entry) and that record docs are untouched; merge interplay with 064 now on main (design.md revision-log append-append, AC-9 symlink approach).
+  〈實作後更新〉三筆都已完成，四種訊息與程式字串逐字相符（我自己的實跑輸出也逐字對上）。〈同步〉只改連結一行，是 checklist 要求的修正。〈不更新〉各筆仍成立：沒有新增或刪除文件，`docs/INDEX.md` 不需動。diff 只碰本票、`operations.md`（evergreen）、`design.md`（INDEX 標為 plan）；沒有 `record` 文件被改。
+  合併 main（scratch worktree，未提交到本分支）：`design.md` 修訂紀錄有一處 append-append 衝突，兩則都保留即可（064 在前、070 在後）；本票 frontmatter 另有一處 `status` 衝突，來自 main 的狀態鏡像，由 FO 處理。`sync-content.mjs`、測試檔、`operations.md` 自動合併。AC-9 改用指向 repo `scripts/` 的符號連結，在合併樹上能解析 064 新增的 `../src/data/verified-case-refs.mjs`，AC-9 四格通過；否證力由 verify 的「入口改回字串比對 → AC-9(a)(b)(c) 失敗」演練證明。
+  見 Findings R1：合併後 `operations.md` 有兩句描述 070 之前的訊息。
+- DONE: Identify regressions on the branch merged with current main (full suite 0 fail now that 068 is merged, tsc, build, one no-write sync with pwd -P byte-identical to src/data) and end with a clear PASSED or REJECTED verdict; F1 (budget at its edge) is a captain-accepted Deferred risk, not a finding.
+  main `dfa6170` 全套 `node --test tests/*.test.*`：122 項，121 過、0 失敗、1 skip。合併樹（`61e5751` + main）：137 項，136 過、0 失敗、1 skip；多出的 15 項正是本票新增的測試。`npx tsc --noEmit` exit 0。`npm run build` exit 0，前後 `src/data/*.json` sha256 相同。
+  不落地同步一次（合併樹的程式，`node --env-file=<repo>/.env.local`，`CONTENT_OUTPUT_DIR` 為 `pwd -P` 暫存目錄，22:08:54Z–22:09:25Z）：exit 0，stderr 0 byte。本次**實際觸發重抓**：`Track 2` 連兩次 36 列 `載入中…`，第 3 次成功。兩個 JSON 的 sha256 與 `src/data` 相同（`4071978a…`、`4d1992e3…`）。repo 的 `git status --short src/data` 無輸出。
+  沒有執行 `npm run sync-content`，沒有寫入試算表。scratch worktree 與暫存輸出已刪除，沒有留下執行中的程序。F1 依指示不列為 finding。
+
+### Findings
+
+- R1（Polish，建議合併時一併處理）：合併 main 後，`operations.md`（evergreen）有兩句仍描述 070 之前的行為。
+  - 使用者與流程：captain 或工程依手冊跑同步，或跑 064 加欄程序的不落地同步。
+  - 可觀察的傷害：070 合併後，未算完快照不會再印出「實際為「載入中…」」，而是先自動重抓，用盡時印 `快照  發布版連續 8 次都還沒算完`。這兩句寫的觸發訊息不會再出現。但新訊息自己寫明「不是內容錯誤…等 5 分鐘後重跑」，〈錯誤與復原〉也已有新補述，所以操作者仍會做對。
+  - 相關 AC 或邊界：無 AC 受影響；不涉及 040 的邊界。
+  - 觸發證據：合併樹 `operations.md` 的〈同步〉補述「同步印出多行 `實際為「載入中…」` 並中止」（本票只改了該段的連結），以及 064 帶進 main 的加欄程序句「錯誤訊息含「載入中…」或 `status` 為 `#NAME?` 時，重跑一次。」（本票分支建立時還不存在）。
+  - 建議處置：合併時在兩句下各追加一行補述，不改原句，例如「070 合併後同步會自動重抓；用盡時訊息是 `快照  發布版連續 8 次都還沒算完`，一樣等 5 分鐘重跑。」由 FO 決定是否授權。
+
+### Summary
+
+PASSED。程式碼只在抓取層、`report` 結尾句與入口判斷動手，040 的驗證函式與指紋模組在合併前後都逐位元組未動；重抓迴圈有明確上限，每個分支都終止，常數都具名。合併 current main 後全套 137 項 0 失敗，tsc 與 build 通過；一次不落地實跑真的碰到 `載入中…` 並在第 3 次恢復，輸出與 `src/data` 相同。唯一 finding R1 是兩句過時的手冊敘述（其中一句是 064 合併後才出現的），屬 Polish，建議合併時順手補述。
