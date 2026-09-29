@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:071:review:attempt-1:revision-1",
+  "question": "Approve 071 review (PASSED) and deliver to merge?",
+  "artifacts": [
+    {
+      "id": "artifact:071:review:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/aafd382822d08cdc26789cbf7bb1fd8279f5e517/docs/constitution-features/071-footer-links.md",
+      "rev": "sha256:9bbef45c633462699e293b40b42be7c3c57bc61765848271d48ba7b3b8bbc793",
+      "mediaType": "text/markdown",
+      "summary": "Independent review PASSED (small-change path): only Footer.tsx (+3/−8); HackMD item removed, two hrefs to ipaaa/constitution and its issues/new, unused import removed; aria-label, target, rel and classes unchanged; © line, 開源 wording and quick-nav untouched. tsc, eslint, build pass; built HTML has only the new links; no regressions beyond the known pre-existing test. Captain notes: phone/desktop look approved without explicit visual confirmation; readers without a GitHub account cannot report errors."
+    }
+  ]
+}
