@@ -1,7 +1,7 @@
 ---
 id: 054
 title: 內容把關機制現況總覽，以及讓它不過時的機制
-status: verify
+status: implement
 source: captain 2026-09-04（把關機制體檢；captain 明確要求本票須設計更新機制）
 started: 2026-09-29T18:59:22Z
 completed:
@@ -428,13 +428,13 @@ Semantics this may change：README review stage 多一項必要輸出（repo 外
 | `docs/project/contributing.md` | 總覽檔已建立 | 〈內容協作〉末加一行指向總覽 |
 | `AGENTS.md` | captain 核准 `## Design` 第三節 (b)、(c) 的措辭 | 「絕對不要做的事」第 5 條；〈文件地圖〉一列 |
 | `docs/content-pipeline/design.md` 第六節 | 同上 | 不變式表第 7 列；修訂紀錄一則 |
+| `docs/health-check/TODO.md` | FO 對 AC-6 的處置（implement cycle 1） | 新增 P2-13、P2-14 與進度紀錄一列。P3-8 由 `069` 修改，本票以指令讀出；P2-12 的過時句不屬本票 |
 
 ### 不更新
 
 | 文件 | 理由 |
 |---|---|
 | `docs/content-pipeline/operations.md` | 過時的第 5、12、41、79 行屬 `050`〈實作後更新〉。本票只連結它 |
-| `docs/health-check/TODO.md` | P3-8 由 `069` 修改，本票以指令讀出。P2-12 的過時句已回報 FO，不屬本票 |
 | `docs/health-check/2026-09-03-editor-onboarding.md` | record。補述屬 `050`〈實作後更新〉 |
 | `docs/content-pipeline/data-collection-guide.md` | 總覽只連結它 |
 | `docs/constitution-features/_archive/` 內的 `056`、`067`、`040` | 已封存，不改 |

@@ -96,6 +96,7 @@
 - 核可綁定的是**核可當下的內容**，不是這一列。內容改了，核可就失效，要重新核可。
 - 責任編輯自己改內容也一樣失效。
 - 只改 B 類審核欄，不會讓核可失效。
+- 指紋是依發布內容算出的代碼，內容改一個字，代碼就不同。
 - Track 2 的指紋含資料列的序號。在 Track 2 插入或刪除一列，其後各列都要重新核可。
 - 同步不再只憑 `status = Approved` 放行。`status` 決定一列要不要檢查；被檢查的列，同步自己重算指紋，與 `review_fingerprint`、`approved_fingerprint`、`current_fingerprint` 三份比對。
 - 2026-09-29 起，正式試算表套用這套機制（feature `050` 部署窗口 S1–S9）。
@@ -195,4 +196,4 @@ node scripts/content-audit.mjs check | grep 'gatekeeping.md'   # 應無輸出
 
 以及第 8 章的票況指令。
 
-正本：`docs/constitution-features/054-gatekeeping-overview.md` 的 `## Design` 第一節。
+正本：`docs/constitution-features/_archive/054-gatekeeping-overview.md` 的 `## Design` 第一節。
