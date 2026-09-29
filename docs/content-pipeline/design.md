@@ -150,6 +150,21 @@
 > 三個分頁另有八個審核欄位。`status` 與 `current_fingerprint` 由公式產生，人不得輸入。
 > 現行規格見〈修訂紀錄〉的「2026-09-03 — feature 040 repo 實作完成」。原文保留供追溯。
 
+> ⚠️ **2026-09-29 補述（feature 050）：正式 SSOT 已建好八個審核欄位與 `chapter`。下方三張欄位表不改，實際欄位如下。**
+> 讀取時間 2026-09-29，來源為發布版 CSV 的標題列。**這是歷史讀數**，現況以試算表第一列為準。
+>
+> | 分頁 | 欄數 | 比下方欄位表多出的欄 |
+> |---|---|---|
+> | `Track 1_history` | 18 | `chapter`，以及 `review_decision`、`review_fingerprint`、`approved_fingerprint`、`current_fingerprint` |
+> | `Track 2_discussion` | 21 | `owl_depth_comment`、`full_content`，以及 `review_decision`、`review_fingerprint`、`approved_fingerprint`、`current_fingerprint` |
+> | `site_tldr` | 12 | 八個審核欄位中除 `status` 以外的七欄 |
+>
+> 八個審核欄位是 `status`、`review_decision`、`review_fingerprint`、`approved_by`、
+> `approved_at`、`approved_fingerprint`、`current_fingerprint`、`reject_reason`。
+> `status` 與 `current_fingerprint` 由公式產生。其餘六欄由 `Review` 選單寫入，只有責任編輯可改。
+> `chapter` 在 2026-09-29 部署時全欄空白。它是 Track 1 內容指紋的欄位之一，Apps Script 要求它存在。欄位位置與保護範圍見 [`operations.md`](operations.md)〈正式 SSOT 部署〉。
+> 原表保留。
+
 ### 分頁
 
 | 分頁 | 放什麼 |
@@ -253,6 +268,34 @@
 > 網站用 `DISCUSSIONS_DATA.find(item => item.id === 'tldr')` 找它（`src/app/present/page.tsx:392`）。
 > 而 `OfficialTLDR` 的第一行是 `if (!item) return null`（同檔 L75）——
 > **找不到不會報錯、不會擋建置，整個區塊直接消失。**
+
+### 發布欄位範圍
+
+> 2026-09-29 新增（feature `064` 階段一）。本節描述現行機制，不是提案。
+> 第 1、2、4、5 列（共四列）抄自 feature `040` 的 design（`../constitution-features/_archive/040-approval-content-version-binding.md` 的〈發布欄位範圍〉）。
+> 選填列由 `064` 新增。見文末修訂紀錄「2026-09-29 — 新增〈發布欄位範圍〉表」。
+
+內容指紋只涵蓋會改變 JSON 的輸入。
+`tests/approval-content-version-binding.test.mjs` 的 `DESIGN_PROJECTION` 逐字抄自下表。
+**改動發布欄位時，先改這張表，再改測試，最後改程式。**
+
+| 分頁 | 指紋欄位，順序固定 |
+|---|---|
+| `Track 1_history` | `id`, `category`, `chapter`, `content`, `handwriting`, `year`, `title`, `ruling`, `ruling_id`, `image_url` |
+| `Track 2_discussion` | `id`, `category`, `title`, `author`, `year`, `abstract`, `link`, `views`, `owl_comment`, `owl_depth_comment`, `vibe`, `sticky`, `full_content` |
+| `Track 2_discussion`（選填，有值才計入） | `case_ref`, `stance` |
+| `site_tldr`, `order = 0` | `order`, `text`, `link` |
+| `site_tldr`, `order >= 1` | `order`, `label`, `text` |
+
+- `status`、所有審核欄位與 `reject_reason` 不進指紋。
+- 程式依欄名取值。移動欄位不改變指紋。
+- Track 2 的指紋在最後加上「非空資料列序號」。移動列後必須重新核可。
+- 「非空資料列」是 13 個 Track 2 發布欄位任一非空的列。只填審核欄位或選填欄位的列不佔序號。
+- 選填欄位空白時不進指紋。所以加欄不會讓既有核可失效。
+- 選填欄位有值時，依表列順序附加在 13 欄之後、序號之前。填了值的列要重新核可。
+- `case_ref` 與 `stance` 必須同時填寫或同時空白。只填一欄，同步中止。
+- `case_ref` 的值必須是 `src/data/verified-case-refs.mjs` 的鍵。`stance` 的值必須是 `支持`、`質疑`、`中立分析` 之一。
+  兩項檢查只對已核可的列執行。填錯一格，整份同步中止。
 
 ---
 
@@ -456,6 +499,7 @@ staging 顯示的是「目前所有已核可內容」，那是另一個問題。
 | 8   | **把同步移出 build**                    | 工程     | 7   | ✅ 2026-09-02（PR #32，已於 main 實測 build 前後 sha256 不變） |
 | 9   | 跑完整同步 → 開 PR → 對 diff → 合併         | 工程＋編輯台 | 7,8 | 🟢 **下一步** —— captain 決定程式與內容分開 PR |
 | 10  | 封存 `SSOT_Editor`                   | 人工     | 9   | ✅ 2026-09-02 改名為 `_已封存_SSOT_Editor_20260902` |
+| 11  | 正式 SSOT 套用核可版本綁定（feature 050） | 人工＋工程 | 7   | ✅ 2026-09-29（部署窗口 S1–S9；040 於 PR #43 合併） |
 
 > ⚠️ **2026-09-04 更正：上表第 4 項的狀態已不成立。**
 > `status` 保護範圍已設定完成，不是「等有協作者再設」。
@@ -541,6 +585,13 @@ staging 顯示的是「目前所有已核可內容」，那是另一個問題。
 > 第二節欄位表與第五節施工順序表仍不改，等實作後再寫。
 > 驗證目標不變：在 `064` 實作合併前，`grep -c "case_ref" scripts/sync-content.mjs` 為 `0`。
 > 原文保留。本次補述見文末修訂紀錄「2026-09-29 — `019` 兩欄已核准，交由 `064` 施工」。
+
+> ⚠️ **2026-09-29 第二則補述（`064` 階段一）：同步程式已改，試算表仍未加欄。**
+> 本補述與 `064` 階段一的程式改動在同一個 PR。PR 合併後，上一則的「同步程式未改」不再成立。
+> 同步程式認得兩欄，兩欄不存在時照常通過。規則見第二節〈發布欄位範圍〉。
+> **試算表仍未新增任何欄位。** 加欄是 `064` 第五節的階段二，由 captain 執行。
+> 驗證目標：`grep -c "case_ref" scripts/sync-content.mjs` 大於 `0`；`src/data/*.json` 在本 PR 無改動。
+> 原文保留。
 
 ---
 
@@ -734,6 +785,67 @@ S9 在 `2026-09-29T18:22:35Z` 以 040 的同步程式唯讀讀取正式表：exi
 044 的結論：`grep -m2 -E '^(status|verdict):' docs/constitution-features/_archive/044-approval-permission-two-account-probe.md`。
 
 **施工單**：feature `054`（本補述是其 design 階段〈現在更新〉的一筆）。
+
+### 2026-09-29 — 第二節欄位表與第五節施工順序表的補述（feature 050）
+
+**起因**：feature 050 的 `## Documentation impact`〈實作後更新〉列了本文兩處：
+第二節欄位表補上八個審核欄位與 `chapter`，第五節施工順序表追加 050。條件「部署完成後」已成立。
+
+**改了什麼**：第二節檔首補述下方追加一則 ⚠️ 補述，列出三個分頁實際多出的欄。
+第五節施工順序表追加第 11 列。
+
+**沒有改什麼**：三張欄位表與施工順序表原有各列一字未改。
+上一則修訂紀錄（feature 054）已補的檔頭與〈部署狀態〉兩則補述，本次不重複。
+
+**依據的證據**：2026-09-29 讀取三個分頁發布版 CSV 的標題列（18／21／12 欄）。
+同日在 main 實際同步一次：exit 0，40 筆與 16 筆，`src/data/` 無 diff。
+記錄見 feature 050 票〈部署窗口記錄（續二）〉。
+
+**施工單**：feature `050`。
+
+### 2026-09-29 — 新增〈發布欄位範圍〉表（feature 064 階段一）
+
+**起因**：`tests/approval-content-version-binding.test.mjs` 的 `DESIGN_PROJECTION` 註解寫「逐字抄自 design.md 的『發布欄位範圍』表」。
+feature `045` 的 design 查出本文沒有這張表。它只存在於 `040` 的封存票。
+`064` 要在這份清單加兩個選填欄位，必須先有這張表。
+
+**改了什麼**：
+
+- 第二節新增〈發布欄位範圍〉小節。四列照抄 `040` 封存票，另加 Track 2 選填列 `case_ref`、`stance`。
+- 第七節 `📌` 提案記錄下方追加第二則補述。
+
+**沒有改什麼**：第二節 `Track 2_discussion` 欄位表、第五節施工順序表。
+兩處依 `064` 第九節，在階段二完成後才更新。2026-09-21 與 2026-09-29 兩則既有記錄一字未改。
+
+**現況**：同步程式、指紋與 Apps Script 已支援兩欄（本 PR）。試算表尚未加欄。
+責任編輯填 `stance`，captain 在同步 PR 看 diff（captain 2026-09-29 決定）。
+
+**施工單**：[`../constitution-features/064-track2-case-ref-stance-columns.md`](../constitution-features/064-track2-case-ref-stance-columns.md)
+
+### 2026-09-29 — 同步對未算完快照重抓（feature 070）
+
+**起因**：feature 050 於 2026-09-29 在正式表同步時失敗：`Track 2` 有 36 列 `status` 為 `載入中…`。
+試算表內容正確。Google 發布的 CSV 有多份快取，有時送出公式還在計算的版本。
+同日另發現：經符號連結路徑執行 `sync-content.mjs` 時，程式 exit 0 而不做任何事。
+
+**改了什麼**：只改 `scripts/sync-content.mjs` 的抓取層、`report` 的結尾句與檔尾的入口判斷。
+
+- `status` 或 `current_fingerprint` 的值完全等於 `載入中…`、`Loading...`、`#NAME?` 時，重抓該分頁。
+  最多抓 8 次。一份快照整份採用或整份丟棄，不拼接。
+- 重抓期間，去掉兩個衍生欄後的內容必須與先前的快照相同，否則中止。
+- 用盡時以 `快照` 錯誤中止，不把未算完的快照交給驗證。
+- 入口判斷改為解開符號連結後比對。無法判斷時印 `⛔ 入口判斷失敗` 並 exit 1，不再 exit 0。
+
+**沒有改什麼**：第四節的檢查規則、第六節的不變式、feature 040 的指紋比對全部未動。
+`validateApprovalBinding`、`checkStatusValues` 等 16 個驗證與輸出函式，以及 `scripts/content-fingerprint.mjs`，
+與 main 逐位元組相同。被採用的快照照原樣跑完全部驗證。
+
+**不變式 #3 如何維持**：重抓用盡、內容改變、驗證失敗三種情況都整份中止，兩個 JSON 都不寫。
+重抓只改變同步多早成功，不改變什麼內容可以上線。
+
+**依據的證據**：feature 070 票〈Risk evidence〉（3×240 次唯讀抓取）與〈Stage Report: implement〉。
+
+**施工單**：feature `070`。
 
 ### 2026-09-29 — 第六節新增不變式 #7：不讓 AI 生成的內容上線
 

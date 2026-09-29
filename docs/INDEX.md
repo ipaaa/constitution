@@ -46,7 +46,7 @@ docs/
 |---|---|---|---|---|
 | `docs/project/about.md` | 專案定位、三圈目標受眾、溝通策略 | evergreen | captain | 2026-09-01 |
 | `docs/project/architecture.md` | 過去／現在／未來三軌的資訊架構 | evergreen | captain | 2026-09-23 |
-| `docs/project/design-system.md` | 視覺美學、色彩、排版、吉祥物語言 | evergreen | captain | 2026-09-23 |
+| `docs/project/design-system.md` | 視覺美學、色彩、排版、吉祥物語言 | evergreen | captain | 2026-09-29 |
 | `docs/project/tech-stack.md` | 網站技術、SSOT、版本綁定與手動同步資料流；含 2026-09-21 外部資料抓取程式補述 | evergreen | captain | 2026-09-03 |
 | `docs/project/contributing.md` | Spacedock 開發流程與內容重新核可流程 | evergreen | captain | 2026-09-03 |
 
@@ -54,8 +54,8 @@ docs/
 
 | 路徑 | 用途 | 狀態 | 負責人 | 最後查核 |
 |---|---|---|---|---|
-| `docs/content-pipeline/design.md` | 產線的唯一規格；現行機制見〈修訂紀錄〉2026-09-03 feature 040 條目，第二至第五節為已取代的舊模型 | plan | captain | 2026-09-04 |
-| `docs/content-pipeline/operations.md` | 核可、拒絕、重新核可、同步錯誤與復原步驟；兩帳號 probe 由 feature 044 承接 | evergreen | captain | 2026-09-04 |
+| `docs/content-pipeline/design.md` | 產線的唯一規格；現行機制見〈修訂紀錄〉2026-09-03 feature 040 條目，第二至第五節為已取代的舊模型 | plan | captain | 2026-09-29 |
+| `docs/content-pipeline/operations.md` | 核可、拒絕、重新核可、同步錯誤與復原步驟；兩帳號 probe 由 feature 044 承接 | evergreen | captain | 2026-09-29 |
 | `docs/content-pipeline/gatekeeping.md` | 內容把關總覽。每個角色的編輯流程、試算表 A／B／C 欄位權限、核可版本綁定、防線與缺口表、上線前檢查。只連正本，票況用指令產生 | evergreen | captain | 2026-09-29 |
 | `docs/content-pipeline/data-collection-guide.md` | T3（未來軌）的資料收集流程。T1／T2 已移除，改指向 `design.md` | evergreen | captain | 2026-09-21 |
 | `docs/content-pipeline/approval-permission-probe.md` | 隔離測試表兩帳號 probe 記錄。核可欄位權限邊界與 `status` 公式重算的實測證據 | record | — | 2026-09-15 |
@@ -65,14 +65,14 @@ docs/
 | 路徑 | 用途 | 狀態 | 負責人 | 最後查核 |
 |---|---|---|---|---|
 | `docs/health-check/2026-08-31-content-pipeline.md` | 體檢報告。出了什麼事、為什麼會上線。**含兩則補述，先看上方** | record | — | 2026-09-01 |
-| `docs/health-check/2026-09-03-editor-onboarding.md` | 學者編輯上稿流程稽核。開放編輯權限後還開著的洞、使用說明改寫對照、會議講稿 | record | — | 2026-09-03 |
-| `docs/health-check/TODO.md` | 待辦清單；含 feature 040 與多人編輯、正式同步的前置關係 | plan | captain | 2026-09-24 |
+| `docs/health-check/2026-09-03-editor-onboarding.md` | 學者編輯上稿流程稽核。開放編輯權限後還開著的洞、使用說明改寫對照、會議講稿 | record | — | 2026-09-29 |
+| `docs/health-check/TODO.md` | 待辦清單；含 feature 040 與多人編輯、正式同步的前置關係 | plan | captain | 2026-09-29 |
 
 ### 驗證腳本
 
 | 路徑 | 用途 | 狀態 | 負責人 | 最後查核 |
 |---|---|---|---|---|
-| `scripts/check-voided-floor.mjs` | 檢查站上是否把已失效的 10 人參與評議下限當成現行法。對真實頁面 HTML 跑三項檢查（門檻句不得帶持續語彙／門檻須與失效及依據同窗出現／停擺敘述不得帶持續語彙）。用法：`node scripts/check-voided-floor.mjs <url>...`，全 PASS 時離開碼 0 | evergreen | — | 2026-09-24 |
+| `scripts/check-voided-floor.mjs` | 檢查站上是否把已失效的 10 人參與評議下限當成現行法。對真實頁面 HTML 跑三項檢查（門檻句不得帶持續語彙／門檻須與失效及依據同窗出現／停擺敘述不得帶持續語彙）。用法：`node scripts/check-voided-floor.mjs <url>...`，全 PASS 時離開碼 0。已知須涵蓋七條路由：`/future`、`/controversy-timeline`、`/quiz/controversy`、`/quiz/pending`、`/quiz/rights`、`/quiz/perspectives`、`/past/thresholds`。須對 LaunchGate 已放行的副本執行（作法見 `docs/constitution-features/_archive/066-quiz-timeline-voided-quorum-present-tense.md` 第 8.1 小節）；未放行時 client component 頁面渲染不出內容，輸出「下限數字出現 0 次」而假性通過。有門檻內容的路由 N 必須 ≥ 1 | evergreen | — | 2026-09-29 |
 | `scripts/content-audit.mjs` | 全站中文內容的法律事實查核（feature `067`）。`check` 跑六條機器判得了的規則 M1–M6（號次存在、號次與年份配對、門檻數值、日期與順序、同段紀年混用、封存路徑），全過時離開碼 0；`reading-list` 輸出人判的 L 層與 H 層清單。只在需要時手動跑，不接 build | evergreen | — | 2026-09-29 |
 | `scripts/fetch-judgment-dockets.mjs` | 從司法院憲判字清單抓號次、判決日期與官方案名，只寫 `tests/fixtures/judgment-dockets.json`。人工執行 | evergreen | — | 2026-09-29 |
 
@@ -177,6 +177,11 @@ docs/
 > `git ls-tree main docs/content-pipeline/` 只有 `design.md` 與 `data-collection-guide.md` 兩檔。
 > `operations.md` 只存在於 feature 040 的 worktree，尚未合併。040 合併後才需要改這一列。
 > 原表格與原句保留。
+
+> ⚠️ **2026-09-29 補述：上方「040 合併後才需要改這一列」的條件已成立，`operations.md` 已在 main。**
+> feature 040 已於 PR #43 合併（merge commit `e98ed02`），`operations.md` 隨之進入 main。
+> 它在上方〈文件〉表已有一筆索引。上表「（新增）」那一列可視為完成。
+> 2026-09-29 feature 050 在該檔新增〈正式 SSOT 部署〉一節，並對過時的四句追加補述。原句保留。
 
 ### 第 4 階段 — 防漂移檢查（captain 已核准）
 

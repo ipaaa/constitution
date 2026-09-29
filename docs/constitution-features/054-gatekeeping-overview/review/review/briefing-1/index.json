@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:054:review:attempt-1:revision-1",
+  "question": "Approve 054 review (cycle 2 PASSED) and deliver to merge?",
+  "artifacts": [
+    {
+      "id": "artifact:054:review:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/5cdd4e40c02371b4a1e0db45544e01f79b27378b/docs/constitution-features/054-gatekeeping-overview.md",
+      "rev": "sha256:c18c3ea96ced7fec32a2b3e9f2a45e52d7f9023a7f1cded373e316166b330160",
+      "mediaType": "text/markdown",
+      "summary": "Review cycle 1 rejected only on R1 (the overview's self-link would break the M6 check once 054 is archived). FO authorized R1–R3 fix; R4 handled at merge; R5 declined for 054. Re-review PASSED: on a clone M6 stays 9 with no line naming gatekeeping.md before and after archive; R2 (TODO.md row moved) and R3 (one-line plain explanation of 「指紋」) done; no other change; G-7 PASS; AGENTS.md unchanged since the captain-approved version. Earlier: update mechanism delivered (README clause 34663fd), review caught an overview omission 4 of 5 times, fresh reader 8/8. Merge notes: INDEX/design.md revision-log conflicts with 050 keep both sides in order; whichever of 054/064 merges second adds 064's checks to ch.4/ch.5."
+    }
+  ]
+}

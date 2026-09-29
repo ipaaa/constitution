@@ -11,6 +11,7 @@ import vm from 'node:vm';
 import {
   fingerprintPayload,
   fingerprintPublishedRow,
+  OPTIONAL_PUBLISHED_FIELDS,
   PUBLISHED_FIELDS,
   SHEET_KEYS,
 } from '../scripts/content-fingerprint.mjs';
@@ -37,6 +38,8 @@ const DESIGN_PROJECTION = Object.freeze({
   track2: Object.freeze(['id', 'category', 'title', 'author', 'year', 'abstract', 'link', 'views', 'owl_comment', 'owl_depth_comment', 'vibe', 'sticky', 'full_content']),
   tldrHeading: Object.freeze(['order', 'text', 'link']),
   tldrPoint: Object.freeze(['order', 'label', 'text']),
+  // 選填發布欄位：有值才計入指紋（feature 064）。
+  track2Optional: Object.freeze(['case_ref', 'stance']),
 });
 const TLDR_HEADING = { order: '0', label: '', text: '摘要標題', link: 'https://example.test/tldr' };
 const TLDR_POINT = { order: '1', label: '重點', text: '重點內容', link: '' };
@@ -125,6 +128,26 @@ test('三個分頁的指紋投影與 design.md 的發布欄位範圍表逐字相
   assert.deepEqual(projected(SHEET_KEYS.TRACK_2, TRACK_2, 1), [...DESIGN_PROJECTION.track2, '__sequence']);
   assert.deepEqual(projected(SHEET_KEYS.SITE_TLDR, TLDR_HEADING), [...DESIGN_PROJECTION.tldrHeading]);
   assert.deepEqual(projected(SHEET_KEYS.SITE_TLDR, TLDR_POINT), [...DESIGN_PROJECTION.tldrPoint]);
+});
+
+test('Track 2 選填發布欄位與 design.md 的發布欄位範圍表逐字相同，Node 與 Apps Script 兩端都是', () => {
+  assert.deepEqual([...OPTIONAL_PUBLISHED_FIELDS[SHEET_KEYS.TRACK_2]], [...DESIGN_PROJECTION.track2Optional]);
+  const gsOptional = vm.runInContext('OPTIONAL_APPROVAL_FIELDS', loadAppsScript());
+  assert.deepEqual(Object.keys(gsOptional), [SHEET_KEYS.TRACK_2]);
+  assert.deepEqual([...gsOptional[SHEET_KEYS.TRACK_2]], [...DESIGN_PROJECTION.track2Optional]);
+  // 每個選填欄位有值時都進投影，排在 13 欄之後、__sequence 之前。
+  const filled = Object.fromEntries(DESIGN_PROJECTION.track2Optional.map(field => [field, `${field}-value`]));
+  const fields = JSON.parse(fingerprintPayload(SHEET_KEYS.TRACK_2, { ...TRACK_2, ...filled }, 1))[2].map(([field]) => field);
+  assert.deepEqual(fields, [...DESIGN_PROJECTION.track2, ...DESIGN_PROJECTION.track2Optional, '__sequence']);
+  // Apps Script 端逐欄：填一個選填欄位就改變指紋，且與 Node 相同。
+  const { CONTENT_FINGERPRINT } = loadAppsScript();
+  const blank = CONTENT_FINGERPRINT(SHEET_KEYS.TRACK_2, ...gsArgs(SHEET_KEYS.TRACK_2, TRACK_2, 1));
+  DESIGN_PROJECTION.track2Optional.forEach((field, index) => {
+    const optionalArgs = DESIGN_PROJECTION.track2Optional.map((_, i) => (i === index ? 'x' : ''));
+    const gs = CONTENT_FINGERPRINT(SHEET_KEYS.TRACK_2, ...gsArgs(SHEET_KEYS.TRACK_2, TRACK_2, 1), ...optionalArgs);
+    assert.notEqual(gs, blank, field);
+    assert.equal(gs, fingerprintPublishedRow(SHEET_KEYS.TRACK_2, { ...TRACK_2, [field]: 'x' }, 1), field);
+  });
 });
 
 test('fingerprint-v1 正規化 NFC、換行、trim、sticky、views 與 order', () => {
@@ -355,4 +378,238 @@ test('原子寫入在第二個 rename 失敗時復原第一個檔案', async () 
   );
   assert.equal(fs.readFileSync(path.join(root, 'history.json'), 'utf8'), 'old-history');
   assert.equal(fs.readFileSync(path.join(root, 'discussions.json'), 'utf8'), 'old-discussions');
+});
+
+// ---------------------------------------------------------------------------
+// 070：未算完快照的重抓，與入口判斷
+// ---------------------------------------------------------------------------
+
+/** 路徑 → 回應陣列。第 n 次請求回應第 min(n, 長度) 個元素。counts 記錄每個路徑的請求次數。 */
+async function withSequenceServer(sequences, callback) {
+  const counts = {};
+  const server = http.createServer((request, response) => {
+    counts[request.url] = (counts[request.url] || 0) + 1;
+    const responses = sequences[request.url];
+    const body = responses ? responses[Math.min(counts[request.url], responses.length) - 1] : undefined;
+    response.writeHead(body === undefined ? 404 : 200, { 'content-type': 'text/csv; charset=utf-8' });
+    response.end(body ?? 'missing');
+  });
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  try {
+    const { port } = server.address();
+    return { counts, value: await callback(`http://127.0.0.1:${port}`) };
+  } finally {
+    await new Promise(resolve => server.close(resolve));
+  }
+}
+
+async function execSync(script, env) {
+  try {
+    const child = await execFileAsync(process.execPath, [script], {
+      cwd: path.resolve('.'),
+      env: { ...process.env, CONTENT_SYNC_RETRY_DELAY_SCALE: '0', ...env },
+    });
+    return { code: 0, ...child };
+  } catch (error) {
+    return { code: error.code, stdout: error.stdout, stderr: error.stderr };
+  }
+}
+
+/** 同 runSync，但每個路徑可以依請求次數換回應，並回報請求次數。 */
+async function runSequencedSync(sequences, { script = 'scripts/sync-content.mjs', env = {} } = {}) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'approval-retry-'));
+  const output = path.join(root, 'data');
+  fs.mkdirSync(output);
+  fs.writeFileSync(path.join(output, 'history.json'), 'history-before');
+  fs.writeFileSync(path.join(output, 'discussions.json'), 'discussions-before');
+  const { counts, value } = await withSequenceServer(sequences, base => execSync(script, {
+    TRACK_1_CSV_URL: `${base}/track1.csv`,
+    TRACK_2_CSV_URL: `${base}/track2.csv`,
+    SITE_TLDR_CSV_URL: `${base}/site.csv`,
+    CONTENT_OUTPUT_DIR: output,
+    ...env,
+  }));
+  const read = name => fs.readFileSync(path.join(output, name), 'utf8');
+  return { ...value, counts, history: read('history.json'), discussions: read('discussions.json') };
+}
+
+/** 每個路徑都只有一種回應，除非 overrides 指定該路徑的回應序列。 */
+function sequenced(base, overrides = {}) {
+  return Object.fromEntries(Object.entries(base).map(([url, csv]) => [url, overrides[url] || [csv]]));
+}
+
+const SECOND = { ...TRACK_2, id: 'd2', title: '第二筆', link: 'https://example.test/d2' };
+const approvedTrack2 = (records = [TRACK_2, SECOND]) => records.map((record, index) => approve(SHEET_KEYS.TRACK_2, record, index + 1));
+/** Risk evidence 實測到的形狀：兩個衍生欄同時是未算完值，其餘格子不變。 */
+const pendingRow = (record, value = '載入中…') => ({ ...record, status: value, current_fingerprint: value });
+
+const NORMAL = fixtureCsv({ track2: approvedTrack2() });
+const [N1, N2] = approvedTrack2();
+const PENDING_TRACK2 = fixtureCsv({ track2: [N1, pendingRow(N2)] })['/track2.csv'];
+
+function lastLine(text) {
+  return text.trimEnd().split('\n').at(-1);
+}
+
+function assertNotWritten(result) {
+  assert.equal(result.history, 'history-before');
+  assert.equal(result.discussions, 'discussions-before');
+}
+
+test('AC-1 未算完快照兩次後成功，輸出與一次成功逐位元組相同', async () => {
+  const baseline = await runSequencedSync(sequenced(NORMAL));
+  assert.equal(baseline.code, 0, baseline.stderr);
+  const flaky = await runSequencedSync(sequenced(NORMAL, {
+    '/track2.csv': [PENDING_TRACK2, PENDING_TRACK2, NORMAL['/track2.csv']],
+  }));
+  assert.equal(flaky.code, 0, flaky.stderr);
+  assert.equal(flaky.discussions, baseline.discussions);
+  assert.equal(flaky.history, baseline.history);
+  assert.deepEqual(flaky.counts, { '/track1.csv': 1, '/track2.csv': 3, '/site.csv': 1 });
+  assert.match(flaky.stdout, /✅ Track 2 第 3 次抓到算完的發布版。/);
+  assert.ok(flaky.stdout.includes('⏳ Track 2 的發布版還沒算完：1 列的 status／current_fingerprint 顯示「載入中…」。10 秒後重抓（第 2／8 次）。'), flaky.stdout);
+});
+
+test('AC-2 未算完快照用盡時 exit 1、請求恰 8 次、訊息可辨識、零寫入', async () => {
+  const result = await runSequencedSync(sequenced(NORMAL, { '/track2.csv': [PENDING_TRACK2] }));
+  assert.equal(result.code, 1);
+  assert.equal(result.counts['/track2.csv'], 8);
+  assert.match(result.stderr, /快照/);
+  assert.match(result.stderr, /發布版連續 8 次都還沒算完：1 列的 status／current_fingerprint 顯示「載入中…」/);
+  assert.match(lastLine(result.stderr), /不是內容錯誤/);
+  assert.doesNotMatch(result.stderr, /status 必須是/);
+  assert.doesNotMatch(result.stderr, /與目前發布內容不符/);
+  assertNotWritten(result);
+});
+
+// 核可後才改的 abstract；三份指紋仍是核可當時的值。
+const MISMATCHED = [{ ...N1, abstract: '核可之後才改的摘要' }, N2];
+
+test('AC-3 算完的快照內容不符時只抓一次並整份中止', async () => {
+  const result = await runSequencedSync(sequenced(fixtureCsv({ track2: MISMATCHED })));
+  assert.equal(result.code, 1);
+  assert.equal(result.counts['/track2.csv'], 1);
+  assert.match(result.stderr, /與目前發布內容不符。需要重新核可。/);
+  assert.match(lastLine(result.stderr), /請修正 SSOT 後重試。$/);
+  assertNotWritten(result);
+});
+
+test('AC-4 重抓後取得的快照仍須通過完整驗證', async () => {
+  const settled = fixtureCsv({ track2: MISMATCHED })['/track2.csv'];
+  const pending = fixtureCsv({ track2: [MISMATCHED[0], pendingRow(MISMATCHED[1])] })['/track2.csv'];
+  const result = await runSequencedSync(sequenced(NORMAL, { '/track2.csv': [pending, settled] }));
+  assert.equal(result.code, 1);
+  assert.equal(result.counts['/track2.csv'], 2);
+  assert.match(result.stderr, /與目前發布內容不符/);
+  assert.doesNotMatch(result.stderr, /發布版連續/);
+  assertNotWritten(result);
+});
+
+test('AC-5 未算完快照與後續快照內容投影不同時中止', async () => {
+  const edited = fixtureCsv({ track2: approvedTrack2([TRACK_2, { ...SECOND, title: '重抓期間改過的標題' }]) })['/track2.csv'];
+  const result = await runSequencedSync(sequenced(NORMAL, { '/track2.csv': [PENDING_TRACK2, edited] }));
+  assert.equal(result.code, 1);
+  assert.match(result.stderr, /重抓期間發布內容改變了（第 1 次與第 2 次不同）/);
+  assert.match(lastLine(result.stderr), /不是內容錯誤/);
+  assertNotWritten(result);
+});
+
+test('AC-6 #NAME? 與載入中…同樣處理；內容欄裡的「載入中…」不觸發重抓', async t => {
+  await t.test('(a) site_tldr 的 status 為 #NAME?', async () => {
+    const site = [approve(SHEET_KEYS.SITE_TLDR, TLDR_HEADING), approve(SHEET_KEYS.SITE_TLDR, TLDR_POINT)];
+    const nameError = fixtureCsv({ track2: approvedTrack2(), site: site.map(record => ({ ...record, status: '#NAME?' })) })['/site.csv'];
+    const result = await runSequencedSync(sequenced(NORMAL, { '/site.csv': [nameError, nameError, NORMAL['/site.csv']] }));
+    assert.equal(result.code, 0, result.stderr);
+    assert.equal(result.counts['/site.csv'], 3);
+    assert.match(result.stdout, /site_tldr 的發布版還沒算完：2 列的 status 顯示「#NAME\?」/);
+  });
+  await t.test('(b) abstract 內容就是「載入中…」', async () => {
+    const result = await runSequencedSync(sequenced(fixtureCsv({ track2: approvedTrack2([{ ...TRACK_2, abstract: '載入中…' }, SECOND]) })));
+    assert.equal(result.code, 0, result.stderr);
+    assert.equal(result.counts['/track2.csv'], 1);
+    assert.match(result.discussions, /"abstract": "載入中…"/);
+  });
+});
+
+test('AC-7(a) 驗證本身沒有放寬：未算完快照直接交給 buildTrack2 仍被擋下', async () => {
+  const { buildTrack2 } = await import('../scripts/sync-content.mjs');
+  const errors = [];
+  assert.equal(buildTrack2(PENDING_TRACK2, errors), null);
+  assert.ok(errors.some(error => error.message === 'status 必須是 Approved、Rejected、Needs review 或空白，實際為「載入中…」。'), JSON.stringify(errors));
+});
+
+test('fetchSettledCSV 依規格的間隔等待，網路錯誤不重抓', async () => {
+  const { fetchSettledCSV } = await import('../scripts/sync-content.mjs');
+  const waits = [];
+  const io = {
+    fetch: async () => new Response(PENDING_TRACK2),
+    sleep: async ms => { waits.push(ms); },
+    log: () => {},
+    delayScale: 1,
+  };
+  const errors = [];
+  assert.equal(await fetchSettledCSV({ group: 'Track 2', url: 'x' }, errors, io), null);
+  assert.deepEqual(waits, [10, 10, 20, 30, 45, 60, 90].map(seconds => seconds * 1000));
+  assert.deepEqual(errors.map(error => error.key), ['快照']);
+
+  let calls = 0;
+  const offline = { ...io, fetch: async () => { calls++; throw new Error('offline'); } };
+  const networkErrors = [];
+  assert.equal(await fetchSettledCSV({ group: 'Track 2', url: 'x' }, networkErrors, offline), null);
+  assert.equal(calls, 1);
+  assert.deepEqual(networkErrors.map(error => error.key), ['抓取']);
+});
+
+test('AC-9 入口判斷在路徑不一致時不可以 exit 0 而什麼都不做', async t => {
+  // os.tmpdir() 在 macOS 是 /var/…，本身就是 /private/var/… 的符號連結；目錄連結本身涵蓋其他平台。
+  // 連結指向 repo 的 scripts/，不複製檔案：本程式日後新增的相對 import 仍解析得到。
+  // 輸出一律寫到 CONTENT_OUTPUT_DIR 的暫存目錄，不碰 src/data。
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'sync-entry-'));
+  const link = path.join(root, 'linked');
+  fs.symlinkSync(path.resolve('scripts'), link, 'dir');
+  const viaLink = path.join(link, 'sync-content.mjs');
+
+  await t.test('(a) 經符號連結執行時正常同步', async () => {
+    const direct = await runSequencedSync(sequenced(NORMAL));
+    const linked = await runSequencedSync(sequenced(NORMAL), { script: viaLink });
+    assert.equal(linked.code, 0, linked.stderr);
+    assert.match(linked.stdout, /🚀 Starting Content Sync\.\.\./);
+    assert.equal(linked.discussions, direct.discussions);
+    assert.equal(linked.history, direct.history);
+  });
+
+  await t.test('(b) 經符號連結執行時，環境變數未設定仍然失敗', async () => {
+    const result = await execSync(viaLink, { TRACK_1_CSV_URL: '', TRACK_2_CSV_URL: '', SITE_TLDR_CSV_URL: '' });
+    assert.equal(result.code, 1);
+    assert.match(result.stderr, /環境變數未設定/);
+  });
+
+  await t.test('(c) 檔名相同、真實路徑不同 → mismatch，子程序 exit 1', async () => {
+    const { resolveEntry } = await import('../scripts/sync-content.mjs');
+    const realpath = file => file.replace('/alias/', '/real/');
+    assert.equal(resolveEntry('/alias/scripts/sync-content.mjs', '/real/scripts/sync-content.mjs', realpath), 'run');
+    assert.equal(resolveEntry('/a/sync-content.mjs', '/b/sync-content.mjs', realpath), 'mismatch');
+    assert.equal(resolveEntry('/a/other.mjs', '/b/sync-content.mjs', realpath), 'import');
+    assert.equal(resolveEntry(undefined, '/b/sync-content.mjs', realpath), 'import');
+    assert.equal(resolveEntry('/a/sync-content.mjs', '/b/sync-content.mjs', () => { throw new Error('ENOENT'); }), 'mismatch');
+
+    // 另一個也叫 sync-content.mjs 的檔案匯入本程式：argv[1] 的檔名相同，真實路徑不同。
+    const impostorDir = path.join(root, 'impostor');
+    fs.mkdirSync(impostorDir);
+    const impostor = path.join(impostorDir, 'sync-content.mjs');
+    fs.writeFileSync(impostor, `import ${JSON.stringify(path.resolve('scripts/sync-content.mjs'))};\n`);
+    const result = await execSync(impostor, {});
+    assert.equal(result.code, 1);
+    assert.match(result.stderr, /⛔ 入口判斷失敗/);
+    assert.doesNotMatch(result.stdout, /Starting Content Sync/);
+  });
+
+  await t.test('(d) 別的檔案匯入本程式時不觸發同步', async () => {
+    const importer = path.join(root, 'importer.mjs');
+    fs.writeFileSync(importer, `import ${JSON.stringify(path.resolve('scripts/sync-content.mjs'))};\n`);
+    const result = await execSync(importer, {});
+    assert.equal(result.code, 0, result.stderr);
+    assert.doesNotMatch(result.stdout, /Starting Content Sync/);
+    assert.equal(result.stderr, '');
+  });
 });

@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:071:verify:attempt-1:revision-1",
+  "question": "Approve 071 verify (PASSED) and advance to review?",
+  "artifacts": [
+    {
+      "id": "artifact:071:verify:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/3d5a89053f8e56f121c3fbf8ad14e84de8053f0b/docs/constitution-features/071-footer-links.md",
+      "rev": "sha256:279c540efaccd3b8cb436e91104b4ac0ee18a0d211c429bf3b07ebccfdf16ba8",
+      "mediaType": "text/markdown",
+      "summary": "Independent verify PASSED: footer external links are exactly github.com/ipaaa/constitution and its issues/new, both reachable by real HTTP (issues/new via GitHub login for unauthenticated readers); old repo URLs are 404 and gone; HackMD removed; no g0v/Welcome-to-Add-C0urt or hackmd string site-wide. Measured on 8 pages after hydration with an independent jsdom probe; the pre-change footer is detected by the same probe. Scope held: only Footer.tsx (+3/−8); © line, 開源 wording, quick-nav untouched; tsc, eslint, build pass. Open for captain: 375px/1280px visual check (no working browser in sandbox); readers without a GitHub account cannot report errors."
+    }
+  ]
+}

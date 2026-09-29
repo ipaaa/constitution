@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:064:review:attempt-1:revision-1",
+  "question": "Approve 064 review (PASSED) and deliver stage 1 (code) to merge?",
+  "artifacts": [
+    {
+      "id": "artifact:064:review:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/3eff7db2386fab5832f36299702edcf8683b1f01/docs/constitution-features/064-track2-case-ref-stance-columns.md",
+      "rev": "sha256:5b16c23bc19e603bb80235a7fb3c02be707e88d7a5c0e06916f2bad7a1ad8458",
+      "mediaType": "text/markdown",
+      "summary": "Independent review PASSED: code matches design 3.2–3.5; 040's approval validation not weakened (fail-closed paths re-checked, e.g. approval-workflow.gs:247); Node/Apps Script parity symmetric and readable; three breakages re-run by reviewer all caught. Docs impact rows done or correctly scheduled for stage 2. No regressions: 118/117/0/1 with 068's 012 fix applied; tsc, build pass; no-write sync (pwd -P) byte-identical to src/data; G-7 PASS; content-audit no new failures. Findings R1 (case ref alias asymmetry, fail-closed) and R2 (test helper duplication) are Polish. Merging this ticket is stage 1; stage 2 (captain adds two columns) and stage 3 (責任編輯 fills stance) follow. 054's gatekeeping.md must list 064's new checks — whichever of 054/064 merges second updates it."
+    }
+  ]
+}

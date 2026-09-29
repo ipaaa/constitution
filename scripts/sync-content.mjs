@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { fingerprintPublishedRow, PUBLISHED_FIELDS, SHEET_KEYS } from './content-fingerprint.mjs';
+import { VERIFIED_CASE_REFS } from '../src/data/verified-case-refs.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,7 +29,14 @@ const CONFIG = {
   TRACK_2_CSV: process.env.TRACK_2_CSV_URL || '',
   SITE_TLDR_CSV: process.env.SITE_TLDR_CSV_URL || '',
   OUTPUT_DIR: process.env.CONTENT_OUTPUT_DIR || path.join(__dirname, '../src/data'),
+  // 只供測試縮短重抓等待。無效值一律當成 1：寧可多等，不可少等。
+  RETRY_DELAY_SCALE: retryDelayScale(process.env.CONTENT_SYNC_RETRY_DELAY_SCALE),
 };
+
+function retryDelayScale(raw) {
+  const scale = raw === undefined || raw.trim() === '' ? 1 : Number(raw);
+  return Number.isFinite(scale) && scale >= 0 ? scale : 1;
+}
 
 /**
  * 欄位標題的分隔符。標題可以在欄位名稱後面接中文說明，例如
@@ -59,6 +67,15 @@ const ALLOWED_VIBES = [
   '💡 腦袋升級',
   '🔥 戰火猛烈',
 ];
+
+/**
+ * stance 的允許清單。值域與定義見 feature 019 第三節 3.1。
+ *
+ * 三個值是論點取向，不是陣營。不得加入政黨名、陣營名或評價性用語
+ * （_archive/015-opposing-views-integration.md:62）。
+ * 改這個常數時，同步設定試算表的下拉選單。
+ */
+const ALLOWED_STANCES = ['支持', '質疑', '中立分析'];
 
 /**
  * 佔位與測試字串。見 AGENTS.md「不要把設計文件裡的範例當成真實內容」。
@@ -120,6 +137,9 @@ const TRACK_2_COLUMNS = [
   { field: 'views', aliases: ['views'], column: 'optional', value: 'optional' },
   { field: 'sticky', aliases: ['sticky'], column: 'optional', value: 'optional' },
   { field: 'full_content', aliases: ['full content', 'full_content'], column: 'optional', value: 'optional' },
+  // 兩欄 column: 'optional'：試算表還沒建這兩欄時，同步不可中止（feature 064 第五節階段一）。
+  { field: 'case_ref', aliases: ['case_ref', 'case ref'], column: 'optional', value: 'optional' },
+  { field: 'stance', aliases: ['stance'], column: 'optional', value: 'optional' },
   ...APPROVAL_COLUMNS,
 ];
 
@@ -235,7 +255,11 @@ function report(errors) {
     }
   }
   console.error('');
-  console.error(`共 ${errors.length} 項錯誤。請修正 SSOT 後重試。`);
+  if (errors.every(e => e.key === SNAPSHOT_KEY)) {
+    console.error(`共 ${errors.length} 項錯誤。試算表的發布版還沒就緒，不是內容錯誤。等 5 分鐘後重試。`);
+  } else {
+    console.error(`共 ${errors.length} 項錯誤。請修正 SSOT 後重試。`);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -499,10 +523,10 @@ function checkPlaceholders(record, fields, group, errors, keyField = 'id') {
 // 抓取
 // ---------------------------------------------------------------------------
 
-async function fetchCSV(url, group, errors) {
+async function fetchCSV(url, group, errors, fetchImpl = fetch) {
   let response;
   try {
-    response = await fetch(url);
+    response = await fetchImpl(url);
   } catch (err) {
     addError(errors, group, '抓取', `連不上試算表：${err.message}`);
     return null;
@@ -517,6 +541,117 @@ async function fetchCSV(url, group, errors) {
     return null;
   }
   return text;
+}
+
+/**
+ * Google 的發布 CSV 有多份快取，有時送出公式還在計算的快照：
+ * status 與 current_fingerprint 兩個衍生欄顯示「載入中…」或「#NAME?」。
+ * 那不是內容錯誤。直接交給驗證，編輯會看到數十行 status 錯誤，以為內容壞了。
+ *
+ * 所以抓取層在衍生欄出現未算完值時重抓。驗證層一個字都不改：
+ *   - 只比對衍生欄，只做完全相等比對。內容欄寫著「載入中…」不觸發重抓。
+ *     `#FINGERPRINT! …` 是內容錯誤，不在清單內。
+ *   - 一份快照要嘛整份採用，要嘛整份丟棄。不拼接。
+ *   - 被採用的快照照原樣跑完全部驗證。重抓只改變「多早成功」，不改變「什麼能上線」。
+ *   - 重抓期間內容投影（去掉衍生欄的所有格子）必須相同。重抓只允許補齊衍生欄。
+ *
+ * 規格與實測依據見 docs/constitution-features/070-sync-csv-loading-snapshot.md。
+ */
+const DERIVED_FIELDS = ['status', 'current_fingerprint'];
+const PENDING_FORMULA_VALUES = ['載入中…', 'Loading...', '#NAME?'];
+const MAX_FETCH_ATTEMPTS = 8;
+const RETRY_DELAYS_SECONDS = [10, 10, 20, 30, 45, 60, 90];
+const SNAPSHOT_KEY = '快照';
+const COLUMNS_BY_GROUP = { [TRACK_1]: TRACK_1_COLUMNS, [TRACK_2]: TRACK_2_COLUMNS, [SITE_TLDR]: SITE_TLDR_COLUMNS };
+
+/**
+ * 找出衍生欄是未算完值的格子，並算出內容投影。
+ * 標題解析失敗時回傳 null：那份 CSV 交給驗證，讓驗證報標題錯誤。
+ */
+function findPendingCells(csv, columns) {
+  const rows = parseCSVRows(csv);
+  if (rows.length === 0) return null;
+  const fieldToIndex = buildColumnMap(rows, columns, '', []);
+  if (fieldToIndex === null) return null;
+
+  const derivedIndexes = new Set(DERIVED_FIELDS.map(field => fieldToIndex[field]));
+  const projection = JSON.stringify(rows.map(row => row.filter((_, index) => !derivedIndexes.has(index))));
+
+  const keyField = columns[0].field;
+  const cells = [];
+  for (const record of toRecords(rows, fieldToIndex)) {
+    for (const field of DERIVED_FIELDS) {
+      if (PENDING_FORMULA_VALUES.includes(record[field])) {
+        cells.push({ key: rowKey(record, keyField), line: record.line, field, value: record[field] });
+      }
+    }
+  }
+  return { cells, projection };
+}
+
+/** 例：`36 列的 status／current_fingerprint 顯示「載入中…」` */
+function describePendingCells(cells) {
+  const rows = new Set(cells.map(cell => cell.line)).size;
+  const fields = DERIVED_FIELDS.filter(field => cells.some(cell => cell.field === field));
+  const values = PENDING_FORMULA_VALUES.filter(value => cells.some(cell => cell.value === value));
+  return `${rows} 列的 ${fields.join('／')} 顯示「${values.join('、')}」`;
+}
+
+const defaultFetchIO = {
+  fetch: url => fetch(url),
+  sleep: ms => new Promise(resolve => setTimeout(resolve, ms)),
+  log: message => console.log(message),
+  delayScale: CONFIG.RETRY_DELAY_SCALE,
+};
+
+/**
+ * 抓一個分頁，直到拿到一份沒有未算完值的快照，最多 MAX_FETCH_ATTEMPTS 次。
+ * 回傳要交給驗證的 CSV；失敗時寫入 errors 並回傳 null。
+ */
+async function fetchSettledCSV(source, errors, io = defaultFetchIO) {
+  const { group, url } = source;
+  const pendingSnapshots = [];
+
+  for (let attempt = 1; attempt <= MAX_FETCH_ATTEMPTS; attempt++) {
+    const csv = await fetchCSV(url, group, errors, io.fetch);
+    if (csv === null) return null;
+
+    const snapshot = findPendingCells(csv, COLUMNS_BY_GROUP[group]);
+    if (snapshot === null) return csv;
+
+    const changed = pendingSnapshots.find(earlier => earlier.projection !== snapshot.projection);
+    if (changed !== undefined) {
+      addError(
+        errors,
+        group,
+        SNAPSHOT_KEY,
+        `重抓期間發布內容改變了（第 ${changed.attempt} 次與第 ${attempt} 次不同）。可能有人正在編輯試算表。等編輯完成 5 分鐘後重跑同步。`,
+      );
+      return null;
+    }
+
+    if (snapshot.cells.length === 0) {
+      if (attempt > 1) io.log(`✅ ${group} 第 ${attempt} 次抓到算完的發布版。`);
+      return csv;
+    }
+
+    pendingSnapshots.push({ attempt, projection: snapshot.projection });
+    const description = describePendingCells(snapshot.cells);
+    if (attempt === MAX_FETCH_ATTEMPTS) {
+      // 不交給驗證：那只會印出一串「status 必須是…實際為「載入中…」」，正是讓編輯誤以為內容壞掉的輸出。
+      addError(
+        errors,
+        group,
+        SNAPSHOT_KEY,
+        `發布版連續 ${MAX_FETCH_ATTEMPTS} 次都還沒算完：${description}。這不是內容錯誤，核可紀錄沒有被比對。等 5 分鐘後重跑同步。一直出現時，打開試算表確認 status 欄已經算完、選單列有「Review」。`,
+      );
+      return null;
+    }
+
+    const delay = RETRY_DELAYS_SECONDS[attempt - 1];
+    io.log(`⏳ ${group} 的發布版還沒算完：${description}。${delay} 秒後重抓（第 ${attempt + 1}／${MAX_FETCH_ATTEMPTS} 次）。`);
+    await io.sleep(delay * io.delayScale * 1000);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -612,6 +747,19 @@ function buildTrack2(csv, errors) {
       addError(errors, TRACK_2, rowKey(record), `views 必須是非負整數，實際為「${trunc(record.views)}」。`);
     }
     checkPlaceholders(record, ['title', 'author', 'abstract', 'owl_comment'], TRACK_2, errors);
+    // case_ref 與 stance 要嘛都填，要嘛都空白。「有字號、沒立場」的文章在 019 的頁面沒有位置。
+    const hasCase = (record.case_ref || '') !== '';
+    const hasStance = (record.stance || '') !== '';
+    if (hasCase !== hasStance) {
+      addError(errors, TRACK_2, rowKey(record), `case_ref 與 stance 必須同時填寫或同時空白。實際：case_ref「${trunc(record.case_ref) || '空白'}」、stance「${trunc(record.stance) || '空白'}」。`);
+    }
+    // 用 Object.hasOwn，不用 in。in 會讓 toString 之類的原型鍵通過。
+    if (hasCase && !Object.hasOwn(VERIFIED_CASE_REFS, record.case_ref)) {
+      addError(errors, TRACK_2, rowKey(record), `case_ref「${trunc(record.case_ref)}」不在已查證的判決字號清單內。允許的值：${Object.keys(VERIFIED_CASE_REFS).join('、')}。`);
+    }
+    if (hasStance && !ALLOWED_STANCES.includes(record.stance)) {
+      addError(errors, TRACK_2, rowKey(record), `stance「${trunc(record.stance)}」不在允許清單內。允許的值：${ALLOWED_STANCES.join('、')}。`);
+    }
   }
 
   if (errors.length > 0) return null;
@@ -631,6 +779,8 @@ function buildTrack2(csv, errors) {
     ...(record.vibe ? { vibe: record.vibe } : {}),
     sticky: (record.sticky || '').toLowerCase() === 'true',
     ...(record.full_content ? { full_content: record.full_content } : {}),
+    ...(record.case_ref ? { case_ref: record.case_ref } : {}),
+    ...(record.stance ? { stance: record.stance } : {}),
   }));
 }
 
@@ -763,7 +913,7 @@ async function main() {
   if (errors.length > 0) return abort(errors);
 
   console.log('⏳ 讀取試算表…');
-  const [csv1, csv2, csv3] = await Promise.all(sources.map(source => fetchCSV(source.url, source.group, errors)));
+  const [csv1, csv2, csv3] = await Promise.all(sources.map(source => fetchSettledCSV(source, errors)));
   if (errors.length > 0) return abort(errors);
 
   console.log('⏳ 檢查資料…');
@@ -819,6 +969,40 @@ function writeOutputsAtomically(outputDir, files, io = fs) {
   }
 }
 
-export { buildTrack1, buildTrack2, buildSiteTldr, validateApprovalBinding, writeOutputsAtomically };
+/**
+ * 本檔被直接執行時跑同步，被 import 時什麼都不做（測試靠這一點匯入本檔）。
+ *
+ * 不可以比字串。__filename 已解開符號連結，process.argv[1] 沒有。
+ * macOS 的 /var 是 /private/var 的符號連結，字串比對會讓直接執行被當成 import：
+ * exit 0、沒有輸出、沒有檔案。呼叫端會以為同步通過。
+ *
+ *   run      —— 兩者解開符號連結後相同
+ *   import   —— 不同，且檔名也不同（別的程式匯入本檔）
+ *   mismatch —— 不同，但檔名相同，或無法解開路徑。看起來是要執行本檔，卻認不出來，要大聲失敗
+ */
+function resolveEntry(argv1, filename, realpath = fs.realpathSync) {
+  if (!argv1) return 'import';
+  let entry;
+  let self;
+  try {
+    entry = realpath(path.resolve(argv1));
+    self = realpath(filename);
+  } catch {
+    return 'mismatch';
+  }
+  if (entry === self) return 'run';
+  return path.basename(argv1) === path.basename(filename) ? 'mismatch' : 'import';
+}
 
-if (process.argv[1] && path.resolve(process.argv[1]) === __filename) main();
+export {
+  buildTrack1, buildTrack2, buildSiteTldr, validateApprovalBinding, writeOutputsAtomically,
+  findPendingCells, fetchSettledCSV, resolveEntry,
+};
+
+const entry = resolveEntry(process.argv[1], __filename);
+if (entry === 'run') {
+  main();
+} else if (entry === 'mismatch') {
+  console.error(`⛔ 入口判斷失敗：執行的檔案是 ${process.argv[1]}，本程式位於 ${__filename}，兩者解開符號連結後仍不相同。同步沒有執行。請用 npm run sync-content 或 node scripts/sync-content.mjs 執行。`);
+  process.exitCode = 1;
+}

@@ -11,7 +11,7 @@ import ChartText from './ChartText';
  */
 interface ThresholdBandProps {
   era: ThresholdEra | StatuteSegment;
-  /** 該期的年均件數。無資料期（current、interim）為 null。 */
+  /** 該期的年均件數。無資料期（fixed-floor、interim、restored）為 null。 */
   meanPerYear: number | null;
   x: number;
   width: number;

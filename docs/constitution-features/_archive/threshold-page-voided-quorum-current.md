@@ -1,15 +1,15 @@
 ---
 id: 068
 title: 門檻分析頁把已失效的 10 人／9 人門檻標為現行
-status: review
+status: complete
 source: constitution-features/067 design 新發現第 3 項（captain 2026-09-29 核准開票）
 started: 2026-09-29T17:14:59Z
-completed:
-verdict:
+completed: 2026-09-29T21:44:02Z
+verdict: PASSED
 score: 0.85
 worktree: .worktrees/spacedock-ensign-threshold-page-voided-quorum-current
 issue:
-pr:
+pr: pr-merge:45
 mod-block:
 gates:
     version: 1
@@ -33,6 +33,26 @@ gates:
               application:
                 target-stage: review
                 state: consumed
+        - id: gate:068:review
+          stage: review
+          attempts:
+            - id: gate-attempt:068-review-1
+              briefing:
+                id: briefing:068:review:attempt-1:revision-1
+                digest: sha256:ea156124c90c87c10af51ec41c2ce24b809df51847ee6450d9ff7092f0b8b74d
+                room-ref: '@review/review/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:068:review:1
+                briefing: briefing:068:review:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-29T20:31:38.394571Z"
+                decision: approve
+                reason: 'Captain approved 068 review in chat 2026-09-29 (「全部照建議」): review PASSED, Polish space fix applied. Captain did not explicitly report the desktop callout 6px visual check; approval given per FO recommendation.'
+              application:
+                target-stage: complete
+                state: consumed
+archived: 2026-09-29T21:44:02Z
 ---
 
 `/past/thresholds`（公開頁）把已失效的評議門檻當成現行法呈現。讀者會帶著錯誤的法律認知離開。
@@ -637,6 +657,7 @@ Problem 第一句寫「`/past/thresholds`（公開頁）」。原句保留。實
   反向改動（每次都已還原）都會讓 (4) 轉紅：F1 在 `scripts/check-voided-floor.mjs` 寫入 `src/data/history.json`；F2 在 `src/data/launch-status.ts` 同樣寫入（另一條 AC-7 閉包測試也紅）；F3 在新測試檔以 `path.join(ROOT, 'src', 'data', 'discussions.json')` 寫入。
 - DONE: 實作後更新文件（Documentation impact）
   `b5497df`：`docs/INDEX.md` 補上七條路由與 LaunchGate 放行條件；`design-system.md` 第 35 節由兩段改為三段；`TODO.md` P1-10 追加補述，原表保留，並記下第 3 項的行號移位。
+- DONE: 【FO 授權 Polish 修正，來自 review】`page.tsx:42` 的 `{voidedFloor.voidedOn}` 後補上 `{' '}`。渲染結果為「終點 2025-12-19 取自憲法法庭判決」；全套 105／104 pass／0 fail／1 skip；`tsc` exit 0（`5940a12`）
 
 ### 發現（交 FO）
 
@@ -684,3 +705,27 @@ Problem 第一句寫「`/past/thresholds`（公開頁）」。原句保留。實
 ### Summary
 
 一手來源（判決頁主文與公告日、法規資料庫第 30 條與沿革）逐項核對，分支所有法律事實與日期正確，無佔位字串。AC-1、AC-2 在 main 與候選副本上獨立重跑，結果與 implement 相同；implement 發現 2 已重現，根因是探針把 `<desc>` 算成可見，提議 Deferred risk／decline 並留紀錄。012 AC-7 (4) 收窄後仍抓得到三種真實寫入，另記一個盲點；全套 0 fail、禁區未動、content-audit 無新增失敗。判定 PASSED。
+
+## Stage Report: review
+
+**判定：PASSED。可以進入交付。** 程式碼照設計實作，沒有回歸。下列發現都不擋合併。
+
+- DONE: Review the diff against the design for what verify did not own: code quality of the threshold-analysis components and data module (types complete, no any, Tailwind consistent with existing pages, reusable where the design calls for it), whether the FO-authorized 012 AC-7 (4) narrowing is the right shape, and confirm or fix-request verify's Polish finding (page.tsx:42 missing space) — do not re-run verify's primary-source checks or AC mutations.
+  逐檔讀 `git diff main...HEAD -- src tests`。型別：`voided?: typeof RULING_THRESHOLD.voidedFloor` 綁到唯一定義處（`as const` 字面型別），`effectiveTo` JSDoc 已改；新增行沒有 `any`、`as unknown`、`@ts-`。元件：props 介面只新增選填 `restored`，比照既有 `interim`；`RESTORED_SEGMENT` 色帶的 `selected`／`dimmed`／`onSelect` 與 interim 色帶一致；引線註解用 `eras.find((e) => e.voided)`，不再依賴陣列最後一個。Tailwind：「已失效」標記沿用同列「未確認」「附但書」的 badge 樣式；`text-[#D32F2F]` 與另 7 個檔的既有寫法相同，值等於 `globals.css:15` 的 `--color-accent-red`。設計的 4.1–4.5 全部落實，沒有設計外的法律文字。
+  012 AC-7 (4) 收窄：形狀正確。只對 `tests/` 加「原始碼也要指到 `src/data`」一個條件，`src/`、`scripts/` 不變，未動 040 的測試檔。它會多報（測試同時讀 `src/data` 又寫暫存檔時仍判為寫入者），不會對 `src/data` 字面路徑少報。verify 記的變數拼接盲點（F4）是已記錄的 Deferred risk，不重列。
+  `page.tsx:42`：**確認，建議修（Polish）。** 以 `tests/tsx-loader.mjs` 渲染 `ThresholdsPage`（暫存檔，跑完即刪，`git status` 為空），實得「的終點 2025-12-19取自憲法法庭判決公告日」。原因：JSX 在 `{voidedFloor.voidedOn}` 與換行之間的空白整段移除。同段其他換行之處都得到一個空格（例：「判決公告日 2025-12-19。 全國」）。修法：`{voidedFloor.voidedOn}` 後加 `{' '}`。四欄：讀者是 team mode 下的 `/past/thresholds` 讀者；可觀察的傷害只有排版不一致；不觸及任何 AC；觸發已實測。分類 Polish，交 FO 決定合併前順手修或 decline。
+  同法渲染 `SeriesBoundaryNote`：「憲法訴訟法第 30 條第 2 項：該下限已由 114 年憲判字第 1 號宣告違憲，自 2025-12-19 起失其效力。此後適用憲法訴訟法第 30 條第 1 項：⋯」，接縫都正確。
+- DONE: Check every ## Documentation impact row against delivered behavior (INDEX.md routes/LaunchGate note, design-system.md §35 three segments, TODO.md P1-10 addendum), record docs untouched, and INDEX consistency.
+  `INDEX.md` 的 `check-voided-floor.mjs` 列：七條路由與 `_archive/066` 第 8.1 小節的六條加 `/past/thresholds` 相符；LaunchGate 放行條件與「N ≥ 1」都已寫入；最後查核 2026-09-29。`design-system.md` 第 35 節：三段起點與 `ERAS`／`INTERIM_SEGMENT`／`RESTORED_SEGMENT` 相符；INDEX 該列日期已改。`TODO.md` P1-10 第 5 項：原表保留，追加補述，符合 AGENTS.md 的修正原則；補述內容與交付行為相符。
+  **待辦（交 FO，Polish）：** 補述寫「合併 PR 待開」，Documentation impact 要求「附合併 PR」。PR 號碼要開 PR 後才存在，請 FO 開 PR 時補上號碼，在合併前完成。另外 INDEX 的 `TODO.md` 列最後查核仍為 2026-09-24，本票追加了補述；設計未要求改這格，要不要改由 FO 決定。
+  不更新清單：`_archive/012`／`066`／`063`、`architecture.md`、`AGENTS.md`、`CLAUDE.md`、`src/data/*.json` 在 `main...HEAD` 皆無差異。`architecture.md:35`「四個時期」與 `ERAS.length === 4` 相符，仍正確。本票沒有新增或刪除文件，INDEX 不需增刪列。
+  main 在 review 期間新增的條款「repo 外步驟之後重判文件影響」（`README.md`，`34663fd`）：本票沒有任何 repo 外步驟，不適用。
+- DONE: Identify regressions (full test suite 0 fail, tsc, noindex, 056 G-7, 066 check, 067 content-audit no new failures) and end with a clear PASSED or REJECTED verdict stating whether delivery can proceed; note the desktop callout 6px clearance remains for the captain's visual check.
+  HEAD `bb53f8b` 實跑：`node --test tests/*.test.mjs` 105 tests／104 pass／0 fail／1 skip（AC-6 線上比對）；`npx tsc --noEmit` exit 0；`layout.tsx:9` 仍為 `robots: { index: false, follow: false }`；`056` 的 canonical G-7 印出 `G-7 PASS [place1=1/1 place2=1 place3=1]`，exit 0；`content-audit check` 為 M4=1、M5=2、M6=9，與 verify 記錄的 main 基線相同，沒有新增失敗；`scripts/`、`src/data/*.json`、`tests/fixtures/` 與 main 無差異；佔位字串掃描 0 筆；`起失其效力` 在 `ruling-threshold.ts` 以外 0 筆。
+  `066` 檢查沒有重跑。它就是 AC-2，由 verify 擁有。verify 在 `2f172b1` 跑出七條路由全 PASS、exit 0、`/past/thresholds` 下限數字 24 次。`git diff --stat 2f172b1 HEAD` 只有 entity 檔，程式碼逐位元相同，所以該結果仍適用。
+  合併注意：main 已前進到 `34663fd`。`git merge-tree` 顯示唯一衝突在本 entity 檔（main 上的狀態鏡像與 `gates:` 前言），程式與文件無衝突，由 FO 在合併時處理。
+  **仍待 captain 目視：** 桌機引線註解第三行在 `PLOT_H + 66`，距 SVG 底緣 6px。本環境沒有瀏覽器，review 也驗不到是否被裁切。
+
+### Summary
+
+逐檔審查 `src`、`tests`、文件的差異。型別完整、無 `any`，Tailwind 與既有 badge 一致，元件照設計以 props 預設值注入 `RESTORED_SEGMENT`。012 AC-7 (4) 的收窄只作用於 `tests/`，形狀正確。實際渲染確認 `page.tsx:42` 缺空格，屬 Polish，建議合併前補 `{' '}`。三筆文件更新都符合交付行為，只剩 TODO 補述的 PR 號碼要在開 PR 時補上。全套測試 0 fail、tsc、noindex、G-7、content-audit 都沒有回歸。判定 PASSED，可以交付；桌機引線 6px 間距仍待 captain 目視。
