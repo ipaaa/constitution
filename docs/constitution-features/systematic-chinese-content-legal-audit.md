@@ -48,6 +48,7 @@ gates:
                 target-stage: complete
                 state: pending
 mod-block: merge:pr-merge
+pr: "#42"
 ---
 
 **⛔ 不得派工，直到 feature `056-pre-launch-checklist` 封存為止。** 這是 captain 2026-09-24 的明確排序：
