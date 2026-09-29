@@ -213,6 +213,21 @@ Verified by: 瀏覽器視窗寬 375px 與 1280px 各截一張頁尾圖。375px�
 Verified by: `npx tsc --noEmit` exit 0；`npx eslint --max-warnings 0 src/components/Footer.tsx` exit 0（改前實測 exit 0）；`npm run build` 成功；
 `shasum -a 256 src/data/*.json` 前後相同。會讓它失敗的改動：保留未使用的 `FileText` import（eslint 警告），或動到 `src/data/*.json`。
 
+**AC-7（端值，implement cycle 2 新增）— 頁尾有 Email 回報，地址完全正確，兩個 GitHub 連結不變。**
+captain 2026-09-29 要求加入 Email 回報，給沒有 GitHub 帳號的讀者；地址為 `constitution.owl@gmail.com`，captain 已確認拼法。
+Verified by: hydration 後，在 AC-2b 的 8 頁上各自檢查：
+`footer a[href^="mailto:"]` 恰有 1 個，`href` 恰為 `mailto:constitution.owl@gmail.com`，可見文字與 `aria-label` 都含這個地址；
+且 `footer a[href^="http"]` 仍恰為 AC-1 的兩個 GitHub 網址。8 頁全部符合才算通過。
+會讓它失敗的改動：地址拼錯（例如 `ow1`），或刪掉 Email `<li>`。兩者都已在 implement cycle 2 實測，8 頁都判定失敗。
+
+> **補述（2026-09-29，implement cycle 2）：Email 回報對 AC-4、AC-5 與容許範圍的影響。**
+> 原 AC-4、AC-5 與「Expected surface and tolerance」寫於加入 Email 之前。原文保留，不改寫。新事實如下：
+> - AC-4 的選擇器 `footer a:not([href^="http"])` 現在也會選到 `mailto:` 連結，結果會多一項。
+>   站內導覽本身沒變。要量站內導覽，改用 `footer a[href^="/"]`，結果仍為 `["/past","/present","/future","/controversy-timeline"]`。
+> - AC-5 的「『專案資源』欄只有 2 項」現在應為 3 項：GitHub 原始碼、內容錯誤回報、Email 回報。
+> - 容許範圍「淨 −5 行 ±2」只涵蓋 cycle 1。cycle 2 另加 5 行 `<li>`、改 1 行 import。相對 `main`，`Footer.tsx` 為 +7／−7，淨 0 行。
+> 以上三點是否正式改寫 AC，由 captain 決定。
+
 ## Test plan
 
 1. `grep -rniE 'Welcome-to-Add-C0urt|hackmd' src public`：改前 4 行，改後 0 行（AC-2a）。
@@ -303,3 +318,16 @@ Verified by: `npx tsc --noEmit` exit 0；`npx eslint --max-warnings 0 src/compon
 ### Summary
 
 **判定：PASSED。** diff 只改 `Footer.tsx`，四項改動與設計完全一致，無障礙屬性、新分頁屬性與版面 class 都保留；tsc、eslint、build 皆通過，測試只有已知的無關失敗，新連結實測可開。請 captain 知悉兩件事：頁尾在手機與電腦上的外觀仍未有人實際看過；沒有 GitHub 帳號的讀者無法使用「內容錯誤回報」。
+
+## Stage Report: implement (cycle 2)
+
+- DONE: Add an email reporting option to the footer next to 內容錯誤回報 for readers without a GitHub account, using exactly mailto:constitution.owl@gmail.com (captain 2026-09-29), with a visible label and aria-label consistent with the existing links; change only src/components/Footer.tsx.
+  `b46c031`：「內容錯誤回報」下方新增 1 個 `<li>`，`href="mailto:constitution.owl@gmail.com"`。可見文字「Email 回報：constitution.owl@gmail.com」，`aria-label`「以 Email 回報內容錯誤（constitution.owl@gmail.com）」。沿用 lucide `Mail` 圖示與同一組 class。沒有加 `target="_blank"`：`mailto:` 開新分頁只會多出空白頁。可見文字直接寫出地址，沒有郵件程式的讀者也能抄。先以一般 merge 併入 `main`（`81b80ac`），entity frontmatter 取 `main` 版。
+- DONE: Prove on the rendered footer after hydration (probe, several pages) that the email link is present with the exact address and the two GitHub links are unchanged; add an AC for it with a failing change (e.g. misspelled address or missing link must fail the check).
+  新增 AC-7（Acceptance criteria 節）。jsdom probe 對全新啟動的 `next start` 量 8 頁：hydration 後都恰有 1 個 `mailto:constitution.owl@gmail.com`，可見文字與 `aria-label` 都含地址，GitHub 連結仍是那兩個，舊連結 0 個，頁面錯誤 0 個，probe exit 0。失敗改動實測：地址改成 `ow1` 重建，8 頁都 FAIL、exit 1；退回 cycle 1 無 Email 版重建，8 頁都 FAIL、exit 1。
+- DONE: No regressions: tsc, eslint, build; © line, 開源 wording and quick-nav untouched; record the change as ## Stage Report: implement (cycle 2) with one evidence line per item; never run npm run sync-content.
+  `npx tsc --noEmit` exit 0；eslint `--max-warnings 0` exit 0；`npm run build` 成功；`src/data/*.json` 的 sha256 與 `main` 相同。`git diff main` 沒有碰到 `G0V`、「開源」或 `LAUNCHED_PAGES` 這幾行。測試 101 個：99 通過、1 失敗、1 略過。失敗的是既有的 `threshold-analysis.test.mjs` AC-7，併入 `main` 後仍在，與本票無關。沒有執行 `sync-content`。
+
+### Summary
+
+頁尾「專案資源」現在有 3 項：GitHub 原始碼、內容錯誤回報（GitHub）、Email 回報（`constitution.owl@gmail.com`）。8 頁 hydration 後量到的地址完全正確。地址拼錯或缺少 Email 連結時，檢查都會失敗。**請 FO／captain 注意：** 加入 Email 後，原 AC-4 的選擇器會多選到 `mailto:`，原 AC-5 的「2 項」變成 3 項；我沒有改寫原 AC，只在 AC 節末追加補述。AC-5 的截圖版面檢查仍要由 verify 用真瀏覽器做。量測時發現 cycle 1 留下一個 `next start` 孤兒程序占住 port 3071。我已停掉它，改用全新啟動的伺服器重量，結果相同。
