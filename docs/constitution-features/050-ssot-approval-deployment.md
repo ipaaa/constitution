@@ -7620,3 +7620,90 @@ Documentation impact：本輪只改本票，無新增或刪除文件，`docs/IND
 ### Summary
 
 逐項重跑 N1、N2 的證據：`.gs:159`、sync 的 grep、`.env.local` 的 gid 均成立，新 S7-a 與步驟 6、S7 範圍表、S7-b、S7-d 無衝突，diff 只落在授權位置。一筆 Polish（R10-P1）記錄不修。判定 PASSED，captain 可照現行 runbook 進 S7。
+
+## 部署窗口記錄：S7／S8 回報與 S9 執行結果（2026-09-29）
+
+本節是部署窗口的記錄，不是另一輪複審。S7／S8 由 captain 在正式表上執行，結果由 FO 轉述。
+S9 由本 review ensign 執行。本節不記任何 email。
+
+### 一、captain 回報的 S7／S8 結果（來源：captain 經 FO 轉述，工程未在正式表上重測）
+
+| 項目 | 回報結果 | 狀態 |
+|---|---|---|
+| S7-b（AC-4／AC-5） | 投稿者帳號測 30 格，全部與預期相符 | 已回報 |
+| S7-d（AC-7） | B 類 18 格可編輯；captain 用過的兩個帳號都驗過 | 已回報 |
+| S8 | 59 列依六段表重新核可；跳過 `h2`、`h28`、`d3`、`d18`–`d44` | 已回報 |
+| S7-a | 12 個範圍是否全部選「限制」 | **待確認** |
+| 第二個 Google 帳號 | 是否已從正式表的共用名單移除（S7-b 第 1 點的收尾） | **待確認** |
+| S7 完成時間 | UTC 時間 | **待確認** |
+
+- **S7-a 待確認不影響保護是否生效的判定。** AC-4 的判準是行為，不是設定畫面。
+  30 格行為相符，代表「顯示警告」模式不存在於受測的範圍。S7-a 的確認仍需補，作為記錄。
+- **AC-4 與 AC-7 的記錄要求尚未滿足。** 兩條都要求「UTC 時間、逐格結果、角色」。
+  目前票內只有彙總結果（「30 格相符」「18 格可改」），沒有逐格記錄，也沒有 UTC 時間。
+  本節不代為補寫。逐格記錄由 captain 提供後追加。
+- **`d3` 未核可是刻意的。** `d3` 是 `d2` 的續篇。captain 刻意讓它停在 `Needs review`，
+  使部署前後網站逐字相同。它會在部署後走一般核可流程。
+
+### 二、觀察到的平台行為：開放範圍被改寫成 1000 列
+
+captain 設定 `R2:R` 這類開放範圍後，Google 試算表把它存成 `R2:R1000`（來源：captain 經 FO 轉述）。
+S7 表中 9 個欄範圍都是開放範圍（`J2:J`、`R2:R`、`L2:Q` 等），全部受影響。3 個標題列範圍（`A1:R1` 等）是封閉範圍，不受影響。
+
+- **影響**：第 1001 列之後的列不受保護。那些列的公式欄與審核欄，投稿者改得動。
+- **現況不受威脅**：三個分頁的資料列目前最多 44 列（`Track 2_discussion` 的 `d44`），遠低於 1000。
+- **分類：Deferred risk。** 升級為 Material 的條件：任一分頁的資料列接近 1000 列。
+  處置方式屆時再定（重設範圍的結束列，或改用整欄範圍）。本節不做處置。
+
+### 三、S9 執行結果（步驟 8 原文＋AC-3 的 id 比對）
+
+執行時間 `2026-09-29T18:22:35Z`。步驟 8 指令逐字照票執行：
+在 040 worktree（HEAD `a51b5d9`，工作區乾淨）內執行，`CONTENT_OUTPUT_DIR` 指向 `mktemp -d` 的暫存目錄，
+`.env.local` 指向主 checkout 那一份。
+
+| AC | 判準 | 實際結果 | 判定 |
+|---|---|---|---|
+| AC-1 | 兩份輸出 sha256 分別為 `4d1992e3…cea3b`、`4071978a…3162`，`diff` 無輸出 | `history.json` `4d1992e3a5fbb21e…57047cea3b`；`discussions.json` `4071978a7ad0b3d0…b213d3162`；兩次 `diff` 皆無輸出，印出 `✅ 部署前後逐字相同` | **通過** |
+| AC-2 | exit 0，stdout 逐字含 40 筆與 16 筆兩行 | exit 0；逐字印出 `✅ 檢查通過，已寫入 src/data/history.json（40 筆）` 與 `✅ 檢查通過，已寫入 src/data/discussions.json（16 筆，含 tldr）` | **通過** |
+| AC-3 | 兩行皆為 `✅ id 清單一致` | `history.json ✅ id 清單一致`；`discussions.json ✅ id 清單一致` | **通過** |
+
+- **比對基準是真的部署前基準。** 執行前先量主 checkout 的 `src/data/*.json`，sha256 與票內 2026-09-07 的量測值相同。
+  主 checkout 的 `src/data/` 在 `git status` 上無變動。
+- **沒有寫到任何 `src/data/`。** 040 worktree 的 `src/data/*.json` sha256 在執行前後相同，`git status` 乾淨。
+  輸出只落在暫存目錄（兩個檔：`history.json` 26057 B、`discussions.json` 11788 B）。
+- **一筆 Polish（記錄不修）**：sync 的訊息固定寫「已寫入 src/data/…」，
+  即使 `CONTENT_OUTPUT_DIR` 指向別處也一樣。這句話在本次執行中字面不實。
+  AC-2 的判準正是逐字比對這一句，所以不能改訊息而不改 AC-2。不影響判定。
+- **AC-6 本節未執行。** 它不在 S9 的範圍內。合併 040 之後須再跑一次，必須 exit 0。
+
+### 四、未越界
+
+- 未寫入 `src/data/`，未寫入試算表。步驟 8 只讀試算表。
+- 未執行 `npm run sync-content`。
+- 未合併 040，未在 040 worktree 提交。040 worktree 只用來執行步驟 8 的指令。
+- 本節未記任何 email。本 commit 只改本票。
+
+### 五、裁決：步驟 9 的 S9 前置條件已滿足
+
+S9 寫的條件是「步驟 8 與 AC-3 兩者都通過才做步驟 9」。兩者都通過，AC-1／AC-2／AC-3 全部成立。
+**就工程這一半而言，步驟 9（合併 040）已放行。**
+
+合併仍要走 040 自己的 gate，並由 captain 核准。呈交該 gate 之前，建議 captain 補齊三件事：
+1. 確認 S7-a 的 12 個範圍全部選「限制」。
+2. 確認第二個 Google 帳號已從共用名單移除。
+3. 提供 S7 的 UTC 完成時間，以及 AC-4（30 格）與 AC-7（18 格）的逐格記錄。
+
+這三件都不改變 S9 的結果，也不影響已發布內容。第 2 件關乎正式表的存取權限，建議優先處理。
+
+## Stage Report: review (deployment window, S9)
+
+- DONE: Run runbook step 8 (the no-write sync, exactly as written, CONTENT_OUTPUT_DIR set, 040 worktree code) and the AC-3 id comparison against the live sheet after the captain's S8: AC-1 sha256 of both outputs equals 4d1992e3…cea3b / 4071978a…3162 with empty diff, AC-2 exit 0 with the 40 and 16 lines verbatim, AC-3 both lines "✅ id 清單一致" — any mismatch stops here with the diff pasted, and 040 is not to be merged.
+  `2026-09-29T18:22:35Z` 執行於 040 worktree `a51b5d9`：exit 0；兩行筆數逐字出現；sha256 兩份相符、`diff` 無輸出；AC-3 兩行 `✅ id 清單一致`。無不符，無 diff 可貼。
+- DONE: Record in the 050 ticket the captain-reported S7/S8 results (S7-b 30 cells as expected, S7-d 18 cells correct for both accounts, S8 59 rows approved; items the captain has not yet confirmed marked as pending, not assumed) and the observed fact that Google Sheets rewrites open ranges like R2:R to R2:R1000 (rows past 1000 would be unprotected), without recording any email.
+  見「部署窗口記錄」第一、二節：S7-a 模式、第二帳號移除、S7 完成時間標為待確認；另標出 AC-4／AC-7 的逐格記錄尚未入票；1000 列行為記為 Deferred risk 並寫明升級條件。無 email。
+- DONE: Confirm scope held: no write to src/data or the sheet, npm run sync-content never run, 040 not merged by you — end with a clear verdict on whether step 9 (merging 040) is cleared.
+  主 checkout 與 040 worktree 的 `src/data/*.json` sha256 在執行前後相同、`git status` 乾淨；未跑 `npm run sync-content`；未合併、未在 040 提交。裁決：S9 條件滿足，工程面放行步驟 9，合併仍待 040 gate 與 captain 核准。
+
+### Summary
+
+依步驟 8 原文在 040 worktree 執行不落地同步，接著跑 AC-3 比對。AC-1、AC-2、AC-3 全部通過：輸出與部署前逐字相同，40／16 筆，id 清單一致。captain 回報的 S7／S8 結果已入票，三項未確認事項標為待確認。另記錄開放範圍被改寫成 1000 列的行為（Deferred risk），以及 AC-4／AC-7 逐格記錄尚未入票。步驟 9 在工程面已放行，合併仍須經 040 gate 由 captain 核准。
