@@ -1,7 +1,7 @@
 ---
 id: 071
 title: 頁尾連結指向錯誤的 GitHub 與 HackMD
-status: verify
+status: review
 source: captain 2026-09-29（聊天中直接要求開票）
 started: 2026-09-29T20:11:16Z
 completed:
@@ -22,6 +22,17 @@ gates:
                 id: briefing:071:verify:attempt-1:revision-1
                 digest: sha256:3cfb0186fdc6ad252b63b6500e23420f316f943188bb1e28e908b39eb7e66284
                 room-ref: '@review/verify/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:071:verify:1
+                briefing: briefing:071:verify:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-29T20:31:38.195703Z"
+                decision: approve
+                reason: 'Captain approved 071 verify in chat 2026-09-29 (「全部照建議」): footer links to ipaaa/constitution verified by HTTP and hydration probe. Captain did not explicitly report the 375px/1280px visual check; approval given per FO recommendation.'
+              application:
+                target-stage: review
+                state: consumed
 ---
 
 全站頁尾的外部連結有多處錯誤。captain 2026-09-29 裁示：原始碼一律指向 `https://github.com/ipaaa/constitution`；不列 HackMD；「內容錯誤回報」也指向正確的 GitHub。
