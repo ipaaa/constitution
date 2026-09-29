@@ -451,3 +451,22 @@ Verified by: 新測試四格。
 ### Summary
 
 設計把重抓放在抓取層，`040` 的驗證函式列為逐位元組不可動；只有 `status`／`current_fingerprint` 完全等於 `載入中…`、`Loading...`、`#NAME?` 時才重抓，被採用的快照必須自己通過完整驗證且內容投影與先前快照相同，所以重抓只影響「多早成功」，不影響「什麼能上線」。實測另發現 `#NAME?` 是第二種未算完值（`site_tldr` 4 次、`Track 2` 8 次，與 064 在 20:21Z 的觀察一致），以及未算完快照集中在 `20:16`–`20:23Z` 的密集期；根因推測為 `PUBLISHED_ROW_SEQUENCE` 的計算量，本票不處理。全程零寫入正式試算表、未執行 `npm run sync-content`、`src/data` 未變動。
+
+## Stage Report: implement
+
+- DONE: Implement the design's bounded re-fetch in the fetch layer of sync-content.mjs (retry only when status or current_fingerprint is exactly 載入中… / Loading... / #NAME?, at most 8 fetches with the specified waits, adopted snapshot must pass full validation alone and match earlier content projections) and the resolveEntry run/import/mismatch fix — with 040's validation functions and content-fingerprint.mjs byte-for-byte unchanged.
+  `4bfe3c3`：`findPendingCells`／`fetchSettledCSV`／`report` 結尾句分支／`resolveEntry`，`main()` 只改一個呼叫；`sync-content.mjs` 淨增 162 行（容許 70–170）。AC-7(b)：`git diff main -- scripts/content-fingerprint.mjs` 零行；擷取 16 個不可動函式（`function X(` 到第一個第 0 欄 `}`）與 main 比對，16／16 相同。
+- DONE: Prove AC-1..AC-9 against fixtures with their stated failing changes (flaky source succeeds with identical output and exact request count; exhaustion fails with the distinguishable message and zero writes; a genuine mismatch fetches once and aborts; symlinked/`/var` entry fails loudly); run AC-8's read-only live runs; no-write sync with pwd -P paths byte-identical to src/data.
+  67／67 通過（既有 50 行零刪改，新增 234 行）。否證演練，每項都改壞後重跑再還原：`MAX_FETCH_ATTEMPTS=1` → AC-1/2/4/5/6(a) 失敗；拿掉投影比對 → 只有 AC-5 失敗；用盡時把快照交給驗證 → AC-2 失敗；改成子字串比對 → AC-6(a)(b) 失敗；入口判斷改回字串比對 → AC-9(a)(b)(c) 失敗；把 mismatch 當 import → AC-9(c) 失敗。
+  AC-3 證明內容真的不符時只抓 1 次，最後一行是 `請修正 SSOT 後重試。`。AC-7(a) 證明 `buildTrack2` 遇到未算完快照仍回傳 null。另加一格單元測試，確認等待為 10/10/20/30/45/60/90 秒，且網路錯誤只抓 1 次。
+  AC-8：對正式表唯讀跑 10 次（`node --env-file=<repo>/.env.local`，`CONTENT_OUTPUT_DIR` 為 `pwd -P` 暫存目錄，21:04:44Z–21:05:42Z）。10 次都 exit 0，兩個 JSON 的 sha256 都等於 `src/data`，stderr 0 byte。重抓**實際觸發**於第 2、3、8 次：第 2 次先抓到 36 列 `#NAME?`，再抓到 1 列 `載入中…`，第 3 次成功；第 3 次先抓到 36 列 `載入中…`，第 2 次成功；第 8 次先抓到 36 列 `#NAME?`，第 2 次成功。
+  AC-8 新觀察：Risk evidence 只記錄到 `#NAME?` 出現在 `status`。這次兩個衍生欄同時是 `#NAME?`，也出現只有 1 列、只有 `status` 的 `載入中…`，兩種都照規格處理。worktree 與 main 的 `git status --short src/data` 都沒有輸出。
+- DONE: Update docs per 實作後更新 (operations.md notes to implemented state, design.md revision entry), including fixing 050's stale link in operations.md 〈同步〉 to 070-sync-csv-loading-snapshot.md; full suite and tsc pass; never run npm run sync-content, never write to the spreadsheet.
+  `5a2f79c`：operations.md〈同步〉連結改為 `070-…`。〈錯誤與復原〉追加「070 已合併」一句與新補述（重抓通知、兩種 `快照` 訊息、不變的不符訊息）。〈驗證〉追加入口判斷現況。原句都保留。design.md 追加修訂紀錄，寫明改了什麼、沒改什麼、不變式 #3 怎麼維持。
+  `npx tsc --noEmit` exit 0；`npm run build` exit 0，前後 `src/data/*.json` 的 sha256 相同。全套 116 項：114 過、1 skip、1 失敗。失敗的是 `threshold-analysis` 的「AC-7 build 指令與寫出產線檔…」，main 上同樣失敗，原因是 040 既有 `runSync` 的 fixture 寫入觸發該守衛。不是本票造成的，本票沒有修改它，見下方旗標。整個過程沒有執行 `npm run sync-content`，也沒有寫入試算表。
+
+### Summary
+
+重抓放在抓取層，040 的驗證函式與 `content-fingerprint.mjs` 逐位元組未動；入口判斷改為 realpath 比對，認不出時 `⛔ 入口判斷失敗` exit 1。唯讀實跑 10 次中有 3 次真的碰到未算完快照並自動恢復，輸出與 `src/data` 相同。
+給 FO 的旗標：(1) 與 064 合併：程式碼無衝突，合併樹上兩票測試 84/84 通過；但 `design.md` 修訂紀錄兩票都在檔尾追加，會有一處 append-append 衝突，兩則都保留即可。為了相容 064 新增的 `../src/data/verified-case-refs.mjs` import，AC-9 的符號連結改指向 repo 的 `scripts/`，而不是複製兩個檔案（AC-9(a) 字面寫的是複製），否證力不變。
+(2) verify 做 AC-7(b) 時，若 064 已先合併，`buildTrack2` 與 `content-fingerprint.mjs` 會因 064 合法地與 main 不同；請改對 merge-base `cefeeee` 比對。(3) `threshold-analysis` 的 AC-7 守衛在 main 上已經失敗，是既有問題，需要另開票或由該票處理。
