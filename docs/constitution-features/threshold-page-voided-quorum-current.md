@@ -11,6 +11,17 @@ worktree: .worktrees/spacedock-ensign-threshold-page-voided-quorum-current
 issue:
 pr:
 mod-block:
+gates:
+    version: 1
+    records:
+        - id: gate:068:verify
+          stage: verify
+          attempts:
+            - id: gate-attempt:068-verify-1
+              briefing:
+                id: briefing:068:verify:attempt-1:revision-1
+                digest: sha256:692cdea80e0d6041b4e97ccd6c06176cde2078421714861878d412991c04209b
+                room-ref: '@review/verify/briefing-1'
 ---
 
 `/past/thresholds`（公開頁）把已失效的評議門檻當成現行法呈現。讀者會帶著錯誤的法律認知離開。

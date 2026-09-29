@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:068:verify:attempt-1:revision-1",
+  "question": "Approve 068 verify (PASSED) and advance to review?",
+  "artifacts": [
+    {
+      "id": "artifact:068:verify:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/9a106fd24150122602d69bd9c67e3c68c5e7a040/docs/constitution-features/threshold-page-voided-quorum-current.md",
+      "rev": "sha256:fb8591f5967bfe63e009cdde541ab1bca46481b261501abd9158d8b368631ea7",
+      "mediaType": "text/markdown",
+      "summary": "Independent verify: every legal fact and date on /past/thresholds matches primary sources (114憲判1 main text and 2025-12-19 announcement, 第30條第1項 text, LawHistory dates) — 0 errors, 0 placeholders, dates in 西元 with ROC only in ruling names. AC-1 hydration probe and AC-2 seven-route 066 check re-run independently (main fails, branch passes). FO-authorized 012 AC-7(4) fix still catches real writers; suite 104/105 pass, 0 fail. Findings: 2 Polish (missing space at page.tsx:42; LawAll link), 2 Deferred risk (probe counts \u003cdesc\u003e as visible; 012 guard variable-join blind spot), 1 out of scope (ROC dates at page.tsx:62). Desktop callout clearance reserved for captain visual check."
+    }
+  ]
+}
