@@ -1,7 +1,7 @@
 ---
 id: 064
 title: Track 2 新增 case_ref 與 stance 欄
-status: verify
+status: review
 source: constitution-features/019 第二節（captain 2026-09-23 核准加欄）
 started: 2026-09-29T16:52:37Z
 completed:
@@ -31,6 +31,17 @@ gates:
                 id: briefing:064:verify:attempt-2:revision-1
                 digest: sha256:95f3ee3edd70cdd4044b4bddd5ef5fc445b6d33b82e6afb7f02a702fef6ab69b
                 room-ref: '@review/verify/briefing-2'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:064:verify:2
+                briefing: briefing:064:verify:attempt-2:revision-1
+                by: person:captain
+                at: "2026-09-29T20:31:37.842468Z"
+                decision: approve
+                reason: 'Captain approved 064 verify in chat 2026-09-29 (「全部照建議」): primary-source whitelist match, fingerprint parity (050 approvals stand), 20 breakages caught; accepts test LOC over design tolerance.'
+              application:
+                target-stage: review
+                state: consumed
 ---
 
 在 `Track 2_discussion` 分頁新增 `case_ref` 與 `stance` 兩個選填欄，並讓同步程式把它們帶進 `discussions.json`，使 feature `019` 的不同意見總覽頁得以成立。
