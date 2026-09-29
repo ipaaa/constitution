@@ -254,6 +254,34 @@
 > 而 `OfficialTLDR` 的第一行是 `if (!item) return null`（同檔 L75）——
 > **找不到不會報錯、不會擋建置，整個區塊直接消失。**
 
+### 發布欄位範圍
+
+> 2026-09-29 新增（feature `064` 階段一）。本節描述現行機制，不是提案。
+> 前三列抄自 feature `040` 的 design（`../constitution-features/_archive/040-approval-content-version-binding.md` 的〈發布欄位範圍〉）。
+> 選填列由 `064` 新增。見文末修訂紀錄「2026-09-29 — 新增〈發布欄位範圍〉表」。
+
+內容指紋只涵蓋會改變 JSON 的輸入。
+`tests/approval-content-version-binding.test.mjs` 的 `DESIGN_PROJECTION` 逐字抄自下表。
+**改動發布欄位時，先改這張表，再改測試，最後改程式。**
+
+| 分頁 | 指紋欄位，順序固定 |
+|---|---|
+| `Track 1_history` | `id`, `category`, `chapter`, `content`, `handwriting`, `year`, `title`, `ruling`, `ruling_id`, `image_url` |
+| `Track 2_discussion` | `id`, `category`, `title`, `author`, `year`, `abstract`, `link`, `views`, `owl_comment`, `owl_depth_comment`, `vibe`, `sticky`, `full_content` |
+| `Track 2_discussion`（選填，有值才計入） | `case_ref`, `stance` |
+| `site_tldr`, `order = 0` | `order`, `text`, `link` |
+| `site_tldr`, `order >= 1` | `order`, `label`, `text` |
+
+- `status`、所有審核欄位與 `reject_reason` 不進指紋。
+- 程式依欄名取值。移動欄位不改變指紋。
+- Track 2 的指紋在最後加上「非空資料列序號」。移動列後必須重新核可。
+- 「非空資料列」是 13 個 Track 2 發布欄位任一非空的列。只填審核欄位或選填欄位的列不佔序號。
+- 選填欄位空白時不進指紋。所以加欄不會讓既有核可失效。
+- 選填欄位有值時，依表列順序附加在 13 欄之後、序號之前。填了值的列要重新核可。
+- `case_ref` 與 `stance` 必須同時填寫或同時空白。只填一欄，同步中止。
+- `case_ref` 的值必須是 `src/data/verified-case-refs.mjs` 的鍵。`stance` 的值必須是 `支持`、`質疑`、`中立分析` 之一。
+  兩項檢查只對已核可的列執行。填錯一格，整份同步中止。
+
 ---
 
 ## 三、誰來把關
@@ -541,6 +569,13 @@ staging 顯示的是「目前所有已核可內容」，那是另一個問題。
 > 驗證目標不變：在 `064` 實作合併前，`grep -c "case_ref" scripts/sync-content.mjs` 為 `0`。
 > 原文保留。本次補述見文末修訂紀錄「2026-09-29 — `019` 兩欄已核准，交由 `064` 施工」。
 
+> ⚠️ **2026-09-29 第二則補述（`064` 階段一）：同步程式已改，試算表仍未加欄。**
+> 本補述與 `064` 階段一的程式改動在同一個 PR。PR 合併後，上一則的「同步程式未改」不再成立。
+> 同步程式認得兩欄，兩欄不存在時照常通過。規則見第二節〈發布欄位範圍〉。
+> **試算表仍未新增任何欄位。** 加欄是 `064` 第五節的階段二，由 captain 執行。
+> 驗證目標：`grep -c "case_ref" scripts/sync-content.mjs` 大於 `0`；`src/data/*.json` 在本 PR 無改動。
+> 原文保留。
+
 ---
 
 ## 修訂紀錄
@@ -733,3 +768,22 @@ S9 在 `2026-09-29T18:22:35Z` 以 040 的同步程式唯讀讀取正式表：exi
 044 的結論：`grep -m2 -E '^(status|verdict):' docs/constitution-features/_archive/044-approval-permission-two-account-probe.md`。
 
 **施工單**：feature `054`（本補述是其 design 階段〈現在更新〉的一筆）。
+
+### 2026-09-29 — 新增〈發布欄位範圍〉表（feature 064 階段一）
+
+**起因**：`tests/approval-content-version-binding.test.mjs` 的 `DESIGN_PROJECTION` 註解寫「逐字抄自 design.md 的『發布欄位範圍』表」。
+feature `045` 的 design 查出本文沒有這張表。它只存在於 `040` 的封存票。
+`064` 要在這份清單加兩個選填欄位，必須先有這張表。
+
+**改了什麼**：
+
+- 第二節新增〈發布欄位範圍〉小節。前三列照抄 `040` 封存票，另加 Track 2 選填列 `case_ref`、`stance`。
+- 第七節 `📌` 提案記錄下方追加第二則補述。
+
+**沒有改什麼**：第二節 `Track 2_discussion` 欄位表、第五節施工順序表。
+兩處依 `064` 第九節，在階段二完成後才更新。2026-09-21 與 2026-09-29 兩則既有記錄一字未改。
+
+**現況**：同步程式、指紋與 Apps Script 已支援兩欄（本 PR）。試算表尚未加欄。
+責任編輯填 `stance`，captain 在同步 PR 看 diff（captain 2026-09-29 決定）。
+
+**施工單**：[`../constitution-features/064-track2-case-ref-stance-columns.md`](../constitution-features/064-track2-case-ref-stance-columns.md)
