@@ -10,7 +10,7 @@ score: 0.8
 worktree: .worktrees/spacedock-ensign-070-sync-csv-loading-snapshot
 issue:
 pr:
-mod-block:
+mod-block: merge:pr-merge
 gates:
     version: 1
     records:
@@ -41,6 +41,17 @@ gates:
                 id: briefing:070:review:attempt-1:revision-1
                 digest: sha256:ae1b939857ebb623372d3df037365fe414673cc30fbba6ea252bb6ae7a4d013a
                 room-ref: '@review/review/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:070:review:1
+                briefing: briefing:070:review:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-29T22:16:10.931226Z"
+                decision: approve
+                reason: 'Captain approved 070 review in chat 2026-09-29 (「070 approve」): fetch-layer retry and entry-point fix, 040 validation untouched, 137 tests 0 fail, R1 docs fixed; F1 accepted as Deferred risk.'
+              application:
+                target-stage: complete
+                state: pending
 ---
 
 `040` 合併後，正式同步可能隨機失敗：Google 發布的 CSV 有時送出公式仍在計算的舊快照，`status` 欄顯示「載入中…」，`040` 的驗證因此判整份不符而中止。不會把錯的內容推上網站，但會讓編輯看到數十筆錯誤而以為內容壞了。
