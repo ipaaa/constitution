@@ -42,6 +42,14 @@ gates:
               application:
                 target-stage: review
                 state: consumed
+        - id: gate:064:review
+          stage: review
+          attempts:
+            - id: gate-attempt:064-review-1
+              briefing:
+                id: briefing:064:review:attempt-1:revision-1
+                digest: sha256:1ed13a078942239b85c89018ce00ee2f0f1fa30f2c3c60560d5cac5ed8dc4726
+                room-ref: '@review/review/briefing-1'
 ---
 
 在 `Track 2_discussion` 分頁新增 `case_ref` 與 `stance` 兩個選填欄，並讓同步程式把它們帶進 `discussions.json`，使 feature `019` 的不同意見總覽頁得以成立。
