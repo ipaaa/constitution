@@ -1,15 +1,15 @@
 ---
 title: 核可綁定內容版本並在修改後退回重審
-status: review
+status: complete
 source: captain 2026-09-03
 started: 2026-09-03T19:46:08Z
-completed:
-verdict:
+completed: 2026-09-29T18:57:45Z
+verdict: PASSED
 score: 0.95
 worktree: .worktrees/spacedock-ensign-040-approval-content-version-binding
 issue:
 pr: pr-merge:43
-mod-block: merge:pr-merge
+mod-block:
 id: 040
 gates:
     version: 1
@@ -77,7 +77,7 @@ gates:
                 reason: 'Captain approved 040 review attempt-2 in chat 2026-09-29: the 2026-09-05 hold''s resume condition is met — 050 S1–S8 done on the live sheet and S9 proved 040 code (a51b5d9) reproduces production byte-identically (sha256, diff, 40/16, id lists). S7-a mode and second-account removal not yet confirmed by captain at approval time.'
               application:
                 target-stage: complete
-                state: pending
+                state: consumed
 review-round:
     id: round:040:review:1
     stage: review
@@ -86,6 +86,7 @@ review-round:
         id: briefing:040:review:round-1
         digest: sha256:36704ba504e93b6ca48676b9653a9ac89c2e1abf2f7547280f5213a26e98c234
         room-ref: '@review/review/round-1'
+archived: 2026-09-29T18:57:45Z
 ---
 
 		讓 SSOT 的核可結果綁定被核可的內容版本。核可後只要發布欄位被修改，該列必須顯示 `Needs review`，而且同步程式必須拒絕沿用舊核可。
