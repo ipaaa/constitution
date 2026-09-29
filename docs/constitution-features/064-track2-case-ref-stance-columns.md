@@ -546,9 +546,25 @@ done < <(node --input-type=module -e "import {VERIFIED_CASE_REFS as V} from './s
 | AC | 階段 | 屆時執行的檢查 |
 |---|---|---|
 | AC-1 | 四 | 同步 PR 合併後，在 repo 根目錄跑第七節 AC-1 的 `node -e` 指令。退出碼 0 且印出至少一組 |
-| AC-2 (b) | 一合併後、二之前 | 同一時間以合併前與合併後的程式各跑一次不落地同步，比對兩份 `discussions.json` 的 sha256。本次已用分支程式先跑一次，結果相同 |
+| AC-2 (b) | 一合併後、二之前 | 同一時間以合併前與合併後的程式各跑一次下方的「不落地同步指令」，兩次都要印出 sha256，且兩個 `discussions.json` 的值相同。本次已用分支程式先跑一次，結果相同 |
 | AC-11 | 二 | captain 比照 `050` S7-b／S7-d：投稿者帳號改 V2、W2 → 被擋；責任編輯帳號改 V2、W2 → 可改，Ctrl+Z 還原。記錄四格 |
-| AC-12 | 二 | captain 在 `operations.md`〈Track 2 加兩欄〉第 1 步與第 9 步各數一次 `Approved` 列數，兩數相同；工程在第 2 步之前與第 8 步之後各跑一次不落地同步，兩次 exit 0 且 `discussions.json` sha256 相同 |
+| AC-12 | 二 | captain 在 `operations.md`〈Track 2 加兩欄〉第 1 步與第 9 步各數一次 `Approved` 列數，兩數相同；工程在第 2 步之前與第 8 步之後各跑一次下方的「不落地同步指令」，兩次都要印出 sha256，且兩個 `discussions.json` 的值相同 |
+
+**不落地同步指令**（取自 verify 報告 F1）。在主 repo 根目錄執行，該處有 `.env.local`：
+
+```bash
+OUT=$(mktemp -d); OUT=$(cd "$OUT" && pwd -P); REPO=$(pwd -P); CONTENT_OUTPUT_DIR="$OUT" node --env-file=.env.local "$REPO/scripts/sync-content.mjs"; test -s "$OUT/discussions.json" && shasum -a 256 "$OUT"/*.json
+```
+
+- **失敗條件**：`test -s` 不成立，也就是沒有印出 sha256。這時比對結果作廢，不可視為相同。
+  路徑經 `pwd -P` 解析，避開 ticket `070` 記錄的陷阱：從符號連結路徑執行時，程式 exit 0，但不寫檔，也不輸出訊息。
+- 遇到暫態快照就重跑。暫態快照是指錯誤訊息含「載入中…」或 `status` 為 `#NAME?`。
+  2026-09-29T20:21:12Z 實跑時遇過一次 `#NAME?`：43 列全數失敗，沒有印出 sha256。7 秒後重跑即通過。
+- AC-2 (b) 的「合併前程式」：先執行 `git worktree add --detach /tmp/pre-064 <064 合併 commit>^1`。
+  再把上面指令的 `REPO=$(pwd -P)` 改成 `REPO=$(cd /tmp/pre-064 && pwd -P)`，仍在主 repo 根目錄執行。
+  `.env.local` 不複製到其他目錄。
+- 2026-09-29T20:21:12Z–20:21:19Z 實跑：`REPO` 指向 main 與本分支，各印出 `discussions.json` `4071978a…3162`、`history.json` `4d1992e3…ea3b`，與 `src/data` 相同。
+  跑完 `src/data` 無改動。
 
 ### 誰填 stance
 
@@ -601,3 +617,14 @@ captain 2026-09-29 決定：責任編輯填 `case_ref`／`stance`，captain 在�
 ### Summary
 
 在 base、分支與拋棄式 worktree 上獨立重跑全部檢查：一手來源、指紋等值（20 列）、20 個反向改動、`tsc`、`build`，以及兩次不落地同步。所有 implement 的數字都重現成功。發現三項，都不阻擋：延後 AC-2 (b)／AC-12 缺逐字指令（F1，附指令）、一個 fail-closed 的測試缺口（F2）、一處文字誤差（F3）。行數超標需 captain 在 gate 認可。
+
+## Stage Report: implement (verify fixes)
+
+- DONE: F1 — give the deferred AC-2 (b) and AC-12 checks an exact, ready-to-paste command (verify's `pwd -P` command; fails if `discussions.json` isn't written).
+  〈留到後續階段的 AC〉表兩列改為引用新增的「不落地同步指令」區塊。區塊內逐字放入 verify 的指令、失敗條件，以及 AC-2 (b) 合併前程式的 `git worktree` 做法。`operations.md`〈Track 2 加兩欄〉第 9 步後也加了同一指令。實跑時第一次遇到 `#NAME?` 暫態快照，指令沒印出 sha256，失敗有被抓到。重跑後 main 與本分支都印出與 `src/data` 相同的 sha256。
+- DONE: F3 — correct 「前三列抄自 040」 to four rows in the design.md 發布欄位範圍 note.
+  改為「第 1、2、4、5 列（共四列）」。修訂紀錄的同一說法一併改正。以 `diff` 比對這四列與 `_archive/040-…md` 的表，逐字相同。
+
+### Summary
+
+只改文件，程式沒有改。F2 依 FO 決定維持延後風險，不改。實跑時遇到的 `#NAME?` 快照與 ticket 070 的「載入中…」同屬暫態，已寫進兩份文件的重跑條件。

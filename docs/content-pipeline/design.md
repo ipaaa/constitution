@@ -257,7 +257,7 @@
 ### 發布欄位範圍
 
 > 2026-09-29 新增（feature `064` 階段一）。本節描述現行機制，不是提案。
-> 前三列抄自 feature `040` 的 design（`../constitution-features/_archive/040-approval-content-version-binding.md` 的〈發布欄位範圍〉）。
+> 第 1、2、4、5 列（共四列）抄自 feature `040` 的 design（`../constitution-features/_archive/040-approval-content-version-binding.md` 的〈發布欄位範圍〉）。
 > 選填列由 `064` 新增。見文末修訂紀錄「2026-09-29 — 新增〈發布欄位範圍〉表」。
 
 內容指紋只涵蓋會改變 JSON 的輸入。
@@ -777,7 +777,7 @@ feature `045` 的 design 查出本文沒有這張表。它只存在於 `040` 的
 
 **改了什麼**：
 
-- 第二節新增〈發布欄位範圍〉小節。前三列照抄 `040` 封存票，另加 Track 2 選填列 `case_ref`、`stance`。
+- 第二節新增〈發布欄位範圍〉小節。四列照抄 `040` 封存票，另加 Track 2 選填列 `case_ref`、`stance`。
 - 第七節 `📌` 提案記錄下方追加第二則補述。
 
 **沒有改什麼**：第二節 `Track 2_discussion` 欄位表、第五節施工順序表。

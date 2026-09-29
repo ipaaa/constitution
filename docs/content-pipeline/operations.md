@@ -52,6 +52,15 @@
 8. 在 `Track 2_discussion` 執行 `Review → 安裝／更新公式`。
 9. 再數一次 `Approved` 列數。必須與第 1 步相同。不同就停下，回報工程。
 
+工程在第 2 步之前與第 8 步之後各跑一次不落地同步。兩次都要印出 sha256，且兩個 `discussions.json` 的值相同。
+在主 repo 根目錄執行：
+
+```bash
+OUT=$(mktemp -d); OUT=$(cd "$OUT" && pwd -P); REPO=$(pwd -P); CONTENT_OUTPUT_DIR="$OUT" node --env-file=.env.local "$REPO/scripts/sync-content.mjs"; test -s "$OUT/discussions.json" && shasum -a 256 "$OUT"/*.json
+```
+
+沒有印出 sha256 就是失敗，不可當成相同。錯誤訊息含「載入中…」或 `status` 為 `#NAME?` 時，重跑一次。
+
 第 1 步到第 8 步之間，不要填兩欄的值。填了值而公式還沒更新，同步會中止。
 
 **填值**（階段三）：責任編輯依 feature `064` 第四節的規則填值，再以 `Review → 核可選取列` 重新核可那些列。
