@@ -235,3 +235,16 @@ Verified by: `npx tsc --noEmit` exit 0；`npx eslint --max-warnings 0 src/compon
 ### Summary
 
 頁尾現在只剩兩個外部連結，都指向 `ipaaa/constitution`，真實 HTTP 請求可以開；HackMD 已移除；全站找不到舊 repo 或 HackMD。這些結果是在 8 頁 hydration 後的 DOM 上量到的。用改前程式碼重建再量，probe 會讀到舊連結，所以這個量測分得出對錯。有一項沒做完：AC-5 的截圖版面檢查。jsdom 沒有版面引擎，這一項要留給 verify 用真瀏覽器做。本機建置時用 symlink 接上主 repo 的 `node_modules`，這個 symlink 在 `.gitignore` 內，不會進 commit。
+
+## Stage Report: verify
+
+- DONE: Verify every destination the branch ships by real HTTP request (github.com/ipaaa/constitution and its issues/new, and each internal footer route), and that no g0v/Welcome-to-Add-C0urt or hackmd string remains site-wide (src and public); run the placeholder scan over the diff.
+  驗證對象：`35180e4`（HEAD `532e54c` 只多了報告）。未登入 `curl`：`ipaaa/constitution` 回 200。`issues/new` 回 302，轉到 `github.com/login?return_to=…ipaaa%2Fconstitution%2Fissues%2Fnew`，`-L` 最終 200。舊 repo 與舊 `issues/new` 都是 404。站內 4 個路徑在 `next start` 上都是 200。`grep -rniE 'Welcome-to-Add-C0urt|hackmd' src public` 0 行。全站 `github.com/` 只剩 Footer 的 2 個網址與 `ContributorGrid.tsx:30`（屬 `052`）。佔位字串掃描：diff 的新增行中，`某學者|某大學法律系|test|lorem ipsum|快速了解最新判決的5個重點` 共 0 筆。
+- DONE: Independently re-run the hydration measurement on at least three pages (probe or dev server, not SSR HTML alone) and confirm the failing change (the pre-change Footer) is detected; confirm Issues is enabled and note for the captain that unauthenticated readers are sent to GitHub login.
+  量測工具：自行寫的 jsdom probe，不沿用 implement 的 probe（只借用 scratchpad 內已安裝的 jsdom）。它向 `next start` 取 8 頁，執行頁面自己的 JS，等 `<footer>` 出現 `__reactFiber$` 鍵才讀 DOM。Chrome 無法使用：puppeteer 快取的 Chrome 147 與 headless-shell 在本機都一啟動就 SEGV，關掉工具沙箱也一樣。8 頁結果相同：hydration 成功，頁尾外部連結恰為 `[ipaaa/constitution, …/issues/new]`，站內導覽恰為 `/past,/present,/future,/controversy-timeline`，舊連結 0，頁面錯誤 0。失敗改動對照：用 `git archive 1234c5e` 在 scratchpad 建出改前版本，另開 port 跑同一 probe。8 頁都讀到 3 個外部連結、3 個舊連結，所以這個量測分得出改前改後。`gh repo view`：`hasIssuesEnabled:true`、PUBLIC、未封存。**請 captain 知悉：沒有登入 GitHub 的讀者，點「內容錯誤回報」會先被帶到 GitHub 登入頁。沒有帳號的人無法回報。**
+- DONE: Judge AC-5 layout: if no real browser is available, measure what can be measured (DOM structure, no empty list items, unchanged classes) and state plainly that the 375px/1280px visual check remains for the captain; confirm scope held (only Footer.tsx changed; © line, 開源 wording, quick-nav untouched; tsc, eslint, build pass; sync-content never run).
+  可量的部分：hydration 後「專案資源」剩 2 個 `<li>`，頁尾空 `<li>` 0 個。diff 只有 `href`、import 與 HackMD 區塊的增刪，沒有 class 行變動。**375px 與 1280px 的畫面沒有看過。本機沒有能用的瀏覽器，這一項留給 captain 用手機與電腦各看一次頁尾。** 範圍：分支對 `main` 的合併基準只動 `Footer.tsx`（+3／−8）與本 entity。© 行、「開源」文字、快速導覽都沒動。`npx tsc --noEmit` exit 0；`npx eslint --max-warnings 0 src/components/Footer.tsx` exit 0；`npm run build` exit 0。`src/data/*.json` 的 sha256 前後相同。`node --test tests/*.test.mjs`：101 個，99 過、1 失敗、1 略過。失敗的是已知的 `threshold-analysis` AC-7（多列出 `tests/approval-content-version-binding.test.mjs`），`068` 已修，不算本票問題。本階段沒有執行 `sync-content`。
+
+### Summary
+
+**判定：PASSED。** 頁尾兩個外部連結都指向 `ipaaa/constitution`，真實請求可開；HackMD 已移除。全站原始碼與 8 頁 hydration 後的畫面都找不到舊 repo 或 HackMD。同一 probe 對改前版本會量到舊連結，所以結果可信。還剩兩件事要告訴 captain。第一，375px／1280px 的外觀沒有實際看過，請 captain 自己看一眼。第二，沒有 GitHub 帳號的讀者無法回報錯誤。
