@@ -104,7 +104,7 @@ git diff -- src/data/history.json src/data/discussions.json
 >
 > **已知暫時性失敗**：發布版 CSV 的部分快取會回傳計算中的 `status`，
 > 同步印出多行 `實際為「載入中…」` 並中止，不寫入任何檔案。內容本身沒有錯。
-> 稍後重跑即可。追蹤票：[`../constitution-features/sync-csv-loading-snapshot.md`](../constitution-features/sync-csv-loading-snapshot.md)。
+> 稍後重跑即可。追蹤票：[`../constitution-features/070-sync-csv-loading-snapshot.md`](../constitution-features/070-sync-csv-loading-snapshot.md)。
 
 同步只接受完整的 `Approved` 紀錄。
 Node 會重算指紋，並比對 `review_fingerprint`、`approved_fingerprint` 與
@@ -139,6 +139,21 @@ Node 會重算指紋，並比對 `review_fingerprint`、`approved_fingerprint` �
   `site_tldr` 出現 `#NAME?` 時，會連帶出現「order 0 的 status 必須是 Approved」與
   「order ≥ 1 沒有任何一列通過核可」，這兩行是同一個原因。
   重跑後仍有「與目前發布內容不符」時，是內容在核可後被改過，照上面第二項處理。
+- **070 已合併，現況見下。** 上面「目前不會自動重抓」「尚未實作」兩句已不成立。原句保留。
+  〈同步〉那則補述的連結已於 070 實作時改為新檔名。
+
+**補述（2026-09-29，feature 070 implement）**：同步現在會自動重抓計算中的版本。
+重抓只在 `status` 或 `current_fingerprint` 的值完全等於 `載入中…`、`Loading...`、`#NAME?` 時發生。
+每個分頁最多抓 8 次，間隔 10、10、20、30、45、60、90 秒，最長約 4.4 分鐘。
+被採用的版本仍要通過全部核可檢查。內容欄寫著「載入中…」不會觸發重抓。
+
+- `⏳ Track 2 的發布版還沒算完：… 10 秒後重抓（第 2／8 次）。`：不是錯誤。同步正在等。不用處理。
+  之後出現 `✅ Track 2 第 3 次抓到算完的發布版。` 表示已取得算完的版本。
+- `快照  發布版連續 8 次都還沒算完`：試算表沒有問題，Google 的發布版還沒算完。
+  最後一行是 `…不是內容錯誤。等 5 分鐘後重試。`。等 5 分鐘重跑。
+  一直出現時，打開試算表確認 `status` 欄已經算完、選單列有「Review」。
+- `快照  重抓期間發布內容改變了`：同步期間有人改了試算表。等編輯完成 5 分鐘後重跑。
+- `與目前發布內容不符。需要重新核可。`：訊息不變。內容在核可後被改過，照上面第二項處理。
 
 ## 驗證
 
@@ -167,3 +182,6 @@ npm run build
 - 做法：確認輸出含 `🚀 Starting Content Sync...` 與兩行 `✅ 檢查通過`。
   暫存目錄用 `"$(cd "$(mktemp -d)" && pwd -P)"` 取得解開後的路徑。
 - feature `070` 已定方向：解開符號連結後再判斷；仍無法判斷時 exit 1。**尚未實作。**
+- **070 已合併**：經符號連結路徑執行會正常同步；無法判斷時印 `⛔ 入口判斷失敗` 並 exit 1。
+  上一句「尚未實作」與第一項「現況」已不成立。原句保留。
+  確認輸出含 `🚀 Starting Content Sync...` 的做法仍然適用。

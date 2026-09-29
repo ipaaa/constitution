@@ -538,15 +538,12 @@ test('fetchSettledCSV 依規格的間隔等待，網路錯誤不重抓', async (
 });
 
 test('AC-9 入口判斷在路徑不一致時不可以 exit 0 而什麼都不做', async t => {
-  // os.tmpdir() 在 macOS 是 /var/…，本身就是 /private/var/… 的符號連結；另建一個目錄連結涵蓋其他平台。
+  // os.tmpdir() 在 macOS 是 /var/…，本身就是 /private/var/… 的符號連結；目錄連結本身涵蓋其他平台。
+  // 連結指向 repo 的 scripts/，不複製檔案：本程式日後新增的相對 import 仍解析得到。
+  // 輸出一律寫到 CONTENT_OUTPUT_DIR 的暫存目錄，不碰 src/data。
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'sync-entry-'));
-  const copy = path.join(root, 'scripts');
-  fs.mkdirSync(copy);
-  for (const name of ['sync-content.mjs', 'content-fingerprint.mjs']) {
-    fs.copyFileSync(path.join('scripts', name), path.join(copy, name));
-  }
   const link = path.join(root, 'linked');
-  fs.symlinkSync(copy, link, 'dir');
+  fs.symlinkSync(path.resolve('scripts'), link, 'dir');
   const viaLink = path.join(link, 'sync-content.mjs');
 
   await t.test('(a) 經符號連結執行時正常同步', async () => {
