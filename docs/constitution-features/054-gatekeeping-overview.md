@@ -515,12 +515,18 @@ REJECTED。檔頭 AGENTS (a)(b)(c) 與核准文字逐字相同，symlink 完整�
 
 - DONE: V1 — 第 7 章改成兩段：(1) P3-8 的解除條件以 `awk` 指令印出，並指向 `056` G-1 至 G-8；(2) captain 2026-09-29 決定把 `content-audit.mjs check` 綁進 P3-8，施工單 `069`，以指令輸出為準。另寫明 L／H 閱讀清單不是 P3-8 的條件。
   AC-5 用沒看過兩張票的 fresh agent 重跑，只給 `gatekeeping.md`：8／8。第 7 題明寫「`067` 的閱讀清單不是條件」。
-- DONE: V2 — 第 5 章 verify 那一列的擋不到什麼改成「不走 workflow 的改動。具名的佔位掃描自 2026-09-02 refit（`1eff0e2`）起才寫進 `verify` 的輸出」。`grep -c 2026-05-01` = 0。
-- DONE: V3 — `design.md` 第六節第 7 列改為 (b) 的完整三句本文，逐字。本票提案 (b) 去掉標題後的三行接成一行，與第 7 列 `diff` 無輸出。`git diff --quiet 3fe06a9 -- AGENTS.md` 成立，`AGENTS.md` 未動。修訂紀錄「與第 5 條相同」因此成立。
-- DONE: V4 — 第 8 章刪掉「`067` 與 `069` 的檔名沒有編號前綴」，指令保留。
-- DONE: V5 — 第 4 章改為「同步不再只憑 `status = Approved` 放行。`status` 決定一列要不要檢查；被檢查的列，同步自己重算指紋…」，與 `design.md` :651 一致。
-- DONE: 檢查。G-7 PASS（place1=1/1、place2=1、place3=1）。`content-audit check` 仍是 M4=1、M5=2、M6=9，指名 `gatekeeping.md` 0 行，沒有新增失敗。單調句掃描 0 行。
-- SKIPPED: V6 由 FO 帶到 `064`；V7 無需動作。依 FO 處置。
+- DONE: V2 — 第 5 章 verify 那一列的擋不到什麼改成「不走 workflow 的改動。具名的佔位掃描自 2026-09-02 refit（`1eff0e2`）起才寫進 `verify` 的輸出」。
+  `grep -c 2026-05-01` = 0。
+- DONE: V3 — `design.md` 第六節第 7 列改為 (b) 的完整三句本文，逐字。
+  本票提案 (b) 去掉標題後的三行接成一行，與第 7 列 `diff` 無輸出。`git diff --quiet 3fe06a9 -- AGENTS.md` 成立，`AGENTS.md` 未動。修訂紀錄「與第 5 條相同」因此成立。
+- DONE: V4 — 第 8 章刪掉「`067` 與 `069` 的檔名沒有編號前綴」。
+  指令保留。
+- DONE: V5 — 第 4 章改為「同步不再只憑 `status = Approved` 放行。`status` 決定一列要不要檢查；被檢查的列，同步自己重算指紋…」。
+  與 `design.md` :651 一致。
+- DONE: 檢查。
+  G-7 PASS（place1=1/1、place2=1、place3=1）。`content-audit check` 仍是 M4=1、M5=2、M6=9，指名 `gatekeeping.md` 0 行，沒有新增失敗。單調句掃描 0 行。
+- SKIPPED: V6 由 FO 帶到 `064`；V7 無需動作。
+  依 FO 處置。
 
 ### Summary
 
