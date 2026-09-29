@@ -68,6 +68,11 @@ gates:
               application:
                 target-stage: complete
                 state: superseded
+            - id: gate-attempt:071-review-2
+              briefing:
+                id: briefing:071:review:attempt-2:revision-1
+                digest: sha256:2762bdd5a51a5d14644d055d69ec88d919557885f1347d7c555230916f686c6f
+                room-ref: '@review/review/briefing-2'
 ---
 
 全站頁尾的外部連結有多處錯誤。captain 2026-09-29 裁示：原始碼一律指向 `https://github.com/ipaaa/constitution`；不列 HackMD；「內容錯誤回報」也指向正確的 GitHub。
