@@ -8,7 +8,7 @@ verdict:
 score: 0.95
 worktree: .worktrees/spacedock-ensign-040-approval-content-version-binding
 issue:
-pr:
+pr: "#43"
 mod-block: merge:pr-merge
 id: 040
 gates:
