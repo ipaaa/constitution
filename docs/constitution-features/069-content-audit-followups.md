@@ -49,6 +49,14 @@ gates:
                 at: "2026-09-30T21:46:59.911354Z"
                 decision: revise
                 reason: 'Captain chose 2026-09-30 (「照建議，文字核准」) at review: R-1 fix with captain-approved AGENTS.md rule-4 text (P3-8 列出的全部解除條件); R-2 fix (example 114年1月23日（2025年1月23日） without spaces); fresh re-review.'
+review-round:
+    id: round:069:review:1
+    stage: review
+    cycle: 1
+    briefing:
+        id: briefing:069:review:round-1
+        digest: sha256:c8d7a5394313da2f74a7f6811303b31267db42f431d851d55d962cf339e6a7cd
+        room-ref: '@review/review/round-1'
 ---
 
 `067`（PR #42）已合併並封存。它的 review 與 captain 在 gate 上的決定留下四件要落地的事，本票一次處理。
@@ -306,6 +314,7 @@ captain 2026-09-29 的三項決定，目前記在本票的 Problem 一節。impl
 | `.github/`、`package.json` | 不接 CI 或 build（Out of scope） |
 
 ### Feedback Cycles
+- Cycle 1: REJECTED — review（`5b79651`）判 PASSED，列 R-1（Deferred risk：`AGENTS.md` 第 4 條「兩項都通過」在 `051`／`053` 合併後不完整）與 R-2（Polish：`content-conventions.md` 規則 2 範例加了空格）。captain 2026-09-30 於 review gate 選「照建議，文字核准」（revise）。授權：R-1 fix（以 captain 核准的文字取代第 4 條新行）；R-2 fix（範例改為「114年1月23日（2025年1月23日）」）。
 
 ## Out of scope
 
@@ -445,3 +454,16 @@ captain 2026-09-29 的三項決定，目前記在本票的 Problem 一節。impl
 ### Summary
 
 069 的實作與設計、captain 09-29／09-30 決定一致，所有 AC 在 `99448b5` 重跑成立，文件影響逐列對得上，`record` 與 `layout.tsx` 未動。判定 **PASSED**。與 `051`、`053` 合併時 P3-8 會有同點文字衝突（聯集可解、G-7 仍 PASS），但 AGENTS 第 4 條的「兩項」屆時不完整，列為 R-1 交 FO。
+
+## Stage Report: implement (cycle 3)
+
+- DONE: R-1: replace the line 069 added to AGENTS.md rule 4 with the captain-approved text byte-for-byte; AC-4 and G-7 place3 must still hold (one line containing both P3-8 and 解除條件二).
+  `80671d8`。`grep -Fxc` 以核准全文比對 `AGENTS.md` 得 1。第 4 條內含 `P3-8` 與 `解除條件二` 的行恰 1 行；G-7 place3=1。
+- DONE: R-2: change the rule-2 example in docs/project/content-conventions.md to 「114年1月23日（2025年1月23日）」 (no spaces); nothing else in the file changes.
+  `80671d8`。該檔 diff 只有規則二那一行的範例。
+- DONE: Re-run AC-1..AC-7 proofs touched by the change (G-7 PASS, P3-8 count 2, M6 only /about:38, tests, tsc); no other candidate change.
+  於 `80671d8` 重跑：G-7 印 `G-7 PASS [place1=1/1 place2=1 place3=1]`，exit 0；P3-8 awk 印 `2`；M6 只剩 `src/app/about/page.tsx:38`（M1–M5 為 `0 0 0 1 2`，與先前相同）；AC-5 grep 仍只列正本；快照 diff 只有第 3 行 commit 不同。測試 138 條，137 過、0 失敗、1 skip（既有線上測試）。`tsc` exit 0。`src/data/*.json` sha256 不變。`git diff --stat 861dd26 HEAD` 只有這兩檔各一行。
+
+### Summary
+
+依 Cycle 1 修正包完成 R-1 與 R-2，各改一行。`AGENTS.md` 那一行逐字換成 captain 核准的文字，AC-4 與 G-7 仍成立。其餘 AC 證據重跑後都不變。
