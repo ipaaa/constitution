@@ -643,6 +643,12 @@ for f in $(grep -rl '[一-鿿]' src/app src/components --include='*.tsx'); do
 done | sort -rn | head -12
 ```
 
+> **2026-09-30 補述（feature `053` design）：逐項處置表已產出，尚未施工。**
+> 處置表在 `docs/constitution-features/053-p1-8-non-ssot-content-disposition.md` 的 `## Design` 第五節。
+> 上面的盤點表已不完整：`src/data/` 現有 14 個檔，含中文的元件檔有 44 個。以 `053` 的表為準。
+> 三項決定待 captain 在 `053` 的 gate 拍板：規則 5 管哪些字（G1）、AI 寫的有來源事實陳述能否留在試算表與 T3 以外（G2）、`053` 是否列為 P3-8 的解除條件（G3）。
+> 狀態仍是「待決定每一項怎麼辦」，直到 gate 通過。本項的結案條件見 `053` 的 AC-8。原文保留。
+
 ### P1-9　`/opinion-lazybag` 的意見光譜已移除，尚未補回　🔴 發布檢查表不要漏掉
 
 - **狀態**：待 `049` 重建資料後補回
@@ -682,6 +688,12 @@ done | sort -rn | head -12
   # 拍板前：站上不得再出現無來源的年度產能數字
   grep -nE '每年[^。]*[0-9]+[^。]*件' src/app/future/page.tsx   # 應為 0 筆
   ```
+
+> **2026-09-30 補述（feature `053` design）：`/future` 仍顯示一個由 `avgDaysPerCase` 算出的年數。**
+> `src/components/future/BottleneckFunnel.tsx:35` 以 `CRISIS_STATS.avgDaysPerCase` 算年數，`:51` 顯示「年」。
+> 上面的 `grep` 只查 `src/app/future/page.tsx`，抓不到這一處。
+> 已定方向：`053` 的 D8 與 C3 移除 `avgDaysPerCase`、`estimatedClearanceYears` 兩欄與這個年數顯示。尚未施工。
+> 驗證目標：`grep -rn 'avgDaysPerCase\|estimatedClearanceYears' src` 無輸出（`053` 的 AC-3 第一條）。原文保留。
 
 ---
 
