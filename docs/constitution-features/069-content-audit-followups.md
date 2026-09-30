@@ -1,7 +1,7 @@
 ---
 id: 069
 title: 067 後續：查核工具自指舊路徑、綁進上線條件、紀年與閱讀順序入檔
-status: verify
+status: review
 source: 067 review R2 ＋ captain 2026-09-29 三項決定（聊天中裁示）
 started: 2026-09-29T18:59:22Z
 completed:
@@ -22,6 +22,17 @@ gates:
                 id: briefing:069:verify:attempt-1:revision-1
                 digest: sha256:d0b7e41604f060c2d0873549f9050aa386eb6ee84d82cd62cc12f14659e48024
                 room-ref: '@review/verify/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:069:verify:1
+                briefing: briefing:069:verify:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-30T18:50:08.462617Z"
+                decision: approve
+                reason: 'Captain approved 069 verify in chat 2026-09-30 (「核准」): facts verified against sources incl. Judicial Yuan example; P3-8 two conditions, 056 line unchanged, G-7 PASS; 19 paths correct; M6 only /about:38. V-1 split to a new small ticket per captain.'
+              application:
+                target-stage: review
+                state: consumed
 ---
 
 `067`（PR #42）已合併並封存。它的 review 與 captain 在 gate 上的決定留下四件要落地的事，本票一次處理。
