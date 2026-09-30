@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:072:verify:attempt-1:revision-1",
+  "question": "072 verify：總覽第 2–5 章關於 064 的每一句，是否與 main 的程式與測試相符、可進 review？",
+  "artifacts": [
+    {
+      "id": "artifact:072:verify:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/4c7b0393fe1520638af4b6ba6ec3d09906ed2bed/docs/constitution-features/gatekeeping-overview-rejudge-064.md",
+      "rev": "sha256:fe24213f0aac64095e910175ccba3253b211e92f9d1d2ce736cf03884a2a4f56",
+      "mediaType": "text/markdown",
+      "summary": "fresh verifier 判 PASSED：C1–C9 逐句對到 file:line；F1 句反向重現為真；captain 兩項 AC 修改已記錄且原文保留；AC-1（四中三）至 AC-8 重跑通過；content-audit 指名總覽 0、單調句 0、G-7 PASS、84/84。V1–V3 皆 Polish，FO decline。"
+    }
+  ]
+}

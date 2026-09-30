@@ -10,6 +10,17 @@ score:
 worktree: .worktrees/spacedock-ensign-gatekeeping-overview-rejudge-064
 issue:
 pr:
+gates:
+    version: 1
+    records:
+        - id: gate:072:verify
+          stage: verify
+          attempts:
+            - id: gate-attempt:072-verify-1
+              briefing:
+                id: briefing:072:verify:attempt-1:revision-1
+                digest: sha256:8180e66ecc1393cc61268bf06845cfb438c31fe55fc973bc6f67664164fc10e0
+                room-ref: '@review/verify/briefing-1'
 ---
 
 `054` 的總覽 `docs/content-pipeline/gatekeeping.md` 寫於 `064` 合併之前。原先的處置是「後合併者重判總覽第 4、5 章」，但 `064`（PR #47）與 `050` 都比 `054` 先合併，這項重判沒有任何票承接。本票承接。
