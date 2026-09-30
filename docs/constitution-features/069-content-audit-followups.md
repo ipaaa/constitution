@@ -1,13 +1,13 @@
 ---
 id: 069
 title: 067 後續：查核工具自指舊路徑、綁進上線條件、紀年與閱讀順序入檔
-status: design
+status: implement
 source: 067 review R2 ＋ captain 2026-09-29 三項決定（聊天中裁示）
 started: 2026-09-29T18:59:22Z
 completed:
 verdict:
 score: 0.8
-worktree:
+worktree: .worktrees/spacedock-ensign-069-content-audit-followups
 issue:
 pr:
 mod-block:
