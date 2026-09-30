@@ -11,6 +11,14 @@ worktree: .worktrees/spacedock-ensign-053-p1-8-non-ssot-content-disposition
 issue:
 pr:
 mod-block:
+review-round:
+    id: round:053:verify:1
+    stage: verify
+    cycle: 1
+    briefing:
+        id: briefing:053:verify:round-1
+        digest: sha256:27074e727cb976facf40de28cad98d8589e3f4d15dafb1ded9bbd2e9d6c7e737
+        room-ref: '@review/verify/round-1'
 ---
 
 `docs/health-check/TODO.md` 的 P1-8 已完成初步盤點，但八個檔各自要「搬進 SSOT／標注來源凍結／移除」三選一，**停在 2026-09-02，一項都沒決定**。
