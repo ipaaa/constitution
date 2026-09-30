@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:051:verify:attempt-1:revision-1",
+  "question": "051 verify：候選 dbb1541 的來源標記與掃描，事實與行為是否正確、可進 review？",
+  "artifacts": [
+    {
+      "id": "artifact:051:verify:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/0bf7a0a19e26e6fb147c3711db5913a5907f2863/docs/constitution-features/051-content-provenance-marking.md",
+      "rev": "sha256:636d48e10daa74191c7b1803e0c656720419b4d4da99ef38a0f7b5bca1134e09",
+      "mediaType": "text/markdown",
+      "summary": "fresh verifier 判 PASSED：72 筆標記有 git 證據、9 個來源逐字存在、掃描實測會失敗、69 處皆為規則 5；ui/fact/reviewed.name 恰合 G1-A/G2-A。四項 finding：(1) AGENTS.md 第 5 條被改且措辭過度宣稱（未經 captain 核准）；(2) 簽核記錄位置未檢查；(3) 可改標 ui 規避；(4) 與 053 的類別編號合併順序。"
+    }
+  ]
+}

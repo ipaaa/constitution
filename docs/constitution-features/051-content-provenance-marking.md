@@ -11,6 +11,17 @@ worktree: .worktrees/spacedock-ensign-051-content-provenance-marking
 issue:
 pr:
 mod-block:
+gates:
+    version: 1
+    records:
+        - id: gate:051:verify
+          stage: verify
+          attempts:
+            - id: gate-attempt:051-verify-1
+              briefing:
+                id: briefing:051:verify:attempt-1:revision-1
+                digest: sha256:2cb6e5d3a201613ccfd6e288801de39704a36886bf5d001c48fa1b5c64d93780
+                room-ref: '@review/verify/briefing-1'
 ---
 
 內容上線後沒有任何方法知道它是誰寫的。要讓「站上不得有 AI 生成內容」這句話可查核，必須先有來源欄位，再有會失敗的檢查。
