@@ -1,7 +1,7 @@
 ---
 id: 069
 title: 067 後續：查核工具自指舊路徑、綁進上線條件、紀年與閱讀順序入檔
-status: implement
+status: review
 source: 067 review R2 ＋ captain 2026-09-29 三項決定（聊天中裁示）
 started: 2026-09-29T18:59:22Z
 completed:
