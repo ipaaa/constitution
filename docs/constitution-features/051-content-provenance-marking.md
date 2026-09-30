@@ -163,7 +163,7 @@ P1-8 以外、`src/data/` 內的其餘檔：`quizzes/*.ts` 四檔 AI（7/7），
 | `class` | `ssot`／`t3`／`other`／`config` | 是 | `gatekeeping.md` 第 6 章的三類，加上「不是讀者內容」 |
 | `author` | `human`／`ai`／`unknown` | `ssot` 以外必填 | 文字是誰寫的。AI 參與過就寫 `ai` |
 | `basis` | 字串陣列。每項是網址或 repo 內存在的路徑 | 是，可為空陣列 | 內容依據什麼。空陣列表示「查無依據」 |
-| `reviewed` | 物件或 `null` | 是 | 誰審過。`by` 只能是 `captain`、`責任編輯`、`學者`（`gatekeeping.md` 第 2 章的角色）。`record` 必須是 repo 內存在的檔案，內容是審閱的記錄 |
+| `reviewed` | 物件或 `null` | 是 | 誰審過。`by` 只能是 `captain`、`責任編輯`、`學者`（`gatekeeping.md` 第 2 章的角色）。`record` 是 repo 內存在的檔案（例如票檔），或本 repo 的 PR 網址 `https://github.com/ipaaa/constitution/pull/N`。沒有 `reviewed` 等於未審 |
 | `fingerprint` | `sha256:` 開頭 | `ssot` 以外必填 | 涵蓋內容的指紋。見 3.3。只由 `stamp` 指令寫入 |
 | `note` | 字串 | 否 | 給人看的說明 |
 | `freeze` | — | 否 | **保留給 `047`。** 本票的掃描不解讀它，也不因它失敗 |
@@ -173,7 +173,10 @@ P1-8 以外、`src/data/` 內的其餘檔：`quizzes/*.ts` 四檔 AI（7/7），
 #### 3.2 `scope` 的寫法
 
 - **整檔**：`src/data/controversy-timeline.ts`、`src/app/future/page.tsx`。
-- **檔內某個位置**：只用於 `src/data/` 的 `.ts` 與 `.json`。`#` 後面是 `units.mjs` 產生的 `path` 前綴，例如 `#JUSTICES`、`#PENDING_CASES[3]`。
+- **檔內某個位置**：只用於 `src/data/` 的 `.ts` 與 `.json`。`#` 後面接匯出名稱，可再接一筆紀錄的**鍵選擇器**，例如 `#JUSTICES`、`#RULINGS_SINCE_FLOOR_VOIDED[docket=114憲判字第3號]`。
+  - 鍵選擇器 `[欄位=值]` 選出陣列中該欄位等於該值的**唯一**一筆。找到 0 筆或 2 筆以上，判 P5。
+  - **不用陣列索引**（例如 `[3]`）。在前面插入一筆，索引就全部位移，標記會指到別筆。鍵選擇器不受插入順序影響。（2026-09-30 依 `047` 的需求 I1 修訂）
+  - 掃描先把鍵選擇器換成 `units.mjs` 的 `path` 前綴，再比對。
 - 一個文字單元屬於**最長**符合的那一筆。`#JUSTICES` 比整檔 `src/data/future.ts` 長，所以 `JUSTICES` 的內容歸 `#JUSTICES`。
 - 元件（`.tsx`）只能整檔標記。原因是元件文字沒有穩定的位置名稱，行號會隨程式碼位移。
 
@@ -227,7 +230,12 @@ node scripts/content-provenance.mjs stamp <scope> [--author ai|unknown]
 - `053` 的「標注來源」處置 = 在清單裡為該範圍填 `basis` 與 `reviewed`。處置表的每一列可以直接寫 `scope` 字串。
 - `053` 的「搬進 SSOT」處置 = 刪掉程式碼裡的內容與對應標記。若內容留著而標記刪了，P1 會失敗。
 - `053` 的「移除」處置 = 刪掉內容與標記。若只刪內容，P5 會失敗。
-- `047` 的「已定稿」可以掛在同一筆標記上（保留欄位 `freeze`），並直接沿用本票的 `fingerprint` 當作「定稿的是哪一版」。凍結的規則由 `047` 自己定。
+- `047` 的「已定稿」掛在同一筆標記上（保留欄位 `freeze`），不另開 `frozen-content.json`。一份清單，不是兩份。
+  - `047` 需求 I1（穩定鍵）：用 3.2 的鍵選擇器。
+  - I2（AI／人寫／未知）：`author` 的 `ai`／`human`／`unknown`。
+  - I3（審閱人、日期、依據）：`reviewed.by`／`on`／`record`。
+  - I4（不必跑 Next 就讀得到）：清單是純 JSON。
+  - `freeze` 物件內的欄位（例如只凍結某幾個欄位與它們的指紋）由 `047` 定義。本票的 `fingerprint` 涵蓋整個 `scope`，`047` 可沿用或另算。
 
 ### 五、第三層：掛載點
 
