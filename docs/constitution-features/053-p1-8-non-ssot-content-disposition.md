@@ -462,3 +462,19 @@ captain 核准的規則 5 新措辭已寫入 `AGENTS.md` 與 `design.md` 不變�
 ### Summary
 
 依 cycle 1 的處理決定修了 F1 與 F2，一共改兩個檔、四行。verify 負責的證據全部重跑，結果都通過。content-audit 的結果與 main 相同。
+
+## Stage Report: verify (cycle 2)
+
+- DONE: Verify the cycle-1 correction independently: /quiz no longer promises 「從入門到進階」 anywhere (page text, share description, intro) and still describes the three remaining sets truthfully; TODO.md P2-9 has a dated 補述 recording /preview's deletion with original text unchanged.
+  `37d7368` changes only the three strings (metadata description, openGraph description, intro `<p>`). `grep -rn 從入門到進階 src public` has no output. `grep -rn 進階` over `src/app/quiz`, `src/data/quizzes` and `src/components` has no output. The page lists exactly 3 sets (controversy, rights, pending), and each has 5 `question:` entries (controversy.ts has 6 matches, but one is the type field at :12). So 「3 組…每組 5 題」 is true. P2-9 has a new 2026-09-30 補述 after the 2026-09-04 更正, and `git diff main...HEAD -- docs/health-check/TODO.md` removes 0 lines.
+- DONE: Re-confirm the previously verified facts still hold: all removal checks, captain-approved rule-5 text byte-identical, CLAUDE.md symlink, P3-8 and P1-8 lines, tests/tsc/build, G-7 PASS, content-audit unchanged vs main; placeholder scan over the new diff.
+  Since the last verify (`6473c8c`), only three files changed: the entity, TODO.md and quiz/page.tsx. `git diff 6473c8c HEAD -- AGENTS.md docs/content-pipeline/` is 0 bytes, so the rule-5 text is unchanged. `grep -c 定版` is 0 in both files. All 7 AC-3 grep/test lines hold. `readlink CLAUDE.md` prints `AGENTS.md`, and `cmp` shows the files are the same. The AC-9 awk prints 1. The P1-8 section has 2 hits for `074`.
+  `node --test tests/*.test.mjs`: 136 pass, 0 fail, 1 skipped. `tsc --noEmit` rc 0. `npm run build` rc 0; its route list has only /quiz, /quiz/controversy, /quiz/pending and /quiz/rights, with no `/preview`. `src/data/*.json` sha256 is the same before and after the build. The G-7 canonical block (056 :282) prints `G-7 PASS [place1=1/1 place2=1 place3=1]`, rc 0.
+  content-audit on a `git archive main` tree (main is now `6d38581`) vs the branch, line numbers stripped: only the summary line differs (units 3045→2888, docs 97→94). Both print M4=1 M5=2 M6=18, with the same finding lines.
+  Placeholder scan: lines added since `6473c8c` have 0 hits for 某學者, 某大學法律系, lorem ipsum, 5個重點 or `test`. Against `main`, the only hit is design.md row 7's unchanged 「對應的失敗」 cell, as before. `src` additions contain 0 `test` hits.
+- DONE: End with a clear PASSED or REJECTED verdict; any new finding goes through the disposition checkpoint without touching the candidate.
+  No new findings. The candidate is untouched: the only commit is this report, and the temporary node_modules symlink and archive tree have been removed. No sync run and no push. F3/F4 were declined per Cycle 1 and are not re-raised.
+
+### Summary
+
+**Verdict: PASSED.** The cycle-1 fix does what was authorized: /quiz no longer promises a 進階 tier, and its remaining claims (3 sets, 5 questions each) are true. P2-9 records /preview's deletion without rewriting the original text. Every earlier proof still holds on `3d8a3f0`: the rule-5 text is unchanged since the last verify, and removals, symlink, TODO lines, tests, tsc, build, G-7 and content-audit parity with main all pass.
