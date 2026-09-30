@@ -41,6 +41,14 @@ gates:
                 id: briefing:069:review:attempt-1:revision-1
                 digest: sha256:ebecfe82064586767c360ec497710c165aa6424bdd526706b90405eb69ad02c5
                 room-ref: '@review/review/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:069:review:1
+                briefing: briefing:069:review:attempt-1:revision-1
+                by: person:captain
+                at: "2026-09-30T21:46:59.911354Z"
+                decision: revise
+                reason: 'Captain chose 2026-09-30 (「照建議，文字核准」) at review: R-1 fix with captain-approved AGENTS.md rule-4 text (P3-8 列出的全部解除條件); R-2 fix (example 114年1月23日（2025年1月23日） without spaces); fresh re-review.'
 ---
 
 `067`（PR #42）已合併並封存。它的 review 與 captain 在 gate 上的決定留下四件要落地的事，本票一次處理。
