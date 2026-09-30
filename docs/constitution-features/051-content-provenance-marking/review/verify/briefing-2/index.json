@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:051:verify:attempt-2:revision-1",
+  "question": "051 verify（修正後）：來源標記與掃描的事實與行為是否正確、可進 review？",
+  "artifacts": [
+    {
+      "id": "artifact:051:verify:attempt-2:revision-1:item-1",
+      "uri": "git-root://main/b6c1028f7ae594fa1f49c5e30df58d96b82d5cde/docs/constitution-features/051-content-provenance-marking.md",
+      "rev": "sha256:a707c69f6f8b0c7db058af220b40c8e8f484002290973fea79e7274d1c1cbb20",
+      "mediaType": "text/markdown",
+      "summary": "fresh verifier 判 PASSED（abf9961）：AGENTS.md 與 main 只差 captain 核准的兩行、位置正確；fact 簽核記錄不在 docs/content-audit/ 即判 P4，拿掉檢查後探測不再報錯；72 筆標記、未標記插入會失敗、完整掃描只有 P4=69；五測試檔、tsc、build 通過，JSON 雜湊不變。無新 finding。"
+    }
+  ]
+}

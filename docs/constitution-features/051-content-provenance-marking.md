@@ -30,6 +30,11 @@ gates:
                 at: "2026-09-30T21:44:05.804222Z"
                 decision: revise
                 reason: 'Captain chose 2026-09-30 (「照建議，文字核准」): revise to implement. Fix A: revert 051''s own AGENTS.md rule-5 edit; add the two captain-approved lines after the existing 「機械檢查的現況見…缺口表」 line. Fix B: scan requires a fact mark''s review record under docs/content-audit/. Fix C: covered by the approved rule-5 line forbidding agents to relabel ui/config, plus 073 scope expanded to all content-provenance.json changes. D handled by FO at merge.'
+            - id: gate-attempt:051-verify-2
+              briefing:
+                id: briefing:051:verify:attempt-2:revision-1
+                digest: sha256:9383b5cdb88f8f404299f08d52c1c504992bdfeab6b66d9c083aeb0a3aff13c1
+                room-ref: '@review/verify/briefing-2'
 review-round:
     id: round:051:verify:1
     stage: verify
