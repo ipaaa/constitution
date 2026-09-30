@@ -33,6 +33,14 @@ gates:
               application:
                 target-stage: review
                 state: consumed
+        - id: gate:069:review
+          stage: review
+          attempts:
+            - id: gate-attempt:069-review-1
+              briefing:
+                id: briefing:069:review:attempt-1:revision-1
+                digest: sha256:ebecfe82064586767c360ec497710c165aa6424bdd526706b90405eb69ad02c5
+                room-ref: '@review/review/briefing-1'
 ---
 
 `067`（PR #42）已合併並封存。它的 review 與 captain 在 gate 上的決定留下四件要落地的事，本票一次處理。

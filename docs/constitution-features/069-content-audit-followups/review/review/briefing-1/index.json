@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:069:review:attempt-1:revision-1",
+  "question": "069 review：候選 5b79651 是否可交付？",
+  "artifacts": [
+    {
+      "id": "artifact:069:review:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/490b31f4f7cf3e11447b997d1902fc2dda9666fa/docs/constitution-features/069-content-audit-followups.md",
+      "rev": "sha256:8b23641c95f506784e47e9b2703030b0e5a496c4aa96ebf2783d3a2c489e36ac",
+      "mediaType": "text/markdown",
+      "summary": "fresh reviewer 判 PASSED：與設計及 captain 決定相符；138 測試 0 失敗、G-7 PASS、M6 只剩 /about:38；合併衝突已實測（051/053 在 P3-8，保留三行即可；072 乾淨）。R-1 deferred risk：AGENTS.md 第 4 條「兩項都通過」在 051/053 合併後不完整。R-2 polish：content-conventions.md 規則 2 範例加了空格。"
+    }
+  ]
+}
