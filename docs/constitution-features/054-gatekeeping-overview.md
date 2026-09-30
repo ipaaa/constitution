@@ -9,7 +9,7 @@ verdict:
 score:
 worktree: .worktrees/spacedock-ensign-054-gatekeeping-overview
 issue:
-pr:
+pr: "#49"
 mod-block: merge:pr-merge
 review-round:
     id: round:054:review:3
