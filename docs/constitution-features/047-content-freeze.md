@@ -3,7 +3,7 @@ id: 047
 title: 內容凍結：區分哪些內容審定後不得再自動變動
 status: design
 source: captain 2026-09-04（把關機制體檢第二類核心缺口）
-started:
+started: 2026-09-30T17:18:46Z
 completed:
 verdict:
 score:
