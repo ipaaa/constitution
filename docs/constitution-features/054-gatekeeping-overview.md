@@ -662,3 +662,16 @@ PASSED。R1 已修好：模擬封存前後，M6 都停在 9，沒有一行指名
 ### Summary
 
 REJECTED，HEAD `fabf4ea`（本報告 commit 在其上）。依 R4 解決了合併衝突，也沒有改到其他內容。候選被退，是因為 main 在本票核准後封存了 `050`，本票 5 行連結隨之失效（R6）。第 9 章自查與「相對 main 無新失敗」兩項因此不成立。G-7、tsc、`AGENTS.md` 都通過。沒有推送，也沒有執行 `sync-content`。
+
+## Stage Report: implement (cycle 4)
+
+- DONE: R6 fix: repoint the 5 dead links (gatekeeping.md :47, :92, :117; TODO.md :734, :745) from docs/constitution-features/050-ssot-approval-deployment.md to docs/constitution-features/_archive/050-ssot-approval-deployment.md; and rewrite gatekeeping.md:92 as a monotonic completed-tense sentence (050 已封存 → 保護範圍正本在 operations.md), no other wording change.
+  `7fe099c`：2 檔，各行一換一，共 5 行。:47、:117 和 `TODO.md` :734、:745 只改路徑，可見文字與連結目標都改成 `_archive/`。:92 改寫為「`050` 已封存，保護範圍的正本是 operations.md」，後面接封存票的連結和原本的節次。`TODO.md` :937 是 main 原有的，不在 R6 範圍，沒有動。
+- DONE: Prove on the candidate: content-audit check M6 equals main's count (18) with 0 lines naming gatekeeping.md; ch.9 self-check prints nothing; monotonic-sentence scan 0 lines; G-7 PASS; AGENTS.md diff vs main still exactly (a)(b)(c).
+  `content-audit check`：M4=1、M5=2、M6=18，與 main `341848e` 相同。去掉行號後逐行比對，只有文件數不同（97 對 96，多的是總覽本身）。第 9 章自查無輸出。第 370 行的單調句掃描 0 行。G-7 印 `G-7 PASS [place1=1/1 place2=1 place3=1]`，exit 0。`git diff --quiet 3fe06a9 -- AGENTS.md CLAUDE.md` 成立，與 main 相比仍只多 (a)(b)(c) 共 11 行。tsc exit 0。如果把任一條連結改回原路徑，M6 會多 1 至 2 行，自查也會印出那一行。
+- DONE: Do NOT touch chapters 4/5 for 064 (R5 declined for 054, split into a new ticket); no candidate change beyond R6.
+  `git diff --stat ae89a22 7fe099c`：只有 `gatekeeping.md` 3 行、`TODO.md` 2 行。第 4、5 章只動了 :92、:117，兩處都是 R6 指定的行。沒有依 064 重判任何內容。
+
+### Summary
+
+R6 已修。5 條連結改指封存後的 `050`，:92 改為完成式。合併後的候選 M6 回到 main 的 18，自查與單調句掃描都無輸出，G-7、tsc 通過，`AGENTS.md` 沒有變。R5 依處置不在本票處理。沒有推送，也沒有執行 `sync-content`。
