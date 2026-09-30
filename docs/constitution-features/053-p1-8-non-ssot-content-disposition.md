@@ -359,3 +359,57 @@ G2-B 時另刪 `src/data/threshold-analysis.ts`（598 行）、`src/components/t
 ### Summary
 
 逐檔處置表完成。核心發現：站上中文幾乎全部經 AI 寫成（38 個主要元件檔每個都有 `Co-Authored-By: Claude` commit），照字面執行規則 5 要刪掉大半個網站，所以 G1（規則 5 管哪些字）與 G2（有來源的 AI 事實陳述能否成為第三類）交 captain 決定；建議 A／A，並給出 G2-B 時每項的替代處置。另外找到兩件未入帳的事：`BottleneckFunnel.tsx:35/:51` 在公開頁顯示無來源年數且 P1-9 的 grep 抓不到；大法官名單的人工確認查無紀錄。爭議時序因含政治評價，不論 G2 都建議搬進 SSOT，另開票。`docs/health-check/TODO.md` 有兩個標題都叫 P1-9，本票未處理編號重複。
+
+## Stage Report: implement
+
+- DONE: Execute only the 移除 dispositions from the design's section 五 table (captain 2026-09-30: G1-A, G2-A, G3-A), and add the P3-8 解除條件 that 053's AC-3..AC-6 must all pass, without touching the other P3-8 lines.
+  `bbe32bc`：D8、D20、C3、C5、C7、C9、C10、C11，以及 C12 的 `/quiz/perspectives` 入口。P3-8 新增獨立一行（2026-09-30，G3-A），056 那行未動；AC-9 指令輸出 1。
+- DONE: Draft the exact new wording of `AGENTS.md` rule 5 and `design.md` invariant #7 (identical text) adding the third class per G2-A, and send it to team-lead as a need_decision; do NOT edit `AGENTS.md` or invariant #7 until the captain approves the text through the FO.
+  已送 team-lead（三類＋編輯判斷排除＋G1-A 範圍句；建議改本文並加 2026-09-30 補述）。`AGENTS.md`、`design.md`、`gatekeeping.md` 第 6 章皆未改，等核准。
+- DONE: Prove each removal with its `Verified by:`; list every remaining 標注來源 / 凍結 / 搬進 SSOT item with the ticket that owns it, and name any item that still needs a new ticket (e.g. controversy timeline → spreadsheet tab); never run `npm run sync-content`.
+  AC-3 八條在本分支全數成立，同樣指令對 `HEAD~1` 全數失敗（avgDaysPerCase 3 處、癱瘓到復活 2 處、其餘各 1、兩檔仍在）。見下方清單。未執行 sync；`src/data/*.json` sha256 在 build 前後相同。
+
+**AC-3 各條**（以 `/usr/bin/grep` 執行）：D8/C3 無輸出；C11 `test ! -e` 為 0；C9 為 0；C7 為 0；C10 全為 0；C5 無輸出；D20 `test ! -e` 為 0；`npx tsc --noEmit` 0、`npm run build` 0。
+另跑：AC-1 缺漏 0、AC-2 為 0；`node --test tests/*.test.mjs` 136 pass／0 fail；`node scripts/content-audit.mjs check` 前後同為 M4=1 M5=2 M6=18（本次沒有新增失敗，文字單元 3045→2888）。`next start` 實測 `/quiz/perspectives`、`/preview` 回 404，`/quiz` 顯示「3 組題目」。
+**做了表外的最小附帶改動**：`BottleneckFunnel` 統計列 `grid-cols-3`→`2`；`/present` 內容欄改 `lg:col-span-12`（避免空欄）；`/past` 門檻連結區 `pb`→`py`（前言移除後補上方留白）；`/quiz` 文案「4 組」→「3 組」（不改會變成錯的事實）；`future/page.tsx` 註解改寫，不再提兩個欄位名（否則 AC-3 第一條會命中註解）。
+**未做**：D6 刪 `synthetic` 字樣（第九節列在本票，但處置是標注來源，先刪字樣等於未取證就宣稱已查核，交 051）。`data-collection-guide.md` 的 `CRISIS_STATS` 欄位清單本來就沒列 D8 兩欄，不需改。`docs/content-audit/2026-09-29-reading-list.md` 是 record，不改。
+**剩餘項目與負責票**：
+- 標注來源 → `051`：D3–D6、D9、D10、D12、D17、D18、D19、C1、C2、C4、C8、C12 其餘三份測驗（D7 跟著 D5、D6）
+- 凍結 → `047`：同上，D4 除外
+- T3 審閱紀錄（AC-5）→ 由 `051` 的標注施工一併產出，審閱人簽核靠人
+- 搬進 SSOT → D14 爭議時序。**需要新票**，建議名稱：「爭議時序搬進 SSOT：新增試算表分頁並改由同步供應」（AC-7、AC-8 以它為前提）
+- 範圍外：`049`（D13、C13）、`052`（D15、C14）、`058`（C13）
+**P1-8 尚未結案**：D14 票開出前 AC-8 不成立。TODO.md P1-8 已追加補述說明。
+
+### Summary
+
+依 captain 的 G1-A／G2-A／G3-A 完成全部「移除」類處置（`bbe32bc`），每條 AC-3 指令在本分支成立、對上一版失敗。P3-8 加了本票自己的解除條件行。規則 5／不變式 #7 的新措辭已送 FO 待 captain 核准，核准前未動 `AGENTS.md` 與 `design.md`；爭議時序搬進試算表需要 FO 另開新票。
+
+## Stage Report: implement (addendum — rule 5 approved)
+
+- DONE: Apply the captain-approved rule 5 / invariant #7 text (FO relay 2026-09-30,「核准，改寫本體＋補述」).
+  `82f7d8d`：`AGENTS.md` 第 5 條本體換成核准文字並加 2026-09-30 補述（引原「兩類」句、註明 G1-A／G2-A 與 053）；`design.md` 不變式 #7「規則」欄換成同一文字，「對應的失敗」欄不變，並加 `### 2026-09-30` 修訂紀錄。未加「並定版」。
+- DONE: Prove the two bodies are identical and `CLAUDE.md` is still a symlink.
+  `cmp` 顯示 `AGENTS.md` 第 5 條本體與核准文字逐位元組相同。把該本體去掉換行後，與 `design.md` 第 7 列規則欄做 `diff`，沒有輸出。表格儲存格不能換行，所以需要去換行才能比對。2026-09-29 的舊版本也只有去換行後才相同，已實跑確認。`readlink CLAUDE.md` 印出 `AGENTS.md`，`cmp CLAUDE.md AGENTS.md` 相同。
+- DONE: Follow-on doc: `docs/content-pipeline/gatekeeping.md` 第 6 章（第十節「實作後更新」所列）。
+  新增第三類那一列，「其餘內容」改稱第四類，並加 2026-09-30 補述。第 8 章 051 那列的「第三類禁令」改為「第四類禁令」。`content-audit check` 計數與改動前相同（M4=1 M5=2 M6=18），沒有指向本次三檔的新 M6。測驗 136 pass／0 fail。
+
+### Summary
+
+captain 核准的規則 5 新措辭已寫入 `AGENTS.md` 與 `design.md` 不變式 #7，兩處文字相同。`gatekeeping.md` 第 6 章已隨之改為四類。剩下的只有 D14 爭議時序的新票，由 FO 開立。
+
+## Stage Report: implement (cycle 2)
+
+- DONE: Apply the captain-approved rule 5 text (「核准，改寫本體＋補述」, 2026-09-30) to `AGENTS.md` rule 5 and `design.md` invariant #7, with the `AGENTS.md` 補述 and a `design.md` `### 2026-09-30` revision record; no 「並定版」.
+  已在 `82f7d8d` 施工（FO 的兩則訊息交錯，核准先到，本輪沒有重做）。「對應的失敗」欄不變。兩檔 `grep -c '定版'` 皆為 0。
+- DONE: Update `gatekeeping.md` chapter 6 to match, following that file's writing rules.
+  `82f7d8d`：新增第三類列，「其餘內容」改為第四類，加 2026-09-30 補述。第 8 章 051 那列改寫為「第四類禁令」。文件開頭的三條寫作規則：（1）只寫有日期的完成事實，不寫進度。（2）新列連結的可見文字是 repo 根目錄路徑 `AGENTS.md`。（3）本章是分類表，不是防線，不適用。
+- DONE: Prove bodies byte-identical, `CLAUDE.md` still a symlink, content-audit names 0 new lines, G-7 passes.
+  `cmp` 顯示 `AGENTS.md` 第 5 條本體與核准文字相同。本體去掉換行後，與 `design.md` 第 7 列規則欄的 `diff` 沒有輸出。表格儲存格不能換行，2026-09-29 的舊版本也只有去換行後才相同，已實跑確認。`readlink CLAUDE.md` 印出 `AGENTS.md`。
+  `content-audit check`：在分派基準 `145127b` 的暫時 worktree 與本分支各跑一次，去掉行號後比對，新增 0 行、消失 0 行，兩邊同為 M4=1 M5=2 M6=18。G-7（`056` 正本 awk 區塊）：`G-7 PASS [place1=1/1 place2=1 place3=1]`，離開碼 0。
+- DONE: Point `docs/health-check/TODO.md` P1-8 at D14's ticket `074` for AC-8.
+  改的是本分支上一輪由本票新增、尚未合併的 P1-8 補述：搬進 SSOT 那一項指向 `074`（`docs/constitution-features/controversy-timeline-to-ssot.md`），規則 5 那句改為已核准，結案句改為「AC-7 由 `074` 驗收」。P1-8 區段中 `074` 的命中數為 2（負責票清單與結案句各一）。
+
+### Summary
+
+規則 5 與不變式 #7 的核准措辭在上一輪已寫入。本輪補上 FO 要的證據：文字相同、symlink 仍在、content-audit 沒有新增失敗、G-7 通過。`TODO.md` P1-8 已指向 `074`。AC-8 的結案條件現在都有負責的票，P1-8 等本票通過最後一道 gate 後結案。
