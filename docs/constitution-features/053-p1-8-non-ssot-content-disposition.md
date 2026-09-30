@@ -1,7 +1,7 @@
 ---
 id: 053
 title: 完成 P1-8 盤點：全站無 SSOT 來源內容的逐項處置
-status: verify
+status: implement
 source: captain 2026-09-04（把關機制體檢第三類；TODO.md P1-8 停滯項）
 started: 2026-09-30T17:18:46Z
 completed:
