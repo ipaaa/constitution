@@ -355,6 +355,10 @@ G2-B 時另刪 `src/data/threshold-analysis.ts`（598 行）、`src/components/t
 - `docs/constitution-features/047-content-freeze.md`、`docs/constitution-features/051-content-provenance-marking.md`：正在平行 design。本票只引用它們，不改它們的內容。它們以本表為輸入清單的方式由各自的 design 決定。
 - `docs/constitution-features/049-opinion-lazybag-content-provenance.md`、`052-contributors-placeholder.md`、`058-opinion-lazybag-unwired-removal-cta-alignment.md`：本票對它們的範圍沒有改變。
 
+### Feedback Cycles
+
+- Cycle 1: REJECTED — verify（`6473c8c`）判 F1 Material（`/quiz` 仍寫「從入門到進階」，進階題組已由本票移除：`src/app/quiz/page.tsx` :10、:13、:52）。FO 授權：F1 fix（刪去三處「從入門到進階，」）；F2 fix（`TODO.md` P2-9 以一行補述記 `/preview` 已由 C11 刪除，原文不改）；F3 decline（「其餘兩句未改」措辭不精確，文字內容無誤）；F4 decline（第 6 章標題「三類內容」下列四列，補述已說明）。
+
 ## Stage Report: design
 
 - DONE: Produce a per-file disposition table for every non-SSOT file in `docs/health-check/TODO.md` P1-8 (move into SSOT / mark source + freeze / remove), each with a reason; no 待決定 — anything needing captain judgment becomes a gate decision with a recommendation.
@@ -443,3 +447,18 @@ captain 核准的規則 5 新措辭已寫入 `AGENTS.md` 與 `design.md` 不變�
 ### Summary
 
 **Verdict: REJECTED.** The only blocker is F1, a one-line owned fix on `/quiz` (team-visible, not public). The rule-5 text is byte-identical to the captain-approved block, all removals match the section 五 table, and tests, tsc, build, G-7 and content-audit all pass. If the FO authorizes declining F1 as polish, nothing else blocks, and I would recommend PASSED.
+
+## Stage Report: implement (cycle 3)
+
+- DONE: F1: remove 「從入門到進階，」 from the three /quiz strings (src/app/quiz/page.tsx :10, :13, :52) so the page describes the three remaining sets truthfully; nothing else on the page changes.
+  `37d7368`：三處都刪了，diff 只動這三行。`grep -c '進階' src/app/quiz/page.tsx` 為 0。只要把任一處改回，這條檢查就會失敗。
+- DONE: F2: add a dated one-line 補述 under TODO.md P2-9 recording that /preview was deleted by 053 C11, original text unchanged.
+  `37d7368`：在 P2-9 的 2026-09-04 更正之後追加一行 2026-09-30 補述。diff 只有新增，沒有刪除任何行。
+- DONE: Re-run the verify-owned proofs touched by the fix (removal checks, tests, tsc, build, G-7, content-audit unchanged vs main); no other candidate change.
+  AC-3 八條全數成立。`tsc` 0、`build` 0，`src/data/*.json` 的 sha256 在 build 前後相同。測驗 136 pass、0 fail。G-7 PASS [1/1, 1, 1]。
+  content-audit 與 main（`b7a7f96`）比對：去掉行號後新增 0 行、消失 0 行，兩邊同為 M4=1 M5=2 M6=18。
+  F3、F4 依 FO 指示不處理。規則 5 的文字與它的補述沒有改動。
+
+### Summary
+
+依 cycle 1 的處理決定修了 F1 與 F2，一共改兩個檔、四行。verify 負責的證據全部重跑，結果都通過。content-audit 的結果與 main 相同。
