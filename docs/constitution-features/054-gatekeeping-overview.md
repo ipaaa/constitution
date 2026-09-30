@@ -60,6 +60,11 @@ gates:
               application:
                 target-stage: complete
                 state: superseded
+            - id: gate-attempt:054-review-2
+              briefing:
+                id: briefing:054:review:attempt-2:revision-1
+                digest: sha256:c65cabf2832658bf1a096dffdc47bedaa8ae0dd6f51ff34d24e447319ba5f654
+                room-ref: '@review/review/briefing-2'
 ---
 
 沒有任何一份文件回答「現在到底有哪些把關、各擋什麼、哪些缺口還開著」。但新增一份 evergreen 文件等於新增一個會過時的東西——**本票的核心不是寫那份文件，是設計讓它不過時的機制。**
