@@ -398,3 +398,34 @@ captain 2026-09-29 的三項決定，目前記在本票的 Problem 一節。impl
 ### Summary
 
 逐項查核 069 的事實陳述：紀年正本與 captain 決定一致，判決字號例在司法院網站實查存在；解除條件二的 `PASS` 措辭與工具輸出一致；閱讀順序的公開頁清單與 `launch-status.ts` 相符；19 處路徑全數指到正確的封存檔。056 那行位元組未變、G-7 PASS、M6 只剩 `/about:38`、測試與 tsc 全過、無佔位資料。判定 **PASSED**；V-1 是 M6 範圍外的 5 處註解／record 舊路徑，屬 Polish，交 FO 處置。
+
+## Stage Report: review
+
+- DONE: Review 069 for what verify did not own: the implementation matches the design and the captain's 2026-09-30 decisions (判決字號 A confirmed, both scope items, 9 post-design paths with src/ limited to one comment line), readability of content-conventions.md for a non-engineer captain, and every Documentation impact row checked against delivered behavior.
+  逐行讀 `main...99448b5` 的 diff。設計四件事全部照做；範圍追加 `040` 3 處＋設計後 9 處都在；`src/` 只有 `verified-case-refs.mjs:9` 註解一行。正本第 3 條寫定規則 A（不附西元，排除 C），無「暫行」。正本 27 行，三條規則各附例，「怎麼查」附可照打的指令，非工程師讀得懂。實作後更新 6 列逐列對到交付；`不更新` 各列的 `record`（`_archive/067`、`_archive/056`、`2026-09-03-editor-onboarding.md`）與 `layout.tsx` 皆零 diff。`operations.md` 在「不更新」列內，但只改了 3 處路徑，屬 captain 09-30 範圍擴大，未加第二份規則，不違反該列理由。
+- DONE: Regressions and merge interplay: 138 tests, tsc, G-7 PASS, content-audit M6 only `/about:38`; anticipate conflicts with 051 and 053 (both add their own P3-8 lines and touch TODO.md/AGENTS.md) and 072 (INDEX.md date cells).
+  於 `99448b5` 實跑：`node --test tests/*.test.mjs` 138 條 137 過 0 失敗 1 skip；`rm -rf .next && npx tsc --noEmit` exit 0；G-7 正本印 `G-7 PASS [place1=1/1 place2=1 place3=1]` exit 0；`check` 印 `FAIL … M6=1`，唯一 M6 行為 `src/app/about/page.tsx:38`；AC-1 第 2 步 grep 0 行；AC-2 恰 1 行含 `_archive/`；P3-8 awk 印 `2`；`056` 那行不在 `-` 側；`敘述用西元` 只在正本；快照 diff 只差第 3 行 commit；`src/data/*.json` sha256 不變。合併模擬見 R-1。
+- DONE: End with a clear PASSED or REJECTED verdict; findings go through the Review-finding disposition checkpoint without touching the candidate.
+  判定 **PASSED**。R-1、R-2 交 FO 處置，candidate 未動（合併模擬在已移除的臨時 worktree 內進行）。V-1 依 FO 指示不列。
+
+### 合併互動（`git merge-tree` 與臨時 worktree 實測）
+
+- `069`＋`051`：`TODO.md`、`INDEX.md` 文字衝突。`069`＋`053`：`TODO.md` 文字衝突。三者都在 P3-8 的 `056` 那行之後插一行，衝突點相同；保留全部三行即可解。`AGENTS.md` 與 `design.md` 自動合併。
+- 三者全合併（衝突以聯集解）後：G-7 仍 `PASS [place1=1/1 place2=1 place3=1]`，因為 `051`、`053` 的新行都不含 `056-pre-launch-checklist`。P3-8 含「解除條件」的行變成 4。
+- `069`＋`072`（`gatekeeping-overview-rejudge-064`）：無衝突。`069` 在 INDEX 專案定位表加一列，`072` 票內寫的 `docs/INDEX.md:59` 會移到 `:60`，只影響其行號引用。
+
+### Finding R-1（Deferred risk，待 FO 處置）
+
+- **觀察**：`051`、`053` 合併後，P3-8 有 4 條解除條件，只有 `069` 那條編號「二」，另兩條都叫「解除條件」。`AGENTS.md` 第 4 條（`069` 加的行）寫「兩項都通過，才可移除」，屆時條件不完整；`051`、`053` 都不改第 4 條。`069` AC-3 第 1 步「印 2」在合併後不成立（該 AC 是 `069` 自身端值，不是永久不變式）。
+- **四個證據欄**：使用者與流程＝agent 只讀 `AGENTS.md` 就移除 noindex；可見傷害＝漏跑 `content-provenance.mjs check` 與 `053` AC-3–6 即上線；受影響邊界＝AGENTS 第 4 條 noindex 禁令；觸發證據＝上方三方合併模擬。今日 `main` 上不觸發。
+- **提議**：Deferred risk，promote 條件＝`051` 或 `053` 任一合併。`069` 內容本身正確，不擋本票。建議由後合併者在解衝突時改 `AGENTS.md` 那行為「P3-8 列出的全部解除條件」並統一編號；歸屬需 FO 決定（`069` 無法擁有另兩票的條件）。
+
+### Finding R-2（Polish，待 FO 處置）
+
+- **觀察**：`content-conventions.md` 第 2 條要求引用官方文字「保留民國」，例子卻寫「114 年 1 月 23 日」，數字與「年」「月」之間有空格；官方原文為 `114年1月23日`。讀者照例子寫會改動原文。
+- **四個證據欄**：使用者與流程＝編輯照正本例子寫引文；可見傷害＝引文多出空格，不影響意義；受影響 AC＝無；觸發證據＝`docs/project/content-conventions.md:18`。
+- **提議**：Polish，建議 decline 或併入後續內容修正票。
+
+### Summary
+
+069 的實作與設計、captain 09-29／09-30 決定一致，所有 AC 在 `99448b5` 重跑成立，文件影響逐列對得上，`record` 與 `layout.tsx` 未動。判定 **PASSED**。與 `051`、`053` 合併時 P3-8 會有同點文字衝突（聯集可解、G-7 仍 PASS），但 AGENTS 第 4 條的「兩項」屆時不完整，列為 R-1 交 FO。
