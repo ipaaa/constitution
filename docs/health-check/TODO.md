@@ -731,7 +731,7 @@ done | sort -rn | head -12
 - **影響**：第 1001 列之後的列不受保護。那些列的公式欄與審核欄，投稿者改得動
 - **現況**：三個分頁的資料列最多 44 列（`Track 2_discussion` 的 `d44`），遠低於 1000
 - **升級條件**：任一分頁的資料列接近 1000 列。處置屆時再定：重設範圍的結束列，或改用整欄範圍
-- **來源**：captain 經 FO 轉述，記錄在 [`050-ssot-approval-deployment.md`](../constitution-features/050-ssot-approval-deployment.md)〈部署窗口記錄：S7／S8 回報與 S9 執行結果〉第二節
+- **來源**：captain 經 FO 轉述，記錄在 [`050-ssot-approval-deployment.md`](../constitution-features/_archive/050-ssot-approval-deployment.md)〈部署窗口記錄：S7／S8 回報與 S9 執行結果〉第二節
 
 ### P2-14　Apps Script 沒有欄位標題的別名表
 
@@ -742,7 +742,7 @@ done | sort -rn | head -12
 - **影響**：有人改了某個標題字串，Apps Script 可能無聲失效，同步程式仍然通過。兩邊不會互相提醒
 - **現況**：feature `050` 實測，正式表三個分頁的 18／21／12 個標題字串同時通過兩支程式
 - **升級條件**：部署後有人改動三個分頁上任何一個標題字串
-- **來源**：[`050-ssot-approval-deployment.md`](../constitution-features/050-ssot-approval-deployment.md)〈十二、J1-J2 的處置〉的「J1 第二處」
+- **來源**：[`050-ssot-approval-deployment.md`](../constitution-features/_archive/050-ssot-approval-deployment.md)〈十二、J1-J2 的處置〉的「J1 第二處」
 
 ### P2-1　Track 1 完全沒有把關
 

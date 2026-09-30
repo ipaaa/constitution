@@ -44,7 +44,7 @@
 - **不能做什麼**：改不到第 3 章的 A、B、C 三類欄位。2026-09-29 captain 回報以投稿者帳號實測 30 格，與預期相符：三類欄位 27 格被擋，內容欄 3 格可改。
 - **被什麼擋**：改了內容，該列退回 `Needs review`，要重新核可才會進網站。
 - **擋不到什麼**：整列刪除。試算表的保護範圍沒有擋整列刪除的設定。
-- **正本**：[`docs/constitution-features/050-ssot-approval-deployment.md`](../constitution-features/050-ssot-approval-deployment.md) 步驟 6 與 S7-b；[`docs/project/contributing.md`](../project/contributing.md)。
+- **正本**：[`docs/constitution-features/_archive/050-ssot-approval-deployment.md`](../constitution-features/_archive/050-ssot-approval-deployment.md) 步驟 6 與 S7-b；[`docs/project/contributing.md`](../project/contributing.md)。
 
 ### 學者（法學背景審閱者）
 
@@ -89,7 +89,7 @@
 2. 整列刪除沒有對應的保護設定。
 3. `R2:R` 這類開放範圍，Google 試算表存成到第 1000 列。第 1001 列之後不受保護。
 
-正本：[`docs/constitution-features/050-ssot-approval-deployment.md`](../constitution-features/050-ssot-approval-deployment.md) 步驟 6、S7 與〈部署窗口記錄〉第一、二節。`050` 封存後，保護範圍的正本移到 [`docs/content-pipeline/operations.md`](operations.md)。
+正本：`050` 已封存，保護範圍的正本是 [`docs/content-pipeline/operations.md`](operations.md)。部署經過記在 [`docs/constitution-features/_archive/050-ssot-approval-deployment.md`](../constitution-features/_archive/050-ssot-approval-deployment.md) 步驟 6、S7 與〈部署窗口記錄〉第一、二節。
 
 ## 4. 核可版本綁定
 
@@ -114,7 +114,7 @@
 | 防線 | 擋什麼 | 擋不到什麼 | 機械或人工 | 正本 |
 |---|---|---|---|---|
 | 核可版本綁定（同步端） | 核可後被改過的內容、缺漏或偽造的核可紀錄、指紋不符的列。任一列不符，整份不寫 | 核可者本身看錯的內容。綁定只證明「核可的就是這一版」，不證明這一版正確 | `機械`：`node --test tests/approval-content-version-binding.test.mjs` | [`docs/content-pipeline/design.md`](design.md) 修訂紀錄 2026-09-03 |
-| 試算表保護範圍 A／B／C | 投稿者改公式欄、審核欄與標題列 | 擁有者手改公式欄；整列刪除；第 1001 列之後的列 | `人工（有記錄）`：由 captain 設定，Google 試算表執行。repo 內沒有可重跑的檢查。有效性靠 captain 以投稿者帳號做的行為測試，記在 `050` 票 S7 | [`docs/constitution-features/050-ssot-approval-deployment.md`](../constitution-features/050-ssot-approval-deployment.md) 步驟 6 |
+| 試算表保護範圍 A／B／C | 投稿者改公式欄、審核欄與標題列 | 擁有者手改公式欄；整列刪除；第 1001 列之後的列 | `人工（有記錄）`：由 captain 設定，Google 試算表執行。repo 內沒有可重跑的檢查。有效性靠 captain 以投稿者帳號做的行為測試，記在 `050` 票 S7 | [`docs/constitution-features/_archive/050-ssot-approval-deployment.md`](../constitution-features/_archive/050-ssot-approval-deployment.md) 步驟 6 |
 | 同步前置檢查 | 缺欄或標題對不上、`status` 值不合法、已核可列的必填欄空白、`id` 重複、核可後 0 筆、5 組已知佔位字串。任一項失敗，整份不寫 | 刪掉少數幾列：同步只在核可後 0 筆時中止，筆數下降時照常寫出。兩列標題相同。內容是 AI 生成或編造的 | `機械`：`node --test tests/approval-content-version-binding.test.mjs`（檢查本身在 `scripts/sync-content.mjs`，只在發布時執行） | [`docs/content-pipeline/operations.md`](operations.md)〈同步〉與〈錯誤與復原〉 |
 | PR 的 JSON diff 與預覽審閱 | 同步產生的兩個 JSON 裡看得見的錯：少了一筆、多了測試字串、畫面壞掉 | 不經同步的內容。看起來合理但事實錯誤的內容 | `人工`：由 captain | [`docs/content-pipeline/operations.md`](operations.md)〈同步〉 |
 | workflow `verify` 階段的事實查核與佔位掃描 | 走 `constitution-features` workflow 的票，其 diff 裡的事實錯誤與設計文件範例值 | 不走 workflow 的改動。具名的佔位掃描自 2026-09-02 refit（`1eff0e2`）起才寫進 `verify` 的輸出，之前的票沒有這一項 | `人工`：由 verify 階段的 fresh agent | [`docs/constitution-features/README.md`](../constitution-features/README.md) 的 `verify` stage |
