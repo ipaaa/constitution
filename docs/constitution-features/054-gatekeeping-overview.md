@@ -12,13 +12,13 @@ issue:
 pr:
 mod-block:
 review-round:
-    id: round:054:review:2
+    id: round:054:review:3
     stage: review
-    cycle: 2
+    cycle: 3
     briefing:
-        id: briefing:054:review:round-2
-        digest: sha256:07af0fa93f3b825b2387b1cf6c45b6aba4aa154e031ea7ec3118a0dd67320199
-        room-ref: '@review/review/round-2'
+        id: briefing:054:review:round-3
+        digest: sha256:5cd4720b920062c66ab2150f98a6fde1294fdc66df9046c2f806b0d57866ac0e
+        room-ref: '@review/review/round-3'
 gates:
     version: 1
     records:
