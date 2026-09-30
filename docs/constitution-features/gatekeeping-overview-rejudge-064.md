@@ -201,3 +201,27 @@ Verified by：`git diff --name-only main...HEAD` 只列 `docs/content-pipeline/g
 ### Summary
 
 總覽沒有與 `064` 相反的句子，但第 4、5 章漏寫三件事：兩欄有值才進指紋、同步的三個新中止條件、captain 在 PR diff 逐值看。改法是逐字草稿，只改總覽與 INDEX 一格，不動程式。第 2、3 章各補一句條件句，因為 `064` 已封存，階段二建欄是 repo 外步驟，沒有票會回頭改總覽。`:118` 同一格順帶補上 `040` 起就漏列的格式檢查；這一項不是 `064` 造成，gate 可以剔除。
+
+## Stage Report: implement
+
+- DONE: Rewrite `docs/content-pipeline/gatekeeping.md` per the design's section 三 tables (chapters 4 and 5, plus the accepted chapter 2/3 sentences and the 040 format-check row), and update the `docs/INDEX.md:59` date; every new sentence follows chapter 0's rules.
+  `8e75576`：第四節草稿逐字套用（第 2 章 1 句、第 3 章 1 段、第 4 章 5 句＋正本、第 5 章 `:116`／`:118`／`:119` 三格）；檔頭與 INDEX 日期改 2026-09-30。總覽 199 → 206 行，在 205–210 內。唯一微調：第 4 章正本以「；指紋涵蓋哪些欄，見同檔第二節〈發布欄位範圍〉」接在原句後。
+- DONE: Prove AC-1..AC-8 as designed: AC-1 breaks the code four ways and each new 擋什麼 is caught by a test; AC-7 fresh reader answers the three 064 questions from the overview alone; content-audit names 0 overview lines, monotonic scan 0 lines, G-7 PASS.
+  AC-1：兩測試檔 84/84，exit 0。拋棄式 worktree 反向改動：(a) 成對檢查改 `if (false)` → `AC-6` 失敗；(b) `hasOwn` 判斷改 `false` → `AC-4` 失敗；(d) 刪選填欄附加 → `AC-7(b)` 等 4 項失敗；**(c) `ALLOWED_STANCES` 加 `反對` → 0 失敗**（見發現 F1）。
+  AC-2：印 `true true true`。改動會失敗的條件：選填欄無條件計入。
+  AC-3：content-audit 指名總覽 0 行；分支 `M4=1 M5=2 M6=18`，與同時間 `main`（`145127b`）相同；連結可見文字掃描 0 行。
+  AC-4：單調句掃描 0 行。AC-5：`G-7 PASS [place1=1/1 place2=1 place3=1]`，exit 0。
+  AC-6：防線表每列 7 欄；被改的三列（`:123`、`:125`、`:126`）第 3、4 欄非空、第 5 欄以 `` `機械` ``／`` `人工` `` 開頭。`:129`（`056` G-3、G-4）擋不到欄為 `—`，是既有內容，本票未改。
+  AC-8：`git diff --name-only main...HEAD` 只列總覽、`docs/INDEX.md` 與本票檔；INDEX 只改 `:59` 日期。
+  AC-7：fresh agent 只讀總覽作答。第 2、3 題與預期相同。**第 1 題答「該列變 `Needs review`，下次同步不寫進 JSON，網站少這一筆」，不是預期的「整份中止」**（見發現 F2）。
+- DONE: No code or test changes; never run `npm run sync-content`.
+  diff 只有兩份文件。反向改動都在拋棄式 worktree，跑完即移除。沒有執行同步。
+
+### 發現（待 FO 授權，本階段未改）
+
+- **F1 — AC-1(c) 沒有測試擋下。** 使用者與流程：captain 依總覽判斷 `stance` 有機械保證。可見損害：有人在 `ALLOWED_STANCES` 加值，測試照樣通過，總覽第 5 章 `:125`「`stance` 不是 `支持`、`質疑`、`中立分析`」一句失真。影響的 AC：AC-1。觸發證據：`AC-5` 只測 `進步派`、`贊成` 兩個壞值（`tests/track2-case-ref-stance.test.mjs:153`）；加 `贊成` 或 `進步派` 會失敗，加 `反對` 不會。提議：Deferred risk（現行程式正確，要有人改常數才觸發）。處置二選一：(i) 另票在測試加 `assert.deepEqual(ALLOWED_STANCES, [...])`，本票不動總覽；(ii) 總覽 `:125` 擋不到欄加「允許清單本身被改寬」。本票依 design 不改測試，傾向 (ii) 或另票 (i)，由 FO 決定。
+- **F2 — AC-7 第 1 題的預期答案與正式流程不符。** reader 的答案引第 1 章 `:31`，與實際試算表路徑相符：公式重算後該列是 `Needs review`，同步不收它。「整份中止」只在該列 `status` 仍顯示 `Approved` 而指紋不符時發生（`tests/track2-case-ref-stance.test.mjs:186` 用的就是這種列）。總覽兩種情形都寫了（第 1 章 `:26`、`:31`）。提議：Polish（總覽不用改）；AC-7 第 1 題的預期答案屬 captain 範圍，建議改成「該列要重新核可；沒重新核可時不會進網站」。
+
+### Summary
+
+依 design 第四節逐字改總覽第 2–5 章與 INDEX 日期，一個 commit（`8e75576`），不動程式。AC-2 至 AC-6、AC-8 通過。AC-1 四個反向改動中 (c) 沒有測試失敗，AC-7 第 1 題答案與 design 預期不同但與總覽和實際流程一致；兩項列為 F1、F2，等 FO 授權處置。
