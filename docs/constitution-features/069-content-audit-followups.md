@@ -49,6 +49,11 @@ gates:
                 at: "2026-09-30T21:46:59.911354Z"
                 decision: revise
                 reason: 'Captain chose 2026-09-30 (「照建議，文字核准」) at review: R-1 fix with captain-approved AGENTS.md rule-4 text (P3-8 列出的全部解除條件); R-2 fix (example 114年1月23日（2025年1月23日） without spaces); fresh re-review.'
+            - id: gate-attempt:069-review-2
+              briefing:
+                id: briefing:069:review:attempt-2:revision-1
+                digest: sha256:17cfe0af81fc9c0e8cb6e6a6f063f411fc5e7f9cda501de6dd11801655027766
+                room-ref: '@review/review/briefing-2'
 review-round:
     id: round:069:review:1
     stage: review

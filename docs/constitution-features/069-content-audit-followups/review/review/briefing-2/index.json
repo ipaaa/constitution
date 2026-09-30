@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:069:review:attempt-2:revision-1",
+  "question": "069 review（修正後）：候選 597269b 是否可交付（開 PR 合併）？",
+  "artifacts": [
+    {
+      "id": "artifact:069:review:attempt-2:revision-1:item-1",
+      "uri": "git-root://main/015800f05894c91eb4d88d1345bf631e56d47b00/docs/constitution-features/069-content-audit-followups.md",
+      "rev": "sha256:dad56c245484335598dde942f96dea4943b5d203ddce66dc9df898b53b009522",
+      "mediaType": "text/markdown",
+      "summary": "fresh reviewer 判 PASSED：AGENTS.md 第 4 條逐字為 captain 核准文字；臨時合併 051、053 後仍成立（P3-8 四條、G-7 PASS）；範例已去空格；自 861dd26 起只改這兩行；138 測試 0 失敗、tsc、M6 只剩 /about:38；與 main、072 皆無衝突。無新 finding。"
+    }
+  ]
+}
