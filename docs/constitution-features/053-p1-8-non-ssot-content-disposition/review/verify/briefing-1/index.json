@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:053:verify:attempt-1:revision-1",
+  "question": "053 verify（修正後）：移除項目與第 5 條措辭的事實是否正確、可進 review？",
+  "artifacts": [
+    {
+      "id": "artifact:053:verify:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/0703517bba93a6aa5c6dc98ca674a1eba0c71f45/docs/constitution-features/053-p1-8-non-ssot-content-disposition.md",
+      "rev": "sha256:b7933df188012d61c838a9a0abbd1e03edf9ed03401c56a01d9764e5b59a8a61",
+      "mediaType": "text/markdown",
+      "summary": "fresh verifier 判 PASSED（3d8a3f0）：/quiz 不再寫從入門到進階，3 組各 5 題為真；P2-9 補述；七項移除檢查成立；captain 核准的第 5 條文字自上次 verify 未變、CLAUDE.md 仍為 symlink；P3-8、P1-8→074；136 測試 0 失敗、tsc、build、G-7 PASS；content-audit 與 main 相同。無新 finding。"
+    }
+  ]
+}

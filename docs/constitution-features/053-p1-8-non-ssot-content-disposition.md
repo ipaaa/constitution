@@ -19,6 +19,17 @@ review-round:
         id: briefing:053:verify:round-1
         digest: sha256:27074e727cb976facf40de28cad98d8589e3f4d15dafb1ded9bbd2e9d6c7e737
         room-ref: '@review/verify/round-1'
+gates:
+    version: 1
+    records:
+        - id: gate:053:verify
+          stage: verify
+          attempts:
+            - id: gate-attempt:053-verify-1
+              briefing:
+                id: briefing:053:verify:attempt-1:revision-1
+                digest: sha256:db3c9bd034a3f0bfb067b558c15db8d078d33774027644d133d885c79bcf083d
+                room-ref: '@review/verify/briefing-1'
 ---
 
 `docs/health-check/TODO.md` 的 P1-8 已完成初步盤點，但八個檔各自要「搬進 SSOT／標注來源凍結／移除」三選一，**停在 2026-09-02，一項都沒決定**。
