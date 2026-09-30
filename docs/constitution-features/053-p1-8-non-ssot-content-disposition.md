@@ -413,3 +413,25 @@ captain 核准的規則 5 新措辭已寫入 `AGENTS.md` 與 `design.md` 不變�
 ### Summary
 
 規則 5 與不變式 #7 的核准措辭在上一輪已寫入。本輪補上 FO 要的證據：文字相同、symlink 仍在、content-audit 沒有新增失敗、G-7 通過。`TODO.md` P1-8 已指向 `074`。AC-8 的結案條件現在都有負責的票，P1-8 等本票通過最後一道 gate 後結案。
+
+## Stage Report: verify
+
+- DONE: Verify every removal against the design's section 五 table: each removed item is exactly what the table names (D8/C3, D20/C12, C5, C7, C9, C10, C11), each follow-on change is necessary and states nothing false (e.g. /quiz says 3 組), and no factual claim remaining on the touched pages became wrong.
+  Removals match the table 1:1 (`git diff main...HEAD -- src`). All 7 AC-3 grep/test lines hold on HEAD. The same greps against `main` hit 7 lines and both deleted files exist there, so each line is falsifiable. Follow-ons are necessary: grid 3→2, `lg:col-span-12`, `pb`→`py`, 4→3 組, and the future/page.tsx comment. No `#timeline`, `/preview` or `perspectives` link is left in `src`. `/future` 「本站不列具體年數」 is now true, where before the funnel's year cell contradicted it.
+- FAILED: 同上 — one claim on a touched page became unsupported (finding F1).
+  `src/app/quiz/page.tsx:10`, `:13` and `:52` still say 「從入門到進階」. The only 進階 set was the removed perspectives quiz (tag 「進階思辨」, description 「5 道進階題目」). The three quizzes left are tagged 必做題組, 入門友善 and 時事關懷.
+- DONE: Verify the rule-5 text: AGENTS.md body byte-identical to the captain-approved text, design.md invariant #7 identical once line breaks are removed, the 補述 quotes the original sentence accurately, gatekeeping.md ch.6/ch.8 now true, no 「定版」 added; CLAUDE.md still a symlink; P3-8 has 053's own line with other lines unchanged; P1-8 points at 074.
+  I took the approved block from the implementer's need_decision SendMessage (17:54:54Z). `cmp` against the AGENTS.md rule-5 body is identical. With line breaks removed, `cmp` against design.md row 7's rule cell is identical. The block also matches the design's G1-A wording and all three G2-A conditions (「依 `051`」 became 「依 feature 051」). The 補述 quote equals the `main` line 1 exactly. `grep -c 定版` returns 0 in both files. `CLAUDE.md -> AGENTS.md`. The TODO.md diff removes 0 lines. The AC-9 awk prints 1. The P1-8 section has 2 hits for `074`; 074 exists on `main` but not yet on this branch. gatekeeping ch.6/ch.8 statements are true (polish in F3 and F4).
+- DONE: Placeholder scan over the diff; tests, tsc and build pass; G-7 PASS; content-audit unchanged vs main; end with a clear PASSED or REJECTED verdict — findings go through the disposition checkpoint without touching the candidate.
+  Placeholder scan: the added lines contain no 某學者, 某大學法律系, lorem ipsum or 5個重點 in `src`. The only 某學者 hit is design.md row 7's pre-existing, unchanged 「對應的失敗」 cell. `node --test tests/*.test.mjs`: 136 pass, 0 fail, 1 skipped. `tsc --noEmit` rc 0. `npm run build` rc 0; its route list has no `/preview` or `/quiz/perspectives`. `src/data/*.json` sha256 is the same before and after the build. G-7 (056 canonical block) prints `G-7 PASS [place1=1/1 place2=1 place3=1]`. content-audit on a `git archive main` tree vs the branch, line numbers stripped: only the summary unit count differs (3045→2888). Both print M4=1 M5=2 M6=18. No sync run and no push. My temporary node_modules symlink has been removed.
+
+**Findings (disposition checkpoint; candidate untouched, HEAD `bf8e2d0`):**
+- F1: /quiz 「從入門到進階」. Released user: team mode only (`/quiz` is in `ALL_PAGES`, not `PUBLIC_PAGES`). Harm: the subtitle promises a 進階 tier that no longer exists. Boundary: this checklist's 「states nothing false」 on a follow-on line 053 already edited. Trigger: observed in source. **Polish now, deferred risk.** It becomes material when `/quiz` enters `PUBLIC_PAGES` (059). Owned by 053. Proposed disposition: fix (drop 「從入門到進階，」 in the three strings).
+- F2: `docs/health-check/TODO.md` P2-9 says 「既有的 `/preview` 路由不是解答」, but C11 deleted that route. Polish, owned. Proposed disposition: fix with a one-line 補述, or decline.
+- F3: the AGENTS.md 補述 and the design.md revision record both say 「其餘兩句未改」. The rest of the old rule is three sentences on two lines, now merged onto one line, with the wording unchanged. Polish. Proposed disposition: decline.
+- F4: gatekeeping ch.6 keeps the heading 「三類內容」 over four rows, which its 補述 explains. The 「其餘內容」 row still says 「寫死在元件裡的中文」, and the next paragraph carries the G1-A carve-out. Polish. Proposed disposition: decline.
+- Merge-order notes, not 053 defects: `docs/constitution-features/051-content-provenance-marking.md:81` still says 「第 5 條只允許兩類」. 051's 「規則 P4 即第三類的禁令」 will point at the wrong class. Both are for the FO.
+
+### Summary
+
+**Verdict: REJECTED.** The only blocker is F1, a one-line owned fix on `/quiz` (team-visible, not public). The rule-5 text is byte-identical to the captain-approved block, all removals match the section 五 table, and tests, tsc, build, G-7 and content-audit all pass. If the FO authorizes declining F1 as polish, nothing else blocks, and I would recommend PASSED.
