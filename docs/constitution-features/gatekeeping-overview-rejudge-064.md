@@ -1,13 +1,13 @@
 ---
 id: 072
 title: 把關總覽第 4、5 章依 064 重判
-status: design
+status: implement
 source: 054 review R5（延續 verify V6）；captain 2026-09-29 裁示「照建議走」——R5 不在 054 處理，另開本票
 started: 2026-09-30T17:18:46Z
 completed:
 verdict:
 score:
-worktree:
+worktree: .worktrees/spacedock-ensign-gatekeeping-overview-rejudge-064
 issue:
 pr:
 ---
