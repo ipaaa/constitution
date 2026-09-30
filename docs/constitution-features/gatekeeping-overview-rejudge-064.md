@@ -113,6 +113,8 @@ Verified by：執行 `node --test tests/track2-case-ref-stance.test.mjs tests/ap
 再在拋棄式 worktree 各做一次反向改動，改完即還原：(a) 刪 `sync-content.mjs` 的成對檢查 → `AC-6` 測試失敗；(b) `Object.hasOwn` 判斷改成恆真 → `AC-4` 失敗；(c) `ALLOWED_STANCES` 加一個值 → `AC-5` 失敗；(d) `content-fingerprint.mjs` 不附加選填欄 → `AC-7(b)` 失敗。
 四項任一沒有測試失敗，就表示總覽寫了一項沒有機械保證的「擋什麼」，要改總覽或回報。
 
+> ⚠️ **2026-09-30 captain 修改（implement 發現 F1）：** 反向改動 (c) 沒有測試失敗（`AC-5` 只測 `進步派`、`贊成`）。AC-1 改為：四項中三項有測試失敗即通過；第四項 (c) 寫進總覽第 5 章〈同步前置檢查〉的擋不到什麼。不另開測試票。原文保留。
+
 **AC-2 — 第 4 章對指紋涵蓋範圍的描述與程式相符。**
 Verified by：在 repo 根目錄執行下列指令，印出 `true true true`：
 ```bash
@@ -146,6 +148,8 @@ Verified by：verify 階段派 fresh agent，只給總覽一份檔案，問：
 (2) 某列填了判決字號、立場空白，同步會怎樣？（答：整份中止）
 (3) 同步能不能發現「立場判斷錯了」？（答：不能，只查值在不在清單內；captain 在 PR diff 看值）
 三題全對才通過。會讓它失敗的改動：拿掉第 4 章新增三句，第 1 題無法由總覽答出。
+
+> ⚠️ **2026-09-30 captain 修改（implement 發現 F2）：** 第 (1) 題的預期答案改為「該列要重新核可，在那之前不會上網站」。原預期「下次同步整份中止」只在該列 `status` 仍顯示 `Approved` 時成立；公式重算後該列是 `Needs review`，同步不收它（總覽第 1 章）。總覽不改。原文保留。
 
 **AC-8 — 只改總覽與 INDEX 一格。**
 Verified by：`git diff --name-only main...HEAD` 只列 `docs/content-pipeline/gatekeeping.md`、`docs/INDEX.md` 與本票檔。`git diff main...HEAD -- docs/INDEX.md` 只改 `:59` 的日期。
@@ -225,3 +229,19 @@ Verified by：`git diff --name-only main...HEAD` 只列 `docs/content-pipeline/g
 ### Summary
 
 依 design 第四節逐字改總覽第 2–5 章與 INDEX 日期，一個 commit（`8e75576`），不動程式。AC-2 至 AC-6、AC-8 通過。AC-1 四個反向改動中 (c) 沒有測試失敗，AC-7 第 1 題答案與 design 預期不同但與總覽和實際流程一致；兩項列為 F1、F2，等 FO 授權處置。
+
+## Stage Report: implement (cycle 2)
+
+- DONE: Rewrite `docs/content-pipeline/gatekeeping.md` per the design's section 三 tables (chapters 4 and 5, plus the accepted chapter 2/3 sentences and the 040 format-check row), and update the `docs/INDEX.md:59` date; every new sentence follows chapter 0's rules.
+  F1 依 captain 裁示 (ii) 處置（commit `14e0e1e`）：`:125` 擋不到欄加「`stance` 允許清單被改寬（例如加入 `反對`）：沒有測試會失敗」。總覽仍 206 行。AC-1、AC-7 的 captain 修改以 2026-09-30 補述記在 `## Design` 第五節，原文保留。
+- DONE: Prove AC-1..AC-8 as designed: AC-1 breaks the code four ways and each new 擋什麼 is caught by a test; AC-7 fresh reader answers the three 064 questions from the overview alone; content-audit names 0 overview lines, monotonic scan 0 lines, G-7 PASS.
+  AC-1（依 captain 修改，四中三）：84/84 pass。(a) → `AC-6` 失敗；(b) → `AC-4` 失敗；(d) → `AC-7(b)` 等 4 項失敗；(c) 加 `反對` → 0 失敗，已寫進總覽擋不到欄。
+  AC-2 印 `true true true`。AC-3：總覽 0 行；分支與 `main`（`1e4428e`）同為 `M4=1 M5=2 M6=18`；連結可見文字掃描 0 行。AC-4：0 行。AC-5：`G-7 PASS [place1=1/1 place2=1 place3=1]`，exit 0。
+  AC-6：防線表每列 7 欄；被改三列（`:123`、`:125`、`:126`）檢查皆通過。AC-8：diff 只有總覽、`docs/INDEX.md`、本票檔；INDEX 只改 `:59` 日期。
+  AC-7（依 captain 修改的第 1 題預期）：fresh agent 只讀總覽重答。第 1 題「該列退回 `Needs review`，下次同步不寫進 JSON，網站少這一筆」，符合「要重新核可，在那之前不會上網站」；第 2 題整份中止；第 3 題不能，只查值在不在清單內。三題通過。
+- DONE: No code or test changes; never run `npm run sync-content`.
+  diff 只有文件。反向改動在拋棄式 worktree 執行，跑完即移除。沒有執行同步。
+
+### Summary
+
+依 captain 2026-09-30 裁示處置 F1、F2：F1 在總覽〈同步前置檢查〉擋不到欄補一句；F2 不改總覽。兩項 AC 修改以補述記在本票，原文保留。AC-1 至 AC-8 全部重跑通過。
