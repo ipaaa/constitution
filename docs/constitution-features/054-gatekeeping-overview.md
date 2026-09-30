@@ -12,13 +12,13 @@ issue:
 pr:
 mod-block: merge:pr-merge
 review-round:
-    id: round:054:review:2
+    id: round:054:review:3
     stage: review
-    cycle: 2
+    cycle: 3
     briefing:
-        id: briefing:054:review:round-2
-        digest: sha256:07af0fa93f3b825b2387b1cf6c45b6aba4aa154e031ea7ec3118a0dd67320199
-        room-ref: '@review/review/round-2'
+        id: briefing:054:review:round-3
+        digest: sha256:5cd4720b920062c66ab2150f98a6fde1294fdc66df9046c2f806b0d57866ac0e
+        room-ref: '@review/review/round-3'
 gates:
     version: 1
     records:
@@ -57,6 +57,22 @@ gates:
                 at: "2026-09-29T20:48:17.17Z"
                 decision: approve
                 reason: 'Captain approved 054 review cycle 2 in chat 2026-09-29 (「1235照建議」): overview delivered, R1–R3 fixed, AGENTS.md as approved.'
+              application:
+                target-stage: complete
+                state: superseded
+            - id: gate-attempt:054-review-2
+              briefing:
+                id: briefing:054:review:attempt-2:revision-1
+                digest: sha256:c65cabf2832658bf1a096dffdc47bedaa8ae0dd6f51ff34d24e447319ba5f654
+                room-ref: '@review/review/briefing-2'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:054:review:2
+                briefing: briefing:054:review:attempt-2:revision-1
+                by: person:captain
+                at: "2026-09-30T15:25:54.130937Z"
+                decision: approve
+                reason: 'Captain approved 054 review cycle 3 in chat 2026-09-30 (「核准054」): R6 fixed and independently verified, content-audit matches main, merge only resolved R4 conflicts; R5 moved to 072.'
               application:
                 target-stage: complete
                 state: pending
