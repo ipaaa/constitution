@@ -510,6 +510,7 @@ Semantics this may change：README review stage 多一項必要輸出（repo 外
 - 2026-09-29 captain 核准措辭（「全部照建議」，經 FO 轉述）：`## Design` 第三節 (a)、(b)、(c) 照提案原文套用；(b) 第 5 條逐字同時作為 `design.md` 第六節不變式第 7 列；候選規則「把關總覽跟著把關變動」不採用。README 條款由 FO 於 `34663fd` 套用。
 - Cycle 1: REJECTED — verify（`8026f4a`）判 V1（第 7 章把 L／H 閱讀清單寫成 P3-8 條件，AC-5 7/8）、V2（:119 無出處日期）Material。FO 授權 V1–V5 fix（V3 依 captain 2026-09-29 核准記錄「逐字」補齊 `design.md` 第 7 列，不改 `AGENTS.md`），V6 decline for 054（交 `064`：後合併者重判總覽），V7 無動作。implement cycle 2 修正於 `f916c94`，fresh agent AC-5 8/8。round 記錄：`review/verify/round-1`。
 - Cycle 2: REJECTED — review（`c01e361`）判 R1 Material（`gatekeeping.md:198` 自連結在 054 封存後使 M6 由 9 變 10）。FO 授權 R1–R3 fix（R1 改指 `_archive/` 路徑；R2 `TODO.md` 移到〈實作後更新〉；R3 第 4 章加一句「指紋」說明），R4 無動作（合併時由 FO 處理），R5 decline for 054（後合併者重判總覽第 4、5 章）。implement cycle 3 修正於 `3cdddd7`，clone 上封存前後 M6 皆 9、不指名總覽。round 記錄：`review/review/round-2`。
+- Cycle 3: REJECTED — review merge reconcile（`cf9bd62`，候選 `fabf4ea`）判 R6 Material（`050` 於 main `60a240f` 封存，本票 5 行連結失效：`gatekeeping.md` :47、:92、:117，`TODO.md` :734、:745；M6 18→26，第 9 章自查印 6 行）。第 3 輪依 README 升級 captain；captain 2026-09-29 裁示「照建議走」：FO 授權 R6 fix（5 行改指 `_archive/050-ssot-approval-deployment.md`；`:92` 改為 050 已封存的完成式單調句），R5（第 4、5 章依 `064` 重判）decline for 054、另開新票承接。原終端核准以 `merge guard --rework` 作廢，修正後由 fresh reviewer 複查，重新呈 captain 核准。
 
 ## Stage Report: design
 
@@ -658,3 +659,54 @@ REJECTED，只因 R1。本票一封存，總覽第 198 行自己的連結就會�
 ### Summary
 
 PASSED。R1 已修好：模擬封存前後，M6 都停在 9，沒有一行指名總覽，第 9 章自查無輸出。R2、R3 依授權完成，自 `c01e361` 起沒有其他候選改動。G-7 通過，`AGENTS.md` 自核准版起未變。本輪沒有新 finding。R4 在合併時由 FO 處理，R5 由後合併的那張票處理，兩項依處置未重判。
+
+## Stage Report: review (merge reconcile)
+
+- DONE: Merge `main` into branch spacedock-ensign/054-gatekeeping-overview and resolve ONLY the two conflicts per review finding R4: docs/INDEX.md keeps 050's two updated dates plus 054's new row; docs/content-pipeline/design.md revision log keeps both entries, with 050's entry placed directly after 054's design-stage entry and before the invariant #7 entry. No other content change.
+  合併 commit `fabf4ea`（parents `780869f`、main `341848e`）。只有這兩個檔衝突，本票 frontmatter 沒有衝突。`INDEX.md` 保留 main 那兩列的 2026-09-29，再加上總覽那一列。`design.md` 的 main 端除了 050，還多了 064、070 兩則，R4 寫的時候還沒有。處理方式：main 的四則照原順序保留（054 design、050、064、070），本票不變式 #7 那則接在最後。050 仍緊接在 054 design 那則之後，也在 #7 之前。`git diff main` 只有本票新增的內容，兩端文字都沒有改。
+- FAILED: Prove the merged candidate: content-audit check shows 0 lines naming gatekeeping.md and no new failures vs main; 056 G-7 prints PASS; ch.9 self-check prints nothing; npx tsc --noEmit exits 0; AGENTS.md diff vs main is exactly the three captain-approved (a)(b)(c) additions.
+  失敗兩項：content-audit 與第 9 章自查。main 上 M6=18，合併後 M6=26，其中 6 行指名總覽。第 9 章自查印出 6 行。其餘通過：G-7 印 `G-7 PASS [place1=1/1 place2=1 place3=1]`，exit 0。tsc exit 0。`AGENTS.md` 與 main 相比只多 (a)(b)(c) 三處，與 `3fe06a9` 相同。M4=1、M5=2 與 main 相同。
+- DONE: End with a clear PASSED or REJECTED verdict on the reconciled candidate, naming the new HEAD SHA.
+  見 Summary。
+
+### Findings（唯讀，未動候選）
+
+- **R6（050 已封存，本票連結失效）**：`050` 已在 main 封存（`60a240f`）。本票有 5 行仍指向 `docs/constitution-features/050-ssot-approval-deployment.md`：`gatekeeping.md` :47、:92、:117，以及 `TODO.md` :734、:745（本票 `09d496e` 新增的 P2-13、P2-14）。M6 因此多 8 行。
+  四欄證據：使用者是跟著總覽找正本的人，照正常流程閱讀。害處是 5 個連結打不開。受影響的是本票自己寫的保持正確機制：第 9 章自查應無輸出。觸發證據是上面的實測。提議：Material，屬本票。修法是把 5 行改指 `_archive/050-ssot-approval-deployment.md`。
+  另外，`gatekeeping.md:92` 寫「`050` 封存後，保護範圍的正本移到 operations.md」，現在條件已成立。這句要不要改寫，是 R5 的範圍（後合併者重判第 4、5 章），需要 FO 決定。
+
+### Summary
+
+REJECTED，HEAD `fabf4ea`（本報告 commit 在其上）。依 R4 解決了合併衝突，也沒有改到其他內容。候選被退，是因為 main 在本票核准後封存了 `050`，本票 5 行連結隨之失效（R6）。第 9 章自查與「相對 main 無新失敗」兩項因此不成立。G-7、tsc、`AGENTS.md` 都通過。沒有推送，也沒有執行 `sync-content`。
+
+## Stage Report: implement (cycle 4)
+
+- DONE: R6 fix: repoint the 5 dead links (gatekeeping.md :47, :92, :117; TODO.md :734, :745) from docs/constitution-features/050-ssot-approval-deployment.md to docs/constitution-features/_archive/050-ssot-approval-deployment.md; and rewrite gatekeeping.md:92 as a monotonic completed-tense sentence (050 已封存 → 保護範圍正本在 operations.md), no other wording change.
+  `7fe099c`：2 檔，各行一換一，共 5 行。:47、:117 和 `TODO.md` :734、:745 只改路徑，可見文字與連結目標都改成 `_archive/`。:92 改寫為「`050` 已封存，保護範圍的正本是 operations.md」，後面接封存票的連結和原本的節次。`TODO.md` :937 是 main 原有的，不在 R6 範圍，沒有動。
+- DONE: Prove on the candidate: content-audit check M6 equals main's count (18) with 0 lines naming gatekeeping.md; ch.9 self-check prints nothing; monotonic-sentence scan 0 lines; G-7 PASS; AGENTS.md diff vs main still exactly (a)(b)(c).
+  `content-audit check`：M4=1、M5=2、M6=18，與 main `341848e` 相同。去掉行號後逐行比對，只有文件數不同（97 對 96，多的是總覽本身）。第 9 章自查無輸出。第 370 行的單調句掃描 0 行。G-7 印 `G-7 PASS [place1=1/1 place2=1 place3=1]`，exit 0。`git diff --quiet 3fe06a9 -- AGENTS.md CLAUDE.md` 成立，與 main 相比仍只多 (a)(b)(c) 共 11 行。tsc exit 0。如果把任一條連結改回原路徑，M6 會多 1 至 2 行，自查也會印出那一行。
+- DONE: Do NOT touch chapters 4/5 for 064 (R5 declined for 054, split into a new ticket); no candidate change beyond R6.
+  `git diff --stat ae89a22 7fe099c`：只有 `gatekeeping.md` 3 行、`TODO.md` 2 行。第 4、5 章只動了 :92、:117，兩處都是 R6 指定的行。沒有依 064 重判任何內容。
+
+### Summary
+
+R6 已修。5 條連結改指封存後的 `050`，:92 改為完成式。合併後的候選 M6 回到 main 的 18，自查與單調句掃描都無輸出，G-7、tsc 通過，`AGENTS.md` 沒有變。R5 依處置不在本票處理。沒有推送，也沒有執行 `sync-content`。
+
+## Stage Report: review (cycle 3)
+
+- DONE: Re-check R6 independently on the candidate (HEAD of the branch, which already merges main): the 5 lines point at docs/constitution-features/_archive/050-ssot-approval-deployment.md and resolve; gatekeeping.md:92 is a monotonic completed-tense sentence; content-audit check M4/M5/M6 equal main's; 0 lines name gatekeeping.md; ch.9 self-check prints nothing.
+  在 scratchpad 各 clone 一份 main `7aff5a4` 與候選 `f17730a`。5 行（`gatekeeping.md` :47、:92、:117，`TODO.md` :734、:745）都指向 `_archive/050-…`，目標檔存在。:92 讀作「`050` 已封存，保護範圍的正本是 operations.md」，單調句掃描 0 行。`content-audit check`：兩邊都是 M4=1、M5=2、M6=18，去掉行號後逐筆相同，只差文件數 97 對 96。指名總覽 0 行。第 9 章自查無輸出。在 clone 上再把 054 `git mv` 進 `_archive/`，仍是 M6=18、0 行，R1 沒有回歸。反證：把 :47 改回舊路徑，M6 立刻指名 `gatekeeping.md:47` 兩筆。
+- DONE: Confirm no other candidate change since cf9bd62 beyond R6 and state lines; the merge with main (fabf4ea) changed nothing but the INDEX.md/design.md conflict resolutions per R4; G-7 PASS; tsc exit 0; AGENTS.md diff vs main exactly (a)(b)(c).
+  `git diff --stat cf9bd62 HEAD` 只有三檔：`gatekeeping.md` 3 行、`TODO.md` 2 行，本票檔只有 Feedback Cycles 一行與 implement cycle 4 報告。`git show --remerge-diff fabf4ea` 只列 `INDEX.md` 與 `design.md` 兩個衝突區。`INDEX.md` 取 main 兩列的 2026-09-29，加上總覽一列。`design.md` 保留 main 的 050、064、070 三則，不變式 #7 那則接在最後，文字都沒改。G-7 從 `056` 正本抽出執行，印 `G-7 PASS [place1=1/1 place2=1 place3=1]`，exit 0。`npx tsc --noEmit` exit 0。`AGENTS.md` 相對 main 只加 11 行、刪 0 行，就是 (a)(b)(c)。與 `3fe06a9` 相同。`CLAUDE.md` 仍是指向 `AGENTS.md` 的 symlink。第 8 章票況指令 exit 0，印 12 行，沒有 `NOT FOUND`。
+- DONE: End with a clear PASSED or REJECTED verdict naming the reviewed HEAD SHA; any new finding goes through the Review-finding disposition checkpoint without touching the candidate.
+  判定 **PASSED**，受審 HEAD 是 `f17730a`。本輪沒有新的 finding，所以不需要走處置流程。repo 外步驟條款：本票沒有執行 repo 外步驟。`050` 的封存發生在 repo 內，已由 R6 處理。
+
+### 備註（非 finding，未動候選）
+
+- main 在 `fabf4ea` 之後前進到 `7aff5a4`。新增的 4 個 commit 都是 state：本票 frontmatter、round-3 briefing，以及 R5 分出的新票。合併時本票 frontmatter 可能衝突。那是 FO 的狀態記錄，不影響交付內容。
+- `TODO.md` :937 仍連到舊的 `050` 路徑。這一行是 main 原有的，不屬本票，它的 M6 在 main 上也有同一筆。
+- implement cycle 4 的報告寫「可見文字與連結目標都改成 `_archive/`」。`TODO.md` 兩行的可見文字原本就只寫檔名，這次只改了連結目標。報告措辭不精確，交付內容沒有問題。
+
+### Summary
+
+PASSED，HEAD `f17730a`。R6 已獨立驗證：5 條連結都指向已封存的 `050`，:92 已是完成式。content-audit 的結果與 main 逐筆相同，指名總覽 0 行。模擬 054 封存後也維持 0 行。自 `cf9bd62` 起只有 R6 的 5 行和 state 行。合併只解決了 R4 那兩個衝突。G-7、tsc、`AGENTS.md` 都通過。沒有推送，也沒有執行 `sync-content`。

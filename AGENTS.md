@@ -29,6 +29,10 @@ node scripts/sync-content.mjs
 正式 SSOT 尚未套用核可版本綁定。兩帳號隔離 probe 完成前，不得部署
 `scripts/apps-script/` 到正式 SSOT。不得補造 probe 證據。
 
+> ⚠️ **2026-09-29 補述：上面「正式 SSOT 尚未套用」與「probe 完成前不得部署」已不成立。**
+> 正式 SSOT 已於 2026-09-29 套用核可版本綁定（feature 050）。兩帳號隔離 probe 已於 2026-09-21 完成（feature 044）。
+> 「不得補造 probe 證據」仍然有效。
+
 ### 2. 不要手改 `src/data/*.json`
 
 那兩個檔是產物，不是原始資料。原始資料在 Google 試算表。
@@ -64,6 +68,12 @@ robots: { index: false, follow: false },
 正式發布時才移除。追蹤項目見 `docs/health-check/TODO.md` 的 P3-8。
 移除前必須通過 `docs/constitution-features/_archive/056-pre-launch-checklist.md` 的上線前檢查清單。
 該票第三節的 gate 執行清單 G-1 至 G-8 八項全數通過，才可移除這一行。
+
+### 5. 不要讓 AI 生成的內容上線
+
+站上只允許兩類內容：試算表裡經責任編輯核可的內容，以及 T3（未來軌）依 `docs/content-pipeline/data-collection-guide.md` 收集並經審閱的內容與圖表。
+其餘位置不得有 AI 生成的內容。要加內容，寫進試算表並走核可。
+機械檢查的現況見 `docs/content-pipeline/gatekeeping.md` 的缺口表。
 
 ---
 
@@ -180,6 +190,7 @@ robots: { index: false, follow: false },
 | 內容產線出了什麼事 | `docs/health-check/2026-08-31-content-pipeline.md`。先看文件上方的兩則補述 |
 | 還有什麼要做 | `docs/health-check/TODO.md` |
 | 新產線要長怎樣 | `docs/content-pipeline/design.md` |
+| 現在有哪些把關、各擋什麼 | `docs/content-pipeline/gatekeeping.md` |
 | 搶救出來的內容 | `docs/content-rescue/` |
 | 專案定位、架構、技術、協作 | `docs/project/` |
 | 全部文件的索引 | `docs/INDEX.md` ← **不確定去哪找就看這份** |

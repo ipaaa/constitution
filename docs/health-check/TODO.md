@@ -723,6 +723,27 @@ done | sort -rn | head -12
 
 ## P2 — 結構性問題（不修就會再發生一次）
 
+### P2-13　試算表保護範圍只到第 1000 列
+
+- **狀態**：Deferred risk。無 feature 票，負責人未定（2026-09-29 由 feature `054` 登錄）
+- **問題**：captain 設定 `R2:R` 這類開放範圍後，Google 試算表把它存成 `R2:R1000`。
+  feature `050` 的 9 個欄範圍都是開放範圍，全部受影響。3 個標題列範圍是封閉範圍，不受影響
+- **影響**：第 1001 列之後的列不受保護。那些列的公式欄與審核欄，投稿者改得動
+- **現況**：三個分頁的資料列最多 44 列（`Track 2_discussion` 的 `d44`），遠低於 1000
+- **升級條件**：任一分頁的資料列接近 1000 列。處置屆時再定：重設範圍的結束列，或改用整欄範圍
+- **來源**：captain 經 FO 轉述，記錄在 [`050-ssot-approval-deployment.md`](../constitution-features/_archive/050-ssot-approval-deployment.md)〈部署窗口記錄：S7／S8 回報與 S9 執行結果〉第二節
+
+### P2-14　Apps Script 沒有欄位標題的別名表
+
+- **狀態**：Deferred risk。無 feature 票，負責人未定（2026-09-29 由 feature `054` 登錄）
+- **問題**：`scripts/apps-script/approval-workflow.gs` 的 `resolveApprovalHeaders_` 沒有別名表。
+  `scripts/sync-content.mjs` 有別名表（例如 `review_decision` 與 `review decision` 都收）。
+  兩支程式對同一列標題的容忍度不同
+- **影響**：有人改了某個標題字串，Apps Script 可能無聲失效，同步程式仍然通過。兩邊不會互相提醒
+- **現況**：feature `050` 實測，正式表三個分頁的 18／21／12 個標題字串同時通過兩支程式
+- **升級條件**：部署後有人改動三個分頁上任何一個標題字串
+- **來源**：[`050-ssot-approval-deployment.md`](../constitution-features/_archive/050-ssot-approval-deployment.md)〈十二、J1-J2 的處置〉的「J1 第二處」
+
 ### P2-1　Track 1 完全沒有把關
 
 > ⚠️ **2026-09-04 更正：P2-1 已於 2026-09-02 解決。**
@@ -1148,3 +1169,4 @@ git log -1 --format='%ad %s' --date=short -- src/data/discussions.json
 | 2026-09-03 | `design.md` 第七節施工項目全部結案；P1-7 隨 038 消滅 | 本次 |
 | 2026-09-04 | 041 修正五份文件與實際行為不符之處，共 23 處追加補述；查核日更新為 2026-09-04 | 本次 |
 | 2026-09-29 | 067 建內容查核工具（`scripts/content-audit.mjs`）；新增 P1-10；本檔 11 處已封存票的路徑改指 `_archive/` | 本次 |
+| 2026-09-29 | 054 新增 P2-13（保護範圍只到第 1000 列）與 P2-14（Apps Script 沒有標題別名表），兩項原本只記在 050 票內 | 本次 |
