@@ -30,6 +30,14 @@ gates:
                 at: "2026-09-30T21:44:05.804222Z"
                 decision: revise
                 reason: 'Captain chose 2026-09-30 (「照建議，文字核准」): revise to implement. Fix A: revert 051''s own AGENTS.md rule-5 edit; add the two captain-approved lines after the existing 「機械檢查的現況見…缺口表」 line. Fix B: scan requires a fact mark''s review record under docs/content-audit/. Fix C: covered by the approved rule-5 line forbidding agents to relabel ui/config, plus 073 scope expanded to all content-provenance.json changes. D handled by FO at merge.'
+review-round:
+    id: round:051:verify:1
+    stage: verify
+    cycle: 1
+    briefing:
+        id: briefing:051:verify:round-1
+        digest: sha256:b52e624e8a57a02f026c01a83b86b9231349031570f7746ed4cf77f46b8596ae
+        room-ref: '@review/verify/round-1'
 ---
 
 內容上線後沒有任何方法知道它是誰寫的。要讓「站上不得有 AI 生成內容」這句話可查核，必須先有來源欄位，再有會失敗的檢查。
