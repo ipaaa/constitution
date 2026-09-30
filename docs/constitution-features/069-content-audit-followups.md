@@ -294,3 +294,60 @@ captain 2026-09-29 的三項決定，目前記在本票的 Problem 一節。impl
 ### Summary
 
 四件事都規格化到可照做：7＋3 處路徑改指 `_archive/`、P3-8 第二條解除條件與 AGENTS 對應一行、紀年正本新檔、H 層兩段閱讀順序。所有端值已在副本上實跑成立，G-7 的可失敗性也已實測。captain 在 gate 要決定判決字號寫法（建議 A），並須知道綁定後 P1-10 第 1、2、3、6 項修好前不能上線。
+
+## Stage Report: implement
+
+- DONE: Implement the design's four changes on a branch from current main: the 7 R2 + 3 `040` old paths repointed to `_archive/`; P3-8 解除條件二 plus the one-line AGENTS.md rule-4 addition (056's line untouched); new `docs/project/content-conventions.md` with 判決字號 rule A stated as captain-confirmed 2026-09-30 (no 暫行); generator H section split into H-1/H-2 with the reading-order line, snapshot regenerated.
+  `3555df3`（路徑 6＋3 處、P3-8、AGENTS、正本、產生器、測試）、`d928b7e`（重產快照，覆寫前 `[x]`=0）、`3081749`（INDEX 列去掉規則文字）。分支底 `7a7c38e` 與 `main` 內容只差 4 個 dispatch 狀態檔。第 7 處是快照，由重產處理。
+- DONE: Prove AC-1..AC-7 on the branch: P3-8 prints exactly two 解除條件 lines; 056's G-7 prints PASS; content-audit M6 end value re-baselined against today's main (054 has merged since design) with any divergence reported as a finding, not silently absorbed; tests and tsc pass.
+  見下方「AC 證據」與「Finding F-1」。AC-1 第 1 步未達設計端值，已依 FO 指示保留為 finding，未擴大範圍。
+- DONE: Never run `npm run sync-content`; no change to `src/` or `src/data/*.json`; no regressions to existing checks.
+  未執行 sync。`git diff --stat 7a7c38e -- src` 為空；`src/data/*.json` sha256 仍為 `4071978a…3162`、`4d1992e3…ea3b`。
+
+### AC 證據（皆於 `3081749` 實跑）
+
+- AC-1：舊路徑 grep（067 與 040 兩組，排除 workflow 票目錄）各 0 行。`check` 的 M6 為 10，不是 1，見 F-1。
+- AC-2：`reading-list` 含 `systematic-chinese` 的行恰 1 行，含 `_archive/`。設計的 grep 樣式 `constitution-features/systematic-chinese` 比對不到 `_archive/` 新路徑，印 0；以 `systematic-chinese` 取代才驗得到「恰 1 行且含 `_archive/`」。
+- AC-3：P3-8 的 awk 印 `2`。`gatekeeping.md` 第七章的 awk 印兩行（解除條件、解除條件二）。056 那行不在 diff 的 `-` 側（計 0）。新行不含 `056-pre-launch-checklist`（計 0）。G-7 正本印 `G-7 PASS [place1=1/1 place2=1 place3=1]`，exit 0。可失敗性：副本上新行加入該字串，印 `G-7 FAIL: place2 … [count=2]`，exit 1。
+- AC-4：`AGENTS.md` 第 4 條內含 `P3-8` 與 `解除條件二` 的行恰 1 行；place3=1。
+- AC-5：`敘述用西元` 只在 `docs/project/content-conventions.md`。`TODO.md` 與產生器都含正本路徑；舊子項計 0；正本無「暫行」「尚未確認」。INDEX 有 evergreen 一列。
+- AC-6：新測試斷言 H-1 在 H-2 前、H-1 列全為「是」、H-2 列全空、`publicPages: []` 時 H-1 為 0 檔、輸出含「閱讀順序」。還原產生器或把 H-1 改判為「有路由即可」，該測試轉紅（兩者皆實測）。快照 diff 只有第 3 行 commit 不同（日期同為 2026-09-30）。H-1 為 23 檔約 6,732 字；H-2 為 45 檔約 16,018 字。
+- AC-7：`node --test tests/*.test.mjs` 138 條，137 過、0 失敗、1 skip（既有的線上重抓測試）。`rm -rf .next && npx tsc --noEmit` exit 0。`layout.tsx` 零改動，`robots` 行仍在。M1–M5 為 `0 0 0 1 2`，與改動前相同。
+
+### Finding F-1：M6 端值在今日 `main` 上不成立（待 FO 處置）
+
+- **觀察**：改動前 `check` 於 `7a7c38e` 印 `M6=18`，不是 design 的 9。改動後 `M6=10`：`/about:38` 加 9 處設計後新封存造成的舊路徑。
+- **9 處**：`064` 四處（`design.md:582`、`:770`、`:823`，`src/data/verified-case-refs.mjs:9`）；`050` 兩處（`operations.md:39`、`TODO.md:935`）；`070` 兩處（`operations.md:143`、`:171`）；`068` 一處（`TODO.md:704`，在 `068` 自己的補述引文內）。
+- **四個證據欄**：使用者與流程＝上線前手動跑 `check`（P3-8 解除條件二）；可見傷害＝`check` 多報 9 處，上線前多 9 項要修，站上讀者看不到；受影響 AC＝AC-1 第 1 步的端值；觸發證據＝上方實跑輸出。
+- **提議**：Material 於 AC-1，但超出核可範圍，歸 Needs decision（hold）。其中 `verified-case-refs.mjs` 在 `src/`，受本票禁區管。另開票或由 captain 擴大範圍，本票未動這 9 處。已先以 SendMessage 通知 FO（當時誤算為 8 處，正確為 9 處）。
+
+### Summary
+
+四件事都已落地：9 處舊路徑改指 `_archive/`，P3-8 有兩條解除條件而 G-7 仍 PASS，紀年正本寫定判決字號規則 A，閱讀清單拆成 H-1 先讀與 H-2 後讀並重產快照。實際改動 9 檔 +90／−26（不含快照），在估計範圍內。M6 端值因設計後又封存了 4 張票而不成立，已列為 F-1 待 FO 處置；AC-2 的 grep 樣式在設計上寫錯，改用可驗證的樣式並記錄。
+
+## Stage Report: implement (cycle 2)
+
+- DONE: Implement the design's four changes on a branch from current main: the 7 R2 + 3 `040` old paths repointed to `_archive/`; P3-8 解除條件二 plus the one-line AGENTS.md rule-4 addition (056's line untouched); new `docs/project/content-conventions.md` with 判決字號 rule A stated as captain-confirmed 2026-09-30 (no 暫行); generator H section split into H-1/H-2 with the reading-order line, snapshot regenerated.
+  cycle 1 已完成（`3555df3`、`d928b7e`、`3081749`），本輪未改。
+- DONE: Prove AC-1..AC-7 on the branch: P3-8 prints exactly two 解除條件 lines; 056's G-7 prints PASS; content-audit M6 end value re-baselined against today's main (054 has merged since design) with any divergence reported as a finding, not silently absorbed; tests and tsc pass.
+  F-1 已處置（見下）。`70c5c7e` 上 `check` 印 `FAIL M1=0 M2=0 M3=0 M4=1 M5=2 M6=1`，M6 只剩 `src/app/about/page.tsx:38`，AC-1 端值依原設計成立。
+- DONE: Never run `npm run sync-content`; no change to `src/` or `src/data/*.json`; no regressions to existing checks.
+  未執行 sync。`src/` 只有 `verified-case-refs.mjs:9` 註解一行（captain 核可的例外）；`src/data/*.json` sha256 不變。
+
+### F-1 處置：captain 決定與範圍變更
+
+- **captain 決定**（2026-09-30，聊天中選「全部納入 069」）：設計後新封存造成的舊路徑全部納入本票。FO 授權 `fix`。AC-1 端值維持原設計：M6 只報 `/about:38`。
+- **範圍變更**：新增 9 處路徑改指 `_archive/`（`70c5c7e`）。`design.md:582`、`:770`、`:823`（064）；`operations.md:39`（050）、`:143`、`:171`（070）；`TODO.md:704`（068 補述，只改路徑，文字不動）、`:935`（050）；`src/data/verified-case-refs.mjs:9`（064，只改註解）。行號為本分支上的行號；FO 訊息的 `:706`、`:937` 是改動前的 `main` 行號。連結文字與目標一起改，沿用 `design.md:737` 的寫法。四個 `_archive/` 目標檔皆存在。
+- `TODO.md` 變更紀錄那一列同步改寫，列出本檔改了哪 4 處。
+- **M6 前後**：`main` 內容（`7a7c38e`）18 → cycle 1 後（`3081749`）10 → 本輪後（`70c5c7e`）1。
+
+### 本輪重跑（於 `70c5c7e`）
+
+- AC-1：M6 恰一行 `M6 src/app/about/page.tsx:38`；067 與 040 舊路徑 grep 各 0 行。
+- AC-3／AC-4：P3-8 awk 印 `2`；G-7 印 `G-7 PASS [place1=1/1 place2=1 place3=1]`，exit 0。
+- AC-6：快照 diff 只有第 3 行（commit）不同。
+- AC-7：138 條測試，137 過、0 失敗、1 skip（既有線上測試）；`tsc` exit 0；`layout.tsx` 未動；M1–M5 不變。
+
+### Summary
+
+依 captain 決定把設計後新封存的 9 處舊路徑納入本票並修正。`src/` 只動一行註解。AC-1 端值回到原設計：M6 只剩 `/about:38`。其餘 AC 在新 HEAD 上重跑全部成立。
