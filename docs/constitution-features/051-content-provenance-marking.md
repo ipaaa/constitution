@@ -418,6 +418,7 @@ Verified by: `node scripts/content-audit.mjs check` 的輸出與實作前相同�
 | 所有 `record` 文件與 `_archive/**` | 記錄，不改寫 |
 
 ### Feedback Cycles
+- Cycle 1: REJECTED — verify（`dbb1541`）判 PASSED 但列四項 finding；captain 2026-09-30 在 gate 選「照建議，文字核准」（revise）。FO 授權：A fix（撤回 051 對 `AGENTS.md` 第 5 條的改寫，改在「機械檢查的現況見…缺口表」一行之後加 captain 核准的兩行）；B fix（`fact` 標記的簽核記錄須位於 `docs/content-audit/`，掃描檢查並附測試）；C 由核准的第 5 條新行（agent 不得改標 `ui`／`config`）處理，另把 `073` 範圍擴大為整份 `content-provenance.json` 的改動須經 captain 核准；D（與 `053` 類別編號）由 FO 於合併時處理，無動作。
 
 ## 相依
 
@@ -507,3 +508,18 @@ Verified by: `node scripts/content-audit.mjs check` 的輸出與實作前相同�
 ### Summary
 
 **PASSED。** 清單 72 筆照實填寫：全部 AI、全部未審；非空依據都抄自檔內原文。我在副本上獨立重證掃描能失敗（未標記 → P1、指紋被改 → P2，離開碼皆 1）。完整掃描 69 處全屬 66＋3。`ui`／`fact` 與 G1-A／G2-A 相符，沒有放寬。四項發現都不是 Material。其中兩項是文件措辭，一項是尚無資料時的條件缺口，一項是自我宣告的繞道，都附升級條件，交 FO 授權。
+
+## Stage Report: implement (cycle 2)
+
+- DONE: A: revert 051's own AGENTS.md rule-5 edit so the existing lines are untouched, then add exactly the two captain-approved lines immediately after 「機械檢查的現況見 `docs/content-pipeline/gatekeeping.md` 的缺口表。」
+  `AGENTS.md` 先還原為 `ddcb690` 版，再插入兩行。`git diff ddcb690 -- AGENTS.md` 只有 2 行新增、0 行刪除，兩行與核准文字逐字相同。
+- DONE: B: the scan fails a `fact` mark whose review record is not a file under `docs/content-audit/`, with a test that proves it (a PR URL record must fail).
+  P4 的 `fact` 分支加一條：`reviewed.record` 必須是 `docs/content-audit/` 底下存在的檔。`other` 類仍接受 PR 網址，不變。測試（`AC-4：fact…`）在副本上斷言：記錄在 `docs/content-audit/signoff.md` → 通過；PR 網址 → P4；`docs/review.md` → P4。拿掉這條檢查再跑，該測試失敗（已實測）。
+- DONE: Re-run the full proof set (scan can fail, 69 rule-5 failures unchanged, 20+ tests, tsc, build, JSON hashes) and state C's handling (approved rule line + 073) in the report; no other candidate change.
+  `check --marking` 離開碼 0。完整 `check` 離開碼 1，P4=69，其餘代號 0，與 cycle 1 相同。塞入未標記內容會失敗：AC-2 的四項測試在副本上非零退出。五個測試檔全過（68／16／20／36／16）。`tsc --noEmit` 0、eslint 0、`npm run build` 0。兩個 json 的 sha256 與實作前相同。`content-audit.mjs check` 結果與 cycle 1 相同。
+  C（改標 `ui`／`config` 可繞過第 5 條）：掃描不改。由核准的規則行「不得把內容改標為 `ui` 或 `config`」約束 agent，並由 `073` 把範圍擴大到 `content-provenance.json` 的所有改動。finding 4 依授權不處理。
+  候選改動只有三個檔：`AGENTS.md`、`scripts/content-provenance.mjs`（+3 行）、`tests/content-provenance.test.mjs`（+7／−1）。
+
+### Summary
+
+依 captain 的 revise 做了兩項窄修。`AGENTS.md` 第 5 條還原成原文，再逐字插入兩行核准文字。`fact` 的簽核記錄限定在 `docs/content-audit/` 底下，PR 網址會判失敗，並有測試證明。其餘證明全部重跑，結果與 cycle 1 相同（P4=69）。
