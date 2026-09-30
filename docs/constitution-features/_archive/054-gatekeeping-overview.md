@@ -1,16 +1,16 @@
 ---
 id: 054
 title: 內容把關機制現況總覽，以及讓它不過時的機制
-status: review
+status: complete
 source: captain 2026-09-04（把關機制體檢；captain 明確要求本票須設計更新機制）
 started: 2026-09-29T18:59:22Z
-completed:
-verdict:
+completed: 2026-09-30T17:17:45Z
+verdict: PASSED
 score:
 worktree: .worktrees/spacedock-ensign-054-gatekeeping-overview
 issue:
 pr: pr-merge:49
-mod-block: merge:pr-merge
+mod-block:
 review-round:
     id: round:054:review:3
     stage: review
@@ -75,7 +75,8 @@ gates:
                 reason: 'Captain approved 054 review cycle 3 in chat 2026-09-30 (「核准054」): R6 fixed and independently verified, content-audit matches main, merge only resolved R4 conflicts; R5 moved to 072.'
               application:
                 target-stage: complete
-                state: pending
+                state: consumed
+archived: 2026-09-30T17:17:46Z
 ---
 
 沒有任何一份文件回答「現在到底有哪些把關、各擋什麼、哪些缺口還開著」。但新增一份 evergreen 文件等於新增一個會過時的東西——**本票的核心不是寫那份文件，是設計讓它不過時的機制。**
