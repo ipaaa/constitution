@@ -351,3 +351,28 @@ captain 2026-09-29 的三項決定，目前記在本票的 Problem 一節。impl
 ### Summary
 
 依 captain 決定把設計後新封存的 9 處舊路徑納入本票並修正。`src/` 只動一行註解。AC-1 端值回到原設計：M6 只剩 `/about:38`。其餘 AC 在新 HEAD 上重跑全部成立。
+
+## Stage Report: verify
+
+- DONE: Verify every factual claim 069 ships against its source: the new `docs/project/content-conventions.md` calendar rules (captain 2026-09-29/30 decisions, 判決字號 rule A with a real example checkable on the Judicial Yuan site), the P3-8 解除條件二 text, the H-1/H-2 reading-order statement, and that each of the 19 repointed paths resolves to the right archived file.
+  紀年三條與來源日期對得上 FO 轉述的 captain 決定（09-29 西元；09-30 規則 A，排除 C）。`114年憲判字第1號` 於 `cons.judicial.gov.tw/judcurrentNew1.aspx?fid=38` 今日實抓存在，官方寫法無空格，與例一致（fixture 亦為 2025-12-19〈憲法訴訟法修正案〉）；例 2 的 114→2025 換算正確。解除條件二說「須印出 `PASS`」：`content-audit.mjs:594` 成功時確實印 `PASS`。H-1 說明中的 `PUBLIC_PAGES` 與 `src/data/launch-status.ts:3` 相同（`/`、`/controversy-timeline`、`/future`），H-1 23 檔含 `layout.tsx`、`Footer.tsx`、`Navbar.tsx`、`ComingSoon.tsx`。19 處：18 行改路徑（067×5、040×3、064×4、050×2、070×2、068×1、加快照 `:4`）＋ `TODO.md` 原 `:694` 改寫去掉路徑；逐一解析相對路徑皆存在，且各目標檔 frontmatter `id` 與原連結的票相符（067、040、064、050、070、068）。
+- DONE: Placeholder scan over the diff and the regenerated reading-list snapshot; confirm 056's line in P3-8 is byte-unchanged and G-7 PASS; content-audit M6 reports only `/about:38`.
+  `某學者|某大學|lorem|ipsum|快速了解最新判決|test|TBD|XXX|placeholder` 在 diff 新增行只中 `TODO.md` 檔名與 `test(` 函式名，快照與正本 0 中。`056` 那行與 `7a7c38e` 版 `cmp` 位元組相同。G-7 正本（`_archive/056…:282-291`）印 `G-7 PASS [place1=1/1 place2=1 place3=1]`，exit 0；P3-8 awk 印 `2`；AGENTS 第 4 條相關行 1。`check`：`FAIL M1=0 M2=0 M3=0 M4=1 M5=2 M6=1`，M6 只有 `src/app/about/page.tsx:38`。
+- DONE: End with a clear PASSED or REJECTED verdict and rationale; any finding goes through the Review-finding disposition checkpoint without touching the candidate.
+  判定 PASSED，理由見 Summary。V-1 記於下方，未動 candidate。
+
+### 其他重跑（於 `86ee71d`）
+
+- `node --test tests/*.test.mjs`：138 條，137 過、0 失敗、1 skip。新測試斷言 H-1 在 H-2 前、H-1 全「是」、H-2 全空、`publicPages: []` 時 H-1 為 0 檔。
+- `rm -rf .next && npx tsc --noEmit` exit 0。`src/data/*.json` sha256 為 `4071978a…3162`、`4d1992e3…ea3b`，不變。`layout.tsx` 零 diff，`robots` 行仍在。`src/` 只有 `verified-case-refs.mjs:9` 註解一行。
+- 快照：`reading-list | diff` 只差第 3 行 commit。`[x]` 在舊快照與新快照皆為 0。AC-2 行恰 1 行且含 `_archive/`。`敘述用西元` 只在正本。
+
+### Finding V-1（Polish，待 FO 處置）
+
+- **觀察**：同樣是設計後封存的票，M6 不掃的位置還有 5 處舊路徑：`scripts/sync-content.mjs:558`（070）、`scripts/content-fingerprint.mjs:23`（064）、`tests/track2-case-ref-stance.test.mjs:16`（064）、`tests/threshold-analysis.test.mjs:1303`（068）、`docs/health-check/2026-09-03-editor-onboarding.md:481`（050，`record`）。
+- **四個證據欄**：使用者與流程＝開發者讀註解；可見傷害＝註解／record 連結斷，站上讀者看不到，`check` 不報；受影響 AC＝無（AC-1 第 2 步只涵蓋 067 路徑，M6 端值已成立）；觸發證據＝上列 grep。
+- **提議**：Polish，不擋本票。建議 decline 或另開小票；`editor-onboarding.md` 是 `record`，若修應以補述而非改寫。另：`operations.md:171` 的「〈同步〉那則補述的連結仍指向改名前的檔名」在 `7a7c38e` 已與 `:143` 不符，非本票造成，僅供記錄。
+
+### Summary
+
+逐項查核 069 的事實陳述：紀年正本與 captain 決定一致，判決字號例在司法院網站實查存在；解除條件二的 `PASS` 措辭與工具輸出一致；閱讀順序的公開頁清單與 `launch-status.ts` 相符；19 處路徑全數指到正確的封存檔。056 那行位元組未變、G-7 PASS、M6 只剩 `/about:38`、測試與 tsc 全過、無佔位資料。判定 **PASSED**；V-1 是 M6 範圍外的 5 處註解／record 舊路徑，屬 Polish，交 FO 處置。
