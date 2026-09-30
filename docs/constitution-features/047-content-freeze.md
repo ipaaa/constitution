@@ -61,10 +61,16 @@ mod-block:
 ### 一、給 captain 的一段話
 
 審過的 AI 內容，現在任何人或 agent 都能再改一次，網站照樣更新，沒有東西會擋。
-本設計讓「定版」變成一份清單。清單上的每一筆，只要內容被改動或刪掉，網站就建置失敗，更新不會上線。
-已實測：改一個日期、重新生成一句案由、刪掉一筆、同步寫回試算表內容，四種改法都被擋下。改清單以外的內容不受影響。
+本設計讓「定版」成為來源清單上的一個標記。標了定版的內容，只要被改動或刪掉，網站就建置失敗，更新不會上線。
+已實測：改一個日期、重新生成一句案由、刪掉一筆、同步寫回試算表內容，四種改法都被擋下。改沒有定版的內容不受影響。
+
+**上線當天不會有任何內容處於定版狀態。** 定版的前提是有人審過，而 `051` 規定只有 captain、責任編輯、學者可以簽審閱，agent 不得代簽。
+第四節列了 9 筆定版候選。captain 簽了審閱之後，它們才會定版。
 
 需要 captain 決定兩件事，見第八節。
+
+> 修訂（2026-09-30，同日）：依 `051` design worker 的回覆，定版標記改寫在 `051` 的 `content-provenance.json` 保留欄位 `freeze`，不另開 `frozen-content.json`。
+> 第一、三、四、五、七、八、十、十一、十二節因此調整。第六節 spike 未重跑：原型的比對邏輯不變，只換清單檔的位置與格式。
 
 ### 二、方向依據
 
@@ -79,15 +85,21 @@ captain 2026-09-30 的方向：
 
 ### 三、凍結放在哪一層
 
-**選定：資料指紋清單＋建置前檢查。** 三個部分：
+**選定：來源清單上的定版標記＋建置前檢查。** 三個部分：
 
 | 部分 | 做什麼 |
 |---|---|
-| `frozen-content.json`（repo 根目錄，新檔） | 定版清單。每筆記錄檔案、export 名稱、鍵、凍結欄位、指紋（sha256）、審閱依據 |
-| `scripts/check-frozen-content.mjs`（新檔） | 讀清單，載入每筆的現值，重算指紋。不符、項目不見、`src/data/` 有未分類的檔 → 離開碼 1。無法載入 → 離開碼 2 |
+| `content-provenance.json` 的 `freeze` 欄位（清單由 `051` 建立） | 標記哪一筆定版、凍結哪些欄位、那些欄位的指紋（sha256）、誰在哪天定版 |
+| `scripts/check-frozen-content.mjs`（新檔） | 讀清單中有 `freeze` 的每一筆，載入現值，重算凍結欄位的指紋。不符或項目不見 → 離開碼 1。無法載入 → 離開碼 2 |
 | `package.json` 加 `prebuild` | `npm run build` 先跑檢查。檢查失敗，`next build` 不執行 |
 
-指紋只算清單指定的欄位。衍生值（`daysPending`）與編輯判斷層（`tags`）不列入，改它們不會失敗。
+另外在 `051` 的 `stamp` 指令加一道攔截：對有 `freeze` 的範圍，凍結欄位若已改變，`stamp` 拒絕並離開碼 1。
+`stamp` 是 `051` 寫入指紋的唯一入口，攔在這裡，「重新生成後重蓋指紋」這條路就走不通。
+
+指紋只算 `freeze.fields` 指定的欄位。衍生值（`daysPending`）與編輯判斷層（`tags`）不列入，改它們不會讓建置失敗。
+
+**與 `051` 的掛載點不同，而且刻意不同。** `051` 不接 `npm run build`，因為它的檢查只要有一處內容未處置就會失敗，接上後連預覽都做不了。
+本票的建置檢查只看有 `freeze` 的項目，不看未標記或未審的內容。它只在「定版內容被改」時失敗，這正是要擋在部署前的情況。
 
 **不選的層：**
 
@@ -96,15 +108,14 @@ captain 2026-09-30 的方向：
 | TypeScript 型別（`readonly`／`as const`） | 只擋執行期修改，不擋改原始碼。把 `'115-08-14'` 改成 `'115-08-15'` 型別仍正確，`npx tsc --noEmit` 照樣通過 |
 | 每筆加 `frozen: true` 欄位 | 只是標籤。改內容而保留標籤，沒有東西會發現 |
 | CI | repo 沒有 `.github`。另架 CI 也不會擋 Vercel 部署，除非另行設定。`prebuild` 直接掛在部署必經的指令上 |
-| 同步程式內加攔截 | 第一批定版不含試算表內容（第四節），攔截會是永遠不觸發的程式。同步產物照樣經過建置檢查（spike 步驟 5） |
-
-**清單檔不放 `src/data/`。** `AGENTS.md` 第 2 條規定 `src/data/*.json` 不可手改，而定版清單必須由人維護。
+| 同步程式內加攔截 | 第一批候選不含試算表內容（第四節），攔截會是永遠不觸發的程式。同步產物照樣經過建置檢查（spike 步驟 5） |
+| 另開 `frozen-content.json` | 會有兩份清單記同一筆內容。`051` 已預留 `freeze` 欄位 |
 
 ### 四、分類：`src/data/` 全部檔案
 
 三類：
 
-- **定版**：有一手來源、有審閱紀錄。第一批寫入清單。
+- **定版候選**：有一手來源，也有 workflow 審閱紀錄（封存票的 verify gate）。captain 在 `051` 的清單簽下 `reviewed` 後定版。
 - **可更新**：編輯判斷、衍生值、設定。不凍結。
 - **不得定版**：沒有審閱紀錄或來源不明。先定版等於把可能的錯誤鎖住。處置交給 `053`（或括號內的票），審過之後才進清單。
 
@@ -112,14 +123,14 @@ captain 2026-09-30 的方向：
 |---|---|---|---|
 | `history.json`（Track 1） | 40 | 試算表管轄，本票不凍結 | 見下方說明 |
 | `discussions.json`（Track 2＋tldr） | 16 | 試算表管轄，本票不凍結 | 同上。貓頭鷹短評是否 AI 生成屬 `docs/health-check/TODO.md` 的 P1-6 |
-| `future.ts` `RULINGS_SINCE_FLOOR_VOIDED` | 6 | **定版** | 逐則對過 `cons.judicial.gov.tw`，取證日 2026-09-21，經 `063` verify 審閱 |
+| `future.ts` `RULINGS_SINCE_FLOOR_VOIDED` | 6 | **定版候選** | 逐則對過 `cons.judicial.gov.tw`，取證日 2026-09-21，經 `063` verify 審閱 |
 | `future.ts` `RAW_CASES`（經 `PENDING_CASES` 匯出） | 54 | `id`／`applicant`／`filingDate`／`topic`：不得定版（待審）；`tags`：可更新；`daysPending`：衍生 | 唯一的審閱證據是檔頭註解「accessed 2026-04-29」。`051` 已證明檔頭註解不可信。有審閱紀錄後這四欄轉為定版 |
 | `future.ts` `JUSTICES` | 15 | 不得定版（`053`） | 檔頭自述 `Researched synthetic records` |
 | `future.ts` `TERM_EVENTS`、`FAILED_NOMINATIONS` | 3＋2 | 不得定版（`053`） | 無出處 |
 | `future.ts` `REAL_TOTAL_PENDING`、`CRISIS_STATS` | — | 不得定版（`053`）；其中由其他常數算出的欄位為衍生 | 473、120、3.4 無連結出處 |
 | `future.ts` `REFERENCE_DATE`、`LAST_UPDATED`、`IdentityTag`、`AVAILABLE_TAGS`、`TAG_COLORS` | — | 可更新 | 設定與顯示 |
-| `ruling-threshold.ts` `RULING_THRESHOLD` 的 `rule`、`statute`、`voidedFloor` | 1 | **定版** | 條文引述與失效依據，經 `063`、`066` 審閱。`headcount` 待法學背景者拍板，不凍結 |
-| `verified-case-refs.mjs` `VERIFIED_CASE_REFS` | 2 | **定版** | 每筆附一手來源網址，經 `064` 審閱 |
+| `ruling-threshold.ts` `RULING_THRESHOLD` 的 `rule`、`statute`、`voidedFloor` | 1 | **定版候選** | 條文引述與失效依據，經 `063`、`066` 審閱。`headcount` 待法學背景者拍板，不凍結 |
+| `verified-case-refs.mjs` `VERIFIED_CASE_REFS` | 2 | **定版候選** | 每筆附一手來源網址，經 `064` 審閱 |
 | `threshold-analysis.ts` | — | 可更新（已有更強的機制） | `tests/threshold-analysis.test.mjs` 從 fixture 重算並比對。再凍結會出現兩份真相 |
 | `controversy-timeline.ts` | 15 | 不得定版（`053`） | 全檔零出處 |
 | `opinions.ts` | 12 | 不得定版（`049`） | 含真實姓名，處置中 |
@@ -127,7 +138,7 @@ captain 2026-09-30 的方向：
 | `quizzes/*.ts` | 4 檔 | 不得定版（`053`） | 只有站內出處 |
 | `launch-status.ts` | — | 可更新 | 上線旗標，非內容 |
 
-第一批定版共 **9 筆**：6 則判決、2 筆判決字號、1 筆門檻條文。
+第一批定版候選共 **9 筆**：6 則判決、2 筆判決字號、1 筆門檻條文。captain 簽審閱時可引用 `063`／`064`／`066` 的封存票作為 `reviewed.record`。
 
 **為什麼 Track 1 的 40 筆不凍結。** 這 40 筆是試算表內容，屬於方向第 1 點。`040` 已讓發布欄位一改就轉為 `Needs review`，改過的內容不會未經核可上線。
 若 repo 再凍結一次，編輯在試算表修正錯字，同步會被 repo 擋下，要改兩處。這違反 `docs/content-pipeline/design.md` 不變式 #4「只能有一份唯一真相」。
@@ -137,21 +148,29 @@ captain 2026-09-30 的方向：
 
 ### 五、與 `051` 的介面（相依）
 
-本票不設計來源欄位。`051` 與本票同時在 design。本票需要 `051` 提供四項（已於 2026-09-30 告知 `051` 的 design worker）：
+本票不設計來源欄位。本票向 `051` 提出四項需求，`051` 已回覆全部接上（`051` commit `6664a40`，該票 Design 第 3.1、3.2 節與第四節〈對 047 與 053 的介面〉）：
 
-| # | 需求 |
-|---|---|
-| I1 | 每筆資料有穩定鍵：檔案＋export 名稱＋鍵欄位 |
-| I2 | 來源值能區分「AI 生成或協助」「人寫」「未知」 |
-| I3 | 審閱紀錄：審閱人（真人）、日期、依據（票號或 PR）。沒有審閱紀錄視同未審 |
-| I4 | node 腳本不必啟動 Next 即可讀取 |
+| # | 需求 | `051` 的對應 |
+|---|---|---|
+| I1 | 每筆資料有穩定鍵 | `scope` 的鍵選擇器，例：`src/data/future.ts#RULINGS_SINCE_FLOOR_VOIDED[docket=…]`。找到 0 筆或 2 筆以上判 P5 |
+| I2 | 區分 AI／人寫／未知 | `author`：`ai`／`human`／`unknown` |
+| I3 | 審閱人、日期、依據 | `reviewed`：`{by, on, record}`。`by` 限 captain／責任編輯／學者；`null` 即未審 |
+| I4 | 不必啟動 Next 即可讀取 | 清單是純 JSON |
 
-**分兩階段施工：**
+**施工順序：本票的 implement 排在 `051` 的 implement 之後。** 清單檔由 `051` 建立，本票沒有它就無處標記。
 
-- **階段一（不等 `051`）**：清單、檢查程式、`prebuild`、第一批 9 筆。每筆的 `review_ref` 暫時指向封存的票（`063`／`064`／`066`）。
-- **階段二（`051` 實作後）**：檢查加兩條規則。有 AI 來源且有審閱紀錄、卻不在清單 → 失敗（「已審未定版」）。在清單、卻沒有審閱紀錄 → 失敗（「未審不得定版」）。若 `051` 採旁置清單檔，本票的清單併入該檔，不留兩份。
+**本票在 `051` 之上加的規則**（由 `check-frozen-content.mjs` 的 `audit` 子命令執行，不接建置）：
+
+- F1 已審未定版：`author: ai` 且 `reviewed` 不為 `null`，卻沒有 `freeze` → 失敗。這是 captain 方向第 2 點的機械版本。
+- F2 未審不得定版：有 `freeze`，`reviewed` 卻是 `null` → 失敗。
+- F3 定版內容被改：同建置檢查。
+
+`audit` 與 `051` 的 `check` 掛在同一處：workflow 的 `verify` 階段與上線條件 P3-8。
+F1、F2 不接建置。理由：改一個非凍結欄位（例如 `tags`）會讓 `051` 的 `stamp` 把 `reviewed` 清成 `null`，F2 隨即失敗。若接建置，改一個標籤就無法部署，要等 captain 重簽。
 
 ### 六、實測（spike）
+
+原型用的是獨立清單檔。改用 `051` 的清單後，比對與載入邏輯相同，只換讀取位置。
 
 `no spike needed` 不成立，已實作原型並實測。原型與執行腳本在工作暫存區，**未進 repo**；程式碼附於本節末，可重跑。
 做法：把 `src/data/` 複製到暫存目錄，從未修改的內容產生 9 筆指紋（6 則判決、2 筆待審案件、1 筆 `history.json`，後兩類僅供實測，不代表第一批決定）。每一步重新複製，只做一種改動。
@@ -220,35 +239,45 @@ console.log(`✅ 凍結檢查通過：${lock.entries.length} 筆未變動`);
 
 本票不新增、不修改任何 React 元件，也沒有畫面。手機與桌機行為：無變化。
 
-**`frozen-content.json`**
+**`content-provenance.json` 一筆標記的 `freeze` 物件**（其餘欄位見 `051` Design 第 3.1 節）：
 
 ```jsonc
 {
-  "classification": { "src/data/future.ts": "mixed", "src/data/history.json": "ssot", … },  // src/data 每個檔都要有一列
-  "entries": [
-    { "file": "src/data/future.ts", "export": "RULINGS_SINCE_FLOOR_VOIDED",
-      "keyField": "docket", "key": "115 年憲判字第 6 號",
-      "fields": ["docket", "rocDate", "dateLabel", "id"],
-      "sha256": "<64 hex>", "frozen_at": "2026-10-xx", "frozen_by": "<人名>",
-      "review_ref": "docs/constitution-features/_archive/063-required-for-ruling-legal-accuracy.md" }
-  ]
+  "scope": "src/data/future.ts#RULINGS_SINCE_FLOOR_VOIDED[docket=115 年憲判字第 6 號]",
+  "class": "t3", "author": "ai", "basis": ["https://cons.judicial.gov.tw/…"],
+  "reviewed": { "by": "captain", "on": "2026-10-xx", "record": "docs/constitution-features/_archive/063-required-for-ruling-legal-accuracy.md" },
+  "fingerprint": "sha256:…",            // 051 的，涵蓋整個 scope
+  "freeze": {
+    "fields": ["docket", "rocDate", "dateLabel", "id"],   // 相對於 scope 選出的值
+    "sha256": "<64 hex>",               // 047 的，只算 fields
+    "by": "captain", "on": "2026-10-xx"
+  }
 }
 ```
 
-- `classification` 讓新增到 `src/data/` 的檔案必須先分類。未分類 → 檢查失敗。
-- 單一物件（`RULING_THRESHOLD`）以 `keyField: null` 表示整個 export 為一筆。
+- `freeze.by` 與 `reviewed.by` 用同一組角色。agent 不得寫 `freeze`，理由與 `051` 第六節「agent 不得填 `reviewed`」相同。
+- `fields` 省略時凍結整個 scope 選出的值。
+- 整檔 scope（例如 `src/data/verified-case-refs.mjs`，`051` 規定非 `.ts`／`.json` 只能整檔標記）的 `fields` 以 export 名稱開頭，例：`VERIFIED_CASE_REFS.113年憲判字第9號.date`。
 - 字串先做 NFC 正規化與去頭尾空白再算指紋，與 `scripts/content-fingerprint.mjs` 的 `normalizeText` 相同。
 
-**`scripts/check-frozen-content.mjs`**：子命令 `check`（預設）、`list`（列出定版項目）、`freeze <file> <export> <key>`（產生一筆指紋，供人審後手動加入清單）。
+**`scripts/check-frozen-content.mjs`** 子命令：
+
+| 子命令 | 做什麼 | 掛在哪 |
+|---|---|---|
+| `check`（預設） | F3：定版欄位指紋比對 | `prebuild` |
+| `audit` | F1、F2、F3 | `verify` 階段、P3-8 |
+| `list` | 列出已定版項目 | 人工 |
+| `fingerprint <scope> [fields…]` | 印出一筆的 `freeze.sha256`，供人審後貼進清單 | 人工 |
+
 **不提供**「全部重算」的指令。重算全部等於一鍵解除全部定版。
 
-**解除定版的程序**：同一個 PR 內同時改內容與清單中那一筆。清單的 diff 會出現在 PR 上。誰可以核准，見第八節決定二。
+**解除定版的程序**：同一個 PR 內同時改內容與該筆的 `freeze`（刪除或重算）。清單的 diff 會出現在 PR 上。誰可以核准，見第八節決定二。
 
 ### 八、需要 captain 決定的事
 
 **決定一：`AGENTS.md` 第 5 條與 `design.md` 不變式 #7 是否加上「並定版」。**
 
-建議：**加，但等階段一上線後再加。** 規則不要早於機制存在。
+建議：**加，但等本票上線後再加。** 規則不要早於機制存在。
 
 現行文字只寫「經審閱」，沒有寫審閱後不得再改。本票上線後，建議把「收集並經審閱的內容與圖表」改為：
 
@@ -260,7 +289,7 @@ console.log(`✅ 凍結檢查通過：${lock.entries.length} 筆未變動`);
 
 建議：**只有 captain 可以核准解除；接受下述漏洞。**
 
-漏洞是：有人在同一次修改裡同時改內容和清單，檢查會通過。檢查分辨不出「經同意的解除」與「順手一起改」。
+漏洞是：有人在同一次修改裡同時改內容和清單的 `freeze`，檢查會通過。檢查分辨不出「經同意的解除」與「順手一起改」。
 能看見的地方只有 PR 上清單檔的變動。要機械擋下，需要 GitHub 分支保護或 CODEOWNERS。repo 目前沒有 `.github`，屬另一張票的範圍。
 改了可以退回。
 
@@ -272,40 +301,44 @@ console.log(`✅ 凍結檢查通過：${lock.entries.length} 筆未變動`);
 |---|---|
 | Vercel 的建置指令若在後台被改掉，`prebuild` 不會執行 | 我不確定 Vercel 後台的設定。`.vercel/project.json` 只有專案編號。AC-8 要求 verify 讀一次實際部署紀錄 |
 | 原型用 `tests/tsx-loader.mjs`，依賴 `node:module` 的 `registerHooks`。Vercel 的 node 版本若太舊，載入會失敗 | 失敗時檢查離開碼 2，建置失敗，不會靜默通過（AC-7）。實作須確認 Vercel 的 node 版本，或改用不依賴 `registerHooks` 的載入方式 |
+| `051` 尚未通過 gate。它的清單格式若再改，本票第五、七節要跟著改 | 本票 implement 排在 `051` implement 之後。清單檔不存在時 `check` 離開碼 2，建置失敗，因此不可先於 `051` 合併 |
 | `prebuild` 讓 `npm run build` 不再只是 `next build` | `AGENTS.md` 第 1 條寫「現在 `build` 就是 `next build`」。檢查只讀不寫，不違反不變式 #1。該句需補述，列於實作後更新 |
 
 ### 十、預計改動的檔案
 
 | 檔案 | 改動 | 行數（容差 ±50%） |
 |---|---|---|
-| `scripts/check-frozen-content.mjs` | 新增 | 約 150 |
-| `frozen-content.json` | 新增，9 筆＋分類表 | 約 120 |
+| `scripts/check-frozen-content.mjs` | 新增 | 約 180 |
+| `scripts/content-provenance.mjs`（`051` 建立） | `stamp` 加凍結攔截 | 約 15 |
+| `content-provenance.json`（`051` 建立） | 不改。定版由 captain 簽審閱後另開 PR 寫入 | 0 |
 | `package.json` | 加 `prebuild` 與 `check-frozen` 兩行 | 2 |
-| `tests/content-freeze.test.mjs` | 新增，實際覆寫嘗試 | 約 150 |
+| `tests/content-freeze.test.mjs` | 新增，以暫存清單做實際覆寫嘗試 | 約 180 |
 | `src/data/*` | **不改** | 0 |
 
 ### 十一、驗收條件
 
-- **AC-1 改動定版欄位會失敗。** 對暫存副本改一則定版判決的 `rocDate`，檢查離開碼 1，訊息指名該判決。
+測試一律用暫存副本與暫存清單，不依賴 repo 清單上已有定版項目（上線當天為 0 筆）。
+
+- **AC-1 改動定版欄位會失敗。** 對暫存副本改一則定版判決的 `rocDate`，`check` 離開碼 1，訊息指名該 scope。
   Verified by: `tests/content-freeze.test.mjs` 的對應測試。若檢查對此改動回傳 0，測試失敗。
-- **AC-2 刪除定版項目會失敗。** 刪除一筆定版判決，檢查離開碼 1，訊息含「不見了」。
+- **AC-2 刪除定版項目會失敗。** 刪除一筆定版判決，`check` 離開碼 1，訊息含「不見了」。
   Verified by: 同檔測試。若只比對存在的項目、跳過不見的項目，測試失敗。
-- **AC-3 同步產物同樣受檢。** 以暫時清單凍結 `history.json` 的一筆，以 `writeOutputsAtomically` 寫入改動後的內容，檢查離開碼 1。
+- **AC-3 同步產物同樣受檢。** 暫存清單凍結 `history.json` 的一筆，以 `writeOutputsAtomically` 寫入改動後的內容，`check` 離開碼 1。
   Verified by: 同檔測試。若檢查只載入 `.ts`，測試失敗。
 - **AC-4 部署路徑會被擋。** 定版項目被改時，`npm run build` 非零離開，且輸出不含 `next build` 的 `Creating an optimized production build`。未改時 `npm run build` 離開碼 0。
-  Verified by: verify 階段在 worktree 實際執行兩次 `npm run build`，記錄離開碼與輸出行。若移除 `prebuild`，第一次會成功。
-- **AC-5 不過度阻擋。** 改非凍結欄 `tags`、改 `REFERENCE_DATE`、新增一筆待審案件，檢查離開碼 0。
-  Verified by: 同檔測試。若指紋改算整個檔案，測試失敗。
-- **AC-6 分類涵蓋 `src/data/` 全部檔案。** 暫存副本新增 `src/data/new.ts`，檢查離開碼 1，訊息指名未分類。現有 repo 的每個檔在 `classification` 都有一列。
-  Verified by: 同檔測試，兩項各一。刪掉 `classification` 任一列，第二項失敗。
-- **AC-7 無法檢查時大聲失敗。** 定版項目所在的檔案有語法錯誤，或 export 名稱不存在，檢查離開碼 2，不是 0。
+  Verified by: verify 階段在 worktree 以暫存清單實際執行兩次 `npm run build`，記錄離開碼與輸出行。若移除 `prebuild`，第一次會成功。
+- **AC-5 不過度阻擋。** 改非凍結欄 `tags`、改 `REFERENCE_DATE`、新增一筆待審案件、新增一筆未標記的內容，`check` 離開碼 0。
+  Verified by: 同檔測試。若指紋改算整個 scope，或 `check` 誤跑 `051` 的 P1，測試失敗。
+- **AC-6 重新蓋指紋被擋。** 對有 `freeze` 且凍結欄位已改的 scope 執行 `051` 的 `stamp`，離開碼 1，清單檔 sha256 不變。凍結欄位未改、只改 `tags` 時，`stamp` 照常成功。
+  Verified by: 同檔測試，兩項各一。拿掉攔截，第一項失敗；攔截改成見 `freeze` 就拒，第二項失敗。
+- **AC-7 無法檢查時大聲失敗。** 定版項目所在的檔案有語法錯誤、鍵選擇器找不到項目、或清單檔不存在，`check` 離開碼非 0。語法錯誤與清單不存在為 2。
   Verified by: 同檔測試。若載入錯誤被吞掉並當成通過，測試失敗。
 - **AC-8 Vercel 實際執行檢查。** 一次預覽部署的建置紀錄出現檢查的輸出行。
   Verified by: verify 階段讀取 Vercel 建置紀錄並貼出該行。紀錄中沒有該行，本項 FAILED。
-- **AC-9 第一批 9 筆恰好在清單，且每筆 `review_ref` 指向存在的檔案。**
-  Verified by: `node scripts/check-frozen-content.mjs list` 輸出 9 筆；測試逐筆確認 `review_ref` 路徑存在。多一筆或少一筆，測試失敗。
-- **AC-10（階段二，等 `051` 實作）已審未定版、未審已定版都會失敗。**
-  Verified by: 以 `051` 的欄位做 fixture：AI 來源＋審閱紀錄但不在清單 → 離開碼 1；在清單但無審閱紀錄 → 離開碼 1。`051` 未實作前，本項標 SKIPPED 並註明原因，不得標 DONE。
+- **AC-9 F1、F2 會失敗。** 暫存清單：`author: ai`＋`reviewed` 非 `null`＋無 `freeze` → `audit` 離開碼 1（F1）；有 `freeze`＋`reviewed: null` → `audit` 離開碼 1（F2）；兩者都合規 → 0。
+  Verified by: 同檔測試三項。刪掉 F1 或 F2 任一規則，對應項失敗。
+- **AC-10 repo 現況可跑。** 在 `051` 的初始清單（全部 `reviewed: null`、無 `freeze`）上，`check` 離開碼 0，`list` 輸出 0 筆，`npm run build` 離開碼 0。
+  Verified by: verify 階段在 worktree 實跑三條指令並記錄輸出。若檢查把「沒有定版項目」當成錯誤，本項失敗。
 
 ### 十二、文件影響
 
@@ -319,21 +352,21 @@ console.log(`✅ 凍結檢查通過：${lock.entries.length} 筆未變動`);
 |---|---|
 | `docs/content-pipeline/gatekeeping.md` | 缺口表 `:166` 一列改為已有機制，寫明第八節決定二的漏洞 |
 | `docs/content-pipeline/design.md` | 修訂紀錄加一則；不變式 #7 措辭依第八節決定一（captain 核准文字） |
-| `AGENTS.md` | 第 1 條補述 `prebuild`；第 5 條依決定一。兩者皆由 captain 核准措辭，worker 不自行修改 |
+| `AGENTS.md` | 第 1 條補述 `prebuild`；第 5 條依決定一，並加「agent 不得寫 `freeze`」。皆由 captain 核准措辭，worker 不自行修改 |
 | `docs/content-pipeline/data-collection-guide.md` | T3 流程加「審閱後定版」一步與指令 |
 | `docs/health-check/TODO.md` | P1-8 補述：「標注來源並凍結」的凍結機制已存在 |
 
-**不更新**：`docs/INDEX.md`（不新增文件；`frozen-content.json` 是資料，不是文件）、`docs/project/tech-stack.md`（資料流章節已標過時，與本票無關）、`051`／`053` 的票（由各自的 worker 處理）、`040` 封存票（record）。
+**不更新**：`docs/INDEX.md`（不新增文件；清單檔是資料，不是文件）、`docs/project/tech-stack.md`（資料流章節已標過時，與本票無關）、`051`／`053` 的票（由各自的 worker 處理）、`040` 封存票（record）。
 
 ## Stage Report: design
 
 - DONE: Choose the freeze layer (type, data field, build-time check, or CI) and classify the existing 40 Track 1 records and T3 `src/data/future.ts`; prove it with an actual overwrite attempt on a frozen item that fails, not rule text alone (spike required).
-  Design 三／四／六節：指紋清單＋`prebuild` 檢查；spike 9 步實測，改日期／重生 topic／刪除／同步寫回皆 exit 1，`npm run build` 後續指令未執行；改 tags／REFERENCE_DATE exit 0。Track 1 的 40 筆不凍結（不變式 #4），第一批定版 9 筆。
+  Design 三／四／六節：`051` 清單的 `freeze` 標記＋`prebuild` 檢查＋`stamp` 攔截；spike 9 步實測，改日期／重生 topic／刪除／同步寫回皆 exit 1，`npm run build` 後續指令未執行；改 tags／REFERENCE_DATE exit 0。Track 1 的 40 筆不凍結（不變式 #4），定版候選 9 筆。
 - DONE: Anchor on the captain's direction (2026-09-30): AI-generated content, once reviewed and finalized, must not be re-rendered or changed by any path; build on 051's provenance field; state whether AGENTS.md rule 5 / design.md invariant 7 should add 「並定版」 as a captain gate decision (do not edit AGENTS.md).
-  二節方向；五節 051 介面 I1–I4（已 SendMessage 告知 051 worker），分兩階段；八節決定一建議加「並定版」但等階段一上線，附建議措辭。AGENTS.md 未修改。
+  二節方向；五節 I1–I4 經 `051` worker 確認（`6664a40`），併入同一份清單，F1「已審未定版」即方向第 2 點；八節決定一建議加「並定版」但等上線後。AGENTS.md 未修改。
 - DONE: Acceptance criteria each with a falsifiable `Verified by:`; split documentation impact into 現在更新／實作後更新／不更新, each listing documents or 無.
   十一節 AC-1 至 AC-10，各附會讓它失敗的改動；十二節三分（現在更新：無，附理由）。
 
 ### Summary
 
-選定「資料指紋清單 `frozen-content.json` ＋ `scripts/check-frozen-content.mjs` ＋ `prebuild`」作為凍結層，否決型別、欄位標籤、CI 與同步內攔截並附理由。spike 原型（附於六節）實測四種覆寫都失敗、兩種合法改動不受影響。captain 需決定兩件事：AGENTS.md 第 5 條是否加「並定版」（建議加，等上線後），以及只由 captain 核准解除定版並接受「同一次修改同時改內容與清單」這個剩下的漏洞。Vercel 建置指令與 node 版本我不確定，列為 AC-8 與風險。
+凍結層選定為 `051` 來源清單上的 `freeze` 標記，加上 `prebuild` 建置檢查與 `stamp` 入口攔截；否決型別、欄位標籤、CI、同步內攔截與另開清單，各附理由。spike 原型（六節）實測四種覆寫都失敗、兩種合法改動不受影響。本票 implement 須排在 `051` implement 之後；上線當天 0 筆定版，9 筆候選待 captain 簽審閱。captain 需決定：AGENTS.md 第 5 條加「並定版」（建議加，上線後），以及只由 captain 核准解除定版並接受「同一次修改同時改內容與清單」的漏洞。Vercel 建置指令與 node 版本我不確定，列為 AC-8 與風險。
