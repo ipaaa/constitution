@@ -3,7 +3,7 @@ id: 051
 title: 內容來源標記與可重跑的來源掃描
 status: design
 source: captain 2026-09-04（把關機制體檢第三類；captain 明確核准建立常設檢查）
-started:
+started: 2026-09-30T17:18:46Z
 completed:
 verdict:
 score:
