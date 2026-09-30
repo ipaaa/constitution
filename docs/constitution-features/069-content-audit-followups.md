@@ -11,6 +11,17 @@ worktree: .worktrees/spacedock-ensign-069-content-audit-followups
 issue:
 pr:
 mod-block:
+gates:
+    version: 1
+    records:
+        - id: gate:069:verify
+          stage: verify
+          attempts:
+            - id: gate-attempt:069-verify-1
+              briefing:
+                id: briefing:069:verify:attempt-1:revision-1
+                digest: sha256:d0b7e41604f060c2d0873549f9050aa386eb6ee84d82cd62cc12f14659e48024
+                room-ref: '@review/verify/briefing-1'
 ---
 
 `067`（PR #42）已合併並封存。它的 review 與 captain 在 gate 上的決定留下四件要落地的事，本票一次處理。

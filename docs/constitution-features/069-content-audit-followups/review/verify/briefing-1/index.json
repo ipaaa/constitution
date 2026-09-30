@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:069:verify:attempt-1:revision-1",
+  "question": "069 verify：候選 86ee71d 的紀年正本、P3-8 解除條件二、閱讀順序與 19 處路徑，事實是否正確、可進 review？",
+  "artifacts": [
+    {
+      "id": "artifact:069:verify:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/8f9d91eeef65e39d38be5ac8b2dd83e025c1d1e3/docs/constitution-features/069-content-audit-followups.md",
+      "rev": "sha256:22d2a78f96070d3c186c2602be04085d24ac798485d5a66ae501eed5cf6f9fc0",
+      "mediaType": "text/markdown",
+      "summary": "fresh verifier 判 PASSED：字號範例於司法院網站實查存在；P3-8 恰兩條、056 那條逐位元組未變、G-7 PASS；19 處路徑皆指到正確封存檔；M6 只剩 /about:38；138 測試 0 失敗；無佔位資料。V-1（Polish）：程式註解與歷史檔另有 5 處舊路徑，check 不掃。"
+    }
+  ]
+}
