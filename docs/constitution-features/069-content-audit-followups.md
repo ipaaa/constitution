@@ -467,3 +467,20 @@ captain 2026-09-29 的三項決定，目前記在本票的 Problem 一節。impl
 ### Summary
 
 依 Cycle 1 修正包完成 R-1 與 R-2，各改一行。`AGENTS.md` 那一行逐字換成 captain 核准的文字，AC-4 與 G-7 仍成立。其餘 AC 證據重跑後都不變。
+
+## Stage Report: review (cycle 2)
+
+- DONE: Review the cycle-1 correction independently: AGENTS.md rule 4 carries the captain-approved line byte-for-byte (true both before and after 051/053 add P3-8 lines; G-7 place3 still counts one binding line), and the rule-2 example is 「114年1月23日（2025年1月23日）」 with nothing else changed.
+  於 `597269b`：以 FO 轉來的核准全文 `grep -cxF` 比對 `AGENTS.md` 得 1。第 4 條內含 `P3-8` 與 `解除條件二` 的行 1。G-7 印 `G-7 PASS [place1=1/1 place2=1 place3=1]` exit 0。臨時 worktree 依序合併 `051`（`abf9961`）與 `053`（`3d8a3f0`），衝突以聯集解：核准行仍 `grep -cxF` 得 1，G-7 仍 PASS，P3-8 有 4 行解除條件，「全部解除條件」措辭涵蓋四條。規則二範例 diff 只換該例，無空格。
+- DONE: Confirm only those two lines changed since 861dd26, and that the earlier review's conclusions still hold (tests, tsc, G-7 PASS, P3-8 count 2, M6 only /about:38, merge interplay with 051/053/072).
+  `git diff 861dd26 HEAD` 在交付檔只有 `AGENTS.md`、`content-conventions.md` 各 1 行（其餘為票內 report）。`node --test tests/*.test.mjs` 138 條 137 過 0 失敗 1 skip；`rm -rf .next && npx tsc --noEmit` exit 0；P3-8 awk 印 `2`；`check` 印 `FAIL M1=0 M2=0 M3=0 M4=1 M5=2 M6=1`，唯一 M6 為 `src/app/about/page.tsx:38`；`src/data/*.json` sha256 與前次相同。`git merge-tree` 對現行 `main` 與 `072` 分支皆無衝突。臨時 worktree 已移除，candidate 未動。
+- DONE: End with a clear PASSED or REJECTED verdict; findings go through the disposition checkpoint without touching the candidate.
+  判定 **PASSED**。本輪無新 finding。R-1 已由核准文字解決；R-2 已修。V-1 屬 `075`，不列。
+
+### 附記（非 069 finding）
+
+- `051`＋`053` 合併時 `AGENTS.md` 第 5 條由兩票各自改寫而衝突，聯集結果重複。這是 `051` 與 `053` 之間的事，`069` 不碰第 5 條，由後合併者解。
+
+### Summary
+
+Cycle 1 的兩處修正各一行，逐字符合 captain 核准文字與指定範例，其他交付未變。前次 review 的全部結論在 `597269b` 重跑成立；與 `051`、`053` 合併後第 4 條措辭正確涵蓋四條解除條件，G-7 仍 PASS。判定 **PASSED**。
