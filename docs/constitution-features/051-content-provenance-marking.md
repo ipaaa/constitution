@@ -456,3 +456,27 @@ Verified by: `node scripts/content-audit.mjs check` 的輸出與實作前相同�
 ### Summary
 
 建好來源清單、P1–P6 掃描與 `stamp`，並照實標記現有內容：72 筆，全部 AI、全部未審。「有沒有標記」這一半今天全過，接在 workflow `verify`。完整掃描有 69 處違反第 5 條，已綁進 P3-8，要等 `053` 處置後才會降下來。依 captain 的 G1-A／G2-A 加了 `ui` 與 `fact` 兩類，`fact` 必須有依據、具名學者簽核與定版。
+
+## Stage Report: verify
+
+- DONE: Verify the factual content 051 ships: `content-provenance.json`'s 72 marks (authorship all `ai`, no agent-signed review, sources named per mark actually exist and say what the mark claims), and the P3-8 解除條件 text matching the captain's 2026-09-30 option-1 decision.
+  72 筆：other/ai 66、t3/ai 3、config/ai 1、ssot 2；`reviewed` 全為 `null`，無 `human`，無 `ui`／`fact` 筆。每筆非 ssot 範圍的 git 旁證都 ≥1 個 AI commit（`report` 無 `0/` 列），`ai` 有據。11 個非空 `basis` 逐一 grep：9 個網址都在該範圍的檔內原文出現（例：`future.ts:9`、`:472`，`ruling-threshold.ts:53`，`verified-case-refs.mjs:15/:20`）；ssot 分頁名 `Track 1_history`／`Track 2_discussion`／`site_tldr` 與 `scripts/content-fingerprint.mjs:4-6` 相符。`#JUSTICES` 的 note 對應 `future.ts:354`。P3-8 新行綁完整 `check`、離開碼 0，其餘 P3-8 行未動，符合選項 1。
+- DONE: Independently re-prove the scan can fail: insert an unmarked item and a mark with a changed fingerprint on a scratch copy and observe non-zero exits; confirm the full scan's 69 failures are all rule-5 placement (66) or T3-unreviewed (3); placeholder scan over the diff.
+  scratchpad 副本（`--root`）基線 `check --marking` 0。新增 `src/data/verify-probe.ts` → 1，`P1 未標記 PROBE[0].title`。把 `opinions.ts` 標記的指紋改成全 0 → 1，只報 P2。改 `future/page.tsx` 一個中文字 → 1，P2。分支上完整 `check` 離開碼 1，P4=69：66 筆「other 的作者是 ai」＋3 筆「t3 未經審閱」，P1–P3／P5／P6 皆 0。佔位掃描（`某學者`、`某大學法律系`、`lorem ipsum`、`快速了解…5個重點`、`test`）：diff 與清單 0 筆內容命中，`test` 只出現在檔名與 regex `.test(`。
+- DONE: 回歸與 AC-10 重跑。`tests/content-provenance.test.mjs` 20/20，其餘四個測試檔 exit 0；`tsc --noEmit` 0；`npm run build` 0；兩個 json 的 sha256 build 前後相同；`content-audit.mjs check` 與 main 相比只差文件數 97→99。未執行 `npm run sync-content`。
+- DONE: `ui`／`fact`／`reviewed.name` 對照 captain 決定。`ui` 不受 P4 管（G1-A），加「有數字判 P3」是依 `053` 的介面文字定義收窄，沒有放寬。`fact` 的 P4 三項對應 G2-A 三條件（依據非空、具名學者、有 `freeze`），副本實測缺任一項即 P4。沒有超出決定的放寬。
+- DONE: Clear PASSED or REJECTED verdict with rationale; findings go through the Review-finding disposition checkpoint without touching the candidate.
+  下列發現皆未改動候選版本，交 FO 授權處置。
+
+### 發現（Review-finding disposition，建議，待 FO 授權）
+
+1. **`AGENTS.md` 第 5 條新行「P4 即本條」說得比掃描做的多。** 使用者與流程：讀 `AGENTS.md` 的 agent 與審 PR 的人。可見的傷害：`053` 合併後第 5 條第三類寫「每句都對到一手來源，依 051 標注」。P4 只驗 `basis` 非空，不驗逐句，也分不出事實陳述與編輯判斷。這個限制在 Design 第九節與腳本檔頭有寫，`gatekeeping.md` 第 6 章有概括句「只檢查宣告，不判讀文字」；但 `AGENTS.md` 這一行沒有寫。受影響的邊界：規則 5 的可查核性。觸發證據：分支 `AGENTS.md` 的 diff。建議：**Polish**，歸 051，改寫為「P4 檢查本條的宣告；逐句對照與是否屬編輯判斷由學者簽核負責」。
+2. **`fact` 不要求簽核記錄放在 `docs/content-audit/`。** G2-A 條件（2）寫「記在 `docs/content-audit/` 的清單」。副本實測：`fact`＋具名學者＋PR 網址＋`freeze: {}` 即通過。現況沒有 `fact` 筆，觸發是假設的。建議：**Deferred risk**，歸 051。升級條件：出現第一筆 `fact` 標記前處理。
+3. **`ui` 可自行宣告，繞過 P4。** 副本實測：66 筆 other 全改 `ui`，30 個元件檔（含 `EditorialAnnotation.tsx`、`OpposingViewCard.tsx`、`JusticeStanceTooltip.tsx`）沒有數字，P4 與 P3 都不報。`gatekeeping.md` 第 5 章「擋不到」與 `report` 已誠實列出。`AGENTS.md` 只禁 agent 寫 `human` 與 `reviewed`，沒有禁寫 `ui`。現況沒有 `ui` 筆。建議：**Deferred risk**，歸 051。升級條件：出現任何一筆 `ui`，卻不對應 `053` 處置表的某一列。可選修法：`AGENTS.md` 加一句「agent 只可依 `053` 處置表寫 `ui`／`config`」。
+4. **合併順序。** `053` 分支把 `gatekeeping.md` 第 6 章改成四類，並保留「沒有機械檢查」一段。本分支的「規則 P4 即第三類的禁令」在 `053` 合併後指錯類別（應為第四類的禁令加第三類的條件）。建議：**Deferred risk**，第二個合併的分支 rebase 時一併修正。實作者注意事項 2 已部分預告。
+
+**「一筆標記只能證明依據非空」的限制，在 051 自述處是否說實話**：Design 第九節（明寫「機器只驗一半」）、腳本檔頭（「不證明宣告為真」）、`gatekeeping.md` 第 6 章概括句，三處都成立。只有 `AGENTS.md` 那一行沒有說，見發現 1。
+
+### Summary
+
+**PASSED。** 清單 72 筆照實填寫：全部 AI、全部未審；非空依據都抄自檔內原文。我在副本上獨立重證掃描能失敗（未標記 → P1、指紋被改 → P2，離開碼皆 1）。完整掃描 69 處全屬 66＋3。`ui`／`fact` 與 G1-A／G2-A 相符，沒有放寬。四項發現都不是 Material。其中兩項是文件措辭，一項是尚無資料時的條件缺口，一項是自我宣告的繞道，都附升級條件，交 FO 授權。
