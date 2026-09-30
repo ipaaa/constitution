@@ -245,3 +245,22 @@ Verified by：`git diff --name-only main...HEAD` 只列 `docs/content-pipeline/g
 ### Summary
 
 依 captain 2026-09-30 裁示處置 F1、F2：F1 在總覽〈同步前置檢查〉擋不到欄補一句；F2 不改總覽。兩項 AC 修改以補述記在本票，原文保留。AC-1 至 AC-8 全部重跑通過。
+
+## Stage Report: verify
+
+- DONE: Verify every factual claim the rewritten gatekeeping.md chapters 2–5 now make about 064 against the code and tests on main: fingerprint coverage (C1/C2), the three new sync abort conditions (C5/C6), the verified-case-refs list (C7), who fills the two columns and the captain's diff check (C8), and the formal-sheet state (C9), citing file:line for each.
+  main 自 `59c0f86` 起只動票檔，程式與測試未變。C1：`scripts/content-fingerprint.mjs:24-26`、`:72-75`，`scripts/apps-script/approval-workflow.gs:9-11`；AC-2 實跑印 `true true true`，另驗「清空＝回到空白指紋」`true`。C2：`content-fingerprint.mjs:21` 註解＋測試 `:233`（只填兩欄的列不佔序號）。C5：`scripts/sync-content.mjs:750-762`（成對、`Object.hasOwn`、`ALLOWED_STANCES`），`:78` 常數；格式檢查 `:679-684`（`year`、`image_url`）、`:737-748`（`link`、`vibe`、`sticky`、`views`）。C6：迴圈只跑 `approved`（`:735`），測試 `:173`。C7：`src/data/verified-case-refs.mjs:1-22` 兩筆，檔頭規則「新增必須先開 source 核對」；增減鍵會讓測試 `:284` 失敗。C8：`docs/content-pipeline/operations.md:121-123`；`_archive/064-…md:622`「captain 2026-09-29 決定」。C9：總覽只寫查法句，無進度句；`_archive/064` verify 讀回 21 欄。第 3 章 `V2:W`、第 5、6 步與 `operations.md:101-102` 相符。
+- DONE: Confirm the captain's 2026-09-30 AC changes are recorded with original text preserved, the F1 sentence is true (widening the stance allowlist fails no test), and each 擋什麼／擋不到什麼 cell is accurate; placeholder scan over the diff.
+  AC-1、AC-7 修改以補述記在 `## Design` 第五節（:116、:152），原 AC 文字保留。拋棄式 worktree 反向重現：`ALLOWED_STANCES` 加 `反對` → 0 失敗（F1 為真）；加 `贊成` → 1 失敗；成對檢查關掉 → 1 失敗；`case_ref` 檢查關掉 → 1 失敗；`hasOwn` 改 `in` → 1 失敗。擋什麼每項都有會失敗的測試。佔位掃描（`某學者`、`某大學法律系`、`test`、`lorem ipsum`、`快速了解最新判決的5個重點`）：新增行 0 命中；`test` 只出現在 `node --test` 指令內。AC-7：fresh agent 只讀總覽，三題答對（第 1 題「要重新核可，之前網站少這一筆」，引 :31、:104）。
+- DONE: content-audit names 0 overview lines, monotonic scan 0, G-7 PASS; end with a clear PASSED or REJECTED verdict — findings go through the disposition checkpoint without touching the candidate.
+  content-audit 指名總覽 0 行；分支與 main 同為 `M4=1 M5=2 M6=18`。單調句掃描 0 行。連結可見文字掃描 0 行。G-7 抽正本執行印 `G-7 PASS [place1=1/1 place2=1 place3=1]`，exit 0。兩測試檔 84/84，exit 0。防線表 :121–:130 每列 7 欄，第 5 欄皆三值之一。diff 只有總覽、`docs/INDEX.md`（只改 :59 日期）與本票檔。
+
+### 發現（皆為 Polish，候選未改，待 FO 處置）
+
+- **V1 — 第 4 章「沒重裝就填值，同步中止」只對已核可的列成立。** 使用者與流程：責任編輯在第 8 步前對新列填值後按核可。可見損害：無內容外洩；新版 `.gs` 的核可選單直接報「指紋公式與發布內容不符」（`approval-workflow.gs:247`），該列不核可、同步不中止。影響：無 value AC；句子與 `operations.md:119` 同義。觸發：理論路徑，captain 依 `operations.md` 第 1–8 步之間不填值。建議 decline；要修則改為「已核可的列會讓同步中止；新核可會被選單拒絕」。
+- **V2 — F1 句「允許清單被改寬（例如加入 `反對`）：沒有測試會失敗」寫得比事實寬。** 加 `贊成`、`進步派` 會讓 `AC-5` 失敗（已重現）。例子限定了範圍，讀者不會因此誤判有保護。建議 decline 或改「加入測試沒列到的值」。
+- **V3 — 可讀性。** fresh reader 看不懂「只填這兩欄的列不佔 Track 2 的序號」與「保護範圍 `V2:W`」。兩句為真。建議 decline（後者是設定步驟的逐字引用）。
+
+### Summary
+
+總覽第 2–5 章關於 `064` 的每一句都與 main 上的程式和測試相符，F1 句經反向改動重現為真，captain 的兩項 AC 修改已記錄且原文保留。AC-1（四中三）至 AC-8 全部重跑通過。三項 Polish 發現不影響把關判斷。**Verdict: PASSED。**
