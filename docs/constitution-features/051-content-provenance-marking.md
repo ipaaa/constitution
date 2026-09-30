@@ -276,6 +276,30 @@ repo 沒有 CI。掛兩處：
 
 不適用。本票不改任何頁面。
 
+### 九、實作補述（2026-09-30 implement）
+
+上面第一至八節保留原文。實作時依 captain 同日的決定加了下列項目。
+
+**captain 決定（FO 轉達）**：決定 A 選 1；`053` 的 G1 選 A、G2 選 A。
+
+| 項目 | 實作 | 理由 |
+|---|---|---|
+| 新類別 `ui` | 介面文字。P4 不管它。範圍內有數字（半形或全形）判 P3 | G1-A：規則 5 只管事實與編輯判斷。`053` 定義介面文字「不提案號、日期、數字」，數字是其中機器驗得了的部分 |
+| 新類別 `fact` | T3 以外、AI 寫的事實陳述。P4 要求三項：`basis` 非空；`reviewed.by` 為 `學者` 且 `reviewed.name` 寫姓名；有 `freeze` | G2-A 的三個條件。`053` 把「掃描要能檢查有沒有簽核人」交給本票 |
+| `reviewed.name` | 選填欄位，`fact` 必填 | 「具名的法學審閱者」需要姓名。`by` 只記角色。`047` 的 I3 不受影響 |
+| ssot 的判定 | 以 `src/data/*.json` 型樣判定，不列檔名 | `AGENTS.md` 第 2 條的判斷方式。列檔名會觸發 `tests/threshold-analysis.test.mjs` AC-7 的守衛（它把「會寫檔又提到那兩個檔名」的程式判為寫產線檔） |
+| ssot 的 `basis` | 不檢查路徑是否存在 | 內容是試算表分頁名，不在 repo 內 |
+| `stamp` | 可一次給多個 scope。清單上沒有的 scope 一律拒絕 | 新標記由人先寫 scope、class、basis、`reviewed: null`，再 `stamp`。未 stamp 前 P6 報「缺 fingerprint」 |
+
+**`fact` 的「每句都對到一手來源」機器只驗一半。** 掃描只驗該範圍的 `basis` 非空。
+逐句對照的粒度受 scope 限制：資料檔可用鍵選擇器細到一筆紀錄，元件只能整檔。逐句是否對得上，由學者的簽核記錄負責。
+
+**`future.ts` 的衍生匯出。** `ACTIVE_JUSTICES`、`ATTENDING_JUSTICES` 是 `JUSTICES` 的篩選結果，單元歸整檔那一筆。
+改一位**在任**大法官的欄位，`#JUSTICES` 與整檔兩筆都報 P2。第二節原型說「只報 `#JUSTICES`」，只在改卸任者時成立。
+`053` 處置 D6 時可為這兩個匯出另加標記。
+
+**對 `047` 的介面。** `freeze` 內容不驗。唯一的解讀是 `fact` 要求它存在。`stamp` 匯出為函式，寫回清單之前那一段就是凍結攔截的位置，檔內有註解。
+
 ## Expected surface and tolerance
 
 Estimate: +1,250 net LOC across 8 files, tolerance ±35%.
@@ -402,3 +426,33 @@ Verified by: `node scripts/content-audit.mjs check` 的輸出與實作前相同�
 ### Summary
 
 來源標記定為 repo 根目錄一份清單，每筆以指紋綁定它所宣告的內容，改一個字就失效；掃描分「有沒有標記」（P1–P3、P5、P6，掛在 workflow `verify`）與「是否違反第 5 條」（P4）。spike 證實「誰寫的」答得出來（幾乎全是 AI），真正缺的是依據與審閱記錄。captain 只需決定一件事：完整掃描是否綁進上線條件 P3-8（建議綁，代價是發布要等 `053` 處置完）。
+
+## Stage Report: implement
+
+- DONE: Build 051 as designed: `content-provenance.json` with key-selector marks and the reserved `freeze` field, the rerunnable scan rules P1–P6, and the `stamp` command (clears the review on content change), plus the initial marking of current content with no agent-signed reviews.
+  `scripts/content-provenance.mjs`（check／check --marking／report／stamp）；清單 72 筆涵蓋 70 個檔（13 個資料模組、`verified-case-refs.mjs`、56 個含中文的 `.tsx`）；`future.ts` 拆整檔、`#JUSTICES`、`#CRISIS_STATS`。全部 `reviewed: null`、無 `human`。依 captain G1-A／G2-A 加 `ui`、`fact` 兩類與 `reviewed.name`，見 Design 第九節。
+- DONE: Prove the scan can fail by actually inserting an unmarked item (non-zero exit); every AC's `Verified by:` runs; one run over current content produces the per-file inputs 053 needs.
+  `node --test tests/content-provenance.test.mjs` 20/20。各主張與會使它失敗的改動：
+  AC-1 刪一筆標記 → 只報 P1。AC-2 塞事件 → P2；新資料檔 → P1 `CLAIMS[0]`；新 `.tsx` → P1；改卸任大法官一字 → 只報 `#JUSTICES`。把最長前綴改成最短、或指紋拿掉文字，AC-2 全紅（已實測兩種突變）。
+  AC-3 改 `className`＋檔頭插空行 → 0；反例改中文字串 → P2。AC-4 other＋ai → P4；human＋存在的記錄 → 通過；記錄不存在 → P6；PR 網址 → 通過；`fact` 缺依據／簽核人／學者角色／姓名／freeze 任一 → P4。
+  AC-5 `report` 對 P1-8 七檔各一列，作者、依據、審閱欄皆非空。AC-6 無 human、無 reviewed、ssot 恰為兩個 json、config 只有 `launch-status.ts`。AC-7 拋錯的資料模組 → 2；清單不存在 → 2。AC-8 stamp 後 reviewed 為 null、指紋更新；`--author human` 非零且清單位元組不變。另有 P3、P5（刪 `StanceSpectrum.tsx`、重複 scope）、P6（拼錯欄位、陣列索引）、鍵選擇器插入穩定性、freeze 不致失敗。
+  AC-1：`check --marking` 離開碼 0（`PASS P1=0 P2=0 P3=0 P5=0 P6=0`）。AC-4 基線：完整 `check` 離開碼 1，**P4=69**（66 筆 other＋ai、3 筆 t3 未審），其餘代號 0。
+- DONE: Add the P3-8 解除條件 binding the full scan (captain 2026-09-30 chose option 1) without touching the other P3-8 lines.
+  `docs/health-check/TODO.md` P3-8 在 2026-09-21 那條之後另起一行；`gatekeeping.md` 第 7 章的 awk 指令會印出它。其餘 P3-8 行未動。
+- DONE: Do not hook into `npm run build` (per design); never run `npm run sync-content`; no regressions to existing checks and tests.
+  `package.json` 未改。未執行同步。`content-audit.mjs check` 失敗項與實作前相同（只有 TODO.md 行號位移、文件數 97→99）。五個測試檔全過（68／16／20／36／16）。`tsc --noEmit` 0、`npm run build` 0、eslint 0、兩個 json 的 sha256 前後相同。
+  回歸一次：初版腳本字面列出兩個 json 檔名，觸發 `threshold-analysis.test.mjs` AC-7 守衛；改以 `src/data/*.json` 型樣判定後恢復通過。
+
+### 文件
+
+`AGENTS.md` 第 5 條（指令＋agent 不得寫 human／reviewed，兩行）、`gatekeeping.md` 第 5／6／8 章與票號清單、README `verify`、`INDEX.md` 兩列、TODO P1-8 補述與 P3-8 條件。
+
+### 給 FO 的注意事項
+
+1. `053` implement 正在刪檔（C11 等）。它合併後，被刪檔的標記會報 P5，要在同一個 PR 刪對應的標記。合併順序若是 `053` 先，本分支要 rebase 後重跑 `check --marking`。
+2. `AGENTS.md` 第 5 條、TODO P3-8、`gatekeeping.md` 第 6／8 章，`053`、`069`、`064` 也在改。我的改動都是獨立的行，衝突應只在相鄰行。
+3. 改一位在任大法官會同時報 `#JUSTICES` 與整檔（衍生匯出），見 Design 第九節。
+
+### Summary
+
+建好來源清單、P1–P6 掃描與 `stamp`，並照實標記現有內容：72 筆，全部 AI、全部未審。「有沒有標記」這一半今天全過，接在 workflow `verify`。完整掃描有 69 處違反第 5 條，已綁進 P3-8，要等 `053` 處置後才會降下來。依 captain 的 G1-A／G2-A 加了 `ui` 與 `fact` 兩類，`fact` 必須有依據、具名學者簽核與定版。
