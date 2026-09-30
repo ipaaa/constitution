@@ -523,3 +523,16 @@ Verified by: `node scripts/content-audit.mjs check` 的輸出與實作前相同�
 ### Summary
 
 依 captain 的 revise 做了兩項窄修。`AGENTS.md` 第 5 條還原成原文，再逐字插入兩行核准文字。`fact` 的簽核記錄限定在 `docs/content-audit/` 底下，PR 網址會判失敗，並有測試證明。其餘證明全部重跑，結果與 cycle 1 相同（P4=69）。
+
+## Stage Report: verify (cycle 2)
+
+- DONE: Verify the cycle-1 correction independently: AGENTS.md rule 5 differs from main only by the two captain-approved lines inserted byte-for-byte after 「機械檢查的現況見…缺口表。」; a `fact` mark whose review record is a PR URL or a file outside docs/content-audit/ fails the scan, one under docs/content-audit/ passes (prove on a scratch copy).
+  `git diff main -- AGENTS.md`：+2／−0，位置在第 76 行「…缺口表。」之後（第 77、78 行）。新增兩行與 FO 轉達的核准文字 `cmp` 逐位元組相同。scratchpad 副本把 `ruling-threshold.ts` 改成 `fact`（具名學者、有 `freeze`），只換 `reviewed.record`：PR 網址 → P4；`docs/other.md` → P4；`docs/content-audit/signoff-probe.md` → 該範圍無任何發現；`docs/content-audit/missing.md` → P4＋P6；`docs/content-audit/../other.md` → P4＋P6（`..` 不能繞出資料夾）。可證偽：用刪掉新增那一行的暫存腳本副本跑同一副本，PR 網址不報任何發現；還原後報 P4。暫存腳本已刪，worktree 乾淨。
+- DONE: Re-confirm the previously verified facts still hold: 72 marks, scan fails on an unmarked insert, 69 rule-5 failures only, tests/tsc/build pass, JSON hashes unchanged; placeholder scan over the new diff.
+  清單 72 筆：other/ai 66、t3/ai 3、config/ai 1、ssot 2；`human` 0 筆，`reviewed` 非 null 0 筆。分支 `check --marking` 離開碼 0。副本新增未標記的 `src/data/verify-probe.ts` → 離開碼 1，`P1 未標記 PROBE[0].title`。分支完整 `check` 離開碼 1，只有 P4=69（66「other 的作者是 ai」＋3「t3 未經審閱」）。五個測試檔離開碼皆 0，`content-provenance.test.mjs` 20/20。`tsc --noEmit` 0。`npm run build`（`next build`）0。兩個 json 的 sha256 build 前後相同，也與 main 相同。佔位掃描（`某學者`、`某大學法律系`、`lorem ipsum`、`快速了解最新判決的5個重點`、`test`）：cycle 2 的 diff 只有檔名 `tests/content-provenance.test.mjs` 命中；cycle 2 沒有改 `src/`。未執行 `npm run sync-content`。
+- DONE: End with a clear PASSED or REJECTED verdict; any new finding goes through the disposition checkpoint without touching the candidate.
+  沒有新發現。C（無掃描改動）與 D（FO 合併時處理）依授權不列為退件理由。候選版本 HEAD `abf9961` 未改動。
+
+### Summary
+
+**PASSED。** 修正 A：`AGENTS.md` 與 main 只差兩行，逐位元組等於核准文字，位置正確。修正 B：我在副本上獨立證明 `fact` 的簽核記錄若是 PR 網址或不在 `docs/content-audit/` 底下就判 P4，放在該資料夾底下的存在檔才通過；拿掉那一行檢查後同一探測不再報錯，所以這條檢查確實生效。cycle 1 的事實全部仍成立，沒有新發現。
