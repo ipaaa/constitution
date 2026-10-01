@@ -286,3 +286,16 @@ Verified by：`git diff --name-only main...HEAD` 只列 `docs/content-pipeline/g
 ### Summary
 
 總覽第 2–5 章關於 `064` 的每一句都與 main 上的程式和測試相符，F1 句經反向改動重現為真，captain 的兩項 AC 修改已記錄且原文保留。AC-1（四中三）至 AC-8 全部重跑通過。三項 Polish 發現不影響把關判斷。**Verdict: PASSED。**
+
+## Stage Report: review
+
+- DONE: Review what verify did not own: chapters 2–5 rewrite matches the design's section 四 drafts and the captain's 2026-09-30 AC changes, reads plainly for a non-engineer captain, and keeps chapter 0's rules; every Documentation impact row checked against delivered behavior.
+  逐行對照 `git diff main...HEAD`：第 2 章 1 句、第 3 章 1 段、第 4 章 5 句＋正本、第 5 章 `:123`／`:125`／`:126` 三格，與第四節草稿逐字相符；唯一微調（正本接續句）不改語意。F1 句在 `:125` 擋不到欄，符合 captain 對 AC-1 的修改；AC-7 修改不需改總覽，總覽未改。新句皆一句一義、無進度詞（掃描 0 行）、連結可見文字皆 `docs/…`（掃描 0 行）、三格擋什麼／擋不到什麼皆非空、第 5 欄三值之一。AC-2 重跑印 `true true true`，對照 `sync-content.mjs:750-762` 三個中止條件與總覽寫法一致。可讀性：除 verify 已 decline 的 V3 兩句外，新句先講結果再講機制。文件影響：實作後更新兩筆（總覽、`docs/INDEX.md:59` 日期 2026-09-30）已完成；不更新五筆（operations.md、design.md、兩張封存票、AGENTS.md、TODO.md）在 diff 中皆未出現；`git diff --name-only main...HEAD` 只列三檔；沒有新增或刪除文件，INDEX 不需增刪列。本票無 repo 外步驟，重判條款不適用。
+- DONE: Regressions and merge interplay: 84/84 tests, G-7 PASS, content-audit names 0 overview lines; merge-tree against current main and the 069, 051, 053 branches (053 and 051 also edit gatekeeping.md ch.6/ch.8; 069 edits INDEX.md) and name each conflict and its resolution.
+  兩測試檔 84/84，exit 0（TAP）。G-7 從 `056` 正本抽出執行，`G-7 PASS [place1=1/1 place2=1 place3=1]`，exit 0。content-audit 指名總覽 0 行，`M4=1 M5=2 M6=18`。merge-tree（`HEAD 1b19b2a`）：對 `main 0696000`、`069 9b13497`、`051 722d11e`、`053 9fd58bf` 各自 0 衝突；`main+072` 再對三分支各自 0 衝突。合併後總覽防線表 13 列皆 7 欄，`051` 新列落在表內。發現的衝突都不涉及本票：`053`↔`051` 在 `AGENTS.md`、`gatekeeping.md`、`TODO.md` 衝突（不含 `072` 也衝突）；`051`↔`069` 在 `INDEX.md`、`TODO.md` 衝突（不含 `072` 也衝突）。解法：由後合併的那兩票處理，本票先合併或後合併都不改變這組衝突。
+- DONE: End with a clear PASSED or REJECTED verdict; findings go through the disposition checkpoint without touching the candidate.
+  無新發現。verify 的 V1–V3 已由 captain 判為 Polish 並 decline，不重提。候選 HEAD `1b19b2a` 未改，本 commit 只追加本報告。
+
+### Summary
+
+總覽第 2–5 章的改動與 design 第四節草稿逐字相符，captain 的兩項 AC 修改都已正確落地，第 0 章規則全數守住。回歸檢查全過，本票與 main、`069`、`051`、`053` 皆無合併衝突；那三張票彼此間的衝突與本票無關。**Verdict: PASSED。**
