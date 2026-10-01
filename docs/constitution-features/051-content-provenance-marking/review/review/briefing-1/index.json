@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:051:review:attempt-1:revision-1",
+  "question": "051 review：候選 722d11e 是否可交付（最後合併，合併時解 069、053 衝突）？",
+  "artifacts": [
+    {
+      "id": "artifact:051:review:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/4ec3fab49562d987502cb9d2b7a7649755bb2ceb/docs/constitution-features/051-content-provenance-marking.md",
+      "rev": "sha256:96fa963a76c42d57f033568281525efe6677b78ab045b16204d7f451cf4b65f0",
+      "mediaType": "text/markdown",
+      "summary": "fresh reviewer 判 PASSED：掃描、清單、stamp 符合設計與 captain 決定；047 介面實測完好；回歸全過。合併解法逐項在副本實跑：main/072 無衝突；069 衝突 2 處＋重蓋 1 筆；053 衝突 5 處＋刪 3 筆標記＋重蓋 9 筆，marking 回 0。發現 1（Deferred risk：跨檔指紋連動）、發現 2（Polish：第 5 章少一句限制），FO 建議於合併時補文件句。"
+    }
+  ]
+}
