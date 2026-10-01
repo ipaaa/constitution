@@ -1,7 +1,7 @@
 ---
 id: 053
 title: 完成 P1-8 盤點：全站無 SSOT 來源內容的逐項處置
-status: verify
+status: review
 source: captain 2026-09-04（把關機制體檢第三類；TODO.md P1-8 停滯項）
 started: 2026-09-30T17:18:46Z
 completed:
@@ -30,6 +30,17 @@ gates:
                 id: briefing:053:verify:attempt-1:revision-1
                 digest: sha256:db3c9bd034a3f0bfb067b558c15db8d078d33774027644d133d885c79bcf083d
                 room-ref: '@review/verify/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:053:verify:1
+                briefing: briefing:053:verify:attempt-1:revision-1
+                by: person:captain
+                at: "2026-10-01T02:18:03.577922Z"
+                decision: approve
+                reason: 'Captain approved in chat 2026-09-30 (「approve all」): verify PASSED, no open findings.'
+              application:
+                target-stage: review
+                state: consumed
 ---
 
 `docs/health-check/TODO.md` 的 P1-8 已完成初步盤點，但八個檔各自要「搬進 SSOT／標注來源凍結／移除」三選一，**停在 2026-09-02，一項都沒決定**。
