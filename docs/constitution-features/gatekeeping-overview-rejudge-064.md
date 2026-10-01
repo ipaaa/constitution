@@ -1,7 +1,7 @@
 ---
 id: 072
 title: 把關總覽第 4、5 章依 064 重判
-status: verify
+status: review
 source: 054 review R5（延續 verify V6）；captain 2026-09-29 裁示「照建議走」——R5 不在 054 處理，另開本票
 started: 2026-09-30T17:18:46Z
 completed:
@@ -21,6 +21,17 @@ gates:
                 id: briefing:072:verify:attempt-1:revision-1
                 digest: sha256:8180e66ecc1393cc61268bf06845cfb438c31fe55fc973bc6f67664164fc10e0
                 room-ref: '@review/verify/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:072:verify:1
+                briefing: briefing:072:verify:attempt-1:revision-1
+                by: person:captain
+                at: "2026-10-01T02:18:03.456235Z"
+                decision: approve
+                reason: 'Captain approved in chat 2026-09-30 (「approve all」): verify PASSED, no open findings.'
+              application:
+                target-stage: review
+                state: consumed
 ---
 
 `054` 的總覽 `docs/content-pipeline/gatekeeping.md` 寫於 `064` 合併之前。原先的處置是「後合併者重判總覽第 4、5 章」，但 `064`（PR #47）與 `050` 都比 `054` 先合併，這項重判沒有任何票承接。本票承接。
