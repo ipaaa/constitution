@@ -1,7 +1,7 @@
 ---
 id: 051
 title: 內容來源標記與可重跑的來源掃描
-status: verify
+status: review
 source: captain 2026-09-04（把關機制體檢第三類；captain 明確核准建立常設檢查）
 started: 2026-09-30T17:18:46Z
 completed:
@@ -35,6 +35,17 @@ gates:
                 id: briefing:051:verify:attempt-2:revision-1
                 digest: sha256:9383b5cdb88f8f404299f08d52c1c504992bdfeab6b66d9c083aeb0a3aff13c1
                 room-ref: '@review/verify/briefing-2'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:051:verify:2
+                briefing: briefing:051:verify:attempt-2:revision-1
+                by: person:captain
+                at: "2026-10-01T02:18:03.761257Z"
+                decision: approve
+                reason: 'Captain approved in chat 2026-09-30 (「approve all」): verify PASSED, no open findings.'
+              application:
+                target-stage: review
+                state: consumed
 review-round:
     id: round:051:verify:1
     stage: verify
