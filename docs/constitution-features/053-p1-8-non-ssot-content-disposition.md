@@ -556,3 +556,18 @@ agent 不得在 `content-provenance.json` 寫 `author: human`、不得填 `revie
 ### Summary
 
 `docs/INDEX.md` 的 `check-voided-floor.mjs` 路由清單改為六條，`/quiz/perspectives` 已拿掉，最後查核改為 2026-09-30。照新清單逐條對已建置的副本執行，每一條都是 rc 0。其餘檢查結果不變。
+
+## Stage Report: review (cycle 2)
+
+- DONE: Review the cycle-2 correction independently: docs/INDEX.md:75 lists exactly the six remaining routes with 六條 and 最後查核 2026-09-30, and check-voided-floor run over them against a built branch returns rc 0 for each; nothing else changed since 210e032 beyond that line and the report.
+  `git diff --stat 210e032 0a9fa34` shows 2 files: `docs/INDEX.md` (1 line) and this entity (the Cycle 2 line and the implement cycle-4 report). The new line says 六條 and lists `/future`, `/controversy-timeline`, `/quiz/controversy`, `/quiz/pending`, `/quiz/rights` and `/past/thresholds`, with 最後查核 2026-09-30. To check it, I took a `git archive 0a9fa34` copy in the scratchpad and opened LaunchGate in the copy only (066 §8.1). Then I ran `next build` (rc 0; the route list has no `/quiz/perspectives` or `/preview`) and `next start`. Each route gave rc 0, and one run over all six also gave rc 0. 下限數字 counts: 4, 16, 5, 3, 0, 24. `/quiz/rights` has 0 門檻句 and 0 下限數字, which matches 053's report. The control `/quiz/perspectives` gave `HTTP 404` with rc 1, so the check still fails on a bad route.
+- DONE: Confirm the earlier review's conclusions still hold: every touched public page coherent, rule-5 docs consistent with the captain-approved text, tests/tsc/build/G-7, every remaining item has an owner, and merge interplay (069 P3-8 keep both lines; 051 per the M1–M4 notes).
+  No `src/`, AGENTS, design.md, gatekeeping or TODO bytes changed since `210e032`, so the earlier page-coherence, rule-5 and owner findings carry forward as they stand. G-7 also carries forward, because its inputs are unchanged. Tests in the worktree: 136 pass, 0 fail, 1 skip. A scratch copy shows 1 extra fail, `threshold-analysis.test.mjs:1674`, but only because the copy has no git ref `main`; it is an environment artifact. `tsc` rc 0. Worktree `git status --porcelain` is empty. An evergreen sweep for `quiz/perspectives|七條路由` finds only `059` (which states 053 removed it), the record reading list, and the TODO `068` 補述 dated 2026-09-29, which is historical and correct. merge-tree: main and `gatekeeping-overview-rejudge-064` merge clean. 051 conflicts as before (M1–M3). **New M5 below.**
+- DONE: End with a clear PASSED or REJECTED verdict; findings go through the disposition checkpoint without touching the candidate.
+  I made no candidate change. The only commit is this report. The scratch copy and server are removed. No sync and no push.
+
+**M5 merge note for FO (not a 053 defect):** 069 (`9b13497`) now also conflicts in `docs/INDEX.md`. Before R1 it conflicted only in TODO. This is an adjacent-line hunk: 053 edits line 75 (`check-voided-floor.mjs`), and 069 edits line 76 (`content-audit.mjs`, 最後查核 → 2026-09-30). Resolve by taking 053's line 75 and 069's line 76. Also keep 069's other INDEX hunks (AGENTS row date, the `content-conventions.md` row), which auto-merge.
+
+### Summary
+
+**Verdict: PASSED.** The R1 fix is the single INDEX line it was authorized to be. I ran the six listed routes independently against a gate-opened build, and every one returned rc 0; the deleted route still fails with 404. Nothing else in the candidate changed, so the earlier conclusions hold. The one new item is M5, a mechanical adjacent-line INDEX conflict with 069 for the FO to resolve at merge.
