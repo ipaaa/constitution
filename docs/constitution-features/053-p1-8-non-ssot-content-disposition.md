@@ -12,13 +12,13 @@ issue:
 pr:
 mod-block:
 review-round:
-    id: round:053:verify:1
-    stage: verify
-    cycle: 1
+    id: round:053:review:2
+    stage: review
+    cycle: 2
     briefing:
-        id: briefing:053:verify:round-1
-        digest: sha256:27074e727cb976facf40de28cad98d8589e3f4d15dafb1ded9bbd2e9d6c7e737
-        room-ref: '@review/verify/round-1'
+        id: briefing:053:review:round-2
+        digest: sha256:9d5ec8f347820a5dd1583e62129048d0bdf3ae96fedb1b6bdc88d2cc871ca919
+        room-ref: '@review/review/round-2'
 gates:
     version: 1
     records:
@@ -380,6 +380,7 @@ G2-B 時另刪 `src/data/threshold-analysis.ts`（598 行）、`src/components/t
 ### Feedback Cycles
 
 - Cycle 1: REJECTED — verify（`6473c8c`）判 F1 Material（`/quiz` 仍寫「從入門到進階」，進階題組已由本票移除：`src/app/quiz/page.tsx` :10、:13、:52）。FO 授權：F1 fix（刪去三處「從入門到進階，」）；F2 fix（`TODO.md` P2-9 以一行補述記 `/preview` 已由 C11 刪除，原文不改）；F3 decline（「其餘兩句未改」措辭不精確，文字內容無誤）；F4 decline（第 6 章標題「三類內容」下列四列，補述已說明）。
+- Cycle 2: REJECTED — review（`210e032`）判 R1（`docs/INDEX.md:75` evergreen 仍寫 `check-voided-floor.mjs`「須涵蓋七條路由」並列 `/quiz/perspectives`，該路由已由本票 C12／D20 刪除，照做得 HTTP 404 假失敗）。FO 授權：R1 fix（刪 `/quiz/perspectives`、七→六、最後查核改 2026-09-30）；閱讀清單快照屬 record，不動。M1–M4 為合併事項，由 FO 於合併時處理。
 
 ## Stage Report: design
 
@@ -543,3 +544,15 @@ agent 不得在 `content-provenance.json` 寫 `author: human`、不得填 `revie
 ### Summary
 
 **Verdict: REJECTED** on one owned finding, R1. 053 deleted `/quiz/perspectives`, but the evergreen `docs/INDEX.md:75` still tells operators to run the voided-floor check on it, and that run fails with HTTP 404. The fix is one line. If the FO declines R1 as polish, nothing else blocks, and I recommend PASSED. The removals read coherently on every touched page, the rule-5 docs agree, and tests, tsc, build and G-7 pass. The merged rule-5 text is shown in M1; it needs a blank line before 051's two lines.
+
+## Stage Report: implement (cycle 4)
+
+- DONE: R1: in docs/INDEX.md:75 remove /quiz/perspectives from the check-voided-floor route list, change 七條 to 六條, and set 最後查核 to 2026-09-30; nothing else in INDEX.md changes; leave the reading-list snapshot (record) untouched.
+  `2beca67`：與 `8bc7834` 比對，diff 只動 `docs/INDEX.md` 的一行。`docs/content-audit/2026-09-29-reading-list.md` 沒有改。
+- DONE: Prove: check-voided-floor run over the six listed routes against a built branch returns rc 0 for each; tests, tsc, build, G-7 PASS unchanged; no other candidate change.
+  依 `066` 第 8.1 小節取 HEAD 的副本，只在副本裡讓 LaunchGate 直接放行，然後 `next build` 加 `next start`。六條路由逐條跑都是 rc 0，一次跑完也是 rc 0。下限數字出現次數：`/future` 4、`/controversy-timeline` 16、`/quiz/controversy` 5、`/quiz/pending` 3、`/past/thresholds` 24、`/quiz/rights` 0。`/quiz/rights` 為 0 是因為題目沒有門檻內容（`rights.ts` 的門檻字樣為 0），頁面有實際渲染（20,605 bytes）。對照：`/quiz/perspectives` 回 `FAIL … HTTP 404`，也就是 R1 的錯誤。
+  分支本身：`tsc` 0、`build` 0、測驗 136 pass、0 fail、G-7 PASS [1/1, 1, 1]。候選 repo 的 `git status --porcelain` 全程為空。
+
+### Summary
+
+`docs/INDEX.md` 的 `check-voided-floor.mjs` 路由清單改為六條，`/quiz/perspectives` 已拿掉，最後查核改為 2026-09-30。照新清單逐條對已建置的副本執行，每一條都是 rc 0。其餘檢查結果不變。
