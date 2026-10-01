@@ -552,3 +552,24 @@ Verified by: `node scripts/content-audit.mjs check` 的輸出與實作前相同�
 ### Summary
 
 **PASSED。** 修正 A：`AGENTS.md` 與 main 只差兩行，逐位元組等於核准文字，位置正確。修正 B：我在副本上獨立證明 `fact` 的簽核記錄若是 PR 網址或不在 `docs/content-audit/` 底下就判 P4，放在該資料夾底下的存在檔才通過；拿掉那一行檢查後同一探測不再報錯，所以這條檢查確實生效。cycle 1 的事實全部仍成立，沒有新發現。
+
+## Stage Report: review
+
+- DONE: Review what verify did not own: the scan, marks file and stamp are maintainable and match the design and the captain's decisions (option 1, G1-A, G2-A, the two approved AGENTS.md lines); gatekeeping.md and every Documentation impact row match delivered behavior and state the scan's limits honestly; 047's interface (freeze field, stamp interception point) is intact.
+  讀完 `scripts/content-provenance.mjs` 全檔：規則代號只定義一次；`ENTRY_FIELDS` 含 `freeze`；P4 的 `ui`／`fact` 分支對應 G1-A／G2-A；P3-8 新行綁完整 `check`（選項 1）；`AGENTS.md` 與 main 只差兩行核准文字。實作後更新 8 列逐一核對：gatekeeping 第 5／6／8 章與票號清單、README `verify`、INDEX 兩列、AGENTS、TODO P1-8／P3-8 都已做；`不更新` 各列未被動到；改動檔不含 record 文件。047 介面在 scratchpad 副本實測：加 `freeze` 後 `check --marking` 0；改內容後 `stamp` 保留 `freeze`、清 `reviewed`（符合 047 的 F2 判法）；`stamp` 先驗全部 scope 再寫檔，失敗離開碼 1 且清單 sha 不變，047 的攔截插在 `fs.writeFileSync` 之前即可。
+- DONE: Regressions and merge interplay: tests, tsc, build, JSON hashes; merge-tree against current main and the 069, 053, 072 branches — AGENTS.md rule 5 vs 053's rewrite, marks for files 053 deletes, the 「P4 即第三類」 class numbering vs 053's four-class wording — naming each conflict and the exact resolution.
+  `722d11e` 的 `git archive` 副本：五個測試檔離開碼 0（provenance 20/20）；`tsc --noEmit` 0；`npm run build` 0，`noindex` 仍在；兩個 json 的 sha256 build 前後相同，也與 main 相同；`content-audit.mjs check` 與 main 只差文件數 97→99。`check --marking` 0；完整 `check` 1，P4=69（66＋3）。
+  merge-tree：main `c5c9197` 無衝突；`072`（`70d6e2d`）無衝突，合併樹 `check --marking` 0。
+  `069`（`9b13497`）：INDEX 衝突 → 取 069 的 `content-audit.mjs` 列（日期 09-30），其後保留 051 兩列。TODO P3-8 衝突 → 兩行都留，069「解除條件二」在前，051 那行改標「解除條件三」。無衝突但會壞：069 改了 `verified-case-refs.mjs` → P2；合併提交內 `stamp src/data/verified-case-refs.mjs`（副本實測後 marking 0、P4=69）。
+  `053`（`210e032`）：AGENTS 第 5 條 → 取 053 的三類本體與補述，051 兩行插在 053「…缺口表。」之後、空行與補述之前，不改字（「第三類」即 053 的第三類）。gatekeeping 第 6 章 → 留 053 補述，刪 053 的「沒有機械檢查」段，換成 051 兩行，並把「規則 P4 即第三類的禁令」改為「規則 P4 即第四類的禁令與第三類的條件」。第 8 章 → 取 051 列，捨 053 改編號的 051 缺口列。TODO P1-8 → 兩則補述都留，051 在前。TODO P3-8 → 053 的 G3-A 行與 051 行都留。無衝突但會壞：053 刪 `src/app/preview/page.tsx`、`src/app/quiz/perspectives/page.tsx`、`src/data/quizzes/perspectives.ts` → P5×3，刪三筆標記；053 改文字的 9 個範圍 → P2×9，`stamp` 這 9 筆。副本實測後 marking 0、P4=66。
+- DONE: End with a clear PASSED or REJECTED verdict; findings go through the disposition checkpoint without touching the candidate.
+  PASSED。下列兩項發現未改動候選版本，交 FO 授權。C 與 D 依 FO 指示不列退件理由。
+
+### 發現（Review-finding disposition，建議，待 FO 授權）
+
+1. **跨檔指紋連動。** 資料模組的單元是執行後的值，會含 import 來的字串。副本實測：只改 `ruling-threshold.ts` 一個字，`controversy-timeline.ts`、`quizzes/controversy.ts`、`threshold-analysis.ts` 也報 P2。`stamp` 這些範圍會清掉它們的 `reviewed`；有 `freeze` 時 047 判 F2，要重簽來源檔沒改的範圍。Design 第九節只寫了 `future.ts` 檔內的連動。現況 `reviewed` 全為 `null`，無實害。建議：**Deferred risk**，歸 051。升級條件：第一筆非 `null` 的 `reviewed` 落在 import 其他資料模組的範圍。修法：在 Design 第九節與 gatekeeping 第 5 章「擋不到」旁各加一句說明。
+2. **gatekeeping 第 5 章 051 列沒寫「不走 workflow 的改動，發布前不檢查」。** Design 第五節寫了。同表 `verify` 那列有寫同類限制，讀者推得出來。建議：**Polish**，可在合併時補一句，或 decline。
+
+### Summary
+
+**PASSED。** 掃描、清單與 `stamp` 符合 design 與 captain 決定，047 的 `freeze` 欄位與 `stamp` 攔截點完好，回歸全過。四個分支的合併：main 與 `072` 無衝突；`069` 衝突 2 處加 1 筆重蓋；`053` 衝突 5 處，另需刪 3 筆標記、重蓋 9 筆。每項的解法都已在副本實跑，`check --marking` 回到 0。兩項發現都不是 Material。
