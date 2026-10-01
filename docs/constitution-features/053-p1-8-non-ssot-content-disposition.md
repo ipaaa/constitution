@@ -500,3 +500,46 @@ captain 核准的規則 5 新措辭已寫入 `AGENTS.md` 與 `design.md` 不變�
 ### Summary
 
 **Verdict: PASSED.** The cycle-1 fix does what was authorized: /quiz no longer promises a 進階 tier, and its remaining claims (3 sets, 5 questions each) are true. P2-9 records /preview's deletion without rewriting the original text. Every earlier proof still holds on `3d8a3f0`: the rule-5 text is unchanged since the last verify, and removals, symlink, TODO lines, tests, tsc, build, G-7 and content-audit parity with main all pass.
+
+## Stage Report: review
+
+- DONE: Review what verify did not own: removals and follow-on edits are the smallest change that leaves each public page coherent for a reader; the captain-approved rule-5 body + 補述 + design.md row 7 + revision record + gatekeeping.md ch.6/ch.8 read consistently; every Documentation impact row checked against delivered behavior; every remaining 053 item has an owning ticket (051, 047, 074, 049, 052, 058).
+  Reader view (`git diff main...HEAD -- src`): `/` CTA now reads 「不知道發生什麼事？ → 看爭議時序」. `/controversy-timeline` OG text is 「互動式時間軸，淺顯說明。」. `/future` funnel has 2 cells and no orphan year. `/present` content spans the full `max-w-7xl` and nothing links to `#timeline`. `/past` hero goes straight to the 門檻 link block. The PresentDetail 「加入轉譯行列」 still matches its own 「我想協助轉譯」 mailto button. Every removal matches section 五, and nothing outside the table was removed. Rule 5: the body, design.md row 7, the revision record and gatekeeping ch.6/ch.8 agree on three classes plus G1-A scope. 「定版」 appears 0 times. The owners in TODO P1-8 cover 051, 047, 074, 049, 052 and 058. Doc-impact rows are done or not yet due: P1-8 closure and ch.8 wait for the final gate, and AC-5's audit file is not created yet. One evergreen line is still stale (R1).
+- FAILED: 同上 — `docs/INDEX.md:75` (evergreen) still says `check-voided-floor.mjs` 「須涵蓋七條路由」 and lists `/quiz/perspectives`, which 053 deleted. This is finding R1.
+  Reproduced on this branch's build with `next start`: `node scripts/check-voided-floor.mjs …/quiz/perspectives` printed `FAIL …: HTTP 404`, rc 1. `/quiz/pending` gave rc 0. 053's Documentation impact did not list this line.
+- DONE: Regressions and merge interplay: tests, tsc, build, G-7 PASS; merge-tree against current main and the 069, 051, 072 branches — in particular AGENTS.md rule 5 with 051's two captain-approved lines (result must be exactly 053's approved body + 補述 followed by 051's two lines, no duplication) and 051's marks for files 053 deletes.
+  At HEAD `9fd58bf`: `node --test tests/*.test.mjs` 136 pass / 0 fail / 1 skip. `tsc` rc 0. `build` rc 0, and the route list has no `/preview` or `/quiz/perspectives`. `src/data/*.json` sha256 is the same before and after the build. G-7 (056 canonical block) printed `PASS [1/1, 1, 1]`. AC-1 miss 0, AC-2 0, all 7 AC-3 lines hold, AC-9 1. merge-tree: main and 072 (`gatekeeping-overview-rejudge-064`) merge clean. 069 conflicts only in TODO P3-8; AGENTS and design.md row 7 auto-merge intact. 051 conflicts in AGENTS, gatekeeping and TODO (M1–M4 below).
+- DONE: End with a clear PASSED or REJECTED verdict; findings go through the disposition checkpoint without touching the candidate.
+  The candidate is untouched. The only commit is this report. The temporary node_modules symlink and server have been removed. No sync run and no push.
+
+**R1 (candidate untouched):** Released user: a maintainer or agent who runs the voided-floor check with the route list in INDEX. Harm: one false FAIL, rc 1, reproduced above. Boundary: AGENTS 文件規範 requires evergreen docs to stay current, and this stage's 「必要更新已完成」. Trigger: observed. Owned by 053 (C12/D20). Proposed disposition: **fix**. In `INDEX.md:75`, drop `/quiz/perspectives`, change 七→六, and bump 最後查核 to 2026-09-30. Evergreen docs may be edited in place. `docs/content-audit/2026-09-29-reading-list.md` still cites perspectives lines, but it is a record, so leave it.
+
+**Merge notes for FO (not 053 defects):**
+- M1 AGENTS rule 5, 053 × 051. Resolve to exactly the block below. It has no duplication: 「機械檢查的現況見」 appears 1×, 051 line 1 appears 1×, and 「定版」 appears 1× (051's own). **The blank line before 051's lines is required.** Without it, CommonMark lazy continuation pulls them into the 補述 blockquote. Keeping them outside the body also keeps the 補述 claim 「與不變式 #7 相同」 true. 051's 「第三類」 is the `fact` class, which is 053's third class (`content-provenance.mjs:46`).
+```markdown
+### 5. 不要讓 AI 生成的內容上線
+
+站上只允許三類內容：
+一、試算表裡經責任編輯核可的內容。
+二、T3（未來軌）依 `docs/content-pipeline/data-collection-guide.md` 收集並經審閱的內容與圖表。
+三、T3 以外的事實陳述，且以下三項全部成立：（1）每句都對到一手來源，依 feature 051 標注；（2）具名的法學審閱者逐項簽核，記在 `docs/content-audit/` 的清單；（3）依 feature 047 凍結。
+編輯判斷不適用第三類。編輯判斷指因果、評價、立場、身分標籤、對專案自身做法的宣稱。
+本條只管主張，即事實陳述與編輯判斷。介面文字不在本條範圍內。介面文字指不提案號、日期、數字、人名、機關、法律效果的導覽、按鈕與操作說明。
+其餘位置不得有 AI 生成的內容。要加內容，寫進試算表並走核可。機械檢查的現況見 `docs/content-pipeline/gatekeeping.md` 的缺口表。
+
+> ⚠️ **2026-09-30 補述：本條改寫，由兩類改為三類，並限定只管主張。**
+> 原句：「站上只允許兩類內容：試算表裡經責任編輯核可的內容，以及 T3（未來軌）依 `docs/content-pipeline/data-collection-guide.md` 收集並經審閱的內容與圖表。」
+> captain 於 2026-09-30 在 feature `053` 的 gate 選 G1-A（規則 5 只管主張）與 G2-A（新增第三類）。
+> 措辭由 captain 於同日核准。與 `docs/content-pipeline/design.md` 第六節不變式 #7 相同。
+> 原句說「只允許兩類」，第三類與它互斥，所以改寫本體，不只追加。其餘兩句未改。
+
+機械檢查：`node scripts/content-provenance.mjs check` 的 P4 規則。它檢查每段內容有無標記、類別是否允許，以及第三類是否有來源、簽核人與定版；不檢查每句是否對得上來源，那要靠審閱者簽核。
+agent 不得在 `content-provenance.json` 寫 `author: human`、不得填 `reviewed`，也不得把內容改標為 `ui` 或 `config`。審閱只能由人簽。
+```
+- M2 gatekeeping ch.6: keep 053's table and 補述. Replace 053's 「沒有機械檢查」 paragraph with 051's paragraph. 051's 「規則 P4 即第三類的禁令」 should read 「第三類的條件與第四類的禁令」, because P4 checks both (`content-provenance.mjs:372-380`). ch.8: take 051's row.
+- M3 TODO: keep both P1-8 補述s. P3-8 keeps the 053, 051 and 069 lines side by side, and AC-9 still matches.
+- M4 051 marks: on the 053+051 merged tree, `content-provenance.mjs check --marking` gives FAIL P2=9 P5=3. P5 hits the 3 deleted files. P2 hits the 9 edited scopes, including `future.ts#CRISIS_STATS`. Whichever branch merges second must delete or restamp these marks. 051's own report already notes this.
+
+### Summary
+
+**Verdict: REJECTED** on one owned finding, R1. 053 deleted `/quiz/perspectives`, but the evergreen `docs/INDEX.md:75` still tells operators to run the voided-floor check on it, and that run fails with HTTP 404. The fix is one line. If the FO declines R1 as polish, nothing else blocks, and I recommend PASSED. The removals read coherently on every touched page, the rule-5 docs agree, and tests, tsc, build and G-7 pass. The merged rule-5 text is shown in M1; it needs a blank line before 051's two lines.
