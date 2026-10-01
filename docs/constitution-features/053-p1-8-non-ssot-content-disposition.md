@@ -41,6 +41,14 @@ gates:
               application:
                 target-stage: review
                 state: consumed
+        - id: gate:053:review
+          stage: review
+          attempts:
+            - id: gate-attempt:053-review-1
+              briefing:
+                id: briefing:053:review:attempt-1:revision-1
+                digest: sha256:d7e0153e9c1caf39dd689247f6705511907111924df41d4fd0423fc38abca5a3
+                room-ref: '@review/review/briefing-1'
 ---
 
 `docs/health-check/TODO.md` 的 P1-8 已完成初步盤點，但八個檔各自要「搬進 SSOT／標注來源凍結／移除」三選一，**停在 2026-09-02，一項都沒決定**。

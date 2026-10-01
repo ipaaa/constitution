@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:053:review:attempt-1:revision-1",
+  "question": "053 review（修正後）：候選 0a9fa34 是否可交付（開 PR 合併，會移除讀者看得到的內容）？",
+  "artifacts": [
+    {
+      "id": "artifact:053:review:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/dbb0454babeb7c78d93893f2693664fdf0522f48/docs/constitution-features/053-p1-8-non-ssot-content-disposition.md",
+      "rev": "sha256:0030e93414e269021802bd17c3b789e4903720a57e61457367ce6207298f00ee",
+      "mediaType": "text/markdown",
+      "summary": "fresh reviewer 判 PASSED：R1 已修，六條路由實跑皆 rc 0；自 210e032 只改該行；前次結論重跑成立（各頁連貫、第 5 條與核准文字一致、測試/tsc/build/G-7、每項剩餘工作有歸屬票）；合併：069 P3-8 兩行都留，051 依 M1–M4。"
+    }
+  ]
+}
