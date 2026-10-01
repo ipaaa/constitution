@@ -32,6 +32,14 @@ gates:
               application:
                 target-stage: review
                 state: consumed
+        - id: gate:072:review
+          stage: review
+          attempts:
+            - id: gate-attempt:072-review-1
+              briefing:
+                id: briefing:072:review:attempt-1:revision-1
+                digest: sha256:0a7ab72f65cf741528947ced5fe3d5d8ada04b0b9ee6a3e05f8bdd3456becd01
+                room-ref: '@review/review/briefing-1'
 ---
 
 `054` 的總覽 `docs/content-pipeline/gatekeeping.md` 寫於 `064` 合併之前。原先的處置是「後合併者重判總覽第 4、5 章」，但 `064`（PR #47）與 `050` 都比 `054` 先合併，這項重判沒有任何票承接。本票承接。

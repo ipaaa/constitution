@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:072:review:attempt-1:revision-1",
+  "question": "072 review：候選 1b19b2a 是否可交付（開 PR 合併）？",
+  "artifacts": [
+    {
+      "id": "artifact:072:review:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/b8b5cab63e8f2ebc3884cdabb6359d3df6c478d9/docs/constitution-features/gatekeeping-overview-rejudge-064.md",
+      "rev": "sha256:8d3e08d3e9ed3189ddee23426fd070739ca1ebbaddf8e58b9dec1bf67e02c139",
+      "mediaType": "text/markdown",
+      "summary": "fresh reviewer 判 PASSED：第 2–5 章改動與設計草稿逐字相符；captain 兩項 AC 修改落地；第 0 章規則全數守住；文件影響逐筆相符；84/84、G-7 PASS、指名總覽 0 行；與 main、069、051、053 皆 0 衝突。無新 finding。"
+    }
+  ]
+}
