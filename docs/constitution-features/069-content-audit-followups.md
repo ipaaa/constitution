@@ -54,6 +54,17 @@ gates:
                 id: briefing:069:review:attempt-2:revision-1
                 digest: sha256:17cfe0af81fc9c0e8cb6e6a6f063f411fc5e7f9cda501de6dd11801655027766
                 room-ref: '@review/review/briefing-2'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:069:review:2
+                briefing: briefing:069:review:attempt-2:revision-1
+                by: person:captain
+                at: "2026-10-01T02:18:03.286513Z"
+                decision: approve
+                reason: 'Captain approved in chat 2026-09-30 (「approve all」): 069 review cycle 2 PASSED, captain-approved rule-4 text, no new findings.'
+              application:
+                target-stage: complete
+                state: pending
 review-round:
     id: round:069:review:1
     stage: review
