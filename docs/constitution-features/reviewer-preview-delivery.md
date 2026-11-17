@@ -434,6 +434,25 @@ R3 有一點我不確定：2026-09-03 captain 把預覽連結貼進群組，紀�
 
 **不需要 captain 決定、由本設計直接定案的技術細節：** 背景圖內嵌（抓不到記為錯誤）、輸出目錄 `review-out/`、檔名格式、檔內不用 JavaScript。
 
+## Captain decisions (2026-11-17)
+
+captain 於 2026-11-17 採用〈現在就要決定〉全部 11 項建議預設值。first officer 於 implement 派工時轉達。
+076 的對應編號寫在括號裡。
+
+| # | 決定 | 採用的值 | 實作中落在哪裡 |
+|---|---|---|---|
+| 1 | 方案 D 或方案 C | **方案 D**（單檔 HTML 審閱檔） | `scripts/review-file.mjs`；`src/` 零改動 |
+| 2 | 順序 C（＝第一輪 D7＝076 D-6b） | **採用**：看審閱檔 → 留言 → 附簽核核可一次 | 轉交檢查只看核可列的 `approved_fingerprint`；審閱檔不看核可狀態 |
+| 3 | 轉交檢查的範圍（＝第一輪 D5＝076 D-4） | **只管 Track 1** | `scripts/review-delivery.mjs` 只讀 Track 1 |
+| 4 | 合併後、老師審完前同步中止 | **接受**，不設例外清單 | 程式沒有例外清單 |
+| 5 | 用 email 寄含未核可草稿的審閱檔 | **接受**。橫幅寫「未核可草稿，請勿轉傳或公開」 | 橫幅與 noindex 由自我檢查確認 |
+| 6 | 寄送管道 | **email 附件** | `operations.md`〈每一批〉第 5 步 |
+| 7 | 誰產生、寄、登錄 | **都由 captain** | 「審閱版本」分頁保護設為只有 captain |
+| 8 | 多久出一次 | **依 078 的批次，每批一次** | 不需程式 |
+| 9 | 誰通知老師 | **captain 寄信即通知** | 不需程式 |
+| 10 | 老師名單與代稱（076 D-1） | **由 captain 決定，不寫進 repo** | 本票不涉及 |
+| 11 | 老師的試算表權限改為加註者（076 D-2） | **採用** | `operations.md` 的行為驗收含加註者一列 |
+
 ## Acceptance criteria（方案 D，定稿）
 
 1. **審閱檔含未核可的列，不含退稿的列，且每列印出短碼與指紋。** Track 1 夾具有 `Approved`、`Needs review`、`Rejected` 各一列時，審閱檔含前兩列，不含第三列。每列都有 `id`、狀態、8 字元短碼與 64 字元指紋，值等於 `content-fingerprint.mjs` 的計算結果。
@@ -501,3 +520,38 @@ R3 有一點我不確定：2026-09-03 captain 把預覽連結貼進群組，紀�
 ### Summary
 
 第二輪改為建議方案 D：captain 在本機產生離線單檔 HTML，寄給老師。不經 Vercel，不推分支，`src/` 不動，第一輪的三個阻擋或不可逆決定因此消失。轉交檢查保留在正式同步，以 captain 專屬的「審閱版本」分頁登錄為準。代價有兩點：版面是簡化版，網站專屬的版面問題歸 039；「信真的寄出」無法由機器證明。T1 欄位數字已與 076 一致。第一輪方案 C 的內容保留並標為已取代。
+
+## Stage Report: implement
+
+- DONE: 依定稿方案 D 實作 scripts/review-file.mjs 與 npm run review-file：讀 Track 1 發布版 CSV、取非 Rejected 列、跑與正式同步相同的內容檢查（錯誤列不放入檔案、寫進登錄表）、產生單檔 HTML 到 .gitignore 排除的 review-out/（背景圖內嵌、抓不到記錯誤、無 JavaScript、noindex、「未核可草稿請勿轉傳」橫幅、每列 id／狀態／大字版本短碼／完整指紋）、自我檢查無外部資源且短碼齊全後才印出含 file_sha256 的登錄表；src/ 零改動
+  commit `67dc0d0`。逐列檢查直接呼叫 sync-content 匯出的函式，`checkTrack1Record` 由 buildTrack1 抽出，正式同步與審閱檔用同一個函式。`git diff main -- src/` 為空，build 前後 `src/data/*.json` 的 sha256 不變
+- DONE: 正式同步轉交檢查放在獨立模組、sync-content.mjs 只加最少接線：REVIEW_BUILDS_CSV_URL 未設定即中止；Track 1 每筆核可列的 approved_fingerprint 須對到 result=OK、sent_at 為日期、file_sha256 為 64 位十六進位的登錄，否則整份中止並寫出列號；tests/review-delivery.test.mjs 全過，含「漏登錄時同步失敗、拿掉檢查後轉為通過」的反證；既有測試不退步
+  `scripts/review-delivery.mjs` 由 main() 以動態 import 載入，不與 076 的接線點重疊。`node --test tests/*.test.mjs` 結果：149 過、0 失敗、1 略過，略過的那一項施工前就是略過。`npx tsc --noEmit` 與 `npm run build` 都通過
+- DONE: 文件依「實作後更新」落地（operations.md 的審閱檔產生、寄送、登錄步驟與「審閱版本」分頁建立與保護，與 076 合計 14 個保護設定）；票內新增「## Captain decisions (2026-11-17)」節記錄 captain 採用的 11 項預設
+  更新 operations.md〈審閱檔與轉交登錄（feature 079）〉、design.md 第五節補述與修訂紀錄、gatekeeping.md 第 2 章與第 5 章、TODO.md P2-9 補述、AGENTS.md 第 1 條。docs/INDEX.md 不需更新：本票沒有新增文件
+
+**測試各證明什麼（括號內是會讓測試失敗的改動，皆已實際改過並確認變紅）：**
+- AC-1：審閱檔含已核可與待核可的列、不含退稿的列，短碼與指紋正確（篩選改成只取 Approved）
+- AC-2/3：佔位字串與圖片 404 的列不進檔案，原因寫進登錄表；背景圖以 data: URI 內嵌（拿掉內容檢查；圖片抓取失敗時靜默略過）
+- AC-3 自我檢查：外部圖片、外部樣式、`<script>`、缺短碼四種變造，結束碼都是 1，不寫檔，也不產生登錄表（拿掉自我檢查）
+- AC-4：審閱檔不改動任何被追蹤的檔案；輸出目錄沒被 git 忽略時拒絕執行（拿掉 git check-ignore 檢查）
+- AC-5：用一個表格跑五個漏轉交案例，同步都以結束碼 1 中止，兩個 JSON 不寫；補上登錄後通過（拿掉 sent_at 空白檢查）。另有一個反證測試：把 `checkReviewDelivery` 改成直接 return 後，同樣五個案例全部轉為通過
+- AC-6：未設定 REVIEW_BUILDS_CSV_URL 時同步中止，訊息寫出變數名。端到端：review-file 的登錄表填上 sent_at 後，同步通過；寄出後又改內容，同步中止
+
+**行數（captain 裁示：上限約 +783）：** 合計淨增 +1176 行，刪減後為 +653 行（另加本報告）。以下依檔案列出「刪減前 → 刪減後」：
+- `review-file.mjs`：406 → 206
+- `review-delivery.mjs`：108 → 57
+- `tests/review-delivery.test.mjs`：435 → 245
+- `tests/review-builds-fixture.mjs`：34 → 19
+- `operations.md`：+84 → +45
+- `design.md`：+38 → +13
+- `sync-content.mjs`：淨 +21 → 淨 +18
+- 其他檔案不變：`.gitignore` +3、AGENTS.md +6、本票 +19、gatekeeping +2、TODO +6、package.json +1、content-fingerprint +7、approval 測試 +5、threshold 測試 +1
+
+刪減前的「保留項目」全部還在。被刪掉的是：卡片多餘的 CSS、圖片 5 MB 上限、四個附屬測試（壞登錄與好登錄並存、分頁缺欄、isSentDate 單元測試、獨立的登錄表測試；最後一項已併入端到端測試）、`file_sha256` 格式的漏轉交案例。
+
+**AC-8 是人工驗證，本階段沒有做：** 需要 captain 實際寄一份審閱檔，在手機與斷網的桌機上開啟。
+
+### Summary
+
+依方案 D 完成 `npm run review-file`，以及正式同步的轉交檢查。審閱檔是可離線開啟的單檔 HTML。正式同步要求 Track 1 每一列已核可的版本都登錄在「審閱版本」分頁，未設定分頁網址也會中止。依 captain 裁示刪減到 +653 行，行為與驗收條件不變。版本短碼函式 `fingerprintShortCode` 與 076 逐字相同，合併時不會衝突。合併時注意一件事：076 的 `tests/teacher-signoff.test.mjs` 有兩個測試會自行執行同步。後合併的那一支，要讓這兩個測試的 runSync 提供 `/review.csv`，做法是改用 `tests/review-builds-fixture.mjs` 的 `registered()`。
