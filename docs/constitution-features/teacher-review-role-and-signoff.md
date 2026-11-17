@@ -1,7 +1,7 @@
 ---
 id: 076
 title: 老師審閱角色與簽核紀錄：權限與審核責任表
-status: verify
+status: implement
 source: captain 2026-11-16 裁示「老師只負責審閱、簽核，由責任編輯代按 Approve」；TODO.md P3-1、P3-2；2026-09-04 會議後續工作四
 started: 2026-11-17T19:08:10Z
 completed:
@@ -459,3 +459,32 @@ captain 於 2026-11-17 採用 079〈現在就要決定〉與本票第七節的 1
 ### Summary
 
 依 (b′) 完成實作。Apps Script 新增附老師簽核的核可選單。同步端新增獨立的簽核判定模組，只印摘要、不擋發布。`sync-content.mjs` 只加 7 行接線，降低與 079 合併時衝突的機會。行數超出預估：新增約 846 行，預估是 410±180。主要多在兩處。一是測試檔 449 行（預估 180±70）：假 `SpreadsheetApp` 與 24 項測試，每個檢查都以 mutation 確認測試會失敗。二是 operations.md 139 行（預估 70±30）：併入 079 的合計數字、錯誤訊息與回退步驟。另外兩處與設計不同，都可退回。代稱清單也接受逗號與頓號分隔，因為指令碼屬性的輸入框只有一行。留言連結必須是 `http(s)` 網址，不只是不可空白。未驗證：「取得留言連結」的介面文字、加註者能否看到選單（R9）、刪除的留言是否保留（R10），都要等部署後由 captain 實測。
+
+## Stage Report: verify
+
+- DONE: 逐項查核本分支文件改動中的事實陳述（gatekeeping.md、operations.md、design.md、contributing.md、INDEX.md）：保護設定 12→14、測試格數 投稿者 34／責任編輯反向 22／加註者至少 7、欄位位置、選單名稱與錯誤訊息，皆對照 approval-workflow.gs、teacher-signoff.mjs、sync-content.mjs 與封存的 040／044／050；凡「尚未部署／尚未實測」的事項不得寫成已上線
+  數字全對：12 個＝050 `:893`、`:1221`；30 格＝050 `:1283`；18 格＝050 `:1390`；`R` 為 T1 最後一欄、`A1:R1`＝operations `:44-52`；`S2:U` 與 `L2:Q` 隔著 A 類 `R`，故 +1 成立；+1 審閱版本分頁＝079 `reviewer-preview-delivery.md:180`。選單四項名稱、四條錯誤訊息、`ℹ️ T1 沒有簽核欄…`、「有效 N 列、失效 N 列、未簽 N 列」皆與 `.gs`／`teacher-signoff.mjs` 逐字相符；不落地同步指令在 operations `:244`。發現 F1–F4、N1，見下。
+- DONE: 佔位掃描：某學者、某大學法律系、test、lorem ipsum、設計文件的樣本值、人名與 email（「老師甲／乙」僅能出現在測試）均未進入出貨文件或 src/data；src/ 與 src/data/*.json 無 diff
+  `git diff main...HEAD -U0 -- . ':!tests'` 新增行無 某學者／某大學法律系／lorem／老師甲乙／快速了解；email 正則無輸出（AC-10）。唯一命中是格式範例 `xxxxxxxx`、`h5 1a2b3c4d`（說明格式，非資料）。`git diff --stat main...HEAD -- src` 空；`npm run build` 前後 `src/data/*.json` sha256 相同。
+- DONE: 獨立重跑 node --test（含 teacher-signoff、040 綁定、064）、npx tsc --noEmit，並至少重做一項 mutation 確認對應測試會失敗；對照 AC-1–AC-11 給出 PASSED 或 REJECTED 與理由
+  108/108、tsc exit 0、build exit 0。在 scratchpad 副本做 5 項 mutation，worktree 未動：同步判定不比對指紋→3 項失敗（AC-2/3）；復原只留 6 欄→2 項失敗（AC-5）；拿掉「清單有選取範圍外 id」檢查→1 項失敗（AC-5，implement 未測過此項）；不附老師核可不清空→1 項失敗（AC-6）；`signoff_by` 加進 `PUBLISHED_FIELDS`→19 項失敗（AC-4）。AC-1–8、10、11 成立；AC-9 為部署後項目，未執行。建議 **REJECTED**，理由為 F1。
+
+### 發現（依 `## Review-finding disposition` 四欄；處置待 FO 授權）
+
+- **F1 建議 Material，本票可修，建議 fix。** 使用者與流程：captain／責任編輯讀 evergreen 的 gatekeeping 與 contributing，判斷「現在」誰擋得住什麼。可見損害：`gatekeeping.md:54-56` 以現在式寫「權限：試算表的加註者」「改不到任何格，由加註者權限擋」「核可由責任編輯以 `核可選取列（附老師簽核）` 代按」；`contributing.md:33-34` 同樣以現在式寫選單代按。正式表沒有這個選單，老師的共用權限也沒有紀錄（R11）。加註者能否看見選單仍是 UNPROVEN（R9）。受影響邊界：本階段 checklist「尚未部署事項不得寫成已上線」，以及 AGENTS.md 對 evergreen 的規則。觸發證據：上述行號。`:63` 的補述有說明，但與本文矛盾；contributing 則完全沒有說明。同檔 `:93` B 類列有寫「尚未建欄、尚未實測」，是正確寫法。修法：在兩處加「〈老師簽核欄部署〉完成後」標記，約 3 行。
+- **F2 Polish。** `gatekeeping.md:58` 與 `:65` 有兩條「正本」。`:64` 的補述暗示舊條已被取代，但舊條仍在。
+- **F3 Polish。** `operations.md:67` 的補述標題寫部署 076 後「會變成 14 個」。076 單獨部署只會到 13 個；第 14 個來自 079 的分頁。補述內文與 `:198-209` 的表都寫對了。另外〈權限與審核責任表〉說它描述「076 部署完成後」，表中卻有「審閱版本」欄，而那一欄屬於 079 的部署。
+- **F4 Polish。** 有兩處文字直接改寫，沒有補述：`design.md` 的 076 修訂紀錄沒寫「尚未部署」，只指向部署步驟；`gatekeeping.md:134`、`:165` 把「學者」直接改成「老師」。在 evergreen 文件裡統一用詞可以接受，此項只記錄。
+- **N1 Needs decision，屬 captain。** AC-9 本文仍寫 33／21／6。operations 的 runbook 依 captain 決定 #1 寫 34／22／7（設計第 5.3 節補述的「079 選 D」欄）。AC 只能由 captain 修改。部署時兩個數字會互相矛盾，建議 captain 確認 AC-9 以 34／22／7 為準。
+
+### 超出預估的判斷
+
+報告的約 846 行屬實（numstat 873 行，含 entity 43 行）。出貨的程式與文件約 381 行。`.gs` 新增 98 行，在 70±30 內。同步端 96 行，超出 40±20，原因是判定移進獨立模組，並含摘要格式。測試 449 行，超出 180±70。多出的部分是 HTTP 假 CSV 伺服器、`vm` 假 `SpreadsheetApp`，以及 24 項測試。五項 mutation 都被抓到，所以這些行有實際作用，不是灌水。可挑剔的一點：載入 `.gs` 的 harness 在 040、064 的測試裡已各有一份，本票又寫了第三份，沒有共用。operations 139 行，超出 70±30。多出的是 079 合計數字、四條錯誤訊息、回退步驟，都在設計第 5.4 節的範圍內。結論：沒有範圍蔓延；超出部分是測試與 runbook 的實際價值。
+
+### Summary
+
+事實查核：數字、欄位、選單名稱、錯誤訊息都與程式及 040／044／050 相符。測試、型別檢查、建置都獨立重跑通過；五項 mutation 都讓對應測試失敗。建議 REJECTED，只因 F1：gatekeeping.md 與 contributing.md 把尚未部署的加註者權限與附簽核選單寫成現況。修正約 3 行。F2–F4 為 Polish，N1 交 captain 決定 AC-9 格數。
+
+### Feedback Cycles
+
+- Cycle 1 (verify → implement, 2026-11-17): verify 建議 REJECTED。FO 授權處置：F1 fix（gatekeeping.md:54-56、contributing.md:33-34 改標為「〈老師簽核欄部署〉完成後」，比照 gatekeeping.md:93；處理 :63 補述與本文矛盾）；F2 fix（gatekeeping.md:58、:65 只留一條「正本」）；F3 fix（operations.md:67 改為 076 單獨部署為 13、加上 079 為 14；權限表「審閱版本」欄註明來自 079 部署）；F4 fix（gatekeeping.md:134、:165 改名處加補述；design.md 076 修訂紀錄註明尚未部署）；N1 fix（captain 2026-11-17 核准：AC-9 改為 投稿者 34／責任編輯反向 22／加註者至少 7）。captain 2026-11-17 接受 076 行數超出（846 對 410±180）。不在本輪：合併後 tests/teacher-signoff.test.mjs 兩項真同步測試需補 review.csv fixture，由後合併的分支處理。
