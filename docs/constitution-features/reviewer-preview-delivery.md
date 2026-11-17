@@ -589,3 +589,21 @@ captain 於 2026-11-17 採用〈現在就要決定〉全部 11 項建議預設�
 ### Feedback Cycles
 
 - Cycle 1 (verify → implement, 2026-11-17): verify 建議 REJECTED。FO 授權處置：F1 fix（gatekeeping.md 第 2 章「看什麼（2026-11-17 起）」與 design.md 第五節「現行順序」改為「程式合併並建立『審閱版本』分頁後」）；F2 fix（tests/review-delivery.test.mjs 表格案例補 `file_sha256` 格式錯誤與 sheet／id 不符兩例，使 M2、M7 轉紅）；F3 部分 fix（operations.md〈轉交的錯誤訊息〉補列 `file_sha256` 與 sheet／id 兩種訊息），其餘（檔名重複日期、AGENTS.md 標題位置）decline。程式行為不變；仍須在 captain 上限約 +783 之內。
+
+## Stage Report: implement (cycle 2)
+
+- DONE: 依授權處置修正 F1、F2、F3（部分），程式行為不變，總行數仍在約 +783 之內
+  commit `03db92e`，未改動 `scripts/`。
+  F1：gatekeeping.md 第 2 章「看什麼」改寫為「feature 079 的程式合併、captain 建好『審閱版本』分頁之後才生效；2026-11-17 尚未生效」。design.md 第五節補述的「現行順序」改寫為「程式合併並建立『審閱版本』分頁後，順序改為…；本補述寫成時尚未生效」。
+  F2：`MISSING` 表格新增「file_sha256 格式錯誤」「sheet 與 id 不符」兩例。
+  F3：operations.md〈轉交的錯誤訊息〉補一行，列出 `file_sha256 不是 64 位十六進位` 與 `sheet 或 id 對不上`。檔名重複日期與 AGENTS.md 標題位置兩項，依授權 decline，未改。
+  行數：本輪 +5／−2；分支對 main 為 +742／−17，淨 +725，含全部 stage report 與 verify 報告。
+- DONE: 重跑 node --test 與 npx tsc --noEmit 全過，並重做 M2、M7 兩項 mutation 證明新增案例會轉紅
+  `node --test tests/*.test.mjs`：152 項，151 過、0 失敗、1 略過，略過的那一項施工前就是略過。`npx tsc --noEmit` 結果 0。
+  M2：拿掉 `entryProblem` 的 file_sha256 檢查，「file_sha256 格式錯誤」轉紅。M7：拿掉 sheet／id 比對，「sheet 與 id 不符」轉紅。兩次 mutation 之後都已還原 `review-delivery.mjs`，`git status` 確認沒有殘留。
+- DONE: 在本票新增 implement（cycle 2）stage report，逐項對應 F1–F3
+  即本節
+
+### Summary
+
+F1：把兩句寫成「已生效」的文件改成「程式合併並建好分頁後才生效」。F2：漏轉交表格補兩個案例，M2、M7 兩項 mutation 現在會轉紅。F3：operations.md 補兩種錯誤訊息，其餘兩項依授權未改。程式行為沒有改變。分支淨增 +725 行，含所有報告，低於約 +783 的上限。AC-8 仍是 captain 的人工項，尚未執行。
