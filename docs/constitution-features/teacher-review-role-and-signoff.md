@@ -488,3 +488,16 @@ captain 於 2026-11-17 採用 079〈現在就要決定〉與本票第七節的 1
 ### Feedback Cycles
 
 - Cycle 1 (verify → implement, 2026-11-17): verify 建議 REJECTED。FO 授權處置：F1 fix（gatekeeping.md:54-56、contributing.md:33-34 改標為「〈老師簽核欄部署〉完成後」，比照 gatekeeping.md:93；處理 :63 補述與本文矛盾）；F2 fix（gatekeeping.md:58、:65 只留一條「正本」）；F3 fix（operations.md:67 改為 076 單獨部署為 13、加上 079 為 14；權限表「審閱版本」欄註明來自 079 部署）；F4 fix（gatekeeping.md:134、:165 改名處加補述；design.md 076 修訂紀錄註明尚未部署）；N1 fix（captain 2026-11-17 核准：AC-9 改為 投稿者 34／責任編輯反向 22／加註者至少 7）。captain 2026-11-17 接受 076 行數超出（846 對 410±180）。不在本輪：合併後 tests/teacher-signoff.test.mjs 兩項真同步測試需補 review.csv fixture，由後合併的分支處理。
+
+## Stage Report: implement (cycle 2)
+
+- DONE: 依授權處置修正 F1–F4 與 N1，只動所列文件與 AC-9，不動程式與測試
+  `1c2b102`。F1：gatekeeping.md 老師一節把加註者權限、附簽核選單、加註者擋格改列在「〈老師簽核欄部署〉完成後才成立，尚未部署」之下，另立「部署前的現況」一項。補述改寫為「原句無記錄可證實，本節不再沿用」，不再與本文矛盾。contributing.md 兩行改標「〈老師簽核欄部署〉完成後」與「尚未部署」。F2：老師一節只剩一條「正本」，原三個連結併入。F3：operations.md〈保護範圍〉補述改為 076 單獨 12→13，加 079 為 14；權限表欄名改「審閱版本（079 部署後）」並註明部署前不適用。F4：gatekeeping.md 第 5 章 `067` 列與第 7 章改稱處各加「原為學者」註記，第 2 章補述也記一句；design.md 的 076 條目加「狀態：repo 內已實作，正式表尚未部署」。N1：AC-9 改為 34／22／至少 7，附 captain 2026-11-17 核准與原數字。`git diff --stat -- scripts tests src` 無輸出。
+- DONE: 修正後重跑 node --test（108 項）與 npx tsc --noEmit 仍全過，並以 grep 證明 gatekeeping.md、contributing.md 不再以現在式描述尚未部署的加註者與簽核選單
+  三檔 108/108，tsc exit 0。`grep -nE '加註者|附老師簽核'` 兩檔共 8 行命中，逐行都帶部署條件：gatekeeping:56–58 在「部署後才成立，尚未部署」子項下；:59「部署前的現況」；:67 補述寫「第 12 步完成後才成立」；:97 同列寫「尚未建欄、尚未實測」；contributing:34–35 寫「完成後」與「尚未部署」。content-audit check 沒有新增指向這兩檔的項目，其餘既有項目與 main 相同。
+- DONE: 在本票新增 implement（cycle 2）stage report，逐項對應 F1–F4、N1
+  即本節。
+
+### Summary
+
+只改文件，處理 verify cycle 1 的 F1–F4 與 N1。關鍵是 F1：gatekeeping.md 與 contributing.md 原本把尚未部署的加註者權限與附簽核選單寫成現況，現在一律標明「〈老師簽核欄部署〉完成後」。AC-9 依 captain 核准改為 34／22／至少 7。程式與測試未動，合併時 review.csv fixture 的處理依 FO 指示不在本輪範圍。
