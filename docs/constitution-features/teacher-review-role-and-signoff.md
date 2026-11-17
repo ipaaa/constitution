@@ -1,13 +1,13 @@
 ---
 id: 076
 title: 老師審閱角色與簽核紀錄：權限與審核責任表
-status: design
+status: implement
 source: captain 2026-11-16 裁示「老師只負責審閱、簽核，由責任編輯代按 Approve」；TODO.md P3-1、P3-2；2026-09-04 會議後續工作四
 started: 2026-11-17T19:08:10Z
 completed:
 verdict:
 score: 0.9
-worktree:
+worktree: .worktrees/spacedock-ensign-teacher-review-role-and-signoff
 issue:
 pr:
 mod-block:
