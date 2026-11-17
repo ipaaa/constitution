@@ -501,3 +501,26 @@ captain 於 2026-11-17 採用 079〈現在就要決定〉與本票第七節的 1
 ### Summary
 
 只改文件，處理 verify cycle 1 的 F1–F4 與 N1。關鍵是 F1：gatekeeping.md 與 contributing.md 原本把尚未部署的加註者權限與附簽核選單寫成現況，現在一律標明「〈老師簽核欄部署〉完成後」。AC-9 依 captain 核准改為 34／22／至少 7。程式與測試未動，合併時 review.csv fixture 的處理依 FO 指示不在本輪範圍。
+
+## Stage Report: verify (cycle 2)
+
+- DONE: 重審 cycle 2：逐項確認 F1–F4 與 N1 已依授權處置修正（gatekeeping.md、contributing.md、operations.md、design.md、AC-9），且未新增以現在式描述尚未部署事項的句子
+  檢查範圍是 `1c2b102` 對 `6b2bf47` 的 diff。F1 已修。gatekeeping `:55-58` 把加註者權限、附簽核選單、加註者擋格三項列在「〈老師簽核欄部署〉完成後才成立，尚未部署」之下。`:59` 另立「部署前的現況」。補述不再說原句是現況，與本文不再矛盾。contributing `:34-35` 加上「完成後」與「尚未部署」兩個標記。F2 已修：老師一節只剩一條「正本」，原三個連結都在。F3 已修：operations `:67-69` 寫明 12→13（076 單獨部署）、→14（079 也部署後），權限表欄名改為「審閱版本（079 部署後）」。F4 已修：gatekeeping 第 5 章 `067` 列與第 7 章 `:169` 都加了「原為學者」，`:169` 確實在第 7 章；design.md 的 076 條目加「正式表尚未部署」。N1 已修：AC-9 改為 34／22／至少 7，附 captain 核准日期與原數字，與 operations 行為測試表一致。
+- DONE: 確認本輪只改文件與 AC-9：scripts、tests、src 無 diff；重跑 node --test 108 項與 npx tsc --noEmit
+  `git diff --stat 6b2bf47 HEAD -- scripts tests src` 無輸出，`git status` 乾淨。三檔 108/108，tsc exit 0。本輪新增行做佔位與 email 掃描，無命中。程式未變，cycle 1 的五項 mutation 結論仍適用。
+- DONE: 給出 PASSED 或 REJECTED 與理由；新發現依 Review-finding disposition 記錄
+  建議 **PASSED**。F1 的 Material 已消除，F2–F4 與 N1 也都處理完。本輪只有一項新發現 P1，屬 Polish，不阻擋。
+
+### 新發現
+
+- **P1 Polish，建議 decline 或順手修。**
+  - 使用者與流程：讀 contributing 的協作者。
+  - 可見損害：`contributing.md:35` 寫「老師的共用權限也還沒改為加註者」。這是對正式表現況的斷言。但 gatekeeping `:59` 與 R11 都說老師目前的權限 repo 內無記錄。這句話無法查證，不過方向保守，不會讓人以為擋得住。
+  - 受影響邊界：無。
+  - 觸發證據：上述兩處行號。
+  - 修法：改為「依〈老師簽核欄部署〉第 12 步改為加註者」。
+- **已由 FO 列為不在本輪範圍，不另記為發現：** 與 079 合併後，`tests/teacher-signoff.test.mjs` 的兩項真同步測試需要補 `review.csv` fixture。這要在後合併的分支處理，否則合併後那兩項會失敗。
+
+### Summary
+
+複驗 cycle 2 的文件修正。F1–F4 與 N1 都按授權處置落地。gatekeeping 與 contributing 不再把尚未部署的加註者權限與附簽核選單寫成現況。AC-9 與 runbook 都是 34／22／至少 7。程式、測試、`src/` 本輪無 diff，108/108 與 tsc 通過。建議 PASSED；P1 為 Polish 不阻擋。另提醒：與 079 合併時要補 `review.csv` fixture。
