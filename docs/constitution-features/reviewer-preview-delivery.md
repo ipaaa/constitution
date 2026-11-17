@@ -1,7 +1,7 @@
 ---
 id: 079
 title: 讓審閱的老師看得到成品：同步錯誤與預覽連結的轉交機制
-status: verify
+status: implement
 source: docs/health-check/TODO.md P2-9（「尚未有對應的票」）；2026-09-03-editor-onboarding.md:453
 started: 2026-11-17T19:08:14Z
 completed:
@@ -555,3 +555,37 @@ captain 於 2026-11-17 採用〈現在就要決定〉全部 11 項建議預設�
 ### Summary
 
 依方案 D 完成 `npm run review-file`，以及正式同步的轉交檢查。審閱檔是可離線開啟的單檔 HTML。正式同步要求 Track 1 每一列已核可的版本都登錄在「審閱版本」分頁，未設定分頁網址也會中止。依 captain 裁示刪減到 +653 行，行為與驗收條件不變。版本短碼函式 `fingerprintShortCode` 與 076 逐字相同，合併時不會衝突。合併時注意一件事：076 的 `tests/teacher-signoff.test.mjs` 有兩個測試會自行執行同步。後合併的那一支，要讓這兩個測試的 runSync 提供 `/review.csv`，做法是改用 `tests/review-builds-fixture.mjs` 的 `registered()`。
+
+## Stage Report: verify
+
+- DONE: 逐項查核本分支文件改動中的事實陳述（AGENTS.md、operations.md、design.md、gatekeeping.md、TODO.md P2-9）：審閱檔產生、寄送、登錄步驟、「審閱版本」分頁欄位與保護、與 076 合計 14 個保護設定、REVIEW_BUILDS_CSV_URL 行為，皆對照 review-file.mjs、review-delivery.mjs、sync-content.mjs；尚未部署的分頁與流程不得寫成已上線
+  八個欄位名與 `REGISTRY_FIELDS` 逐字相同；14 ＝ operations.md〈保護範圍（12 個）〉＋076 一個＋本分頁一個；34／22／至少 7 與 076 第 5.3 節補述相同；錯誤訊息字串與 `review-delivery.mjs` 相符；`REVIEW_BUILDS_CSV_URL` 未設定即中止（`sync-content.mjs` main()）。AGENTS.md 第 1 條的新增句逐句屬實，指向的 operations.md 小節存在；TODO.md 寫「已實作，待合併」正確。**一項不符，見 F1**：design.md 補述寫「現行順序」，gatekeeping.md 寫「看什麼（2026-11-17 起）：看 captain 寄來的審閱檔」。程式未合併、分頁未建、還沒有任何老師收到審閱檔（AC-8 未做），這兩句寫成已上線
+- DONE: 佔位掃描：某學者、某大學法律系、test、lorem ipsum、設計樣本值、人名與 email 未進入出貨文件或 src/data；src/ 與 src/data/*.json 無 diff；review-out/ 已被 .gitignore 排除且 repo 內沒有任何產生的審閱檔
+  掃描 tests/ 與本票以外的新增行：五組佔位字串 0 筆；`test` 只出現在 `.test(` 與測試檔名；沒有人名或 email。`git diff main...HEAD -- src/` 為空；`git check-ignore -v review-out/a.html` 命中 `.gitignore:45`；`git ls-files` 沒有 review-out；worktree 沒有 `review-out/` 目錄
+- DONE: 獨立重跑 node --test、npx tsc --noEmit，至少重做一項 mutation（例如拿掉轉交檢查）確認測試轉紅；以夾具實跑一次 review-file 確認單檔無外部資源、每列短碼齊全；對照驗收條件給出 PASSED 或 REJECTED 與理由（AC-8 為 captain 手動項，標未執行）
+  `node --test tests/*.test.mjs`：150 項，149 過、0 失敗、1 略過。`npx tsc --noEmit` 0。`npm run build` 0，前後 `src/data/*.json` sha256 相同，`git status` 乾淨。Mutation 都在 scratchpad 的 clone 做，候選分支沒動。結果見下表。夾具實跑見下方
+
+**Mutation（拿掉什麼 → `tests/review-delivery.test.mjs` 結果）：**
+- M1 拿掉 `sync-content.mjs` 對 `checkReviewDelivery` 的呼叫 → AC-5 五個子案例與端到端轉紅（7 失敗）
+- M3 review-file 只取 `Approved` → AC-1 等 5 項轉紅。M4 圖片抓不到時略過 → AC-2/3 轉紅
+- M5 拿掉 `checkIgnored` → AC-4 轉紅。M6 不要求 `REVIEW_BUILDS_CSV_URL` → AC-6 轉紅
+- M2 拿掉 `file_sha256` 64 位十六進位檢查 → **13 項全過**（F2）。M7 拿掉 sheet／id 比對 → 13 項全過（F2）
+
+**夾具實跑**（本機 HTTP 夾具，輸出到 scratchpad clone 的 `review-out/`）：4 列＝已核可含圖、待核可、退稿、待核可含 `lorem ipsum`。結束碼 0，檔案 2796 位元組。檔內只有 1 個 `src`，是 `data:image/png`；沒有 `href`、`url(`、`@import`、`<script`、`<link`。v1、v2 各有 8 字元短碼與 64 字元指紋；退稿列不在檔內；`lorem ipsum` 列只在登錄表，`result` 是錯誤原文。`<b>` 以 `&#60;b&#62;` 純文字顯示。`shasum -a 256` 與登錄表 `file_sha256` 相同。有 noindex 與「未核可草稿，請勿轉傳或公開」橫幅
+
+**行數：** 實作 commit `67dc0d0` 為 +670／−17，淨 +653，與 implement 報告相同。加上 implement 報告（+35），分支合計 +705／−17，淨 +688。低於 captain 的上限約 +783。刪減沒有拿掉驗收條件要的東西：AC-1 至 AC-7、AC-9 都有測試或指令，AC-5 要求的四種情況都在（另多一個「sent_at 不是日期」）。刪掉的 `file_sha256` 格式案例不在 AC-5 清單內，但設計文〈漏轉交檢查的改寫〉寫了這條檢查，見 F2
+
+**驗收條件：** AC-1、2、3、4、5、6 PASSED（測試＋mutation＋實跑）。AC-7 PASSED（`src/` diff 空，build 通過）。AC-9 PASSED。AC-8 未執行，是 captain 的人工項
+
+**發現事項（四欄證據；處置由 FO 授權）：**
+- F1 文件寫成已上線。(1) 使用者與流程：合併後讀 gatekeeping.md 了解現有防線的 captain 與 agent。(2) 損害：讀者以為 2026-11-17 起老師已改看審閱檔，實際上分頁未建、沒有寄過任何一份。(3) 邊界：本階段清單「尚未部署的分頁與流程不得寫成已上線」，及 AGENTS.md「過時的 evergreen 文件是危險的」。(4) 證據：`docs/content-pipeline/gatekeeping.md` 第 2 章新增的「看什麼」一行；`docs/content-pipeline/design.md` 第五節補述「現行順序」。建議：Material，本票可負責，修兩句措辭（例如「合併並建立分頁後」），fix
+- F2 兩條檢查沒有測試。(1) 使用者與流程：captain 手貼登錄表時改壞 `file_sha256` 或 id。(2) 損害：目前沒有，程式有擋；但之後有人改壞這兩條檢查，測試不會發現。(3) 邊界：不在 AC-5 清單；設計文寫了 `file_sha256` 檢查。指紋含 `id`，sheet／id 不符而指紋相同的情況只會出現在手造登錄。(4) 證據：M2、M7 存活。建議：Deferred risk，升級條件：有人修改 `entryProblem`，或 captain 把 `file_sha256` 列入驗收條件。decline 或補一個表格案例（約 +1 行）
+- F3 細節（Polish）：檔名重複日期（`T1-2026-11-18-20261118-304495.html`），與設計的 `T1-<日期>-<review_id>` 字面一致；AGENTS.md 把 `review-file` 放在標題「不要自己執行內容同步」底下，`review-file` 本身不是同步，但下方新增句已說明。operations.md〈轉交的錯誤訊息〉沒有列 `file_sha256` 與 sheet／id 兩種訊息。建議 decline
+
+### Summary
+
+獨立重跑：全部測試、型別檢查與 build 都通過；拿掉轉交檢查等五種 mutation 都讓測試轉紅；以夾具實跑 review-file，產出單一檔案，沒有外部資源，短碼齊全。行數淨 +653（含報告 +688），在上限內，刪減沒有拿掉驗收條件要的項目。**建議 REJECTED，只因 F1**：gatekeeping.md 與 design.md 各有一句把尚未合併、分頁未建的流程寫成 2026-11-17 起已上線。改兩句措辭即可。程式部分無須修改。F2、F3 建議 decline 或順手補。AC-8 未執行。
+
+### Feedback Cycles
+
+- Cycle 1 (verify → implement, 2026-11-17): verify 建議 REJECTED。FO 授權處置：F1 fix（gatekeeping.md 第 2 章「看什麼（2026-11-17 起）」與 design.md 第五節「現行順序」改為「程式合併並建立『審閱版本』分頁後」）；F2 fix（tests/review-delivery.test.mjs 表格案例補 `file_sha256` 格式錯誤與 sheet／id 不符兩例，使 M2、M7 轉紅）；F3 部分 fix（operations.md〈轉交的錯誤訊息〉補列 `file_sha256` 與 sheet／id 兩種訊息），其餘（檔名重複日期、AGENTS.md 標題位置）decline。程式行為不變；仍須在 captain 上限約 +783 之內。
