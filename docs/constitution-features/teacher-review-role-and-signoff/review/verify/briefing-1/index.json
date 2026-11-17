@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:076:verify:attempt-1:revision-1",
+  "question": "076 verify 建議 PASSED（cycle 2）。核准進入 review？",
+  "artifacts": [
+    {
+      "id": "artifact:076:verify:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/4b5d5a6c0bf55c8ae0a5257fbe238297c1702609/docs/constitution-features/teacher-review-role-and-signoff.md",
+      "rev": "sha256:ef376ec1b012ea89c61f8fae98bb76a4fa931f38d183a357a01601019398b820",
+      "mediaType": "text/markdown",
+      "summary": "老師簽核選單、同步端簽核摘要（第一期不擋發布）、權限與審核責任表與部署步驟。verify cycle 1 退回文件 F1–F4、AC-9；cycle 2 全數修正，108/108、tsc 通過、程式本輪無 diff；新發現 P1 Polish 不阻擋。"
+    }
+  ]
+}
