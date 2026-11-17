@@ -51,18 +51,22 @@
 - **做什麼**：審閱 T1 內容，判斷法律上是否正確。在試算表留言表示同意或要求修改。同意時，留言寫出該列的版本短碼（`current_fingerprint` 前 8 字元）。另外負責只有法學背景者能做的判斷：
   - 釋字第 272 號的內容是否正確（`docs/health-check/TODO.md` 的 P0-2）。
   - `067` 閱讀清單的 H 層：因果敘述、法律效果的精確度、語氣與立場。
-- **不能做什麼**：不改內容，不按核可。核可由責任編輯以 `Review → 核可選取列（附老師簽核）` 代按，同時寫入簽核老師、留言連結與簽核所綁的內容指紋。
-- **權限**：試算表的加註者（只能看、只能留言）。不在任何保護範圍的允許名單內。
-- **被什麼擋**：改不到任何格，由加註者權限擋。簽核綁錯版本，由選單的短碼比對與同步的指紋重算擋。內容在法律上對不對，沒有機制，只靠老師讀。
+- **不能做什麼**：不改內容，不按核可（captain 2026-11-16 裁示）。
+- **〈老師簽核欄部署〉完成後才成立，尚未部署**：
+  - 權限：試算表的加註者（只能看、只能留言）。不在任何保護範圍的允許名單內。
+  - 核可由責任編輯以 `Review → 核可選取列（附老師簽核）` 代按，同時寫入簽核老師、留言連結與簽核所綁的內容指紋。程式已在 repo，正式表尚未建欄、尚未貼上新版 Apps Script。
+  - 被什麼擋：改不到任何格，由加註者權限擋（尚未實測）。簽核綁錯版本，由選單的短碼比對與同步的指紋重算擋。
+- **部署前的現況**：老師是誰、目前是何種共用權限，repo 內無記錄。正式表上沒有附老師簽核的選單。
+- **被什麼擋**：內容在法律上對不對，沒有機制，只靠老師讀。
 - **擋不到什麼**：第一期同步不排除沒有老師簽核的列，只在輸出中列出有效、失效、未簽三類。
-- **正本**：[`docs/content-pipeline/operations.md`](operations.md)〈權限與審核責任表〉；[`docs/constitution-features/teacher-review-role-and-signoff.md`](../constitution-features/teacher-review-role-and-signoff.md)；[`docs/health-check/TODO.md`](../health-check/TODO.md) P0-2。
+- **正本**：[`docs/content-pipeline/operations.md`](operations.md)〈權限與審核責任表〉與〈老師簽核欄部署〉；[`docs/constitution-features/teacher-review-role-and-signoff.md`](../constitution-features/teacher-review-role-and-signoff.md)；[`docs/health-check/TODO.md`](../health-check/TODO.md) P0-2；[`docs/constitution-features/_archive/systematic-chinese-content-legal-audit.md`](../constitution-features/_archive/systematic-chinese-content-legal-audit.md) `## Design` 第二、十節；[`docs/content-audit/2026-09-29-reading-list.md`](../content-audit/2026-09-29-reading-list.md)。
 
 > **2026-11-17 補述（feature 076）：本節由「學者」改寫為「老師」。**
 > 原標題是「學者（法學背景審閱者）」。原句「編輯試算表時，權限與投稿者相同」，「被什麼擋」原為「這些判斷沒有機制。只靠人讀。」。
 > 改寫依據是 captain 2026-11-16 裁示：老師只負責審閱與簽核，由責任編輯代按核可。captain 2026-11-17 決定在 076 implement 階段修正本節。
-> 原句描述的「權限與投稿者相同」，在〈老師簽核欄部署〉第 12 步完成前仍是正式表的現況：老師是誰、目前是何種共用權限，repo 內無記錄。
-> 原「正本」中的 [`docs/constitution-features/_archive/systematic-chinese-content-legal-audit.md`](../constitution-features/_archive/systematic-chinese-content-legal-audit.md) `## Design` 第二、十節與 [`docs/content-audit/2026-09-29-reading-list.md`](../content-audit/2026-09-29-reading-list.md) 仍適用於 H 層判斷。
-- **正本**：[`docs/health-check/TODO.md`](../health-check/TODO.md) P0-2；[`docs/constitution-features/_archive/systematic-chinese-content-legal-audit.md`](../constitution-features/_archive/systematic-chinese-content-legal-audit.md) `## Design` 第二、十節；[`docs/content-audit/2026-09-29-reading-list.md`](../content-audit/2026-09-29-reading-list.md)。
+> 原句「權限與投稿者相同」沒有 repo 內的記錄可證實或推翻，本節不再沿用。部署前的現況寫在上方「部署前的現況」一項。加註者權限在〈老師簽核欄部署〉第 12 步完成後才成立。
+> 原「正本」的三個連結併入上方的「正本」一項。
+> 第 5 章防線表「`067` 閱讀清單」一列與第 7 章的「交給老師的人工查核」原寫「學者」，同日改稱「老師」，指同一群人。
 
 ### 責任編輯
 
@@ -131,7 +135,7 @@
 | `056` 上線前 gate 的機械項 G-1、G-2、G-5–G-8 | 指定票的結論、佔位字串、釋字第 272 號回到線上、`noindex` 綁定、建置與型別 | 清單以外的內容錯誤 | `機械`：各項指令在 `056` 票第三節〈Gate 執行清單〉 | [`docs/constitution-features/_archive/056-pre-launch-checklist.md`](../constitution-features/_archive/056-pre-launch-checklist.md) 第三節 |
 | `056` 上線前 gate 的人工項 G-3、G-4 | Vercel 的實際設定；三項明確接受的風險 | — | `人工（有記錄）`：由 captain，簽字記在 `056` 票的 `### Feedback Cycles` | 同上 |
 | `067` 內容查核 M 層 | 號次不存在、號次與年份不配、門檻數值漂移、日期順序倒退、同段紀年混用、文件路徑指向已封存的檔 | 佔位字串與釋字第 272 號（那是 `056` 的 G-5、G-6）。需要理解語意的錯誤 | `機械`：`node scripts/content-audit.mjs check`，全過時離開碼 0 | [`docs/constitution-features/_archive/systematic-chinese-content-legal-audit.md`](../constitution-features/_archive/systematic-chinese-content-legal-audit.md) `## Design` 第三節 |
-| `067` 閱讀清單 L 層與 H 層 | 同一事實的互斥說法、號次與案名配對、現在式的法律狀態、因果敘述、法律效果精確度、語氣與立場 | 審閱者沒讀到的段落 | `人工（有記錄）`：由老師（法學背景審閱者），逐項勾選記在 `docs/content-audit/` 的清單 | [`docs/content-audit/2026-09-29-reading-list.md`](../content-audit/2026-09-29-reading-list.md) |
+| `067` 閱讀清單 L 層與 H 層 | 同一事實的互斥說法、號次與案名配對、現在式的法律狀態、因果敘述、法律效果精確度、語氣與立場 | 審閱者沒讀到的段落 | `人工（有記錄）`：由老師（法學背景審閱者；2026-11-17 前稱「學者」，見第 2 章老師一節補述），逐項勾選記在 `docs/content-audit/` 的清單 | [`docs/content-audit/2026-09-29-reading-list.md`](../content-audit/2026-09-29-reading-list.md) |
 | 已失效門檻的時態檢查（`066`） | 頁面把已失效的 10 人參與評議下限寫成現行法 | 沒有傳給它的路由 | `機械`：`node scripts/check-voided-floor.mjs <url>...`，需先啟動網站 | `scripts/check-voided-floor.mjs` 檔頭 |
 | 門檻分析的資料測試（`012`） | 釋字逐年件數與門檻條文被改錯 | `src/data/threshold-analysis.ts` 以外的內容 | `機械`：`node --test tests/threshold-analysis.test.mjs` | `tests/threshold-analysis.test.mjs` |
 | `src/app/layout.tsx` 的 `noindex` | 搜尋引擎在對外發布前收錄網站 | 知道網址的人直接瀏覽 | `機械`：`npm run build` 之後 `grep -o '<meta name="robots" content="[^"]*"' .next/server/app/index.html` 印 `noindex, nofollow` | [`docs/health-check/TODO.md`](../health-check/TODO.md) P3-8 |
@@ -162,7 +166,7 @@ awk '/^### P3-8/{s=1;next} /^### /{s=0} s && /解除條件/' docs/health-check/T
 
 **二、`067` 的 `check`。** captain 於 2026-09-29 決定把 `node scripts/content-audit.mjs check` 綁進 P3-8，施工單是 feature `069`。這一條以 P3-8 的正本為準：它出現在上面指令的輸出裡，才算條件。
 
-**`067` 的閱讀清單（L 層、H 層）不是 P3-8 的條件。** 它是交給老師的人工查核，見第 5 章。
+**`067` 的閱讀清單（L 層、H 層）不是 P3-8 的條件。** 它是交給老師的人工查核，見第 5 章。（原文為「學者」，2026-11-17 改稱「老師」，見第 2 章老師一節補述。）
 
 **分工**：`067` 不掃佔位字串，也不管釋字第 272 號。那兩項是 `056` 的 G-5 與 G-6。
 
