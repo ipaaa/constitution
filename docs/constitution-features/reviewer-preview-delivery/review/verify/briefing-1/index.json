@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:079:verify:attempt-1:revision-1",
+  "question": "079 verify 建議 PASSED（cycle 2）。核准進入 review？",
+  "artifacts": [
+    {
+      "id": "artifact:079:verify:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/3b27759f026e92ec4a9f294c2e6f46f34289248c/docs/constitution-features/reviewer-preview-delivery.md",
+      "rev": "sha256:a24ca2035e5e90c5e8e9496c5ff31aebfdc1f2cd439fc83cb7c4f2a294f39a4e",
+      "mediaType": "text/markdown",
+      "summary": "單檔 HTML 審閱檔（npm run review-file）與正式同步轉交檢查；src/ 零改動。verify cycle 1 退回 F1 文件措辭並補 F2 兩案例、F3 錯誤訊息；cycle 2 全數修正，151/152 過 1 略過、tsc 通過，7 項 mutation 皆轉紅，無新發現。"
+    }
+  ]
+}
