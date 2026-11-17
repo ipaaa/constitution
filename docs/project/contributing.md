@@ -30,6 +30,10 @@ Google 試算表是內容唯一真相。不要手改 `src/data/*.json`。
 核可會保存內容指紋、核可者與 UTC 時間。
 拒絕必須填寫原因。
 
+老師（法學背景審閱者）只審閱與簽核，不改內容、不按核可。
+老師在試算表留言表示同意，責任編輯用 `Review → 核可選取列（附老師簽核）` 代按核可。
+各角色的權限見 [`docs/content-pipeline/operations.md`](../content-pipeline/operations.md)〈權限與審核責任表〉。
+
 正式同步由工程人員明確發起。同步通過後仍要開 PR。
 編輯台必須檢查 JSON diff 與預覽畫面。
 
@@ -40,7 +44,7 @@ Google 試算表是內容唯一真相。不要手改 `src/data/*.json`。
 ## 驗證指令
 
 ```bash
-node --test tests/approval-content-version-binding.test.mjs
+node --test tests/approval-content-version-binding.test.mjs tests/teacher-signoff.test.mjs
 npx tsc --noEmit
 npm run build
 ```

@@ -380,6 +380,15 @@ test('不適用的分頁、未設定代稱清單、按取消：都不寫入', ()
   assert.deepEqual(guardedValues(cancelled.state.sheet), before);
 });
 
+test('代稱清單可用換行、逗號或頓號分隔：指令碼屬性的輸入框只有一行', () => {
+  for (const labels of ['老師甲\n老師乙', '老師甲, 老師乙', '老師甲、老師乙']) {
+    const { context, state } = setup({ labels });
+    state.prompts = ['老師乙', COMMENT_LINK, `h1 ${code(ROW_A)}\nh2 ${code(ROW_B)}`];
+    context.approveActiveRowsWithSignoff();
+    assert.equal(state.sheet.value(2, 'signoff_by'), '老師乙', labels);
+  }
+});
+
 test('AC-6 先附簽核核可，再不附老師核可：三個簽核欄清空，status 仍 Approved', () => {
   const { context, state } = setup();
   state.prompts = ['老師甲', COMMENT_LINK, `h1 ${code(ROW_A)}\nh2 ${code(ROW_B)}`];

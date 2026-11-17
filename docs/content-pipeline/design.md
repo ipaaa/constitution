@@ -861,3 +861,25 @@ feature `045` 的 design 查出本文沒有這張表。它只存在於 `040` 的
 機械檢查的缺口與對應的票見 `docs/content-pipeline/gatekeeping.md` 的缺口表。
 
 **施工單**：feature `054`。
+
+### 2026-11-17 — T1 老師簽核欄與簽核判定（feature 076）
+
+**起因**：captain 2026-11-16 裁示：老師只負責審閱與簽核，核可由責任編輯代按。
+現行核可紀錄只記按核可的帳號，看不出哪位老師對哪個內容版本表示同意。
+
+**改了什麼**：
+
+- `Track 1_history` 新增三個選填欄：`signoff_by`、`signoff_ref`、`signoff_fingerprint`。B 類，只由選單寫入。
+- `Review` 選單新增 `核可選取列（附老師簽核）`。選單比對老師留言中的版本短碼（指紋前 8 字元），再與核可同批寫入三欄。
+- 不附老師的 `核可選取列` 在 T1 清空三欄。`拒絕選取列` 不碰三欄。
+- 同步把每一個 `Approved` 的 T1 列分成有效、失效、未簽三類並印出。有效的定義：`signoff_by`、`signoff_ref` 非空白，且 `signoff_fingerprint` 等於同步重算的指紋。
+
+**沒有改什麼**：
+
+- 第二節的〈發布欄位範圍〉表、`APPROVAL_FIELDS`、指紋演算法與 `APPROVAL_VERSION`。三欄不參與指紋，既有核可不受影響。
+- `history.json` 的欄位與位元組。三欄不寫進 JSON。
+- 第四節的檢查規則。**第一期簽核只記錄，不擋發布。** 何時讓同步排除沒有有效簽核的列，等 feature `078` 的 T1 重審完成後由 captain 決定。
+
+**部署**：程式先合併，試算表再建欄。步驟見 `docs/content-pipeline/operations.md`〈老師簽核欄部署〉。
+
+**施工單**：feature `076`。

@@ -25,7 +25,7 @@ const SIGNOFF_FIELDS = ['signoff_by', 'signoff_ref', 'signoff_fingerprint'];
 const SIGNOFF_SHEETS = ['Track 1_history'];
 /** 版本短碼長度。與 scripts/content-fingerprint.mjs 的 SHORT_CODE_LENGTH 相同。 */
 const SIGNOFF_SHORT_CODE_LENGTH = 8;
-/** 指令碼屬性：老師代稱清單，一行一個。由 captain 設定，不寫進 repo。 */
+/** 指令碼屬性：老師代稱清單，以換行、逗號或頓號分隔。由 captain 設定，不寫進 repo。 */
 const TEACHER_LABELS_PROPERTY = 'TEACHER_SIGNOFF_LABELS';
 
 function onOpen() {
@@ -242,7 +242,7 @@ function approveActiveRowsWithSignoff() {
   if (SIGNOFF_SHEETS.indexOf(sheet.getName()) < 0) throw new Error('這個分頁不支援老師簽核。適用分頁：' + SIGNOFF_SHEETS.join('、') + '。');
   requireSignoffColumns_(resolveApprovalHeaders_(sheet));
   const labels = normalizeApprovalText_(PropertiesService.getScriptProperties().getProperty(TEACHER_LABELS_PROPERTY))
-    .split('\n').map(normalizeApprovalText_).filter(function(label) { return label !== ''; });
+    .split(/[\n,，、]/).map(normalizeApprovalText_).filter(function(label) { return label !== ''; });
   if (labels.length === 0) throw new Error('指令碼屬性 ' + TEACHER_LABELS_PROPERTY + ' 尚未設定老師代稱。');
   const ui = SpreadsheetApp.getUi();
   const label = promptSignoff_(ui, '輸入老師代稱：');
