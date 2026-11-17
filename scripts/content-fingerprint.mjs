@@ -85,3 +85,10 @@ export function fingerprintPayload(sheetKey, record, sequence) {
 export function fingerprintPublishedRow(sheetKey, record, sequence) {
   return createHash('sha256').update(fingerprintPayload(sheetKey, record, sequence), 'utf8').digest('hex');
 }
+
+/** 版本短碼：指紋前 8 字元。老師留言與審閱檔都用這個長度（076 第 3.2 節、079 方案 D）。 */
+export const SHORT_CODE_LENGTH = 8;
+
+export function fingerprintShortCode(fingerprint) {
+  return String(fingerprint ?? '').slice(0, SHORT_CODE_LENGTH);
+}

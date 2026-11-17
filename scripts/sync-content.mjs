@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { fingerprintPublishedRow, PUBLISHED_FIELDS, SHEET_KEYS } from './content-fingerprint.mjs';
 import { VERIFIED_CASE_REFS } from '../src/data/verified-case-refs.mjs';
+import { formatSignoffSummary, SIGNOFF_COLUMNS, summarizeSignoffs } from './teacher-signoff.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -120,6 +121,8 @@ const TRACK_1_COLUMNS = [
   { field: 'chapter', aliases: ['chapter'], column: 'optional', value: 'optional' },
   { field: 'handwriting', aliases: ['handwriting'], column: 'optional', value: 'optional' },
   { field: 'image_url', aliases: ['image_url', 'image url'], column: 'optional', value: 'optional' },
+  // 老師簽核三欄（feature 076）。選填，不寫進 history.json，不參與指紋。
+  ...SIGNOFF_COLUMNS,
   ...APPROVAL_COLUMNS,
 ];
 
@@ -934,6 +937,10 @@ async function main() {
 
   console.log(`✅ 檢查通過，已寫入 src/data/history.json（${history.length} 筆）`);
   console.log(`✅ 檢查通過，已寫入 src/data/discussions.json（${discussions.length + 1} 筆，含 tldr）`);
+  // 老師簽核摘要（feature 076）。第一期只記錄，不擋發布。T1 已通過驗證，這裡重讀只為取得列與標題。
+  const track1Rows = parseCSVRows(csv1);
+  const track1Columns = buildColumnMap(track1Rows, TRACK_1_COLUMNS, TRACK_1, []);
+  console.log(formatSignoffSummary(summarizeSignoffs(toRecords(track1Rows, track1Columns), SHEET_KEYS.TRACK_1, track1Columns)));
   console.log('🏁 同步完成。下一步：檢查 git diff，開 PR，讓編輯台看過預覽再合併。');
 }
 
