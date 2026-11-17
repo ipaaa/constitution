@@ -1,7 +1,7 @@
 ---
 id: 079
 title: 讓審閱的老師看得到成品：同步錯誤與預覽連結的轉交機制
-status: verify
+status: implement
 source: docs/health-check/TODO.md P2-9（「尚未有對應的票」）；2026-09-03-editor-onboarding.md:453
 started: 2026-11-17T19:08:14Z
 completed:
@@ -607,3 +607,16 @@ captain 於 2026-11-17 採用〈現在就要決定〉全部 11 項建議預設�
 ### Summary
 
 F1：把兩句寫成「已生效」的文件改成「程式合併並建好分頁後才生效」。F2：漏轉交表格補兩個案例，M2、M7 兩項 mutation 現在會轉紅。F3：operations.md 補兩種錯誤訊息，其餘兩項依授權未改。程式行為沒有改變。分支淨增 +725 行，含所有報告，低於約 +783 的上限。AC-8 仍是 captain 的人工項，尚未執行。
+
+## Stage Report: verify (cycle 2)
+
+- DONE: 重審 cycle 2：確認 F1（gatekeeping.md、design.md 兩句改為合併並建分頁後生效）、F2（兩個新案例；重做 M2、M7 確認轉紅）、F3（operations.md 兩種錯誤訊息）已依授權修正，且未新增把未部署事項寫成已上線的句子
+  F1：gatekeeping.md 第 2 章與 design.md 第五節補述都改成「程式合併、建好分頁後才生效；2026-11-17 尚未生效」。F2：在 clone 重做 mutation。M2（拿掉 file_sha256 檢查）讓「file_sha256 格式錯誤」轉紅，M7（拿掉 sheet／id 比對）讓「sheet 與 id 不符」轉紅，M1（拿掉轉交檢查）讓 AC-5 七個案例全紅。F3：新增的一行列出兩種訊息，原文與 `review-delivery.mjs` 一致。檔名、AGENTS.md 標題兩項依授權 decline，未改。分支文件新增行掃描「起／現行／已上線／已生效／已部署」，沒有新的已上線敘述；TODO.md 仍寫「已實作，待合併」
+- DONE: 確認程式行為不變：scripts 本輪無 diff、src 無 diff；重跑 node --test 與 npx tsc --noEmit；淨行數仍在約 +783 之內
+  `git diff 3392f3d HEAD -- scripts src` 為空；`main...HEAD -- src` 為空。`node --test tests/*.test.mjs`：152 項，151 過、0 失敗、1 略過。`npx tsc --noEmit` 0。行數：實作與測試仍是淨 +653，加 2 行測試、1 行文件；分支在本報告之前是 +760／−17，淨 +743。淨增多出的部分是各輪 stage report 與 Feedback Cycles。本報告約 +10 行，總數仍在 +783 以內
+- DONE: 給出 PASSED 或 REJECTED 與理由；新發現依 Review-finding disposition 記錄
+  PASSED。沒有新發現
+
+### Summary
+
+cycle 1 的三項發現都已依授權修正，程式沒有改動。F2 新增的兩個案例會被對應的 mutation 弄紅。建議 PASSED。AC-1–7 與 AC-9 PASSED；AC-8 是 captain 人工項，仍未執行。
