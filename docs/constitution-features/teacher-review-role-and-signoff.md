@@ -484,3 +484,7 @@ captain 於 2026-11-17 採用 079〈現在就要決定〉與本票第七節的 1
 ### Summary
 
 事實查核：數字、欄位、選單名稱、錯誤訊息都與程式及 040／044／050 相符。測試、型別檢查、建置都獨立重跑通過；五項 mutation 都讓對應測試失敗。建議 REJECTED，只因 F1：gatekeeping.md 與 contributing.md 把尚未部署的加註者權限與附簽核選單寫成現況。修正約 3 行。F2–F4 為 Polish，N1 交 captain 決定 AC-9 格數。
+
+### Feedback Cycles
+
+- Cycle 1 (verify → implement, 2026-11-17): verify 建議 REJECTED。FO 授權處置：F1 fix（gatekeeping.md:54-56、contributing.md:33-34 改標為「〈老師簽核欄部署〉完成後」，比照 gatekeeping.md:93；處理 :63 補述與本文矛盾）；F2 fix（gatekeeping.md:58、:65 只留一條「正本」）；F3 fix（operations.md:67 改為 076 單獨部署為 13、加上 079 為 14；權限表「審閱版本」欄註明來自 079 部署）；F4 fix（gatekeeping.md:134、:165 改名處加補述；design.md 076 修訂紀錄註明尚未部署）；N1 fix（captain 2026-11-17 核准：AC-9 改為 投稿者 34／責任編輯反向 22／加註者至少 7）。captain 2026-11-17 接受 076 行數超出（846 對 410±180）。不在本輪：合併後 tests/teacher-signoff.test.mjs 兩項真同步測試需補 review.csv fixture，由後合併的分支處理。
