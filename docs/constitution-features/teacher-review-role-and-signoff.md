@@ -436,3 +436,26 @@ captain 於 2026-11-17 採用 079〈現在就要決定〉與本票第七節的 1
 ### Summary
 
 選定 (b′)。老師以「加註者」身分在試算表留言表示同意，留言要引用版本短碼。責任編輯用新選單 `核可選取列（附老師簽核）` 代按核可，選單同時寫入 `signoff_by`、`signoff_ref`、`signoff_fingerprint`。第一期只記錄、不擋發布。指紋、狀態公式與 `history.json` 都不變；既有綁定測試 68/68 通過，作為基線。共有 9 項待 captain 或 11/26 會議決定（D-1 至 D-8，加 D-6b）。最關鍵的是 D-2 老師的共用角色，以及 D-5 何時強制簽核。已把預覽順序的介面（建議「先看後簽」）以訊息告知 079 的 design worker。同日 079 回覆：079 另做含 `Needs review` 列的審閱版建置，而且 Vercel 預覽要登入、老師打不開。因此第 6.1 節追加修訂，建議改為順序 A（先在審閱版看，再簽，再核可），原句保留。
+
+## Stage Report: implement
+
+- DONE: 依定稿方案 (b′) 實作並通過測試：approval-workflow.gs 新增「核可選取列（附老師簽核）」（缺欄中止、代稱清單比對、留言連結必填、id 短碼逐列比對、與既有核可同批鎖定快照寫入、任一失敗全欄復原），既有「核可選取列」清空三個簽核欄；簽核判定與摘要（有效／失效／未簽）放在獨立模組，sync-content.mjs 只加最少的接線，第一期不擋發布；新測試 tests/teacher-signoff.test.mjs 通過，既有 040 綁定測試 68/68 不退步，history.json 輸出不變
+  `1c47ffe`、`cfe4f3e`。判定在新模組 `scripts/teacher-signoff.mjs`。`sync-content.mjs` 只加 7 行：一個 import、`TRACK_1_COLUMNS` 一個展開、`main()` 寫檔後 3 行摘要。`buildTrack1` 與匯出清單未動。短碼 `fingerprintShortCode` 加在 `content-fingerprint.mjs` 檔尾，已把逐字內容傳給 079 共用。`node --test` 三檔 108/108（新 24、040 綁定 68、064 16），`npx tsc --noEmit` exit 0，`npm run build` exit 0 且 `src/data/*.json` sha256 不變。
+  依宣稱分組，每組的測試與會讓它失敗的改動：
+  - AC-2：四列夾具各落入一類，且印出代稱與短碼。判定改成永遠「有效」時，4 項失敗（已實測）。
+  - AC-3：逐一改 T1 的 10 個發布欄位，每次都判「版本不符」。拿掉指紋比對時失敗（同一次 mutation）。
+  - AC-4、AC-7、AC-8：真的跑子程序同步，比較有三欄與無三欄的結果。`history.json` sha256 相同、exit 0，未簽與失效列照常寫出，無欄時印一行說明。把 `SIGNOFF_COLUMNS` 從 T1 欄位定義拿掉時，2 項失敗（已實測）。
+  - AC-5：以 `vm` 載入 `.gs`，配假的 `SpreadsheetApp`、`PropertiesService`、`Session`、`LockService`。觸發 7 種失敗，外加缺任一欄，九個欄位都逐格回到原值。已實測下列拿掉檢查的改動，各有對應測試失敗：拿掉短碼比對，3 項失敗；復原範圍只留 6 欄，2 項失敗；拿掉代稱檢查，1 項失敗。
+  - AC-6：附簽核核可後，不附老師的核可會清空三欄。拿掉清空那一行，1 項失敗（已實測）。拒絕不碰三欄。
+  - 相容性：沒有簽核欄的分頁，舊選單照常運作。`.gs` 與 Node 的三欄、適用分頁、短碼長度常數相同。`onOpen` 選單恰為四項。
+  - AC-11：`git diff main...HEAD` 中 `.gs` 的 5 行刪除都在 `resolveApprovalHeaders_` 與 `reviewActiveRows_`，四個受保護段落沒有刪除行。040 綁定測試檔與 `src/` 無 diff。
+- DONE: 文件依「實作後更新」落地：gatekeeping.md「學者」一節依 2026-11-16 裁示改寫（老師為加註者、只審閱簽核）、B 類加三欄；operations.md 新增〈權限與審核責任表〉與〈老師簽核欄部署〉步驟（先合併程式再建欄、與 079 合計 14 個保護設定、測試格數 投稿者 34／責任編輯反向 22／加註者至少 7）；repo 內不寫人名或 email
+  `cfe4f3e`。gatekeeping 第 2 章改為「老師」一節，追加補述並保留原句。第 3 章 B 類加三欄，標明「尚未建欄、尚未實測」。operations.md 新增兩節，並加了四項補充：〈保護範圍〉補述 12→14、〈核可與拒絕〉補述新選單、四條錯誤訊息、驗證指令。design.md 修訂紀錄、contributing.md、INDEX.md 一併更新。AC-10 email 掃描無輸出。人名只用「老師甲／老師乙」代號，且只在測試裡。
+- DONE: 票內新增「## Captain decisions (2026-11-17)」節，逐項記錄 captain 採用的 11 項預設（方案 D、順序 C、只管 T1、接受同步暫停、試算表留言、email 寄送、captain 產生寄送登錄、第二期待 078 完成、接受 R8、使用說明僅 captain 與責任編輯可改、gatekeeping.md 學者節於本階段修正）
+  位於 `## Acceptance criteria` 之前，11 列附 079／076 編號對照與對實作的影響。另列出仍待 captain 的 D-1、D-2、D-7。
+- SKIPPED: gatekeeping.md 第 5 章「老師簽核紀錄」防線一列、TODO.md P3-1／P3-2 補述
+  兩項在設計的時點都是「部署完成後」或「D-1、D-2 決定後」，現在都還不成立。提前寫，evergreen 文件會描述尚未存在的現況。
+
+### Summary
+
+依 (b′) 完成實作。Apps Script 新增附老師簽核的核可選單。同步端新增獨立的簽核判定模組，只印摘要、不擋發布。`sync-content.mjs` 只加 7 行接線，降低與 079 合併時衝突的機會。行數超出預估：新增約 846 行，預估是 410±180。主要多在兩處。一是測試檔 449 行（預估 180±70）：假 `SpreadsheetApp` 與 24 項測試，每個檢查都以 mutation 確認測試會失敗。二是 operations.md 139 行（預估 70±30）：併入 079 的合計數字、錯誤訊息與回退步驟。另外兩處與設計不同，都可退回。代稱清單也接受逗號與頓號分隔，因為指令碼屬性的輸入框只有一行。留言連結必須是 `http(s)` 網址，不只是不可空白。未驗證：「取得留言連結」的介面文字、加註者能否看到選單（R9）、刪除的留言是否保留（R10），都要等部署後由 captain 實測。
