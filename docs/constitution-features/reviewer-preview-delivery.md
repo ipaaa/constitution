@@ -1,7 +1,7 @@
 ---
 id: 079
 title: 讓審閱的老師看得到成品：同步錯誤與預覽連結的轉交機制
-status: verify
+status: review
 source: docs/health-check/TODO.md P2-9（「尚未有對應的票」）；2026-09-03-editor-onboarding.md:453
 started: 2026-11-17T19:08:14Z
 completed:
@@ -22,6 +22,17 @@ gates:
                 id: briefing:079:verify:attempt-1:revision-1
                 digest: sha256:ecc8fb54a7b5560f6afdb415a79c8a0fe39003e322255ea4a11dbbdc0cad6d76
                 room-ref: '@review/verify/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:079:verify:1
+                briefing: briefing:079:verify:attempt-1:revision-1
+                by: person:captain
+                at: "2026-11-18T00:10:58.485648Z"
+                decision: approve
+                reason: Captain approved 079 verify (cycle 2 PASSED, no new findings).
+              application:
+                target-stage: review
+                state: consumed
 ---
 
 老師審閱時，要能看到內容在網站上的實際呈現，不能只看試算表的儲存格。
