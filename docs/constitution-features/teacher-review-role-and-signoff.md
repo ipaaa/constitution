@@ -524,3 +524,31 @@ captain 於 2026-11-17 採用 079〈現在就要決定〉與本票第七節的 1
 ### Summary
 
 複驗 cycle 2 的文件修正。F1–F4 與 N1 都按授權處置落地。gatekeeping 與 contributing 不再把尚未部署的加註者權限與附簽核選單寫成現況。AC-9 與 runbook 都是 34／22／至少 7。程式、測試、`src/` 本輪無 diff，108/108 與 tsc 通過。建議 PASSED；P1 為 Polish 不阻擋。另提醒：與 079 合併時要補 `review.csv` fixture。
+
+## Stage Report: review
+
+- DONE: 逐條重現 AC-1–AC-11 的 Verified by（不採信 implement 自述）；AC-9 為部署後 captain 實測項，標未執行並確認 operations.md 的實測步驟足以執行
+  重跑位置：scratchpad 的乾淨 clone（HEAD `8c40811`），worktree 未改動。AC-1：awk 印出該節，含四張表（23 行表格列）。老師一列在五個分頁欄都沒有「改」或「核可」，與 2026-11-16 裁示一致。AC-2／3／5／6：判定或檢查拿掉後對應測試會失敗。verify 做過 5 項 mutation，本輪另做 3 項，都被抓到：拿掉 `requireSignoffColumns_`→「缺任一簽核欄」測試失敗；拿掉 id 重複檢查→「選取列在清單中重複」測試失敗；「有效」判定不看 `signoff_by`／`signoff_ref`→「簽核欄不完整判為失效」測試失敗。AC-4／7／8：子程序真同步，有三欄與無三欄的 sha256 相同。040 綁定測試檔、`src/` 對 main 沒有 diff。AC-10：email 正則沒有輸出；人名只有測試裡的「老師甲／乙／丙」。AC-11：`.gs` 的 5 行刪除只在 `resolveApprovalHeaders_` 與 `reviewActiveRows_`，四個受保護段落沒有刪除行。AC-9 未執行（部署後項目）。`operations.md:176-221` 的 12 步、34／22／至少 7 的測試表、R9／R10 的記錄要求都足以照做。缺口有兩項，見下方 R1（沒有多列批次的測試）與 R2（與 079 合併後，第 2、11 步無法照寫的方式執行）。
+- DONE: 程式品質與回歸：approval-workflow.gs 新選單與既有三項選單的相容、四個受保護段落未刪改、teacher-signoff.mjs 與 sync-content.mjs 接線最小、040 綁定測試 68/68 與全套 node --test、tsc、build 通過且 src/data 不變
+  選單恰為四項，順序是三個舊項目加一個新項目。舊 `核可選取列` 只在 T1、且簽核欄存在時才清空簽核欄；`拒絕選取列` 的快照含簽核欄，但不寫入。T2 與 `site_tldr` 沒有 `id` 欄時取空字串，不會出錯。`sync-content.mjs` 只加 7 行，判定放在獨立模組。指紋未改，T1 不需要序號。三檔測試 108/108；全套 node --test 161 項，160 過、1 項 skip（threshold 的線上重抓，main 上已有）；`npx tsc --noEmit` exit 0；`npm run build` exit 0，`src/data/*.json` 前後 sha256 相同。content-audit 的輸出與 main 相同，只有行號位移。
+- DONE: 依實際交付檢查 Documentation impact 每一筆（現在更新／實作後更新／不更新）、record 文件未被改寫、docs/INDEX.md 一致；列出與 079 合併時需處理的事項（teacher-signoff.test.mjs 兩項真同步測試的 review.csv fixture）；給出 PASSED 或 REJECTED 與是否可交付
+  現在更新：本票有更新。gatekeeping 老師一節改寫原文並加補述，依 captain 決定 #11（原驗證目標「只有新增行」由該決定取代）。實作後更新：operations、design、contributing、INDEX（4 份文件的查核日期）已寫。gatekeeping 第 5 章與 TODO P3-1／P3-2 的時點未到，SKIPPED 理由成立。不更新：`_archive`、`approval-permission-probe.md`、`AGENTS.md` 都沒有 diff。合併事項：在 scratch clone 試合併 079（`6033437`），程式自動合併。3 項真同步測試失敗，其中 1 項是 clone 沒有 `main` ref 造成的假失敗，排除後剩 FO 指出的 2 項，原因都是 `REVIEW_BUILDS_CSV_URL` 未設定。套用 079 的 `registered(track1)` fixture 並設環境變數後，全套 176 項中 175 過、0 失敗。所以測試這部分的合併說明是完整的。**但合併說明還缺兩件事**：3 份文件有文字衝突（見 M1），以及 076 部署步驟與 079 的轉交檢查互相衝突（見 R2）。結論：**PASSED**，本分支可交付；合併時要處理 M1 與 R2。
+
+### 發現（依 `## Review-finding disposition` 四欄；處置待 FO 授權）
+
+- **R1 Deferred risk，本票可修。建議在部署前修，或至少把多列批次加進部署測試。**
+  - 使用者與流程：責任編輯一次對多列附簽核核可。第 3.3 節與 `operations.md:104` 都寫「一列一行」，40 列預定分批處理。
+  - 可見損害：`approval-workflow.gs:261` 用 `ui.prompt` 收清單，`:275` 以換行切行。如果 Google 的提示框只有一行（我不確定，repo 內沒有實測），貼上的換行會被刪掉或換掉。多列清單會變成「第 1 行格式不符」。損害方向是安全的：程式中止，不會寫錯，AC-5 仍成立。代價是只能一次核可一列。implement 報告提到「指令碼屬性的輸入框只有一行」，並為代稱清單改成也接受逗號分隔，但沒有對清單提示框做同樣處理。測試以假 UI 直接傳入 `\n`（`tests/teacher-signoff.test.mjs:319`），所以測不出這個問題。
+  - 受影響 AC 或邊界：沒有 AC 被違反。
+  - 觸發證據：尚未觀察到。轉為 Material 的條件：部署時用兩列清單執行，出現「短碼清單第 1 行格式不符」。修法約 2 行加 1 項測試：也接受 `;`／`；` 當列分隔，並在 `operations.md` 第 10 步加一次兩列批次。
+- **R2 Needs decision（合併與部署順序），本票單獨無法決定。**
+  - 使用者與流程：captain 執行〈老師簽核欄部署〉。
+  - 可見損害：第 2 步與第 11 步（`operations.md:180`、`:194-195`）都要求「不落地同步」跑完，印出 sha256 與簽核摘要。079 合併後，`sync-content.mjs:938` 的 `checkReviewDelivery` 會在寫檔與摘要之前中止同步，因為既有核可列都沒有登錄。079 的 `operations.md:145` 和 captain 決定 #4 都接受這次暫停。登錄要等老師審完、重新附簽核核可才會有，到那時列已是「有效」，不會是第 11 步預期的「未簽 N」。結果是：076 若在 079 合併之後才建欄，第 2、11 步無法照寫的方式執行，AC-2 與 AC-4 的部署後半也無法驗證。
+  - 受影響 AC 或邊界：AC-2、AC-4 的部署後驗證，以及 R1 風險的「先程式、後建欄」順序。
+  - 觸發證據：已在 scratch clone 試合併確認程式路徑。選項：(a) 076 的試算表部署第 1–11 步在 079 程式合併前做完；(b) 合併時改寫第 2、11 步，改用另一種方法比對；(c) 接受部署後驗證延到老師審完。
+- **M1 合併事項（不是本分支的缺陷）。** 試合併後有 3 份文件衝突：`design.md` 檔尾兩票各自追加的修訂紀錄；`gatekeeping.md` 老師一節，079 改了舊的「被什麼擋」並加了「看什麼」，要與 076 的改寫合併；`operations.md` 本機驗證指令那一行，要同時列出 `teacher-signoff`、`review-delivery` 兩個測試檔。`content-fingerprint.mjs` 兩邊新增的內容相同，自動合併沒有問題。
+- **P2 Polish。** 079 合併後，只有同步成功才會印出簽核摘要。第 6.1 節原本要交給 079 的「未簽」清單，在同步暫停期間看不到。方案 D 改由 `review-file` 印短碼，所以這個介面已經用不到。只記錄。
+
+### Summary
+
+獨立重跑全部 AC 的驗證，另做 3 項新的 mutation，都被測試抓到。tsc、build 通過，`src/data` 沒有變動，受保護段落與 040 測試都沒有被動到。本分支建議 **PASSED**，可以交付。與 079 合併時，FO 原本的說明只涵蓋 review.csv fixture；我已實測，這一項足以讓測試全過。但還有兩件事要處理：3 份文件的文字衝突（M1），以及 076 部署步驟在 079 合併後無法照寫的方式執行（R2，需要決定部署順序）。R1 是提示框可能只有一行、多列批次可能用不了的風險，建議部署前處理。
