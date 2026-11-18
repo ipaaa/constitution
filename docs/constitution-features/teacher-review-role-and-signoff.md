@@ -11,6 +11,17 @@ worktree: .worktrees/spacedock-ensign-teacher-review-role-and-signoff
 issue:
 pr:
 mod-block:
+gates:
+    version: 1
+    records:
+        - id: gate:076:review
+          stage: review
+          attempts:
+            - id: gate-attempt:076-review-1
+              briefing:
+                id: briefing:076:review:attempt-1:revision-1
+                digest: sha256:dc4f61c4503df6cc0c4f955a41f591f8b412ec4fcfbdb7ca570e5124991de377
+                room-ref: '@review/review/briefing-1'
 ---
 
 讓法律老師能審閱 T1 內容並留下可查的簽核紀錄，而核可（Approve）仍由責任編輯在試算表 `Review` 選單代按。

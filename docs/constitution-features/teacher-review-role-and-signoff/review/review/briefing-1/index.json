@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:076:review:attempt-1:revision-1",
+  "question": "076 review 建議 PASSED（可交付）。R1 是否部署前修、R2 部署順序如何定？",
+  "artifacts": [
+    {
+      "id": "artifact:076:review:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/aa12ead93ef9e7fb573bc45a59d28fdf1b683408/docs/constitution-features/teacher-review-role-and-signoff.md",
+      "rev": "sha256:d7c8a36e45ebc8816a59dea4942fc9d737a3c2d6d7b7106bb9a7eca38c0ba620",
+      "mediaType": "text/markdown",
+      "summary": "獨立重跑 AC-1–11（另 3 項新 mutation 皆被抓到）、全套測試 160/161 過 1 skip、tsc、build 通過、src/data 不變；試合併 079 程式自動合併、補 fixture 後 175 過 0 失敗。發現：R1 多列批次提示框可能只收一行（建議部署前修）、R2 076 部署驗證步驟在 079 合併後無法執行（需定順序）、M1 三份文件合併衝突、P2 記錄。"
+    }
+  ]
+}
