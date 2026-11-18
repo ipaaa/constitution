@@ -11,28 +11,6 @@ worktree: .worktrees/spacedock-ensign-reviewer-preview-delivery
 issue:
 pr:
 mod-block:
-gates:
-    version: 1
-    records:
-        - id: gate:079:verify
-          stage: verify
-          attempts:
-            - id: gate-attempt:079-verify-1
-              briefing:
-                id: briefing:079:verify:attempt-1:revision-1
-                digest: sha256:ecc8fb54a7b5560f6afdb415a79c8a0fe39003e322255ea4a11dbbdc0cad6d76
-                room-ref: '@review/verify/briefing-1'
-              resolution:
-                type: Resolution
-                id: resolution:spacedock:079:verify:1
-                briefing: briefing:079:verify:attempt-1:revision-1
-                by: person:captain
-                at: "2026-11-18T00:10:58.485648Z"
-                decision: approve
-                reason: Captain approved 079 verify (cycle 2 PASSED, no new findings).
-              application:
-                target-stage: review
-                state: consumed
 ---
 
 老師審閱時，要能看到內容在網站上的實際呈現，不能只看試算表的儲存格。
@@ -642,3 +620,24 @@ F1：把兩句寫成「已生效」的文件改成「程式合併並建好分頁
 ### Summary
 
 cycle 1 的三項發現都已依授權修正，程式沒有改動。F2 新增的兩個案例會被對應的 mutation 弄紅。建議 PASSED。AC-1–7 與 AC-9 PASSED；AC-8 是 captain 人工項，仍未執行。
+
+## Review-finding disposition
+
+review 階段的發現（2026-11-17）。四欄證據依序是：(1) 使用者與流程；(2) 損害；(3) 受影響的驗收條件或邊界；(4) 觸發證據。materiality、負責的票與處置分開建議，處置待 FO 授權。候選分支沒有改動。
+
+- **R1 與 076 合併的說明不完整。** (1) 第二個合併的人照 implement 報告的合併說明修 076 的 `tests/teacher-signoff.test.mjs`。(2) 照字面只補 `/review.csv` 夾具時，兩個測試仍然失敗。另有三個文件衝突，說明裡沒有提到。(3) FO 的合併順序備註；AC-9（既有測試不退步）在合併後才成立。(4) 在 scratchpad 的 clone 試合併 `teacher-review-role-and-signoff`：`content-fingerprint.mjs` 自動合併；`design.md`、`gatekeeping.md`、`operations.md` 各衝突 1 處。合併後全套是 176 項，2 項失敗，就是預告的那兩項，訊息是 `REVIEW_BUILDS_CSV_URL 環境變數未設定`。只補夾具：仍然 2 項失敗。三處都改之後：175 過、0 失敗、1 略過。三處是：import `registered`；`fixtures()` 加上 `'/review.csv': registered(track1)`；`runSync` 的 env 加上 `REVIEW_BUILDS_CSV_URL`。建議：Polish（失敗看得見，不會悄悄通過），由合併步驟負責。fix 的方式是 FO 把完整的三處改法和三個文件衝突轉給合併的人，不用改候選分支。
+- **R2 三個設計行為沒有測試保護。** (1) 之後修改 `review-file.mjs` 或 `review-delivery.mjs` 的人。(2) 目前沒有損害，程式行為正確。可是下列三種改壞的情況，測試都抓不到：(a) 拿掉 HTML 跳脫，老師就看不到〈與正式網站的差異〉寫明要以純文字顯示的標記；(b) 拿掉 `current_fingerprint` 比對；(c) 同一指紋有壞登錄與好登錄時，改成「有壞的就中止」，captain 重寄後同步會被錯擋。(3) 三項都不在 AC 1–9 內；(a) 是設計表格的敘述。(4) 我在 clone 做三個 mutation，`tests/review-delivery.test.mjs` 都是 15 過、0 失敗。(c) 的測試是 captain 核准刪減時刪掉的「壞登錄與好登錄並存」。建議：Deferred risk。升級條件：有人修改 `escapeHtml`、`renderCard` 或 `checkReviewDelivery`，或 captain 把這三項列入驗收條件。decline，或補 3 個表格案例（約 +6 行，會超過約 +783 的上限）。
+- **R3 AC-8 的手機、斷網、截圖步驟只寫在本票。** (1) captain 執行 AC-8。(2) 沒有損害。operations.md〈每一批〉第 1–3 步足以產生、自己先開、寄出；AC-8 本文寫明手機、斷網桌機與截圖。`review-file` 只需要 `TRACK_1_CSV_URL`，不必先建分頁。(3) AC-8。(4) 讀 operations.md 新增節與 AC-8。建議：Polish，decline。
+
+## Stage Report: review
+
+- DONE: 逐條重現方案 D 定稿驗收條件的 Verified by（不採信 implement 自述），以夾具實跑 review-file 一次；AC-8 為 captain 人工項，標未執行並確認 operations.md 的寄送、開啟步驟足以執行
+  AC-1–6：逐項讀 `tests/review-delivery.test.mjs`，對照 Verified by，都有斷言。AC-5 涵蓋四種情況，另多 3 種，反證測試會把漏轉交改成通過。AC-7：`git diff main...HEAD -- src/` 為空，`npm run build` 結束碼 0。AC-9：全套 152 項，151 過、0 失敗、1 略過；`tsc` 結束碼 0。夾具實跑用 scratchpad 的暫存 repo 與本機 HTTP，共 5 列（核可含圖、待核可、退稿、空白狀態含佔位標題、圖 404）。結束碼 0，檔案 2 列，依 year 排序，沒有退稿列。另 2 列的錯誤原文寫在 `.tsv`。`src` 只有 `data:image/png`，沒有 `href`、`@import`、`<script`、`<link`。`<b>` 以純文字顯示。`shasum` 等於 `file_sha256`。暫存 repo 的 `git status` 沒有 review-out。AC-8 未執行，需要的步驟足夠，見 R3
+- DONE: 程式品質與回歸：review-file.mjs、review-delivery.mjs 與 sync-content.mjs 接線最小且 fail closed；src/ 零改動；fingerprintShortCode 與 076 分支逐字相同；全套 node --test、tsc、build 通過且 src/data 不變；AGENTS.md 新增段落正確
+  `sync-content.mjs` 只做三件事：抽出 `checkTrack1Record`（行為不變）、加一個環境變數、在寫檔前動態 import 並呼叫檢查。fail closed 的情況：網址未設、分頁空、缺欄、無登錄或登錄不成立，都會整份中止。review-file 在 git 判斷失敗時當成「沒被忽略」，自我檢查沒過就不寫檔。`content-fingerprint.mjs` 的新增段與 076 分支 `diff` 相同，試合併時自動合併。build 前後 `src/data/*.json` 的 sha256 相同。AGENTS.md 新增的三句都屬實，指向的小節存在。我另做 3 個 mutation，都沒被測試抓到，見 R2
+- DONE: 依實際交付檢查文件影響每一筆、record 文件未被改寫、docs/INDEX.md 一致；列出與 076 合併時需處理的事項；給出 PASSED 或 REJECTED 與是否可交付
+  「實作後更新」的 4 筆 repo 內文件都已完成，另加 operations.md；077 的使用說明不在 repo 內。改動的 5 份文件在 INDEX 是 evergreen 或 plan，沒有改到 record；修正都用追加補述。沒有新增或刪除文件，INDEX 不需更新。review 期間沒有執行 repo 外的步驟。合併時要處理 4 件事：(1) 076 兩個同步測試要改三處，見 R1；(2) 三個文件衝突；(3) 把 TODO.md P2-9 補述的「實作 PR 的連結」補上；(4) 在合併前先建「審閱版本」分頁並設定 `REVIEW_BUILDS_CSV_URL`（operations.md〈一次性設定〉）。合併後到老師審完之前，同步會中止。PASSED，可以交付
+
+### Summary
+
+建議 PASSED。AC-1–7 與 AC-9 都已獨立重現，AC-8 是 captain 的人工項，尚未執行。程式接線最小，各項檢查 fail closed，`src/` 沒有改動，短碼函式與 076 逐字相同。三項發現都不阻擋：R1 合併說明少了環境變數與三個文件衝突，由 FO 轉給合併的人；R2 三個 mutation 存活，屬 Deferred risk；R3 屬 Polish。含本報告，分支對 main 為 +794／−17，淨 +777，在約 +783 之內。
