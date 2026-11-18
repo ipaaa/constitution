@@ -1,7 +1,7 @@
 ---
 id: 076
 title: 老師審閱角色與簽核紀錄：權限與審核責任表
-status: verify
+status: review
 source: captain 2026-11-16 裁示「老師只負責審閱、簽核，由責任編輯代按 Approve」；TODO.md P3-1、P3-2；2026-09-04 會議後續工作四
 started: 2026-11-17T19:08:10Z
 completed:
@@ -22,6 +22,17 @@ gates:
                 id: briefing:076:verify:attempt-1:revision-1
                 digest: sha256:b50e6f1673a26c49429cd8198a8e68dcd0dfabb45612fb8a55d77c3d5248282d
                 room-ref: '@review/verify/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:076:verify:1
+                briefing: briefing:076:verify:attempt-1:revision-1
+                by: person:captain
+                at: "2026-11-18T00:10:58.124343Z"
+                decision: approve
+                reason: Captain approved 076 verify (cycle 2 PASSED); P1 wording in contributing.md:35 declined for now, to be folded into the post-deployment doc update.
+              application:
+                target-stage: review
+                state: consumed
 ---
 
 讓法律老師能審閱 T1 內容並留下可查的簽核紀錄，而核可（Approve）仍由責任編輯在試算表 `Review` 選單代按。
@@ -162,14 +173,14 @@ gates:
 
 #### 4.1 角色與 Google 試算表權限
 
-| 角色 | Google 共用權限 | 保護範圍允許名單 | 一句話職責 |
-|---|---|---|---|
-| captain | 擁有者 | 自動涵蓋全部 | 設定權限與保護範圍；發起同步；看 PR 後合併 |
-| 責任編輯 | 編輯者 | B 類（審核欄與簽核欄） | 修改內容；代老師按核可，寫入簽核紀錄 |
-| 老師（審閱者） | **加註者** 🔴 D-2 | 無 | 審閱 T1 內容；留言表示同意或要求修改 |
-| 協作者（投稿者） | 編輯者 | 無 | 撰寫、修改內容 |
-| 檢視者 | 檢視者 | 無 | 只讀 |
-| 工程人員與 agent | 不需要試算表權限 | 無 | 依明確要求執行同步、開 PR；不改試算表 |
+| 角色          | Google 共用權限    | 保護範圍允許名單     | 一句話職責                   |
+| ----------- | -------------- | ------------ | ----------------------- |
+| captain     | 擁有者            | 自動涵蓋全部       | 設定權限與保護範圍；發起同步；看 PR 後合併 |
+| 責任編輯        | 編輯者            | B 類（審核欄與簽核欄） | 修改內容；代老師按核可，寫入簽核紀錄      |
+| 老師（審閱者）     | **加註者** 🔴 D-2 | 無            | 審閱 T1 內容；留言表示同意或要求修改    |
+| 協作者（投稿者）    | 編輯者            | 無            | 撰寫、修改內容                 |
+| 檢視者         | 檢視者            | 無            | 只讀                      |
+| 工程人員與 agent | 不需要試算表權限       | 無            | 依明確要求執行同步、開 PR；不改試算表    |
 
 #### 4.2 角色 × 分頁 × 可做的事
 
