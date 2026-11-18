@@ -51,6 +51,21 @@ This workflow tracks features for a constitution literacy website that makes Tai
 
 Each feature is a markdown file named `{id}-{slug}.md` — lowercase, hyphens, no spaces. Example: `004-t2-search-wiring.md`.
 
+> ⚠️ **2026-11-17 補述（captain 指示：所有的票都要標號）：上面的規則一直存在，但 2026-09-29 之後建立的票有 10 張沒有遵守。**
+> 原因：`spacedock new <slug>` 會把檔案寫成 `<slug>.md`，id 只寫進 frontmatter，不會加在檔名前面。first officer 直接傳入不含 id 的 slug，檔名就少了編號。
+> 編號也是查詢的依據。`AGENTS.md` 列票況的指令用 `docs/constitution-features/0*.md`，沒有編號的票不會出現在結果裡。
+>
+> **建立新票的固定程序（first officer 必須遵守）：**
+> 1. 執行 `spacedock new <slug> --workflow-dir docs/constitution-features`，記下輸出的 `id=NNN`。
+> 2. 在第一次 commit 之前執行 `git mv docs/constitution-features/<slug>.md docs/constitution-features/NNN-<slug>.md`。
+> 3. 執行 `spacedock status --workflow-dir docs/constitution-features --validate`，結果必須是 `VALID`，之後才 commit 與 dispatch。
+>
+> 已經 dispatch 的票（有 worktree、gate 紀錄目錄或分支）不在進行中改名。這類票在封存時改名，並同時移動 `{slug}/review/` 目錄。
+> 2026-11-17 已改名的票：073、074、075、077、078。
+> 尚未改名的票：
+> - 進行中（封存時改名）：072 `gatekeeping-overview-rejudge-064`、076 `teacher-review-role-and-signoff`、079 `reviewer-preview-delivery`。
+> - 已封存（程式與測試引用其路徑，改名須由 worker 一併更新引用）：067 `systematic-chinese-content-legal-audit`、068 `threshold-page-voided-quorum-current`。
+
 ## Schema
 
 Every feature file has YAML frontmatter with these fields:
