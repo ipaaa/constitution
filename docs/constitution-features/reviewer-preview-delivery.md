@@ -11,6 +11,17 @@ worktree: .worktrees/spacedock-ensign-reviewer-preview-delivery
 issue:
 pr:
 mod-block:
+gates:
+    version: 1
+    records:
+        - id: gate:079:review
+          stage: review
+          attempts:
+            - id: gate-attempt:079-review-1
+              briefing:
+                id: briefing:079:review:attempt-1:revision-1
+                digest: sha256:106b9e5e0ab1fccb5ae88966b588d5759fa8b8197bd8a7db52704ac0e896c3b0
+                room-ref: '@review/review/briefing-1'
 ---
 
 老師審閱時，要能看到內容在網站上的實際呈現，不能只看試算表的儲存格。

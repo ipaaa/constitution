@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:079:review:attempt-1:revision-1",
+  "question": "079 review 建議 PASSED（可交付）。R2 三項無測試保護是否補、合併順序是否採 076 先？",
+  "artifacts": [
+    {
+      "id": "artifact:079:review:attempt-1:revision-1:item-1",
+      "uri": "git-root://main/d656282629029f5da3f1c90cf25ee35dcd6c5e40/docs/constitution-features/reviewer-preview-delivery.md",
+      "rev": "sha256:1a2e9f49f5951eb0f6eefaec0e905ba2f795baabde0928401657f86bc08a1407",
+      "mediaType": "text/markdown",
+      "summary": "獨立重現 AC-1–7、AC-9，夾具實跑 review-file（5 列）結果正確；接線最小、fail closed、src/ 零改動、短碼函式與 076 相同；151/152 過、tsc、build 通過。發現：R1 合併事項（fixture、三份文件衝突、P2-9 PR 連結、合併前先建分頁與環境變數）、R2 三個 mutation 存活（HTML 跳脫、current_fingerprint 比對、壞登錄與好登錄並存）、R3 Polish。淨 +777／上限約 +783。"
+    }
+  ]
+}
