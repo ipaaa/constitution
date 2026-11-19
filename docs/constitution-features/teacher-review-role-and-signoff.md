@@ -9,7 +9,7 @@ verdict:
 score: 0.9
 worktree: .worktrees/spacedock-ensign-teacher-review-role-and-signoff
 issue:
-pr: "#50"
+pr: pr-merge:50
 mod-block: merge:pr-merge
 gates:
     version: 1
