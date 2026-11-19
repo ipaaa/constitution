@@ -1,16 +1,16 @@
 ---
 id: 076
 title: 老師審閱角色與簽核紀錄：權限與審核責任表
-status: review
+status: complete
 source: captain 2026-11-16 裁示「老師只負責審閱、簽核，由責任編輯代按 Approve」；TODO.md P3-1、P3-2；2026-09-04 會議後續工作四
 started: 2026-11-17T19:08:10Z
-completed:
-verdict:
+completed: 2026-11-19T21:44:22Z
+verdict: PASSED
 score: 0.9
 worktree: .worktrees/spacedock-ensign-teacher-review-role-and-signoff
 issue:
 pr: pr-merge:50
-mod-block: merge:pr-merge
+mod-block:
 gates:
     version: 1
     records:
@@ -60,7 +60,8 @@ gates:
                 reason: Captain approved 076 review (attempt 2, cycle 2 PASSED); P3 declined — record the two test-row ids during deployment step 10. Merge first per order (a).
               application:
                 target-stage: complete
-                state: pending
+                state: consumed
+archived: 2026-11-19T21:44:22Z
 ---
 
 讓法律老師能審閱 T1 內容並留下可查的簽核紀錄，而核可（Approve）仍由責任編輯在試算表 `Review` 選單代按。
