@@ -41,6 +41,10 @@ gates:
                 id: briefing:076:review:attempt-1:revision-1
                 digest: sha256:dc4f61c4503df6cc0c4f955a41f591f8b412ec4fcfbdb7ca570e5124991de377
                 room-ref: '@review/review/briefing-1'
+              withdrawal:
+                by: agent:first-officer
+                at: "2026-11-19T19:31:25.994006Z"
+                reason: 'Stale: attempt-1 was decided revise by the captain on 2026-11-19 (see Feedback Cycles cycle 2); its resolution was lost when the FO overwrote main frontmatter during a report mirror. Implement cycle 3 and re-review completed since; a fresh attempt follows.'
 ---
 
 讓法律老師能審閱 T1 內容並留下可查的簽核紀錄，而核可（Approve）仍由責任編輯在試算表 `Review` 選單代按。
