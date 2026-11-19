@@ -1,7 +1,7 @@
 ---
 id: 079
 title: 讓審閱的老師看得到成品：同步錯誤與預覽連結的轉交機制
-status: review
+status: implement
 source: docs/health-check/TODO.md P2-9（「尚未有對應的票」）；2026-09-03-editor-onboarding.md:453
 started: 2026-11-17T19:08:14Z
 completed:
@@ -11,17 +11,6 @@ worktree: .worktrees/spacedock-ensign-reviewer-preview-delivery
 issue:
 pr:
 mod-block:
-gates:
-    version: 1
-    records:
-        - id: gate:079:review
-          stage: review
-          attempts:
-            - id: gate-attempt:079-review-1
-              briefing:
-                id: briefing:079:review:attempt-1:revision-1
-                digest: sha256:106b9e5e0ab1fccb5ae88966b588d5759fa8b8197bd8a7db52704ac0e896c3b0
-                room-ref: '@review/review/briefing-1'
 ---
 
 老師審閱時，要能看到內容在網站上的實際呈現，不能只看試算表的儲存格。
@@ -652,3 +641,4 @@ review 階段的發現（2026-11-17）。四欄證據依序是：(1) 使用者�
 ### Summary
 
 建議 PASSED。AC-1–7 與 AC-9 都已獨立重現，AC-8 是 captain 的人工項，尚未執行。程式接線最小，各項檢查 fail closed，`src/` 沒有改動，短碼函式與 076 逐字相同。三項發現都不阻擋：R1 合併說明少了環境變數與三個文件衝突，由 FO 轉給合併的人；R2 三個 mutation 存活，屬 Deferred risk；R3 屬 Polish。含本報告，分支對 main 為 +794／−17，淨 +777，在約 +783 之內。
+- Cycle 2 (review → implement, 2026-11-19): review 建議 PASSED；captain 選 revise。授權處置：R2 fix（tests/review-delivery.test.mjs 補三個表格案例：(a) content 含 HTML 標記時以純文字跳脫顯示、(b) `current_fingerprint` 比對拿掉時失敗、(c) 同一指紋同時有壞登錄與好登錄時同步通過；重做三個 mutation 證明轉紅）；captain 將行數上限放寬到約 +790。R1 合併事項依 captain 定案順序 (a)：076 先合併並部署 → 建「審閱版本」分頁與 `REVIEW_BUILDS_CSV_URL` → 再合併 079；合併時由本票補 076 兩項真同步測試的 fixture、解三份文件衝突、補 P2-9 PR 連結（本輪先不做）。R3 decline。

@@ -1,7 +1,7 @@
 ---
 id: 076
 title: 老師審閱角色與簽核紀錄：權限與審核責任表
-status: review
+status: implement
 source: captain 2026-11-16 裁示「老師只負責審閱、簽核，由責任編輯代按 Approve」；TODO.md P3-1、P3-2；2026-09-04 會議後續工作四
 started: 2026-11-17T19:08:10Z
 completed:
@@ -11,17 +11,6 @@ worktree: .worktrees/spacedock-ensign-teacher-review-role-and-signoff
 issue:
 pr:
 mod-block:
-gates:
-    version: 1
-    records:
-        - id: gate:076:review
-          stage: review
-          attempts:
-            - id: gate-attempt:076-review-1
-              briefing:
-                id: briefing:076:review:attempt-1:revision-1
-                digest: sha256:dc4f61c4503df6cc0c4f955a41f591f8b412ec4fcfbdb7ca570e5124991de377
-                room-ref: '@review/review/briefing-1'
 ---
 
 讓法律老師能審閱 T1 內容並留下可查的簽核紀錄，而核可（Approve）仍由責任編輯在試算表 `Review` 選單代按。
@@ -563,3 +552,4 @@ captain 於 2026-11-17 採用 079〈現在就要決定〉與本票第七節的 1
 ### Summary
 
 獨立重跑全部 AC 的驗證，另做 3 項新的 mutation，都被測試抓到。tsc、build 通過，`src/data` 沒有變動，受保護段落與 040 測試都沒有被動到。本分支建議 **PASSED**，可以交付。與 079 合併時，FO 原本的說明只涵蓋 review.csv fixture；我已實測，這一項足以讓測試全過。但還有兩件事要處理：3 份文件的文字衝突（M1），以及 076 部署步驟在 079 合併後無法照寫的方式執行（R2，需要決定部署順序）。R1 是提示框可能只有一行、多列批次可能用不了的風險，建議部署前處理。
+- Cycle 2 (review → implement, 2026-11-19): review 建議 PASSED；captain 選 revise。授權處置：R1 fix（短碼清單除換行外也接受 `;`／`；` 為列分隔，補 1 項測試；operations.md 第 10 步加一次兩列批次實測）；R2 依 captain 定案順序 (a)：076 先合併並完成試算表部署第 1–11 步，之後才建「審閱版本」分頁並合併 079——寫進 operations.md〈老師簽核欄部署〉開頭；M1 與 P2 由後合併的 079 處理，本票不動。
