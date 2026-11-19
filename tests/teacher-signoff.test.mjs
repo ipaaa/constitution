@@ -389,6 +389,17 @@ test('代稱清單可用換行、逗號或頓號分隔：指令碼屬性的輸�
   }
 });
 
+test('短碼清單可寫成一行、以 ; 或 ； 分隔兩列：對話框可能只有一行', () => {
+  for (const separator of ['; ', '；']) {
+    const { context, state } = setup();
+    state.prompts = ['老師甲', COMMENT_LINK, `h1 ${code(ROW_A)}${separator}h2 ${code(ROW_B)}`];
+    context.approveActiveRowsWithSignoff();
+    for (const [row, record] of [[2, ROW_A], [3, ROW_B]]) {
+      assert.equal(state.sheet.value(row, 'signoff_fingerprint'), fingerprintPublishedRow(T1, record), separator);
+    }
+  }
+});
+
 test('AC-6 先附簽核核可，再不附老師核可：三個簽核欄清空，status 仍 Approved', () => {
   const { context, state } = setup();
   state.prompts = ['老師甲', COMMENT_LINK, `h1 ${code(ROW_A)}\nh2 ${code(ROW_B)}`];

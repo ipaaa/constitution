@@ -251,7 +251,7 @@ function approveActiveRowsWithSignoff() {
   const ref = promptSignoff_(ui, '貼上老師那則留言的連結：');
   if (ref == null) return;
   if (!/^https?:\/\/\S+$/.test(ref)) throw new Error('留言連結必須是 http 或 https 開頭的網址，不可空白。');
-  const list = promptSignoff_(ui, '貼上「id 短碼」清單，一列一行，例如 h5 1a2b3c4d：');
+  const list = promptSignoff_(ui, '貼上「id 短碼」清單，一列一行或以分號隔開，例如 h5 1a2b3c4d; h6 5e6f7a8b：');
   if (list == null) return;
   reviewActiveRows_('Approved', '', { label: label, ref: ref, codes: parseSignoffCodes_(list) });
 }
@@ -269,10 +269,10 @@ function requireSignoffColumns_(columns) {
   });
 }
 
-/** 「id 短碼」清單轉成 id → 短碼。同一 id 出現兩次就中止。 */
+/** 「id 短碼」清單轉成 id → 短碼。列以換行或分號（; ；）分隔：對話框可能只有一行。同一 id 出現兩次就中止。 */
 function parseSignoffCodes_(text) {
   const codes = {};
-  normalizeApprovalText_(text).split('\n').forEach(function(line, index) {
+  normalizeApprovalText_(text).split(/[\n;；]/).forEach(function(line, index) {
     const parts = normalizeApprovalText_(line).split(/[\s,，]+/).filter(function(part) { return part !== ''; });
     if (parts.length === 0) return;
     if (parts.length !== 2) throw new Error('短碼清單第 ' + (index + 1) + ' 行格式不符，應為「id 短碼」：' + line);
