@@ -1,7 +1,7 @@
 ---
 id: 079
 title: 讓審閱的老師看得到成品：同步錯誤與預覽連結的轉交機制
-status: implement
+status: review
 source: docs/health-check/TODO.md P2-9（「尚未有對應的票」）；2026-09-03-editor-onboarding.md:453
 started: 2026-11-17T19:08:14Z
 completed:
