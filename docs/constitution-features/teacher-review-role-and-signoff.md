@@ -11,6 +11,36 @@ worktree: .worktrees/spacedock-ensign-teacher-review-role-and-signoff
 issue:
 pr:
 mod-block:
+gates:
+    version: 1
+    records:
+        - id: gate:076:verify
+          stage: verify
+          attempts:
+            - id: gate-attempt:076-verify-1
+              briefing:
+                id: briefing:076:verify:attempt-1:revision-1
+                digest: sha256:b50e6f1673a26c49429cd8198a8e68dcd0dfabb45612fb8a55d77c3d5248282d
+                room-ref: '@review/verify/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:076:verify:1
+                briefing: briefing:076:verify:attempt-1:revision-1
+                by: person:captain
+                at: "2026-11-18T00:10:58.124343Z"
+                decision: approve
+                reason: Captain approved 076 verify (cycle 2 PASSED); P1 wording in contributing.md:35 declined for now, to be folded into the post-deployment doc update.
+              application:
+                target-stage: review
+                state: consumed
+        - id: gate:076:review
+          stage: review
+          attempts:
+            - id: gate-attempt:076-review-1
+              briefing:
+                id: briefing:076:review:attempt-1:revision-1
+                digest: sha256:dc4f61c4503df6cc0c4f955a41f591f8b412ec4fcfbdb7ca570e5124991de377
+                room-ref: '@review/review/briefing-1'
 ---
 
 讓法律老師能審閱 T1 內容並留下可查的簽核紀錄，而核可（Approve）仍由責任編輯在試算表 `Review` 選單代按。
