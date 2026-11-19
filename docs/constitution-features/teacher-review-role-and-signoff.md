@@ -45,6 +45,11 @@ gates:
                 by: agent:first-officer
                 at: "2026-11-19T19:31:25.994006Z"
                 reason: 'Stale: attempt-1 was decided revise by the captain on 2026-11-19 (see Feedback Cycles cycle 2); its resolution was lost when the FO overwrote main frontmatter during a report mirror. Implement cycle 3 and re-review completed since; a fresh attempt follows.'
+            - id: gate-attempt:076-review-2
+              briefing:
+                id: briefing:076:review:attempt-2:revision-1
+                digest: sha256:c4d9e62bb6d84b0b5d46011df868e400659bacb62ade5b0aea018efe794a66cf
+                room-ref: '@review/review/briefing-2'
 ---
 
 讓法律老師能審閱 T1 內容並留下可查的簽核紀錄，而核可（Approve）仍由責任編輯在試算表 `Review` 選單代按。

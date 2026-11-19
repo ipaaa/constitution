@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:076:review:attempt-2:revision-1",
+  "question": "076 review cycle 2 建議 PASSED。核准交付（依順序 (a) 先合併並部署 076）？",
+  "artifacts": [
+    {
+      "id": "artifact:076:review:attempt-2:revision-1:item-1",
+      "uri": "git-root://main/b9faca20fb4d36009ddd9f4156df979cf02674b0/docs/constitution-features/teacher-review-role-and-signoff.md",
+      "rev": "sha256:707cee9f045eeedd798afaea7887bedddcdacef4d672d12351d876676798cd74",
+      "mediaType": "text/markdown",
+      "summary": "R1 修正（; ； 分隔＋測試＋第 10 步兩列批次）與部署順序 (a) 已寫入 operations.md；重審確認、全套 162 項 161 過 1 skip、tsc 通過、兩次 mutation 皆轉紅；可交付。新發現 P3 Polish（第 10 步還原會更新兩列核可者與時間）。"
+    }
+  ]
+}
