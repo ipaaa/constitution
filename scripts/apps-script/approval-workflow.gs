@@ -17,12 +17,23 @@ const WRITABLE_REVIEW_FIELDS = REVIEW_FIELDS.filter(function(field) {
   return field !== 'status' && field !== 'current_fingerprint';
 });
 const HEADER_SEPARATORS = ' \t(（[［{｛-–—:：/｜|,，';
+/**
+ * 老師簽核三欄（feature 076）。B 類，只由選單寫入。不參與指紋，也不是公式欄。
+ * 適用分頁與 scripts/teacher-signoff.mjs 的 SIGNOFF_SHEETS 必須相同。第一期只有 T1。
+ */
+const SIGNOFF_FIELDS = ['signoff_by', 'signoff_ref', 'signoff_fingerprint'];
+const SIGNOFF_SHEETS = ['Track 1_history'];
+/** 版本短碼長度。與 scripts/content-fingerprint.mjs 的 SHORT_CODE_LENGTH 相同。 */
+const SIGNOFF_SHORT_CODE_LENGTH = 8;
+/** 指令碼屬性：老師代稱清單，以換行、逗號或頓號分隔。由 captain 設定，不寫進 repo。 */
+const TEACHER_LABELS_PROPERTY = 'TEACHER_SIGNOFF_LABELS';
 
 function onOpen() {
   SpreadsheetApp.getUi().createMenu('Review')
     .addItem('安裝／更新公式', 'installApprovalFormulas')
     .addSeparator()
     .addItem('核可選取列', 'approveActiveRows')
+    .addItem('核可選取列（附老師簽核）', 'approveActiveRowsWithSignoff')
     .addItem('拒絕選取列', 'promptRejectActiveRows')
     .addToUi();
 }
@@ -138,7 +149,8 @@ function APPROVAL_STATUS(currentFingerprint, decision, reviewFingerprint, approv
 function resolveApprovalHeaders_(sheet) {
   const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getDisplayValues()[0];
   const expected = (APPROVAL_FIELDS[sheet.getName()] || ['order', 'label', 'text', 'link']).concat(REVIEW_FIELDS);
-  const optional = OPTIONAL_APPROVAL_FIELDS[sheet.getName()] || [];
+  const optional = (OPTIONAL_APPROVAL_FIELDS[sheet.getName()] || [])
+    .concat(SIGNOFF_SHEETS.indexOf(sheet.getName()) >= 0 ? SIGNOFF_FIELDS : []);
   const result = {};
   headers.forEach(function(raw, index) {
     const normalized = normalizeApprovalText_(raw).toLowerCase().replace(/\s+/g, ' ');
@@ -220,21 +232,95 @@ function fingerprintForSheetRow_(sheet, columns, row) {
 }
 
 function approveActiveRows() { reviewActiveRows_('Approved', ''); }
+
+/**
+ * 責任編輯代老師核可（feature 076 第 3.3 節）。先檢查欄位，再依序問代稱、留言連結、id 短碼清單。
+ * 任一項不符就中止，此時還沒有寫入任何格。短碼比對在鎖定後、對快照執行。
+ */
+function approveActiveRowsWithSignoff() {
+  const sheet = SpreadsheetApp.getActiveSheet();
+  if (SIGNOFF_SHEETS.indexOf(sheet.getName()) < 0) throw new Error('這個分頁不支援老師簽核。適用分頁：' + SIGNOFF_SHEETS.join('、') + '。');
+  requireSignoffColumns_(resolveApprovalHeaders_(sheet));
+  const labels = normalizeApprovalText_(PropertiesService.getScriptProperties().getProperty(TEACHER_LABELS_PROPERTY))
+    .split(/[\n,，、]/).map(normalizeApprovalText_).filter(function(label) { return label !== ''; });
+  if (labels.length === 0) throw new Error('指令碼屬性 ' + TEACHER_LABELS_PROPERTY + ' 尚未設定老師代稱。');
+  const ui = SpreadsheetApp.getUi();
+  const label = promptSignoff_(ui, '輸入老師代稱：');
+  if (label == null) return;
+  if (labels.indexOf(label) < 0) throw new Error('老師代稱「' + label + '」不在清單內。');
+  const ref = promptSignoff_(ui, '貼上老師那則留言的連結：');
+  if (ref == null) return;
+  if (!/^https?:\/\/\S+$/.test(ref)) throw new Error('留言連結必須是 http 或 https 開頭的網址，不可空白。');
+  const list = promptSignoff_(ui, '貼上「id 短碼」清單，一列一行或以分號隔開，例如 h5 1a2b3c4d; h6 5e6f7a8b：');
+  if (list == null) return;
+  reviewActiveRows_('Approved', '', { label: label, ref: ref, codes: parseSignoffCodes_(list) });
+}
+
+/** 回傳輸入文字；按取消時回傳 null。 */
+function promptSignoff_(ui, message) {
+  const response = ui.prompt('核可選取列（附老師簽核）', message, ui.ButtonSet.OK_CANCEL);
+  if (response.getSelectedButton() !== ui.Button.OK) return null;
+  return normalizeApprovalText_(response.getResponseText());
+}
+
+function requireSignoffColumns_(columns) {
+  SIGNOFF_FIELDS.forEach(function(field) {
+    if (columns[field] == null) throw new Error('缺少簽核欄位「' + field + '」。請先依 operations.md 建欄。');
+  });
+}
+
+/** 「id 短碼」清單轉成 id → 短碼。列以換行或分號（; ；）分隔：對話框可能只有一行。同一 id 出現兩次就中止。 */
+function parseSignoffCodes_(text) {
+  const codes = {};
+  normalizeApprovalText_(text).split(/[\n;；]/).forEach(function(line, index) {
+    const parts = normalizeApprovalText_(line).split(/[\s,，]+/).filter(function(part) { return part !== ''; });
+    if (parts.length === 0) return;
+    if (parts.length !== 2) throw new Error('短碼清單第 ' + (index + 1) + ' 行格式不符，應為「id 短碼」：' + line);
+    if (Object.prototype.hasOwnProperty.call(codes, parts[0])) throw new Error('短碼清單中 id「' + parts[0] + '」出現兩次。');
+    codes[parts[0]] = parts[1].toLowerCase();
+  });
+  return codes;
+}
+
+/** 選取的每一列都必須在清單中恰好出現一次，短碼等於該列指紋前 8 字元；清單不可有選取範圍外的 id。 */
+function checkSignoffCodes_(snapshots, codes) {
+  const seen = {};
+  snapshots.forEach(function(item) {
+    if (!Object.prototype.hasOwnProperty.call(codes, item.id)) throw new Error('第 ' + item.row + ' 列（id ' + item.id + '）不在短碼清單中。');
+    const expected = item.fingerprint.slice(0, SIGNOFF_SHORT_CODE_LENGTH);
+    if (codes[item.id] !== expected) {
+      throw new Error('第 ' + item.row + ' 列（id ' + item.id + '）的短碼不符：清單為 ' + codes[item.id] + '，目前版本為 ' + expected + '。');
+    }
+    seen[item.id] = true;
+  });
+  Object.keys(codes).forEach(function(id) {
+    if (!seen[id]) throw new Error('短碼清單中的 id「' + id + '」不在選取範圍內。');
+  });
+}
 function rejectActiveRows(reason) {
   const normalized = normalizeApprovalText_(reason);
   if (normalized === '') throw new Error('拒絕必須填寫退回原因。');
   reviewActiveRows_('Rejected', normalized);
 }
 
-function reviewActiveRows_(decision, reason) {
+/**
+ * signoff 只有「核可選取列（附老師簽核）」會傳入。適用分頁上，不附老師的核可會清空三個簽核欄；
+ * 拒絕不碰簽核欄。快照與復原範圍是 WRITABLE_REVIEW_FIELDS 加上存在的簽核欄。
+ */
+function reviewActiveRows_(decision, reason, signoff) {
   const lock = LockService.getDocumentLock();
   lock.waitLock(30000);
   let sheet;
   let columns;
   let snapshots;
+  let restoreFields = WRITABLE_REVIEW_FIELDS;
   try {
     sheet = SpreadsheetApp.getActiveSheet();
     columns = resolveApprovalHeaders_(sheet);
+    if (signoff) requireSignoffColumns_(columns);
+    const signoffFields = SIGNOFF_SHEETS.indexOf(sheet.getName()) >= 0
+      ? SIGNOFF_FIELDS.filter(function(field) { return columns[field] != null; }) : [];
+    restoreFields = WRITABLE_REVIEW_FIELDS.concat(signoffFields);
     const range = sheet.getActiveRange();
     const rows = Array.from({ length: range.getNumRows() }, function(_, index) { return range.getRow() + index; });
     if (rows.some(function(row) { return row < 2; })) throw new Error('不可核可標題列。');
@@ -245,9 +331,10 @@ function reviewActiveRows_(decision, reason) {
       const fingerprint = normalizeApprovalText_(values[columns.current_fingerprint - 1]);
       if (!/^[a-f0-9]{64}$/.test(fingerprint)) throw new Error('第 ' + row + ' 列沒有可核可的 current_fingerprint。');
       if (fingerprintForSheetRow_(sheet, columns, row) !== fingerprint) throw new Error('第 ' + row + ' 列的指紋公式與發布內容不符。');
-      const old = WRITABLE_REVIEW_FIELDS.map(function(field) { return sheet.getRange(row, columns[field]).getValue(); });
-      return { row: row, fingerprint: fingerprint, old: old };
+      const old = restoreFields.map(function(field) { return sheet.getRange(row, columns[field]).getValue(); });
+      return { row: row, id: normalizeApprovalText_(values[columns.id - 1]), fingerprint: fingerprint, old: old };
     });
+    if (signoff) checkSignoffCodes_(snapshots, signoff.codes);
     const now = new Date().toISOString();
     snapshots.forEach(function(item) {
       sheet.getRange(item.row, columns.review_decision).setValue('');
@@ -257,6 +344,12 @@ function reviewActiveRows_(decision, reason) {
         sheet.getRange(item.row, columns.approved_by).setValue(actor);
         sheet.getRange(item.row, columns.approved_at).setValue(now);
         sheet.getRange(item.row, columns.approved_fingerprint).setValue(item.fingerprint);
+        signoffFields.forEach(function(field) { sheet.getRange(item.row, columns[field]).setValue(''); });
+        if (signoff) {
+          sheet.getRange(item.row, columns.signoff_by).setValue(signoff.label);
+          sheet.getRange(item.row, columns.signoff_ref).setValue(signoff.ref);
+          sheet.getRange(item.row, columns.signoff_fingerprint).setValue(item.fingerprint);
+        }
       }
     });
     SpreadsheetApp.flush();
@@ -273,7 +366,7 @@ function reviewActiveRows_(decision, reason) {
   } catch (error) {
     if (snapshots) {
       snapshots.forEach(function(item) {
-        WRITABLE_REVIEW_FIELDS.forEach(function(field, index) { sheet.getRange(item.row, columns[field]).setValue(item.old[index]); });
+        restoreFields.forEach(function(field, index) { sheet.getRange(item.row, columns[field]).setValue(item.old[index]); });
       });
       SpreadsheetApp.flush();
     }
