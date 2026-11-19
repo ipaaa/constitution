@@ -689,3 +689,16 @@ review 階段的發現（2026-11-17）。四欄證據依序是：(1) 使用者�
 ### Summary
 
 補上 R2 的三個測試案例，三個 mutation 都會讓測試轉紅。程式行為沒有改變。
+
+## Stage Report: review (cycle 2)
+
+- DONE: 重審 cycle 3（小改動快速路徑）：確認 R2 三個案例已加入且各自的 mutation 會轉紅；本輪只改 tests/review-delivery.test.mjs
+  `a205fac` 只改 `tests/review-delivery.test.mjs`，實際是 +8／−3。implement 報告寫 +5／−0，數字不對，內容沒有影響。`runReviewFile` 改成只在圖片網址含 `{BASE}` 時重算 `current_fingerprint`，既有案例行為相同。我在 scratchpad 的 clone（`e6803a0`）重做三個 mutation：(a) 不跳脫 HTML，AC-1 轉紅；(b) 拿掉 `current_fingerprint` 比對，AC-2/3 轉紅；(c) 改成「有壞登錄就中止」，AC-5 轉紅。三次都是 14 過、1 失敗，之後已還原
+- DONE: 確認 scripts、src 無 diff；重跑全套 node --test 與 npx tsc --noEmit；淨行數在約 +790 之內
+  `git diff c949e9f HEAD -- scripts src` 為空，`main...HEAD -- src` 為空。全套 152 項：151 過、0 失敗、1 略過。`tsc` 結束碼 0。行數：本報告之前，分支對 main 是 +813／−17，淨 +796。加上本報告是 +826／−17，淨 +809，超過約 +790。程式、測試與 repo 文件（不含本票）是淨 +642，超出的部分全在本票的各輪報告
+- DONE: 給出 PASSED 或 REJECTED 與是否可交付；合併事項清單（076 測試三處修改、三份文件衝突、P2-9 PR 連結、合併前建分頁與環境變數）確認完整
+  PASSED，可以交付。合併事項依 captain 定案順序：076 先合併並部署；接著建「審閱版本」分頁，設 A–H 純文字與只有 captain 的保護，發布 CSV，設 `REVIEW_BUILDS_CSV_URL`；最後合併 079。合併 079 時要做四件事：(1) `tests/teacher-signoff.test.mjs` 改三處：import `registered`、`fixtures()` 加 `'/review.csv': registered(track1)`、`runSync` 的 env 加 `REVIEW_BUILDS_CSV_URL`；(2) 解 `design.md`、`gatekeeping.md`、`operations.md` 各 1 處衝突；(3) 補 TODO.md P2-9 補述的 PR 連結；(4) 合併後重跑全套，cycle 1 試合併的結果是 175 過、0 失敗、1 略過。清單完整
+
+### Summary
+
+R2 的三個案例已加入。對應的 mutation 各讓一個測試轉紅，程式與 `src/` 都沒有改動，全套測試與型別檢查通過。建議 PASSED，可以交付。行數超出約 +790 約 19 行，超出的部分全是本票的報告。程式與測試在上限內。
