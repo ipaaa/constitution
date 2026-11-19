@@ -45,6 +45,11 @@ gates:
                 by: agent:first-officer
                 at: "2026-11-19T19:31:26.085632Z"
                 reason: 'Stale: attempt-1 was decided revise by the captain on 2026-11-19 (see Feedback Cycles cycle 2); its resolution was lost when the FO overwrote main frontmatter during a report mirror. Implement cycle 3 and re-review completed since; a fresh attempt follows.'
+            - id: gate-attempt:079-review-2
+              briefing:
+                id: briefing:079:review:attempt-2:revision-1
+                digest: sha256:4faa4d5e34e95aa5416ff5bbb2d976e248850c3d390e643be2ed4c8356f6e5f3
+                room-ref: '@review/review/briefing-2'
 ---
 
 老師審閱時，要能看到內容在網站上的實際呈現，不能只看試算表的儲存格。

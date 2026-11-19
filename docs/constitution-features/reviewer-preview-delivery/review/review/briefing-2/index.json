@@ -1,0 +1,15 @@
+{
+  "type": "Briefing",
+  "version": "1",
+  "id": "briefing:079:review:attempt-2:revision-1",
+  "question": "079 review cycle 2 建議 PASSED。核准交付（依順序 (a) 在 076 部署後合併）？行數含報告淨 +809，超出 +790 上限 19 行（全為票內報告）是否接受？",
+  "artifacts": [
+    {
+      "id": "artifact:079:review:attempt-2:revision-1:item-1",
+      "uri": "git-root://main/9281d10524e7546c5256cd6c8759fc32d97c590f/docs/constitution-features/reviewer-preview-delivery.md",
+      "rev": "sha256:64a91da984d0182890333deffc91bfecb586539f8ba981cf1dc24ff6e653c261",
+      "mediaType": "text/markdown",
+      "summary": "R2 三個測試案例已加入，三個 mutation 皆轉紅；本輪只改測試檔；151/152 過 1 略過、tsc 通過；程式、測試與其他文件淨 +642，含票內報告淨 +809。合併清單：076 測試三處修改、三份文件衝突、P2-9 PR 連結、合併前建分頁與環境變數。"
+    }
+  ]
+}
