@@ -642,3 +642,16 @@ review 階段的發現（2026-11-17）。四欄證據依序是：(1) 使用者�
 
 建議 PASSED。AC-1–7 與 AC-9 都已獨立重現，AC-8 是 captain 的人工項，尚未執行。程式接線最小，各項檢查 fail closed，`src/` 沒有改動，短碼函式與 076 逐字相同。三項發現都不阻擋：R1 合併說明少了環境變數與三個文件衝突，由 FO 轉給合併的人；R2 三個 mutation 存活，屬 Deferred risk；R3 屬 Polish。含本報告，分支對 main 為 +794／−17，淨 +777，在約 +783 之內。
 - Cycle 2 (review → implement, 2026-11-19): review 建議 PASSED；captain 選 revise。授權處置：R2 fix（tests/review-delivery.test.mjs 補三個表格案例：(a) content 含 HTML 標記時以純文字跳脫顯示、(b) `current_fingerprint` 比對拿掉時失敗、(c) 同一指紋同時有壞登錄與好登錄時同步通過；重做三個 mutation 證明轉紅）；captain 將行數上限放寬到約 +790。R1 合併事項依 captain 定案順序 (a)：076 先合併並部署 → 建「審閱版本」分頁與 `REVIEW_BUILDS_CSV_URL` → 再合併 079；合併時由本票補 076 兩項真同步測試的 fixture、解三份文件衝突、補 P2-9 PR 連結（本輪先不做）。R3 decline。
+
+## Stage Report: implement (cycle 3)
+
+- DONE: 依授權處置補 R2 三個表格案例（HTML 跳脫、current_fingerprint 比對、壞登錄與好登錄並存通過），程式行為不變，淨行數在約 +790 之內
+  commit `a205fac`，只改 `tests/review-delivery.test.mjs`（+5／−0）。新增三項斷言：AC-1 的 h2 內含 `<b>`，檔內必須是跳脫後的純文字；AC-2/3 的 h5 帶舊的 `current_fingerprint`，必須不進檔案，登錄表寫明原因；AC-5 同一指紋同時有壞登錄與好登錄時，同步必須通過。`scripts/` 與 `src/` 無 diff。分支加上本報告後淨增約 +790
+- DONE: 重跑全套 node --test、npx tsc --noEmit 全過，並重做三個 mutation 證明新案例轉紅
+  全套 152 項：151 過、0 失敗、1 略過（施工前就略過）。`tsc` 結果 0。三個 mutation 都已還原：(a) `escapeHtml` 改成不跳脫，AC-1 以「HTML 標記以純文字顯示」轉紅；(b) 拿掉 `current_fingerprint` 比對，AC-2/3 轉紅；(c) 改成「有任何壞登錄就中止」，AC-5 轉紅
+- DONE: 在本票新增 implement（cycle 3）stage report，逐項對應 R2
+  即本節。依 captain 定案，R1 的合併事項留到 076 合併並部署後處理，本輪不做
+
+### Summary
+
+補上 R2 的三個測試案例，三個 mutation 都會讓測試轉紅。程式行為沒有改變。
