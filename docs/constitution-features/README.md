@@ -61,9 +61,9 @@ Each feature is a markdown file named `{id}-{slug}.md` — lowercase, hyphens, n
 > 3. 執行 `spacedock status --workflow-dir docs/constitution-features --validate`，結果必須是 `VALID`，之後才 commit 與 dispatch。
 >
 > 已經 dispatch 的票（有 worktree、gate 紀錄目錄或分支）不在進行中改名。這類票在封存時改名，並同時移動 `{slug}/review/` 目錄。
-> 2026-11-17 已改名的票：073、074、075、077、078。
+> 2026-11-17 已改名的票：073、074、075、077、078。2026-11-20 封存時改名：076。
 > 尚未改名的票：
-> - 進行中（封存時改名）：072 `gatekeeping-overview-rejudge-064`、076 `teacher-review-role-and-signoff`、079 `reviewer-preview-delivery`。
+> - 進行中（封存時改名）：072 `gatekeeping-overview-rejudge-064`、079 `reviewer-preview-delivery`。
 > - 已封存（程式與測試引用其路徑，改名須由 worker 一併更新引用）：067 `systematic-chinese-content-legal-audit`、068 `threshold-page-voided-quorum-current`。
 
 ## Schema
