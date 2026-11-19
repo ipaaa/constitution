@@ -50,6 +50,17 @@ gates:
                 id: briefing:079:review:attempt-2:revision-1
                 digest: sha256:4faa4d5e34e95aa5416ff5bbb2d976e248850c3d390e643be2ed4c8356f6e5f3
                 room-ref: '@review/review/briefing-2'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:079:review:2
+                briefing: briefing:079:review:attempt-2:revision-1
+                by: person:captain
+                at: "2026-11-19T21:36:14.192152Z"
+                decision: approve
+                reason: Captain approved 079 review (attempt 2, cycle 2 PASSED) and accepted net +809 including ticket reports (code/tests/docs +642). Merge only after 076 is deployed and the 審閱版本 tab plus REVIEW_BUILDS_CSV_URL exist, per order (a).
+              application:
+                target-stage: complete
+                state: pending
 ---
 
 老師審閱時，要能看到內容在網站上的實際呈現，不能只看試算表的儲存格。
