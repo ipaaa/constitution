@@ -50,6 +50,17 @@ gates:
                 id: briefing:076:review:attempt-2:revision-1
                 digest: sha256:c4d9e62bb6d84b0b5d46011df868e400659bacb62ade5b0aea018efe794a66cf
                 room-ref: '@review/review/briefing-2'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:076:review:2
+                briefing: briefing:076:review:attempt-2:revision-1
+                by: person:captain
+                at: "2026-11-19T21:36:13.925382Z"
+                decision: approve
+                reason: Captain approved 076 review (attempt 2, cycle 2 PASSED); P3 declined — record the two test-row ids during deployment step 10. Merge first per order (a).
+              application:
+                target-stage: complete
+                state: pending
 ---
 
 讓法律老師能審閱 T1 內容並留下可查的簽核紀錄，而核可（Approve）仍由責任編輯在試算表 `Review` 選單代按。
