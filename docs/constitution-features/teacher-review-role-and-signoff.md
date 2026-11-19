@@ -566,3 +566,20 @@ captain 於 2026-11-17 採用 079〈現在就要決定〉與本票第七節的 1
 ### Summary
 
 短碼清單現在也接受 `;` 與 `；` 分隔，對話框只有一行時也能一批處理多列。新增 1 項測試，mutation 已確認它會抓到退化。operations.md 寫下 captain 決定的部署順序 (a)，並在第 10 步加一次可還原的兩列實機檢查。其他程式與文件未動。
+
+## Stage Report: review (cycle 2)
+
+- DONE: 重審 cycle 3（小改動快速路徑）：確認 R1 已修（parseSignoffCodes_ 接受 ; 與 ；、新測試存在且 mutation 會轉紅、operations.md 第 10 步兩列批次可還原）與 R2 已寫入 operations.md〈部署順序〉(a)
+  R1 已修（`ba81f9c`）。`approval-workflow.gs:275` 改以 `/[\n;；]/` 切列，提示文字也同步改寫。新測試「短碼清單可寫成一行」用 `; ` 和 `；` 各跑一次兩列批次，斷言兩列的 `signoff_fingerprint`。mutation 結果：改回 `split('\n')`，新測試失敗；拿掉 `；` 只留 `;`，新測試也失敗。`operations.md` 第 10 步加了兩列批次的實機檢查，用暫時代稱 `部署測試`，最後有還原步驟。還原後三個簽核欄清空，留言與代稱移除，`history.json` 不受影響。但這兩列的 `approved_by`、`approved_at` 會變成責任編輯與測試當天，不會回到原值，見 P3。R2 已修。`operations.md`〈老師簽核欄部署〉開頭新增〈部署順序〉，寫明 captain 2026-11-19 的方案 (a)：076 的程式合併並完成第 1–11 步，之後才建 079 分頁、合併 079。也寫了理由。測試格數改為先測 33／21／至少 6，079 部署時補測，合計仍是 34／22／至少 7，與 AC-9 一致。
+- DONE: 確認本輪沒有其他程式改動；重跑全套 node --test 與 npx tsc --noEmit
+  `git diff --stat 21c62b8 HEAD -- scripts src tests` 只有 `.gs`（+3／−3，即上述切列與兩段文字）和測試檔（+11）。全套 node --test 162 項：161 過、0 失敗、1 項 skip（已知的線上重抓）。`npx tsc --noEmit` exit 0。在 scratchpad clone（HEAD `fb382f5`）執行，worktree 未改動。
+- DONE: 給出 PASSED 或 REJECTED 與是否可交付
+  **PASSED，可以交付。** R1、R2 都依授權修正，沒有新的 Material。依方案 (a)，076 先合併，所以 review.csv fixture 由 079 的分支補上。上一輪的 M1（3 份文件衝突）仍由後合併的 079 處理。
+
+### 新發現
+
+- **P3 Polish，建議 decline 或只補一句說明。** 使用者與流程：captain 執行第 10 步的兩列批次檢查。可見損害：「還原」那一步會重新核可，兩列的 `approved_by`、`approved_at` 改成責任編輯帳號與當天，不會回到 2026-09-29 的原紀錄。`approved_fingerprint`、`status`、`history.json` 都不變，第 11 步的比對仍會通過。受影響 AC 或邊界：無。觸發證據：`operations.md` 第 10 步最後一項，以及 `reviewActiveRows_` 核可時一定會寫入 `approved_by`、`approved_at`。修法：在第 10 步註明「這兩列的核可者與時間會更新，屬預期」，或在測試紀錄裡寫下這兩列的 `id`。另外，刪除留言那一步正好可以順便實測 R10。
+
+### Summary
+
+複驗 cycle 3 的兩項修正。R1：短碼清單現在接受 `;`、`；` 分隔，新測試在兩次 mutation 下都會失敗；部署手冊加了兩列批次的實機檢查。R2：部署順序 (a) 已寫進 `operations.md`，格數拆成兩次測，合計不變。本輪的程式改動只有切列那一行與兩段文字。全套測試與 tsc 都通過。建議 PASSED，可以交付。另記一項 Polish：P3，還原步驟會更新兩列的核可者與時間。
