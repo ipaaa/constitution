@@ -44,3 +44,7 @@ next-env.d.ts
 # editor / local notes
 .obsidian/
 docs/meetup-chats/
+
+# content-review: share links are capabilities; the repo is public
+/docs/content-review/links.local.json
+/docs/content-review/INDEX.md

@@ -26,6 +26,7 @@ docs/
   meetup-chats/        會議記錄（本機限定，未進版控）
   _archive/            已過時、保留供追溯的文件
   constitution-features/   spacedock workflow（進行中）
+  content-review/          spacedock workflow：內容審稿 pilot（進行中）
   design-assets/           spacedock workflow（休眠）
 ```
 
@@ -58,6 +59,8 @@ docs/
 | `docs/content-pipeline/operations.md` | 核可、拒絕、重新核可、同步錯誤與復原步驟；兩帳號 probe 由 feature 044 承接；權限與審核責任表；老師簽核欄部署 | evergreen | captain | 2026-11-17 |
 | `docs/content-pipeline/gatekeeping.md` | 內容把關總覽。每個角色的編輯流程、試算表 A／B／C 欄位權限、核可版本綁定、防線與缺口表、上線前檢查。只連正本，票況用指令產生 | evergreen | captain | 2026-11-17 |
 | `docs/content-pipeline/data-collection-guide.md` | T3（未來軌）的資料收集流程。T1／T2 已移除，改指向 `design.md` | evergreen | captain | 2026-09-21 |
+| `docs/content-review/README.md` | 內容審稿 pilot workflow：每列試算表一篇 article，用 Spacedock Review 審稿；專家留言 `approved`、責任編輯最後核可。不取代試算表核可 | plan | captain | 2026-11-20 |
+| `docs/content-review/INDEX.md` | 內容審稿索引，由 `scripts/content-review/build-index.mjs` 產生，同步發布於 Review | evergreen | captain | 2026-11-20 |
 | `docs/content-pipeline/approval-permission-probe.md` | 隔離測試表兩帳號 probe 記錄。核可欄位權限邊界與 `status` 公式重算的實測證據 | record | — | 2026-09-15 |
 
 ### 體檢與待辦
