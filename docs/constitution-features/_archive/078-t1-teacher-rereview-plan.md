@@ -1,16 +1,17 @@
 ---
 id: 078
 title: T1 既有 40 列的老師重審計畫（含 h2、h28 優先處理）
-status: design
+status: complete
 source: 050 S8（captain 2026-09-29 切換時批次核可 40 列）；067 閱讀清單；069 第 4 項；TODO.md P0-2、P0-6、P0-7
 started:
-completed:
-verdict:
+completed: 2026-11-25T23:14:24Z
+verdict: REJECTED
 score: 0.85
 worktree:
 issue:
 pr:
 mod-block:
+archived: 2026-11-25T23:14:24Z
 ---
 
 把 T1 從「切換時為保持網站不變而批次核可」推進到「每一列都有老師簽核」。
