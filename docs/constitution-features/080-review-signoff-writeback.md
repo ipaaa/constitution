@@ -103,6 +103,7 @@ T1、T2 內容改在 Spacedock Review 審稿（workflow `docs/content-review/`�
 - **對選單的影響：** `approval-workflow.gs` 的 `resolveApprovalHeaders_` 要求欄位名後面接分隔符。「3」不是分隔符，所以找不到 `signoff_by`。`核可選取列（附老師簽核）` 會停在 `缺少簽核欄位「signoff_by」`。
 - **文件與事實不符：** `docs/content-pipeline/operations.md`〈錯誤與復原〉寫「`T1 的簽核欄不齊…`（同步）：…或標題打錯。…這一行不讓同步中止」。實際上標題打錯時，同步在更早的標題解析就中止，走不到那一行。列入〈文件影響〉實作後更新。
 - **修法：** captain 把 S1 格改成 `signoff_by（簽核老師）`。只改標題，不影響任何列的指紋。本設計把「標題解析失敗」列為拒絕寫入（第 3.6 節 X8）。
+- **前提 P-0：** S1 標題修正是本票實作驗證與部署的前提。修正後，以匯出的 `buildTrack1` 在記憶體解析 T1 發布版，必須 0 錯誤，才可在正式表執行 `dryRun`（AC-9）或任何寫入。first officer 已轉告 captain 修正；本票不動試算表。
 
 ### 三、選定方案
 
