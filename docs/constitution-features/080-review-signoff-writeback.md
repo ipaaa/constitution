@@ -2,7 +2,7 @@
 title: Review 核可寫回試算表（取代試算表審核選單）
 status: design
 source: captain 2026-11-25（content-review 審稿流程討論）
-started:
+started: 2026-11-25T23:01:11Z
 completed:
 verdict:
 score:
