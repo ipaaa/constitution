@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Build docs/content-review/INDEX.md from each article's index.md and src/data/history.json.
+// Build docs/content-review/INDEX.md from each article's index.md and the SSOT sheet (Track 1_history).
 // Usage: node scripts/content-review/build-index.mjs
 // Layout: 🟦 使用說明 (quote) + 🟥 審閱清單, grouped by decade like the site's /past page.
 import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
@@ -7,7 +7,8 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const dir = fileURLToPath(new URL('../../docs/content-review/', import.meta.url));
-const rows = JSON.parse(readFileSync(new URL('../../src/data/history.json', import.meta.url), 'utf8'));
+import { loadTrack1 } from './sheet.mjs';
+const rows = await loadTrack1();
 const byId = new Map(rows.map((r) => [r.id, r]));
 // Share links live in links.local.json (not in git: the repo is public). INDEX.md is git-ignored too.
 const linksFile = join(dir, 'links.local.json');
@@ -43,7 +44,7 @@ const short = (v, n = 16) => {
 const decision = { approve: '已核可', revise: '退回修改', hold: '暫緩', '': '—' };
 
 const articles = readdirSync(dir, { withFileTypes: true })
-  .filter((d) => d.isDirectory() && !d.name.startsWith('_') && existsSync(join(dir, d.name, 'index.md')))
+  .filter((d) => d.isDirectory() && byId.has(d.name) && existsSync(join(dir, d.name, 'index.md'))) // T1 rows only
   .map((d) => {
     const text = readFileSync(join(dir, d.name, 'index.md'), 'utf8');
     const meta = fm(text);
