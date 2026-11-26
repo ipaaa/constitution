@@ -2,8 +2,8 @@
 id:
 title: "h15｜釋字第445號：遊行想主張什麼國家管不著！"
 status: review
-source: src/data/history.json (sync 2026-09-02)
-started: 2026-11-25T20:13:14Z
+source: SSOT_收集區 Track 1_history 第 12 列（2026-11-25 讀取）
+started: 2026-11-25T22:45:51Z
 completed:
 verdict:
 score:
@@ -11,29 +11,29 @@ worktree:
 issue:
 pr:
 sheet: Track 1_history
-review-briefing: briefing:799b5c2871b4d342fe0dda867c23c33f
+review-briefing: briefing:afb73c581f5f29ee6b3eb9e53e6a6822
 review-version: 1
-review-rev: sha256:3f09d788576b83072edf1c08c25d4449e898536f6fb6b3a266a271211d9ffe75
-review-expiry: 2026-12-02T20:13:11.017Z
+review-rev: sha256:c3bb7634f3f8b54ff3847a928ae2207cfeaba765d72b882d52ec043355fdfdc3
+review-expiry: 2026-12-02T22:45:48.427Z
 owner-decision:
 owner-decided-at:
 ---
 
-試算表 `Track 1_history` 列 `h15`（集會自由，1998）。審閱頁：`h15/h15.md`。分享連結見 `links.local.json`（不進 git）。
+試算表 `Track 1_history` 列 `h15`（集會自由，1998；試算表狀態 `Approved`）。審閱頁：`h15/h15.md`。分享連結見 `links.local.json`（不進 git）。
 
 ## Acceptance criteria
 
 **AC-1 — owner 已核可目前版本的審閱頁。**
-Verified by: `subspace-relay-client decision <review-url> --briefing briefing:799b5c2871b4d342fe0dda867c23c33f` 回傳 `decision: approve`，且 `result.artifact.rev` 等於 `review-rev`。審閱頁內容改動即令 rev 不符而失敗。
+Verified by: `subspace-relay-client decision <review-url> --briefing briefing:afb73c581f5f29ee6b3eb9e53e6a6822` 回傳 `decision: approve`，且 `result.artifact.rev` 等於 `review-rev`。審閱頁內容改動即令 rev 不符而失敗。
 
 **AC-2 — 每一節都有已登入帳號的 `approved`。**
 Verified by: `subspace-relay-client feedback <review-url>` 中，每個 `##` 節標題都有至少一則已登入帳號留下的 `approved` 留言。沒登入的留言不算。少一節即失敗。
 
 ## Review record
 
-### 版本 1（briefing:799b5c2871b4d342fe0dda867c23c33f）
+### 版本 1（briefing:afb73c581f5f29ee6b3eb9e53e6a6822）
 
-- 2026-11-25T20:13:14Z — 發布審閱頁 `h15/h15.md`。等待專家留言與 owner 決定。
+- 2026-11-25T22:45:51Z — 發布審閱頁 `h15/h15.md`（內容直接讀自試算表）。等待專家留言與 owner 決定。
 
 ### 各節專家簽核（版本 1）
 

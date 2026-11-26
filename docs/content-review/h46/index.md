@@ -2,8 +2,8 @@
 id:
 title: "h46｜114年憲判字第1號：法院是法治國家的最後防線，不容癱瘓！"
 status: review
-source: src/data/history.json (sync 2026-09-02)
-started: 2026-11-25T20:15:54Z
+source: SSOT_收集區 Track 1_history 第 43 列（2026-11-25 讀取）
+started: 2026-11-26T00:11:29Z
 completed:
 verdict:
 score:
@@ -11,29 +11,29 @@ worktree:
 issue:
 pr:
 sheet: Track 1_history
-review-briefing: briefing:2c4e26820ad505319b979ba23258a526
+review-briefing: briefing:fbfbdc7658e163837948092ef374bb03
 review-version: 1
-review-rev: sha256:631bc9854e1432f33c5f838f0f868a988baf7b965c76a156809b0f94d217f35f
-review-expiry: 2026-12-02T20:15:50.453Z
+review-rev: sha256:26cc431f43d52c5f997a4030b9b11967597b80b7a3f37d5369a175c2015a95bf
+review-expiry: 2026-12-03T00:11:25.882Z
 owner-decision:
 owner-decided-at:
 ---
 
-試算表 `Track 1_history` 列 `h46`（權力分立，2025）。審閱頁：`h46/h46.md`。分享連結見 `links.local.json`（不進 git）。
+試算表 `Track 1_history` 列 `h46`（權力分立，2025；試算表狀態 `Approved`）。審閱頁：`h46/h46.md`。分享連結見 `links.local.json`（不進 git）。
 
 ## Acceptance criteria
 
 **AC-1 — owner 已核可目前版本的審閱頁。**
-Verified by: `subspace-relay-client decision <review-url> --briefing briefing:2c4e26820ad505319b979ba23258a526` 回傳 `decision: approve`，且 `result.artifact.rev` 等於 `review-rev`。審閱頁內容改動即令 rev 不符而失敗。
+Verified by: `subspace-relay-client decision <review-url> --briefing briefing:fbfbdc7658e163837948092ef374bb03` 回傳 `decision: approve`，且 `result.artifact.rev` 等於 `review-rev`。審閱頁內容改動即令 rev 不符而失敗。
 
 **AC-2 — 每一節都有已登入帳號的 `approved`。**
 Verified by: `subspace-relay-client feedback <review-url>` 中，每個 `##` 節標題都有至少一則已登入帳號留下的 `approved` 留言。沒登入的留言不算。少一節即失敗。
 
 ## Review record
 
-### 版本 1（briefing:2c4e26820ad505319b979ba23258a526）
+### 版本 1（briefing:fbfbdc7658e163837948092ef374bb03）
 
-- 2026-11-25T20:15:54Z — 發布審閱頁 `h46/h46.md`。等待專家留言與 owner 決定。
+- 2026-11-26T00:11:29Z — 發布審閱頁 `h46/h46.md`（內容直接讀自試算表）。等待專家留言與 owner 決定。
 
 ### 各節專家簽核（版本 1）
 

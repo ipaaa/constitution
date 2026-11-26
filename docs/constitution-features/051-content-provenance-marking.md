@@ -10,7 +10,7 @@ score:
 worktree: .worktrees/spacedock-ensign-051-content-provenance-marking
 issue:
 pr:
-mod-block:
+mod-block: merge:pr-merge
 gates:
     version: 1
     records:
@@ -54,6 +54,17 @@ gates:
                 id: briefing:051:review:attempt-1:revision-1
                 digest: sha256:4bc6895166e5db8752cc6851a696606c4b20448d0f7d0f4609e311326589a971
                 room-ref: '@review/review/briefing-1'
+              resolution:
+                type: Resolution
+                id: resolution:spacedock:051:review:1
+                briefing: briefing:051:review:attempt-1:revision-1
+                by: person:captain
+                at: "2026-11-25T23:31:15.823776Z"
+                decision: approve
+                reason: Captain approved in chat 2026-11-25 after FO summary (accepts direction; 051 record format to be coordinated with 080)
+              application:
+                target-stage: complete
+                state: pending
 review-round:
     id: round:051:verify:1
     stage: verify
